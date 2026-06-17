@@ -1,21 +1,4 @@
-// 便利店菜單資料庫 - 7-11 & 全家 (完整真實菜單)
-// 包含478個爬取產品中精選的最佳餐點
-
-export interface ConvenienceItem {
-  id: string
-  name: string
-  store: '7-11' | '全家'
-  category: 'breakfast' | 'lunch' | 'dinner'
-  calories: number
-  protein_g: number
-  carbs_g: number
-  fat_g: number
-  price: number
-  photo_url: string
-  description: string
-}
-
-export const convenienceStoreMenu: ConvenienceItem[] = [
+[
   {
     "id": "7-11-lunch-1",
     "name": "泰式酸辣雞腿冷麵",
@@ -641,11 +624,3 @@ export const convenienceStoreMenu: ConvenienceItem[] = [
     "description": "港式醬燜牛肉燴飯：31g 蛋白質，488 kcal"
   }
 ]
-
-export function getConvenienceItems(category: 'breakfast' | 'lunch' | 'dinner'): ConvenienceItem[] {
-  return convenienceStoreMenu.filter(item => item.category === category)
-}
-
-export function getConvenienceItemsByStore(store: '7-11' | '全家', category: 'breakfast' | 'lunch' | 'dinner'): ConvenienceItem[] {
-  return convenienceStoreMenu.filter(item => item.store === store && item.category === category)
-}
