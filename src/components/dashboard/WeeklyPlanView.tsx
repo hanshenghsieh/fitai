@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { format, addDays } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { CheckCircle2, Circle, ChevronDown, ChevronUp, ShoppingCart, MessageSquare } from 'lucide-react'
+import { getConvenienceItems } from '@/lib/convenience-store-menu'
 import type { WeeklyPlanData, WeeklyFeedback } from '@/types'
 import WeeklyFeedbackForm from './WeeklyFeedbackForm'
 
@@ -19,6 +20,7 @@ const DAY_NAMES = ['一', '二', '三', '四', '五', '六', '日']
 
 export default function WeeklyPlanView({ planData, weekStart, todayDayIndex, checkinMap, existingFeedback }: Props) {
   const [selectedDay, setSelectedDay] = useState(Math.min(todayDayIndex, planData?.days?.length - 1 ?? 0))
+  const [mealType, setMealType] = useState<'cook' | 'eat-out' | 'mixed'>('cook')
   const [showGrocery, setShowGrocery] = useState(false)
   const [showFeedback, setShowFeedback] = useState(false)
 
@@ -94,15 +96,44 @@ export default function WeeklyPlanView({ planData, weekStart, todayDayIndex, che
       {/* Selected day detail */}
       {todayPlan && (
         <div className="space-y-3">
+          {/* Meal type selector */}
+          <div className="bg-white rounded-xl shadow-sm p-3">
+            <p className="text-xs font-medium text-gray-500 mb-2">今天吃法</p>
+            <div className="flex gap-2">
+              {[
+                { val: 'cook', label: '🍳 自己煮' },
+                { val: 'eat-out', label: '🍱 外食' },
+                { val: 'mixed', label: '🔄 混合' },
+              ].map(({ val, label }) => (
+                <button
+                  key={val}
+                  onClick={() => setMealType(val as any)}
+                  className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${
+                    mealType === val
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-50 bg-orange-50">
               <h3 className="font-bold text-gray-800">🥗 飲食計畫</h3>
               <p className="text-xs text-gray-500 mt-0.5">
-                總熱量 {todayPlan.meals.reduce((s, m) => s + m.total_calories, 0)} kcal ·
-                蛋白質 {todayPlan.daily_targets.protein_g.toFixed(0)}g
+                {mealType === 'cook' ? (
+                  <>總熱量 {todayPlan.meals.reduce((s, m) => s + m.total_calories, 0)} kcal ·
+                  蛋白質 {todayPlan.daily_targets.protein_g.toFixed(0)}g</>
+                ) : (
+                  <>便利店菜單選項</>
+                )}
               </p>
             </div>
-            {todayPlan.meals.map(meal => (
+            {mealType === 'cook' ? (
+              todayPlan.meals.map(meal => (
               <div key={meal.type} className="px-4 py-3 border-b border-gray-50 last:border-0">
                 <div className="flex justify-between items-center mb-1">
                   <p className="font-medium text-sm text-gray-700">{meal.type_zh}</p>
@@ -131,7 +162,39 @@ export default function WeeklyPlanView({ planData, weekStart, todayDayIndex, che
                   );
                 })}
               </div>
-            ))}
+              ))
+            ) : (
+              // 外食菜單
+              ['breakfast', 'lunch', 'dinner'].map((mealType) => {
+                const convItems = getConvenienceItems(mealType as any)
+                const item = convItems[(selectedDay + (mealType === 'lunch' ? 1 : mealType === 'dinner' ? 2 : 0)) % convItems.length]
+                const mealLabel = mealType === 'breakfast' ? '早餐' : mealType === 'lunch' ? '午餐' : '晚餐'
+                return (
+                  <div key={mealType} className="px-4 py-3 border-b border-gray-50 last:border-0">
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="font-medium text-sm text-gray-700">{mealLabel}</p>
+                      <p className="text-xs text-gray-400">{item.calories} kcal</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="w-16 h-16 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden">
+                        <img src={item.photo_url} alt={item.name} className="w-full h-full object-cover" onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none'
+                        }} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-700">{item.name}</p>
+                        <p className="text-xs text-gray-500">{item.store} · {item.description}</p>
+                        <div className="flex gap-2 mt-2 text-xs">
+                          <span className="text-gray-600">熱量 {item.calories} kcal</span>
+                          <span className="text-emerald-600">蛋{item.protein_g}g</span>
+                          <span className="text-gray-600">${item.price}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })
+            )}
           </div>
 
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
