@@ -32,31 +32,31 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
 
   // Generate diet items when mealType changes
   useEffect(() => {
+    const completedMap = new Map(dietItems.map(i => [i.meal_id, i.completed]))
     const newDietItems: DietCheckinItem[] = []
 
     if (mealType === 'cook') {
       todayPlan.meals.forEach(meal => {
-        const existing = dietItems.find(i => i.meal_id === meal.type)
         newDietItems.push({
           meal_id: meal.type,
           meal_type: meal.type,
-          completed: existing?.completed ?? false,
+          completed: completedMap.get(meal.type) ?? false,
         })
       })
     } else if (mealType === 'eat-out') {
       const mealTypes = ['breakfast', 'lunch', 'dinner'] as const
-      mealTypes.forEach(mealType => {
-        const items = getConvenienceItems(mealType)
-        const existing = dietItems.find(i => i.meal_id === mealType)
-        const selected = existing?.convenience_item_id
-          ? items.find(i => i.id === existing.convenience_item_id)
+      mealTypes.forEach(mt => {
+        const items = getConvenienceItems(mt)
+        const existingItem = dietItems.find(i => i.meal_id === mt && i.convenience_item_id)
+        const selected = existingItem?.convenience_item_id
+          ? items.find(i => i.id === existingItem.convenience_item_id)
           : items[0]
 
         if (selected) {
           newDietItems.push({
-            meal_id: mealType,
-            meal_type: mealType,
-            completed: existing?.completed ?? false,
+            meal_id: mt,
+            meal_type: mt,
+            completed: completedMap.get(mt) ?? false,
             convenience_item_id: selected.id,
             convenience_item: selected,
           })
@@ -64,17 +64,16 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
       })
     } else if (mealType === 'mixed') {
       todayPlan.meals.forEach(meal => {
-        const existing = dietItems.find(i => i.meal_id === meal.type)
         newDietItems.push({
           meal_id: meal.type,
           meal_type: meal.type,
-          completed: existing?.completed ?? false,
+          completed: completedMap.get(meal.type) ?? false,
         })
       })
     }
 
     setDietItems(newDietItems)
-  }, [mealType])
+  }, [mealType, todayPlan])
 
   const dietCompleted = dietItems.filter(i => i.completed).length
   const workoutCompleted = workoutItems.filter(i => i.completed).length
