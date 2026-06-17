@@ -150,6 +150,8 @@ export interface DietCheckinItem {
   meal_id: string
   meal_type: string
   completed: boolean
+  convenience_item_id?: string
+  convenience_item?: any
 }
 
 export interface WorkoutCheckinItem {

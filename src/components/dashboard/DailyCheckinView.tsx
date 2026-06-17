@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useOptimistic, useTransition } from 'react'
+import { useState, useOptimistic, useTransition, useEffect } from 'react'
 import { toast } from 'sonner'
 import { CheckCircle2, Circle, Play, ChevronDown, ChevronUp, Droplets, Flame, Dumbbell, Store } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
-import { getConvenienceItems } from '@/lib/convenience-store-menu'
+import { getConvenienceItems, type ConvenienceItem } from '@/lib/convenience-store-menu'
 import type { DayPlan, DailyCheckin, DietCheckinItem, WorkoutCheckinItem } from '@/types'
 
 interface Props {
@@ -29,6 +29,52 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
   const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
   const [expandedMeal, setExpandedMeal] = useState<string | null>(null)
   const [expandedEx, setExpandedEx] = useState<string | null>(null)
+
+  // Generate diet items when mealType changes
+  useEffect(() => {
+    const newDietItems: DietCheckinItem[] = []
+
+    if (mealType === 'cook') {
+      todayPlan.meals.forEach(meal => {
+        const existing = dietItems.find(i => i.meal_id === meal.type)
+        newDietItems.push({
+          meal_id: meal.type,
+          meal_type: meal.type,
+          completed: existing?.completed ?? false,
+        })
+      })
+    } else if (mealType === 'eat-out') {
+      const mealTypes = ['breakfast', 'lunch', 'dinner'] as const
+      mealTypes.forEach(mealType => {
+        const items = getConvenienceItems(mealType)
+        const existing = dietItems.find(i => i.meal_id === mealType)
+        const selected = existing?.convenience_item_id
+          ? items.find(i => i.id === existing.convenience_item_id)
+          : items[0]
+
+        if (selected) {
+          newDietItems.push({
+            meal_id: mealType,
+            meal_type: mealType,
+            completed: existing?.completed ?? false,
+            convenience_item_id: selected.id,
+            convenience_item: selected,
+          })
+        }
+      })
+    } else if (mealType === 'mixed') {
+      todayPlan.meals.forEach(meal => {
+        const existing = dietItems.find(i => i.meal_id === meal.type)
+        newDietItems.push({
+          meal_id: meal.type,
+          meal_type: meal.type,
+          completed: existing?.completed ?? false,
+        })
+      })
+    }
+
+    setDietItems(newDietItems)
+  }, [mealType])
 
   const dietCompleted = dietItems.filter(i => i.completed).length
   const workoutCompleted = workoutItems.filter(i => i.completed).length
@@ -90,7 +136,40 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
     saveCheckin({ water_ml: newVal })
   }
 
-  const totalCalories = todayPlan.meals.reduce((sum, m) => sum + m.total_calories, 0)
+  function getTotalCalories(): number {
+    if (mealType === 'cook') {
+      return todayPlan.meals.reduce((sum, m) => sum + m.total_calories, 0)
+    } else {
+      return dietItems.reduce((sum, item) => {
+        if (item.convenience_item) {
+          return sum + item.convenience_item.calories
+        }
+        const meal = todayPlan.meals.find(m => m.type === item.meal_id)
+        return sum + (meal?.total_calories ?? 0)
+      }, 0)
+    }
+  }
+
+  function getMealItem(mealId: string) {
+    const item = dietItems.find(i => i.meal_id === mealId)
+    if (mealType === 'cook') {
+      return todayPlan.meals.find(m => m.type === mealId)
+    }
+    return item
+  }
+
+  function handleChangeConvenienceItem(mealId: string, itemId: string) {
+    const updated = dietItems.map(i => {
+      if (i.meal_id === mealId) {
+        const items = getConvenienceItems(mealId as any)
+        const selected = items.find(x => x.id === itemId)
+        return { ...i, convenience_item_id: itemId, convenience_item: selected }
+      }
+      return i
+    })
+    setDietItems(updated)
+    saveCheckin({ diet_items: updated })
+  }
 
   return (
     <div className="px-4 pb-4 space-y-4 mt-4">
@@ -142,7 +221,7 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
         <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
           <div>
             <h2 className="font-bold text-gray-800">🥗 今日飲食</h2>
-            <p className="text-xs text-gray-400 mt-0.5">{dietCompleted}/{dietItems.length} 餐完成 · 共 {totalCalories} kcal</p>
+            <p className="text-xs text-gray-400 mt-0.5">{dietCompleted}/{dietItems.length} 餐完成 · 共 {getTotalCalories()} kcal</p>
           </div>
           <div className="text-right">
             <p className="text-sm font-bold text-emerald-600">{dietItems.length > 0 ? Math.round((dietCompleted / dietItems.length) * 100) : 0}%</p>
@@ -151,68 +230,160 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
         <Progress value={dietItems.length > 0 ? (dietCompleted / dietItems.length) * 100 : 0} className="h-1 rounded-none" />
 
         <div className="divide-y divide-gray-50">
-          {todayPlan.meals.map(meal => {
-            const item = dietItems.find(i => i.meal_id === meal.type)
-            const expanded = expandedMeal === meal.type
-            return (
-              <div key={meal.type}>
-                <div
-                  className="px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => setExpandedMeal(expanded ? null : meal.type)}
-                >
-                  <button
-                    type="button"
-                    onClick={e => { e.stopPropagation(); toggleDiet(meal.type) }}
-                    className="flex-shrink-0"
+          {dietItems.map(dietItem => {
+            const expanded = expandedMeal === dietItem.meal_id
+            const mealTypeLabel = dietItem.meal_id === 'breakfast' ? '早餐' : dietItem.meal_id === 'lunch' ? '午餐' : '晚餐'
+
+            if (mealType === 'cook') {
+              const meal = todayPlan.meals.find(m => m.type === dietItem.meal_id)
+              if (!meal) return null
+
+              return (
+                <div key={meal.type}>
+                  <div
+                    className="px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setExpandedMeal(expanded ? null : meal.type)}
                   >
-                    {item?.completed
-                      ? <CheckCircle2 className="h-6 w-6 text-emerald-500" />
-                      : <Circle className="h-6 w-6 text-gray-300" />
-                    }
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-800 text-sm">{meal.type_zh}</p>
-                    <p className="text-xs text-gray-400 truncate">
-                      {meal.items.map(i => i.name_zh).join('、')}
-                    </p>
+                    <button
+                      type="button"
+                      onClick={e => { e.stopPropagation(); toggleDiet(meal.type) }}
+                      className="flex-shrink-0"
+                    >
+                      {dietItem.completed
+                        ? <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+                        : <Circle className="h-6 w-6 text-gray-300" />
+                      }
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-800 text-sm">{meal.type_zh}</p>
+                      <p className="text-xs text-gray-400 truncate">
+                        {meal.items.map(i => i.name_zh).join('、')}
+                      </p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-xs font-medium text-gray-600">{meal.total_calories} kcal</p>
+                      {expanded ? <ChevronUp className="h-3 w-3 text-gray-400 ml-auto mt-0.5" /> : <ChevronDown className="h-3 w-3 text-gray-400 ml-auto mt-0.5" />}
+                    </div>
                   </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-xs font-medium text-gray-600">{meal.total_calories} kcal</p>
-                    {expanded ? <ChevronUp className="h-3 w-3 text-gray-400 ml-auto mt-0.5" /> : <ChevronDown className="h-3 w-3 text-gray-400 ml-auto mt-0.5" />}
-                  </div>
-                </div>
-                {expanded && (
-                  <div className="px-4 pb-3 bg-gray-50 space-y-3">
-                    {meal.items.map(item => (
-                      <div key={item.id} className="flex gap-3">
-                        <div className="w-16 h-16 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden">
-                          {(item as any).photo_url ? (
-                            <img src={(item as any).photo_url} alt={item.name_zh} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-2xl">
-                              {item.name_zh === '蛋' ? '🥚' : item.name_zh === '吐司' ? '🍞' : item.name_zh === '雞肉' ? '🍗' : item.name_zh === '白飯' ? '🍚' : item.name_zh === '鮭魚' ? '🐟' : item.name_zh === '地瓜' ? '🍠' : '🍽️'}
+                  {expanded && (
+                    <div className="px-4 pb-3 bg-gray-50 space-y-3">
+                      {meal.items.map(item => (
+                        <div key={item.id} className="flex gap-3">
+                          <div className="w-16 h-16 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden">
+                            {(item as any).photo_url ? (
+                              <img src={(item as any).photo_url} alt={item.name_zh} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-2xl">
+                                {item.name_zh === '蛋' ? '🥚' : item.name_zh === '吐司' ? '🍞' : item.name_zh === '雞肉' ? '🍗' : item.name_zh === '白飯' ? '🍚' : item.name_zh === '鮭魚' ? '🐟' : item.name_zh === '地瓜' ? '🍠' : '🍽️'}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-700">{item.name_zh}</p>
+                            <p className="text-xs text-gray-500">
+                              {(item as any).quantity ? `${(item as any).quantity} · ` : ''}{item.portion} · {item.preparation}
+                            </p>
+                            {(item as any).portionDesc && (
+                              <p className="text-xs text-gray-400 italic">({(item as any).portionDesc})</p>
+                            )}
+                            <div className="flex gap-2 mt-1">
+                              <span className="text-xs text-gray-600">{item.calories} kcal</span>
+                              <span className="text-xs text-emerald-600">蛋{item.protein_g}g</span>
                             </div>
-                          )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            } else if (mealType === 'eat-out' || mealType === 'mixed') {
+              const convItem = dietItem.convenience_item
+              if (!convItem) return null
+
+              const allItems = getConvenienceItems(dietItem.meal_id as any)
+
+              return (
+                <div key={dietItem.meal_id}>
+                  <div
+                    className="px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setExpandedMeal(expanded ? null : dietItem.meal_id)}
+                  >
+                    <button
+                      type="button"
+                      onClick={e => { e.stopPropagation(); toggleDiet(dietItem.meal_id) }}
+                      className="flex-shrink-0"
+                    >
+                      {dietItem.completed
+                        ? <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+                        : <Circle className="h-6 w-6 text-gray-300" />
+                      }
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-800 text-sm">{mealTypeLabel}</p>
+                      <p className="text-xs text-gray-400 truncate flex items-center gap-1">
+                        <Store className="h-3 w-3" />
+                        {convItem.name} ({convItem.store})
+                      </p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-xs font-medium text-gray-600">{convItem.calories} kcal</p>
+                      {expanded ? <ChevronUp className="h-3 w-3 text-gray-400 ml-auto mt-0.5" /> : <ChevronDown className="h-3 w-3 text-gray-400 ml-auto mt-0.5" />}
+                    </div>
+                  </div>
+                  {expanded && (
+                    <div className="px-4 py-3 bg-gray-50 space-y-3">
+                      <div className="flex gap-3">
+                        <div className="w-20 h-20 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden">
+                          <img src={convItem.photo_url} alt={convItem.name} className="w-full h-full object-cover" onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none'
+                          }} />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-700">{item.name_zh}</p>
-                          <p className="text-xs text-gray-500">
-                            {(item as any).quantity ? `${(item as any).quantity} · ` : ''}{item.portion} · {item.preparation}
-                          </p>
-                          {(item as any).portionDesc && (
-                            <p className="text-xs text-gray-400 italic">({(item as any).portionDesc})</p>
-                          )}
-                          <div className="flex gap-2 mt-1">
-                            <span className="text-xs text-gray-600">{item.calories} kcal</span>
-                            <span className="text-xs text-emerald-600">蛋{item.protein_g}g</span>
+                          <p className="text-sm font-bold text-gray-800">{convItem.name}</p>
+                          <p className="text-xs text-gray-500 mb-2">{convItem.store} · {convItem.description}</p>
+                          <div className="flex gap-3 text-xs">
+                            <div>
+                              <span className="text-gray-600">熱量: </span>
+                              <span className="font-bold text-orange-600">{convItem.calories} kcal</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">蛋白: </span>
+                              <span className="font-bold text-emerald-600">{convItem.protein_g}g</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">價格: </span>
+                              <span className="font-bold">${convItem.price}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
+
+                      {/* Item selector for eat-out/mixed mode */}
+                      <div className="mt-4 pt-3 border-t border-gray-200">
+                        <p className="text-xs font-bold text-gray-700 mb-2">選擇{mealTypeLabel}:</p>
+                        <div className="space-y-1 max-h-32 overflow-y-auto">
+                          {allItems.map(option => (
+                            <button
+                              key={option.id}
+                              onClick={() => handleChangeConvenienceItem(dietItem.meal_id, option.id)}
+                              className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors ${
+                                convItem.id === option.id
+                                  ? 'bg-emerald-100 text-emerald-800 font-bold'
+                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              }`}
+                            >
+                              <div className="font-medium">{option.name}</div>
+                              <div className="text-gray-600">{option.calories} kcal · ${option.price}</div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            }
           })}
         </div>
       </div>
