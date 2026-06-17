@@ -31,6 +31,22 @@ export async function requestNotificationPermission(userId: string) {
   if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return null
 
   try {
+    // 先請求瀏覽器權限
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') {
+      console.warn('Notification permission denied:', permission)
+      return null
+    }
+
+    // 註冊 Service Worker
+    if ('serviceWorker' in navigator) {
+      try {
+        await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      } catch (err) {
+        console.warn('Service Worker registration failed:', err)
+      }
+    }
+
     const app = initializeFirebase()
     if (!app) return null
 
