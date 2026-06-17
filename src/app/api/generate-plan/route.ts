@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { format, startOfWeek } from 'date-fns'
 import {
   calculateTDEE,
   calculateNutritionTargets,
@@ -94,8 +95,32 @@ export async function POST(req: NextRequest) {
       coach_note: generateCoachNote(profile, goal, nutrition),
     }
 
-    console.log('✅ Plan generated successfully')
-    return NextResponse.json(planData)
+    // 保存到數據庫
+    const weekStartStr = format(weekStart, 'yyyy-MM-dd')
+    const { error: upsertError } = await supabase
+      .from('weekly_plans')
+      .upsert(
+        {
+          user_id: user.id,
+          week_start: weekStartStr,
+          week_number: 1,
+          plan_data: planData,
+          coach_note: planData.coach_note,
+          generation_status: 'completed',
+        },
+        { onConflict: 'user_id,week_start' }
+      )
+
+    if (upsertError) {
+      console.error('Error saving plan:', upsertError)
+      return NextResponse.json(
+        { error: 'Failed to save plan to database' },
+        { status: 500 }
+      )
+    }
+
+    console.log(`✅ Plan saved for user ${user.id}, week ${weekStart}`)
+    return NextResponse.json({ success: true, data: planData })
   } catch (err) {
     console.error('Error generating plan:', err)
     return NextResponse.json(
