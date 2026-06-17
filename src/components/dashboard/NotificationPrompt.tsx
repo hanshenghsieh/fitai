@@ -10,22 +10,32 @@ export default function NotificationPrompt() {
   const [isSupported, setIsSupported] = useState(false)
   const [isEnabled, setIsEnabled] = useState(false)
   const [isDismissed, setIsDismissed] = useState(false)
+  const [showPrompt, setShowPrompt] = useState(false)
 
   useEffect(() => {
     const checkSupport = async () => {
       const supported = typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator
       setIsSupported(supported)
 
-      if (supported && Notification.permission === 'granted') {
-        setIsEnabled(true)
-        listenForPushMessages()
+      if (supported) {
+        // Check localStorage for dismissed status (today only)
+        const today = new Date().toISOString().split('T')[0]
+        const savedDate = localStorage.getItem('notif_dismissed_date')
+        const wasDismissedToday = savedDate === today
+
+        if (Notification.permission === 'granted') {
+          setIsEnabled(true)
+          listenForPushMessages()
+        } else if (!wasDismissedToday) {
+          setShowPrompt(true)
+        }
       }
     }
 
     checkSupport()
   }, [])
 
-  if (!isSupported || isEnabled || isDismissed) return null
+  if (!isSupported || isEnabled || isDismissed || !showPrompt) return null
 
   async function handleEnableNotifications() {
     try {
@@ -66,7 +76,11 @@ export default function NotificationPrompt() {
         啟用
       </button>
       <button
-        onClick={() => setIsDismissed(true)}
+        onClick={() => {
+          const today = new Date().toISOString().split('T')[0]
+          localStorage.setItem('notif_dismissed_date', today)
+          setIsDismissed(true)
+        }}
         className="text-blue-100 hover:text-white flex-shrink-0"
       >
         <X className="h-4 w-4" />
