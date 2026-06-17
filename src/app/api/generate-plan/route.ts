@@ -39,46 +39,46 @@ function generateDefaultPlan(profile: any, goal: any, hasKneeInjury: boolean, ha
   // 3 套早午晚菜單輪換
   const breakfastOptions = [
     [
-      { id: '1', name: 'Eggs', name_zh: '雞蛋', calories: 160, protein_g: 14, carbs_g: 2, fat_g: 12, portion: '2個', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', quantity: '2個', portionDesc: '約麻將牌大小' },
-      { id: '2', name: 'Toast', name_zh: '吐司', calories: 120, protein_g: 5, carbs_g: 20, fat_g: 2, portion: '2片', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1599599810694-b5ac4dd0alec?w=200&h=200&fit=crop', quantity: '2片', portionDesc: '標準切片吐司' },
+      { id: '1', name: 'Eggs', name_zh: '雞蛋', calories: 160, protein_g: 14, carbs_g: 2, fat_g: 12, portion: '2個', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '約麻將牌大小' },
+      { id: '2', name: 'Toast', name_zh: '吐司', calories: 120, protein_g: 5, carbs_g: 20, fat_g: 2, portion: '2片', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1599599810694-b5ac4dd0alec?w=200&h=200&fit=crop', portionDesc: '標準切片吐司' },
     ],
     [
-      { id: 'b1a', name: 'Oatmeal', name_zh: '燕麥', calories: 150, protein_g: 5, carbs_g: 27, fat_g: 3, portion: '50g', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', quantity: '半碗', portionDesc: '即食燕麥片' },
-      { id: 'b1b', name: 'Banana', name_zh: '香蕉', calories: 105, protein_g: 1, carbs_g: 27, fat_g: 0, portion: '1根', preparation: '生', photo_url: 'https://images.unsplash.com/photo-1587859211519-2d0a825f2f43?w=200&h=200&fit=crop', quantity: '1根', portionDesc: '中等大小' },
+      { id: 'b1a', name: 'Oatmeal', name_zh: '燕麥', calories: 150, protein_g: 5, carbs_g: 27, fat_g: 3, portion: '50g', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '即食燕麥片' },
+      { id: 'b1b', name: 'Banana', name_zh: '香蕉', calories: 105, protein_g: 1, carbs_g: 27, fat_g: 0, portion: '1根', preparation: '生', photo_url: 'https://images.unsplash.com/photo-1587859211519-2d0a825f2f43?w=200&h=200&fit=crop', portionDesc: '中等大小' },
     ],
     [
-      { id: 'b2a', name: 'Yogurt', name_zh: '優格', calories: 100, protein_g: 10, carbs_g: 8, fat_g: 3, portion: '100g', preparation: '-', photo_url: 'https://images.unsplash.com/photo-1488477181946-6428a0291840?w=200&h=200&fit=crop', quantity: '1杯', portionDesc: '原味優格' },
-      { id: 'b2b', name: 'Granola', name_zh: '麥片', calories: 120, protein_g: 3, carbs_g: 20, fat_g: 4, portion: '30g', preparation: '-', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', quantity: '1份', portionDesc: '堅果麥片' },
+      { id: 'b2a', name: 'Yogurt', name_zh: '優格', calories: 100, protein_g: 10, carbs_g: 8, fat_g: 3, portion: '100g', preparation: '-', photo_url: 'https://images.unsplash.com/photo-1488477181946-6428a0291840?w=200&h=200&fit=crop', portionDesc: '原味優格' },
+      { id: 'b2b', name: 'Granola', name_zh: '麥片', calories: 120, protein_g: 3, carbs_g: 20, fat_g: 4, portion: '30g', preparation: '-', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '堅果麥片' },
     ],
   ]
 
   const lunchOptions = [
     [
-      { id: 'l1', name: 'Chicken', name_zh: '雞胸肉', calories: 320, protein_g: 55, carbs_g: 0, fat_g: 8, portion: '160g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop', quantity: '1塊', portionDesc: '約一個手掌大小' },
-      { id: 'l2', name: 'Rice', name_zh: '白飯', calories: 220, protein_g: 5, carbs_g: 50, fat_g: 1, portion: '1碗', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', quantity: '1碗', portionDesc: '標準飯碗8分滿' },
+      { id: 'l1', name: 'Chicken', name_zh: '雞胸肉', calories: 320, protein_g: 55, carbs_g: 0, fat_g: 8, portion: '160g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop', portionDesc: '約一個手掌大小' },
+      { id: 'l2', name: 'Rice', name_zh: '白飯', calories: 220, protein_g: 5, carbs_g: 50, fat_g: 1, portion: '1碗', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '標準飯碗8分滿' },
     ],
     [
-      { id: 'l1b', name: 'Beef', name_zh: '牛肉', calories: 350, protein_g: 52, carbs_g: 0, fat_g: 15, portion: '150g', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', quantity: '1份', portionDesc: '里肌肉片' },
-      { id: 'l2b', name: 'Sweet Potato', name_zh: '番薯飯', calories: 200, protein_g: 4, carbs_g: 45, fat_g: 1, portion: '150g', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1596535542636-922503f663d7?w=200&h=200&fit=crop', quantity: '1碗', portionDesc: '黃色番薯' },
+      { id: 'l1b', name: 'Beef', name_zh: '牛肉', calories: 350, protein_g: 52, carbs_g: 0, fat_g: 15, portion: '150g', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', portionDesc: '里肌肉片' },
+      { id: 'l2b', name: 'Sweet Potato', name_zh: '番薯飯', calories: 200, protein_g: 4, carbs_g: 45, fat_g: 1, portion: '150g', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1596535542636-922503f663d7?w=200&h=200&fit=crop', portionDesc: '黃色番薯' },
     ],
     [
-      { id: 'l1c', name: 'Fish', name_zh: '鱈魚', calories: 280, protein_g: 50, carbs_g: 0, fat_g: 6, portion: '150g', preparation: '蒸', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', quantity: '1片', portionDesc: '白肉魚' },
-      { id: 'l2c', name: 'Noodles', name_zh: '麵條', calories: 280, protein_g: 8, carbs_g: 54, fat_g: 2, portion: '100g', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', quantity: '1份', portionDesc: '全麥麵條' },
+      { id: 'l1c', name: 'Fish', name_zh: '鱈魚', calories: 280, protein_g: 50, carbs_g: 0, fat_g: 6, portion: '150g', preparation: '蒸', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', portionDesc: '白肉魚' },
+      { id: 'l2c', name: 'Noodles', name_zh: '麵條', calories: 280, protein_g: 8, carbs_g: 54, fat_g: 2, portion: '100g', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '全麥麵條' },
     ],
   ]
 
   const dinnerOptions = [
     [
-      { id: 'd1', name: 'Salmon', name_zh: '鮭魚', calories: 300, protein_g: 42, carbs_g: 0, fat_g: 16, portion: '130g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', quantity: '1片', portionDesc: '約信用卡大小厚度1指' },
-      { id: 'd2', name: 'Sweet Potato', name_zh: '地瓜', calories: 120, protein_g: 2, carbs_g: 27, fat_g: 0, portion: '120g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1596535542636-922503f663d7?w=200&h=200&fit=crop', quantity: '中等1個', portionDesc: '約拳頭大小' },
+      { id: 'd1', name: 'Salmon', name_zh: '鮭魚', calories: 300, protein_g: 42, carbs_g: 0, fat_g: 16, portion: '130g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', portionDesc: '約信用卡大小厚度1指' },
+      { id: 'd2', name: 'Sweet Potato', name_zh: '地瓜', calories: 120, protein_g: 2, carbs_g: 27, fat_g: 0, portion: '120g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1596535542636-922503f663d7?w=200&h=200&fit=crop', portionDesc: '約拳頭大小' },
     ],
     [
-      { id: 'd1b', name: 'Turkey', name_zh: '火雞胸', calories: 280, protein_g: 48, carbs_g: 0, fat_g: 8, portion: '140g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop', quantity: '1份', portionDesc: '低脂肉類' },
-      { id: 'd2b', name: 'Broccoli', name_zh: '花菜', calories: 55, protein_g: 4, carbs_g: 11, fat_g: 1, portion: '200g', preparation: '蒸', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', quantity: '1碗', portionDesc: '新鮮綠花菜' },
+      { id: 'd1b', name: 'Turkey', name_zh: '火雞胸', calories: 280, protein_g: 48, carbs_g: 0, fat_g: 8, portion: '140g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop', portionDesc: '低脂肉類' },
+      { id: 'd2b', name: 'Broccoli', name_zh: '花菜', calories: 55, protein_g: 4, carbs_g: 11, fat_g: 1, portion: '200g', preparation: '蒸', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '新鮮綠花菜' },
     ],
     [
-      { id: 'd1c', name: 'Shrimp', name_zh: '蝦', calories: 250, protein_g: 48, carbs_g: 0, fat_g: 5, portion: '150g', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', quantity: '1份', portionDesc: '中蝦' },
-      { id: 'd2c', name: 'Asparagus', name_zh: '蘆筍', calories: 65, protein_g: 5, carbs_g: 12, fat_g: 1, portion: '150g', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', quantity: '1份', portionDesc: '新鮮蘆筍' },
+      { id: 'd1c', name: 'Shrimp', name_zh: '蝦', calories: 250, protein_g: 48, carbs_g: 0, fat_g: 5, portion: '150g', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', portionDesc: '中蝦' },
+      { id: 'd2c', name: 'Asparagus', name_zh: '蘆筍', calories: 65, protein_g: 5, carbs_g: 12, fat_g: 1, portion: '150g', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '新鮮蘆筍' },
     ],
   ]
 

@@ -280,7 +280,7 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
                           <div className="flex-1">
                             <p className="text-sm font-medium text-gray-700">{item.name_zh}</p>
                             <p className="text-xs text-gray-500">
-                              {(item as any).quantity ? `${(item as any).quantity} · ` : ''}{item.portion} · {item.preparation}
+                              {item.portion} · {item.preparation}
                             </p>
                             {(item as any).portionDesc && (
                               <p className="text-xs text-gray-400 italic">({(item as any).portionDesc})</p>
