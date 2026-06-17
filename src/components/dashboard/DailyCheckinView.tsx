@@ -14,6 +14,7 @@ interface Props {
 
 export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: Props) {
   const [isPending, startTransition] = useTransition()
+  const [mealType, setMealType] = useState<'cook' | 'eat-out' | 'mixed'>('cook')
   const [dietItems, setDietItems] = useState<DietCheckinItem[]>(
     checkin?.diet_items?.length
       ? checkin.diet_items
@@ -92,6 +93,30 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
 
   return (
     <div className="px-4 pb-4 space-y-4 mt-4">
+      {/* Meal type selector */}
+      <div className="bg-white rounded-xl shadow-sm p-3">
+        <p className="text-xs font-medium text-gray-500 mb-2">今天吃法</p>
+        <div className="flex gap-2">
+          {[
+            { val: 'cook', label: '🍳 自己煮' },
+            { val: 'eat-out', label: '🍱 外食' },
+            { val: 'mixed', label: '🔄 混合' },
+          ].map(({ val, label }) => (
+            <button
+              key={val}
+              onClick={() => setMealType(val as any)}
+              className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${
+                mealType === val
+                  ? 'bg-emerald-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Daily targets summary */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl p-3 shadow-sm text-center">
