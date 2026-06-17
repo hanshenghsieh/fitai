@@ -3,10 +3,10 @@ export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { format, startOfWeek, differenceInDays } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
-import DailyCheckinView from '@/components/dashboard/DailyCheckinView'
 import { redirect } from 'next/navigation'
 import type { WeeklyPlanData, DayPlan } from '@/types'
 import NotificationPrompt from '@/components/dashboard/NotificationPrompt'
+import BetterBitHome from '@/components/dashboard/BetterBitHome'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -31,28 +31,26 @@ export default async function DashboardPage() {
   const activeGoal = goal?.[0]
   const daysLeft = activeGoal ? differenceInDays(new Date(activeGoal.end_date), today) : null
 
-  const greeting = today.getHours() < 12 ? '早安' : today.getHours() < 18 ? '午安' : '晚安'
-
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="max-w-lg mx-auto bg-slate-50 min-h-screen">
       {/* Push notification prompt */}
       <NotificationPrompt />
 
-      {/* Header */}
-      <div className="bg-gradient-to-br from-emerald-500 to-teal-600 px-4 pt-12 pb-6 text-white">
-        <p className="text-emerald-100 text-sm">{greeting}，</p>
-        <h1 className="text-2xl font-bold mt-0.5">{profile?.display_name ?? '訓練者'} 💪</h1>
-        <p className="text-emerald-100 text-sm mt-1">
+      {/* BetterBit Header - 簡潔設計 */}
+      <div className="bg-white px-4 pt-6 pb-4 border-b border-gray-100">
+        {/* 靈魂標語 */}
+        <div className="mb-6">
+          <p className="text-sm text-gray-500 mb-2">今天不用想太多，</p>
+          <h1 className="text-3xl font-bold text-gray-800">照著做就好。</h1>
+        </div>
+
+        {/* 日期 */}
+        <p className="text-sm text-gray-400">
           {format(today, 'M月d日 EEEE', { locale: zhTW })}
         </p>
-        {daysLeft !== null && daysLeft > 0 && (
-          <div className="mt-3 bg-white/20 rounded-xl px-3 py-2 inline-block">
-            <span className="text-sm">距離目標還有 <strong>{daysLeft}</strong> 天</span>
-          </div>
-        )}
       </div>
 
-      {/* Plan status */}
+      {/* 生成計畫狀態 */}
       {weeklyPlan?.generation_status === 'generating' && (
         <div className="m-4 p-4 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700 text-center">
           ⏳ AI 正在生成你的計畫，請稍候...
@@ -65,29 +63,31 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* No plan yet */}
+      {/* 還沒有計畫 */}
       {!weeklyPlan || !planData?.days?.length ? (
-        <div className="m-4 p-6 bg-white rounded-xl shadow-sm text-center">
-          <p className="text-gray-500 text-sm">尚未有本週計畫</p>
+        <div className="m-4 p-6 bg-white rounded-2xl border border-gray-100 text-center">
+          <p className="text-gray-600 text-sm mb-4">還沒有本週計畫</p>
           <GeneratePlanButton />
         </div>
-      ) : null}
+      ) : (
+        <>
+          {/* AI 教練建議 */}
+          {weeklyPlan?.coach_note && (
+            <div className="mx-4 mt-4 p-4 bg-green-50 border border-green-200 rounded-2xl">
+              <p className="text-xs font-medium text-green-700 mb-2">💡 今週提醒</p>
+              <p className="text-sm text-gray-700">{weeklyPlan.coach_note}</p>
+            </div>
+          )}
 
-      {/* Coach note */}
-      {weeklyPlan?.coach_note && (
-        <div className="mx-4 mt-4 p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
-          <p className="text-xs font-medium text-emerald-600 mb-1">💬 AI 教練本週提醒</p>
-          <p className="text-sm text-gray-700">{weeklyPlan.coach_note}</p>
-        </div>
-      )}
-
-      {/* Today's plan */}
-      {todayPlan && (
-        <DailyCheckinView
-          todayPlan={todayPlan}
-          checkin={checkin}
-          weeklyPlanId={weeklyPlan?.id ?? null}
-        />
+          {/* 今日計畫 - 新設計 */}
+          {todayPlan && (
+            <BetterBitHome
+              todayPlan={todayPlan}
+              checkin={checkin}
+              weeklyPlanId={weeklyPlan?.id ?? null}
+            />
+          )}
+        </>
       )}
     </div>
   )
