@@ -1,0 +1,16 @@
+{
+  "name": "FitAI - 個人化健身計畫",
+  "short_name": "FitAI",
+  "description": "AI 量身打造你的飲食與訓練計畫",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "categories": ["health", "fitness"],
+  "lang": "zh-TW"
+}
