@@ -459,6 +459,179 @@ export interface ExerciseSet {
   notes: string
 }
 
+// 重訓動作庫
+const strengthExercises = {
+  upper: [
+    {
+      id: 'bench-press',
+      name: 'Bench Press',
+      name_zh: '臥推',
+      youtube_id: '4YnVV_Ksb1E',
+      reps: 8,
+      sets: 4,
+      rest: 120,
+      hasEquipment: true,
+      noEquipment: false,
+    },
+    {
+      id: 'dumbbell-rows',
+      name: 'Dumbbell Rows',
+      name_zh: '啞鈴划船',
+      youtube_id: 'w-PL77Umd28',
+      reps: 10,
+      sets: 3,
+      rest: 90,
+      hasEquipment: true,
+      noEquipment: false,
+    },
+    {
+      id: 'shoulder-press',
+      name: 'Shoulder Press',
+      name_zh: '肩推',
+      youtube_id: 'GbnXvEaso8s',
+      reps: 8,
+      sets: 3,
+      rest: 90,
+      hasEquipment: true,
+      noEquipment: false,
+    },
+    {
+      id: 'dumbbell-flyes',
+      name: 'Dumbbell Flyes',
+      name_zh: '飛鳥',
+      youtube_id: 'eozdVT5pDcQ',
+      reps: 12,
+      sets: 3,
+      rest: 60,
+      hasEquipment: true,
+      noEquipment: false,
+    },
+    {
+      id: 'push-ups',
+      name: 'Push-ups',
+      name_zh: '伏地挺身',
+      youtube_id: 'IODxDxX7oi4',
+      reps: 15,
+      sets: 3,
+      rest: 60,
+      hasEquipment: false,
+      noEquipment: true,
+    },
+    {
+      id: 'pike-push-ups',
+      name: 'Pike Push-ups',
+      name_zh: '倒V伏地挺身',
+      youtube_id: 'T4rnpJhyxLY',
+      reps: 12,
+      sets: 3,
+      rest: 60,
+      hasEquipment: false,
+      noEquipment: true,
+    },
+  ],
+  lower: [
+    {
+      id: 'squat',
+      name: 'Squat',
+      name_zh: '深蹲',
+      youtube_id: 'aclHktwnyYs',
+      reps: 8,
+      sets: 4,
+      rest: 120,
+      hasEquipment: true,
+      noEquipment: true,
+    },
+    {
+      id: 'deadlift',
+      name: 'Deadlift',
+      name_zh: '硬舉',
+      youtube_id: 'V1Y_CziDszo',
+      reps: 6,
+      sets: 4,
+      rest: 120,
+      hasEquipment: true,
+      noEquipment: false,
+    },
+    {
+      id: 'leg-press',
+      name: 'Leg Press',
+      name_zh: '腿部推蹬',
+      youtube_id: 'IZxyjW7MIAI',
+      reps: 10,
+      sets: 3,
+      rest: 90,
+      hasEquipment: true,
+      noEquipment: false,
+    },
+    {
+      id: 'lunges',
+      name: 'Lunges',
+      name_zh: '弓步',
+      youtube_id: 'Z2ECwLW4Alk',
+      reps: 10,
+      sets: 3,
+      rest: 90,
+      hasEquipment: false,
+      noEquipment: true,
+    },
+    {
+      id: 'pistol-squats',
+      name: 'Pistol Squats',
+      name_zh: '單腿深蹲',
+      youtube_id: 'WKOwMw7qOv8',
+      reps: 5,
+      sets: 3,
+      rest: 90,
+      hasEquipment: false,
+      noEquipment: true,
+    },
+  ],
+}
+
+// 有氧選項
+const cardioExercises = [
+  {
+    id: 'running',
+    name: 'Running',
+    name_zh: '跑步',
+    duration: 1800,
+    intensity: '中等 (130-150 BPM)',
+    lowImpact: false,
+  },
+  {
+    id: 'cycling',
+    name: 'Cycling',
+    name_zh: '騎車',
+    duration: 1800,
+    intensity: '中等 (100-120 RPM)',
+    lowImpact: true,
+  },
+  {
+    id: 'rowing',
+    name: 'Rowing',
+    name_zh: '划船',
+    duration: 1800,
+    intensity: '中等 (24-28 strokes/min)',
+    lowImpact: true,
+  },
+  {
+    id: 'jump-rope',
+    name: 'Jump Rope',
+    name_zh: '跳繩',
+    duration: 1200,
+    intensity: '中等-高強度 (140-160 BPM)',
+    lowImpact: false,
+  },
+  {
+    id: 'swimming',
+    name: 'Swimming',
+    name_zh: '游泳',
+    duration: 1800,
+    intensity: '中等',
+    lowImpact: true,
+  },
+]
+
 export function generateWorkoutPlan(
   dayIndex: number,
   fitnessLevel: string,
@@ -487,14 +660,14 @@ export function generateWorkoutPlan(
       cooldown: [
         {
           exercise_id: 'stretch-1',
-          exercise_name: 'Light Stretching',
-          exercise_name_zh: '輕度伸展',
-          youtube_id: null,
+          exercise_name: 'Stretching',
+          exercise_name_zh: '伸展',
+          youtube_id: 'J8epyPNR-x0',
           sets: 1,
           reps: null,
           duration_secs: 600,
           rest_secs: 0,
-          notes: '全身放鬆伸展',
+          notes: '全身放鬆伸展 10 分鐘',
         },
       ],
       estimated_duration_mins: 10,
@@ -503,72 +676,64 @@ export function generateWorkoutPlan(
   }
 
   if (isStrengthDay) {
-    // 根據fitness_level調整
-    const isBeginner = fitnessLevel === 'beginner'
+    // 在 upper 和 lower 之間輪換，每天選不同的動作
+    const isUpperDay = dayIndex % 2 === 0
+    const exercises = isUpperDay
+      ? strengthExercises.upper
+      : strengthExercises.lower
+
+    // 選擇 2 個動作組成訓練
+    const exerciseIndex1 = (dayIndex * 2) % exercises.length
+    const exerciseIndex2 = (dayIndex * 2 + 1) % exercises.length
+
+    const exercise1 = exercises[exerciseIndex1]
+    const exercise2 = exercises[exerciseIndex2]
 
     return {
       type: 'strength',
-      type_zh: '重訓',
+      type_zh: isUpperDay ? '上肢重訓' : '下肢重訓',
       warmup: [
         {
-          exercise_id: 'warmup-1',
-          exercise_name: 'Cardio Warm-up',
-          exercise_name_zh: '熱身有氧',
+          exercise_id: 'warmup-cardio',
+          exercise_name: 'Warm-up',
+          exercise_name_zh: '5分鐘熱身',
           youtube_id: null,
           sets: 1,
           reps: null,
           duration_secs: 300,
           rest_secs: 0,
-          notes: '跑步機或跳繩',
-        },
-        {
-          exercise_id: 'warmup-2',
-          exercise_name: 'Dynamic Stretching',
-          exercise_name_zh: '動態伸展',
-          youtube_id: null,
-          sets: 1,
-          reps: null,
-          duration_secs: 180,
-          rest_secs: 0,
-          notes: '關節活動',
+          notes: '輕度有氧或動態伸展',
         },
       ],
       main: [
         {
-          exercise_id: dayIndex % 3 === 0 ? 'bench-press' : dayIndex % 3 === 1 ? 'squat' : 'deadlift',
-          exercise_name:
-            dayIndex % 3 === 0 ? 'Bench Press' : dayIndex % 3 === 1 ? 'Squat' : 'Deadlift',
-          exercise_name_zh:
-            dayIndex % 3 === 0 ? '臥推' : dayIndex % 3 === 1 ? '深蹲' : '硬舉',
-          youtube_id:
-            dayIndex % 3 === 0
-              ? '4YnVV_Ksb1E'
-              : dayIndex % 3 === 1
-                ? 'aclHktwnyYs'
-                : 'V1Y_CziDszo',
-          sets: isBeginner ? 3 : 4,
-          reps: 8,
+          exercise_id: exercise1.id,
+          exercise_name: exercise1.name,
+          exercise_name_zh: exercise1.name_zh,
+          youtube_id: exercise1.youtube_id,
+          sets: exercise1.sets,
+          reps: exercise1.reps,
           duration_secs: null,
-          rest_secs: 120,
-          notes: hasBackInjury ? '控制重量，避免過度負荷' : '',
+          rest_secs: exercise1.rest,
+          notes: hasBackInjury ? '控制重量' : '',
         },
         {
-          exercise_id: 'assistance-1',
-          exercise_name: 'Dumbbell Rows',
-          exercise_name_zh: '啞鈴划船',
-          youtube_id: 'w-PL77Umd28',
-          sets: isBeginner ? 3 : 3,
-          reps: 10,
+          exercise_id: exercise2.id,
+          exercise_name: exercise2.name,
+          exercise_name_zh: exercise2.name_zh,
+          youtube_id: exercise2.youtube_id,
+          sets: exercise2.sets,
+          reps: exercise2.reps,
           duration_secs: null,
-          rest_secs: 90,
-          notes: '背部輔助運動',
+          rest_secs: exercise2.rest,
+          notes: '',
         },
       ],
       cooldown: [
         {
-          exercise_id: 'cooldown-1',
-          exercise_name: 'Static Stretching',
-          exercise_name_zh: '靜態伸展',
+          exercise_id: 'cooldown-stretch',
+          exercise_name: 'Stretching',
+          exercise_name_zh: '伸展',
           youtube_id: null,
           sets: 1,
           reps: null,
@@ -583,53 +748,57 @@ export function generateWorkoutPlan(
   }
 
   if (isCardioDay) {
-    // 有氧 - 根據膝蓋傷害調整
-    const cardioType = hasKneeInjury ? 'rowing' : dayIndex % 2 === 0 ? 'running' : 'cycling'
-    const cardioTypeZh = hasKneeInjury ? '划船' : dayIndex % 2 === 0 ? '跑步' : '騎車'
+    // 選擇有氧方式，避免膝蓋傷害
+    const availableCardio = hasKneeInjury
+      ? cardioExercises.filter(c => c.lowImpact)
+      : cardioExercises
+
+    const cardioIndex = dayIndex % availableCardio.length
+    const cardio = availableCardio[cardioIndex]
 
     return {
       type: 'cardio',
       type_zh: '有氧運動',
       warmup: [
         {
-          exercise_id: 'warmup-cardio',
-          exercise_name: 'Light Jog',
-          exercise_name_zh: '輕慢跑',
+          exercise_id: 'warmup-light',
+          exercise_name: 'Light Warm-up',
+          exercise_name_zh: '輕度熱身',
           youtube_id: null,
           sets: 1,
           reps: null,
           duration_secs: 300,
           rest_secs: 0,
-          notes: '逐步升溫',
+          notes: '逐步升溫 5 分鐘',
         },
       ],
       main: [
         {
-          exercise_id: `cardio-${cardioType}`,
-          exercise_name: cardioTypeZh,
-          exercise_name_zh: cardioTypeZh,
+          exercise_id: cardio.id,
+          exercise_name: cardio.name,
+          exercise_name_zh: cardio.name_zh,
           youtube_id: null,
           sets: 1,
           reps: null,
-          duration_secs: 1800, // 30分鐘中等強度
+          duration_secs: cardio.duration,
           rest_secs: 0,
-          notes: hasKneeInjury ? '低衝擊運動' : '保持心率在 130-150 BPM',
+          notes: `強度：${cardio.intensity}`,
         },
       ],
       cooldown: [
         {
           exercise_id: 'cooldown-cardio',
-          exercise_name: 'Cool Down Walk',
-          exercise_name_zh: '緩和步行',
+          exercise_name: 'Cool Down',
+          exercise_name_zh: '緩和',
           youtube_id: null,
           sets: 1,
           reps: null,
           duration_secs: 300,
           rest_secs: 0,
-          notes: '心率逐步恢復',
+          notes: '步行 5 分鐘，心率恢復',
         },
       ],
-      estimated_duration_mins: 40,
+      estimated_duration_mins: Math.round(cardio.duration / 60 + 10),
       calories_burned_est: 350,
     }
   }

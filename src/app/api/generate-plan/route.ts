@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import {
   calculateTDEE,
   calculateNutritionTargets,
@@ -9,10 +10,23 @@ import type { UserProfile, Goal } from '@/types'
 
 export async function POST(req: NextRequest) {
   try {
-    const { profile, goal } = await req.json() as { profile: UserProfile; goal: Goal }
-    if (!profile || !goal) {
-      return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    // 獲取用戶 profile 和 goal
+    const [{ data: profile }, { data: goals }] = await Promise.all([
+      supabase.from('user_profiles').select('*').eq('id', user.id).single(),
+      supabase.from('goals').select('*').eq('user_id', user.id).eq('is_active', true).order('created_at', { ascending: false }).limit(1),
+    ])
+
+    if (!profile || !goals || goals.length === 0) {
+      return NextResponse.json({ error: 'Missing profile or goal' }, { status: 400 })
+    }
+
+    const goal = goals[0]
 
     console.log(
       `🤖 Generating plan for ${profile.display_name || 'user'} (${profile.age}y, ${profile.weight_kg}kg, goal: ${goal.goal_type})`
