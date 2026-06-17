@@ -430,7 +430,19 @@ export function getHomeCookedMeal(
   dayIndex: number
 ) {
   const meals = cookMealDatabase[mealType]
-  const meal = meals[dayIndex % meals.length]
+  // 確保每個 dayIndex 拿到不同的菜單
+  // breakfast: day0→0, day1→1, day2→2, day3→0, day4→1, day5→2, day6→0
+  // lunch: day0→1, day1→2, day2→0, day3→1, day4→2, day5→0, day6→1
+  // dinner: day0→2, day1→0, day2→1, day3→2, day4→0, day5→1, day6→2
+  let mealIndex = dayIndex % meals.length
+
+  if (mealType === 'lunch') {
+    mealIndex = (dayIndex + 1) % meals.length
+  } else if (mealType === 'dinner') {
+    mealIndex = (dayIndex + 2) % meals.length
+  }
+
+  const meal = meals[mealIndex]
 
   return {
     type: mealType,
