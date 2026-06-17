@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { format, startOfWeek } from 'date-fns'
+import { format, startOfWeek, addMonths } from 'date-fns'
 import {
   calculateTDEE,
   calculateNutritionTargets,
@@ -17,17 +17,44 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // 獲取用戶 profile 和 goal
-    const [{ data: profile }, { data: goals }] = await Promise.all([
-      supabase.from('user_profiles').select('*').eq('id', user.id).single(),
-      supabase.from('goals').select('*').eq('user_id', user.id).eq('is_active', true).order('created_at', { ascending: false }).limit(1),
-    ])
+    let profile: UserProfile | null = null
+    let goal: Goal | null = null
 
-    if (!profile || !goals || goals.length === 0) {
-      return NextResponse.json({ error: 'Missing profile or goal' }, { status: 400 })
+    // 先嘗試從 request body 讀取
+    try {
+      const body = await req.json()
+      if (body.profile && body.goal) {
+        console.log('📤 Using profile and goal from request body')
+        // 從 request body 構建完整的 profile 和 goal（Onboarding 時用）
+        const dbProfile = (await supabase.from('user_profiles').select('*').eq('id', user.id).single()).data
+        if (dbProfile) {
+          profile = { ...dbProfile, ...body.profile } as UserProfile
+        }
+        goal = {
+          goal_type: body.goal,
+          start_date: format(new Date(), 'yyyy-MM-dd'),
+          end_date: format(addMonths(new Date(), 3), 'yyyy-MM-dd'),
+        } as any
+      }
+    } catch (e) {
+      console.log('No request body or parsing failed, will fetch from DB')
     }
 
-    const goal = goals[0]
+    // 如果沒有從 body 讀到，從 DB 查詢
+    if (!profile || !goal) {
+      console.log('📥 Fetching profile and goal from database')
+      const [{ data: dbProfile }, { data: goals }] = await Promise.all([
+        supabase.from('user_profiles').select('*').eq('id', user.id).single(),
+        supabase.from('goals').select('*').eq('user_id', user.id).eq('is_active', true).order('created_at', { ascending: false }).limit(1),
+      ])
+
+      profile = dbProfile as UserProfile
+      goal = goals?.[0] as Goal
+
+      if (!profile || !goal) {
+        return NextResponse.json({ error: 'Missing profile or goal' }, { status: 400 })
+      }
+    }
 
     console.log(
       `🤖 Generating plan for ${profile.display_name || 'user'} (${profile.age}y, ${profile.weight_kg}kg, goal: ${goal.goal_type})`
