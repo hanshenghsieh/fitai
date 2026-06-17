@@ -95,9 +95,13 @@ export default async function DashboardPage() {
 
 function GeneratePlanButton() {
   return (
-    <form action="/api/generate-plan" method="POST">
+    <form onSubmit={async (e) => {
+      e.preventDefault()
+      await fetch('/api/generate-plan', { method: 'POST' })
+      window.location.reload()
+    }}>
       <button type="submit" className="mt-3 px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition-colors">
-        生成本週計畫
+        🔄 重新生成計畫
       </button>
     </form>
   )
