@@ -2,8 +2,9 @@
 
 import { useState, useOptimistic, useTransition } from 'react'
 import { toast } from 'sonner'
-import { CheckCircle2, Circle, Play, ChevronDown, ChevronUp, Droplets, Flame, Dumbbell } from 'lucide-react'
+import { CheckCircle2, Circle, Play, ChevronDown, ChevronUp, Droplets, Flame, Dumbbell, Store } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
+import { getConvenienceItems } from '@/lib/convenience-store-menu'
 import type { DayPlan, DailyCheckin, DietCheckinItem, WorkoutCheckinItem } from '@/types'
 
 interface Props {
