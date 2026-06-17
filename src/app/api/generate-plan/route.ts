@@ -45,11 +45,18 @@ export async function POST(req: NextRequest) {
     // 生成7天計畫
     const days = Array.from({ length: 7 }, (_, dayIndex) => {
       // 每日菜單（自己煮）
-      const meals = [
-        getHomeCookedMeal('breakfast', dayIndex),
-        getHomeCookedMeal('lunch', dayIndex),
-        getHomeCookedMeal('dinner', dayIndex),
-      ]
+      const breakfast = getHomeCookedMeal('breakfast', dayIndex)
+      const lunch = getHomeCookedMeal('lunch', dayIndex)
+      const dinner = getHomeCookedMeal('dinner', dayIndex)
+
+      // 調試：確保菜單轉換
+      if (dayIndex === 0 || dayIndex === 3 || dayIndex === 6) {
+        console.log(
+          `Day ${dayIndex + 1}: ${breakfast.name_zh} | ${lunch.name_zh} | ${dinner.name_zh}`
+        )
+      }
+
+      const meals = [breakfast, lunch, dinner]
 
       const mealsTotalCalories = meals.reduce((sum, m) => sum + m.total_calories, 0)
       const mealsProtein = meals.reduce((sum, m) => sum + m.protein_g, 0)
