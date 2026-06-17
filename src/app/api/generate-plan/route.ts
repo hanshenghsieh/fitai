@@ -1,34 +1,157 @@
 import { NextRequest, NextResponse } from 'next/server'
+import {
+  calculateTDEE,
+  calculateNutritionTargets,
+  getHomeCookedMeal,
+  generateWorkoutPlan,
+} from '@/lib/plan-engine'
+import type { UserProfile, Goal } from '@/types'
 
 export async function POST(req: NextRequest) {
   try {
-    const { profile, goal, preferences } = await req.json()
-    if (!profile || !goal) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+    const { profile, goal } = await req.json() as { profile: UserProfile; goal: Goal }
+    if (!profile || !goal) {
+      return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+    }
 
-    const hasKneeInjury = profile.injuries?.some((i: any) => String(i).toLowerCase().includes('膝') || String(i).toLowerCase().includes('knee'))
-    const hasBackInjury = profile.injuries?.some((i: any) => String(i).toLowerCase().includes('腰') || String(i).toLowerCase().includes('back'))
+    console.log(
+      `🤖 Generating plan for ${profile.display_name || 'user'} (${profile.age}y, ${profile.weight_kg}kg, goal: ${goal.goal_type})`
+    )
 
-    console.log(`🤖 Plan: ${profile.age}y, injuries: ${profile.injuries?.join(', ') || 'none'}`)
-
-    // Return fast fallback plan (no Claude call)
-    const planData = generateDefaultPlan(profile, goal, hasKneeInjury, hasBackInjury)
+    const nutrition = calculateNutritionTargets(profile, goal)
+    console.log(
+      `📊 TDEE: ${calculateTDEE(profile)} kcal | Target: ${nutrition.dailyCalories} kcal | Protein: ${nutrition.proteinGrams}g`
+    )
 
     const today = new Date()
     const weekStart = new Date(today)
     weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1)
 
-    planData.days = planData.days.map((day, idx) => ({
-      ...day,
-      day: idx + 1,
-      date: new Date(weekStart.getTime() + idx * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    }))
+    // 生成7天計畫
+    const days = Array.from({ length: 7 }, (_, dayIndex) => {
+      // 每日菜單（自己煮）
+      const meals = [
+        getHomeCookedMeal('breakfast', dayIndex),
+        getHomeCookedMeal('lunch', dayIndex),
+        getHomeCookedMeal('dinner', dayIndex),
+      ]
 
-    console.log('✅ Plan ready')
+      const mealsTotalCalories = meals.reduce((sum, m) => sum + m.total_calories, 0)
+      const mealsProtein = meals.reduce((sum, m) => sum + m.protein_g, 0)
+
+      // 運動計畫
+      const workout = generateWorkoutPlan(
+        dayIndex,
+        profile.fitness_level || 'beginner',
+        profile.injuries || [],
+        goal.goal_type
+      )
+
+      return {
+        day: dayIndex + 1,
+        date: new Date(
+          weekStart.getTime() + dayIndex * 24 * 60 * 60 * 1000
+        ).toISOString().split('T')[0],
+        meals,
+        workout,
+        daily_targets: {
+          calories: nutrition.dailyCalories,
+          protein_g: nutrition.proteinGrams,
+          carbs_g: nutrition.carbsGrams,
+          fat_g: nutrition.fatGrams,
+          water_ml: Math.round((profile.weight_kg || 70) * 35), // 35ml per kg
+        },
+        meal_summary: {
+          total_calories: mealsTotalCalories,
+          total_protein: mealsProtein,
+        },
+      }
+    })
+
+    const planData = {
+      week_number: 1,
+      weekly_targets: {
+        avg_daily_calories: nutrition.dailyCalories,
+        avg_daily_protein_g: nutrition.proteinGrams,
+        workout_days: 5,
+      },
+      days,
+      grocery_list: generateGroceryList(days),
+      coach_note: generateCoachNote(profile, goal, nutrition),
+    }
+
+    console.log('✅ Plan generated successfully')
     return NextResponse.json(planData)
   } catch (err) {
-    console.error('Error:', err)
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Failed' }, { status: 400 })
+    console.error('Error generating plan:', err)
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Failed to generate plan' },
+      { status: 500 }
+    )
   }
+}
+
+function generateGroceryList(
+  days: any[]
+): Array<{ category: string; items: string[] }> {
+  const items = new Set<string>()
+
+  days.forEach(day => {
+    day.meals.forEach((meal: any) => {
+      meal.items.forEach((item: any) => {
+        items.add(item.name_zh)
+      })
+    })
+  })
+
+  return [
+    {
+      category: '🥚 蛋白質',
+      items: Array.from(items).filter(
+        i =>
+          ['雞蛋', '雞胸肉', '牛肉', '鮭魚', '火雞胸', '鱈魚', '蝦', '優格'].includes(i)
+      ),
+    },
+    {
+      category: '🍚 碳水化合物',
+      items: Array.from(items).filter(
+        i =>
+          ['吐司', '白飯', '番薯飯', '地瓜', '麵條', '燕麥', '香蕉', '麥片'].includes(i)
+      ),
+    },
+    {
+      category: '🥦 蔬菜與補充',
+      items: Array.from(items).filter(i => ['花菜', '蘆筍'].includes(i)),
+    },
+  ]
+}
+
+function generateCoachNote(profile: UserProfile, goal: Goal, nutrition: any): string {
+  const tdee = calculateTDEE(profile)
+  const deficit = tdee - nutrition.dailyCalories
+  const deficitPerWeek = deficit * 7
+  const lossPerMonth = (deficitPerWeek / 7700) * 30 // 1 kg fat ≈ 7700 kcal
+
+  let note = `根據你的數據：\n`
+  note += `• TDEE: ${tdee} kcal | 目標: ${nutrition.dailyCalories} kcal | 每日赤字: ${deficit} kcal\n`
+  note += `• 預計每月減重: ${lossPerMonth.toFixed(1)} kg\n`
+  note += `• 蛋白質目標: ${nutrition.proteinGrams}g (保護肌肉)\n`
+
+  if (goal.goal_type === 'lose_fat' || goal.goal_type === 'lose_weight') {
+    note += `\n減脂策略：\n`
+    note += `✓ 周一三五：重訓 (保持肌肉)\n`
+    note += `✓ 周二四六：有氧 (消耗熱量)\n`
+    note += `✓ 周日：充分休息\n`
+  }
+
+  if (profile.injuries?.length) {
+    note += `\n⚠️ 受傷注意事項：\n`
+    profile.injuries.forEach(injury => {
+      note += `• ${injury}\n`
+    })
+  }
+
+  return note
 }
 
 function generateDefaultPlan(profile: any, goal: any, hasKneeInjury: boolean, hasBackInjury: boolean) {
