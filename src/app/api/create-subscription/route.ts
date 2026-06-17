@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     )
 
     // 建立訂閱
-    const subscription = await createSubscription(customerId, priceId)
+    const subscription = await createSubscription(customerId, priceId) as any
 
     // 保存訂閱信息到 Supabase
     const { error: dbError } = await supabase.from('subscriptions').insert({
@@ -40,8 +40,8 @@ export async function POST(req: NextRequest) {
       stripe_subscription_id: subscription.id,
       stripe_customer_id: subscription.customer,
       status: subscription.status,
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      current_period_start: new Date((subscription.current_period_start as number) * 1000).toISOString(),
+      current_period_end: new Date((subscription.current_period_end as number) * 1000).toISOString(),
       cancel_at_period_end: false,
     })
 

@@ -52,9 +52,9 @@ export async function GET(req: NextRequest) {
         // 延長訂閱至下下月（下月免費）
         const stripeSubscription = await stripe.subscriptions.retrieve(
           subscription.stripe_subscription_id
-        )
+        ) as any
 
-        const nextBillingDate = new Date(stripeSubscription.current_period_end * 1000)
+        const nextBillingDate = new Date((stripeSubscription.current_period_end as number) * 1000)
         nextBillingDate.setMonth(nextBillingDate.getMonth() + 1)
 
         await stripe.subscriptions.update(subscription.stripe_subscription_id, {

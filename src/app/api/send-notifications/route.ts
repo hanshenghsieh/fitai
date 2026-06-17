@@ -1,16 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import admin from 'firebase-admin'
 
-// 初始化 Firebase Admin SDK
-if (!admin.apps.length) {
-  const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK || '{}')
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  })
+let messaging: any = null
+
+function initializeFirebaseAdmin() {
+  try {
+    const admin = require('firebase-admin')
+    if (!messaging && (!admin.apps || !admin.apps.length)) {
+      const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK || '{}')
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      })
+      messaging = admin.messaging()
+    }
+  } catch (err) {
+    console.error('Firebase Admin init error:', err)
+  }
 }
 
-const messaging = admin.messaging()
+initializeFirebaseAdmin()
 
 interface PushNotification {
   title: string

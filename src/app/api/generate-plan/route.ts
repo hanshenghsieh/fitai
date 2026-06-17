@@ -5,8 +5,8 @@ export async function POST(req: NextRequest) {
     const { profile, goal, preferences } = await req.json()
     if (!profile || !goal) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
 
-    const hasKneeInjury = profile.injuries?.some(i => String(i).toLowerCase().includes('膝') || String(i).toLowerCase().includes('knee'))
-    const hasBackInjury = profile.injuries?.some(i => String(i).toLowerCase().includes('腰') || String(i).toLowerCase().includes('back'))
+    const hasKneeInjury = profile.injuries?.some((i: any) => String(i).toLowerCase().includes('膝') || String(i).toLowerCase().includes('knee'))
+    const hasBackInjury = profile.injuries?.some((i: any) => String(i).toLowerCase().includes('腰') || String(i).toLowerCase().includes('back'))
 
     console.log(`🤖 Plan: ${profile.age}y, injuries: ${profile.injuries?.join(', ') || 'none'}`)
 
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function generateDefaultPlan(profile, goal, hasKneeInjury: boolean, hasBackInjury: boolean) {
+function generateDefaultPlan(profile: any, goal: any, hasKneeInjury: boolean, hasBackInjury: boolean) {
   const today = new Date()
   const weekStart = new Date(today)
   weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1)
