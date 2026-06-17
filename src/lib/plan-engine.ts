@@ -75,7 +75,105 @@ export function calculateNutritionTargets(
   }
 }
 
-// 便利店菜單篩選
+// 智能餐點搭配 - 根據營養需求自動組合多個項目
+export interface MealCombination {
+  items: any[] // ConvenienceItem[]
+  total_calories: number
+  total_protein_g: number
+  total_carbs_g: number
+  total_fat_g: number
+  reasoning: string // 說明為什麼這樣搭配
+}
+
+export function buildMealCombination(
+  mealType: 'breakfast' | 'lunch' | 'dinner',
+  targetCalories: number,
+  targetProtein: number,
+  targetCarbs: number,
+  targetFat: number
+): MealCombination {
+  let availableItems = convenienceStoreMenu.filter(
+    item => item.category === mealType
+  )
+
+  // 先找能達到蛋白質目標的高蛋白項目
+  const highProteinItems = availableItems.filter(
+    item => item.protein_g >= targetProtein * 0.6
+  )
+
+  // 按蛋白質排序（高到低）
+  highProteinItems.sort((a, b) => b.protein_g - a.protein_g)
+
+  const selected: any[] = []
+  let currentCalories = 0
+  let currentProtein = 0
+  let currentCarbs = 0
+  let currentFat = 0
+  let reasoning = ''
+
+  // 貪心演算法：優先選擇能達到蛋白質目標的項目
+  for (const item of highProteinItems) {
+    if (currentProtein >= targetProtein) break
+
+    // 檢查加入後是否超過熱量目標太多（>120%）
+    if (currentCalories + item.calories <= targetCalories * 1.2) {
+      selected.push(item)
+      currentCalories += item.calories
+      currentProtein += item.protein_g
+      currentCarbs += item.carbs_g
+      currentFat += item.fat_g
+
+      if (selected.length === 1) {
+        reasoning += `選擇 ${item.name} (${item.protein_g}g蛋白質) `
+      } else {
+        reasoning += `+ ${item.name} `
+      }
+    }
+  }
+
+  // 如果蛋白質還不夠，嘗試加入補充項目
+  if (currentProtein < targetProtein) {
+    const remainingProtein = targetProtein - currentProtein
+    const supplementItems = availableItems.filter(
+      item => !selected.includes(item) && item.protein_g >= remainingProtein * 0.3
+    )
+
+    for (const item of supplementItems) {
+      if (currentProtein >= targetProtein) break
+      if (currentCalories + item.calories <= targetCalories * 1.3) {
+        selected.push(item)
+        currentCalories += item.calories
+        currentProtein += item.protein_g
+        currentCarbs += item.carbs_g
+        currentFat += item.fat_g
+        reasoning += `+ ${item.name}補充`
+        break
+      }
+    }
+  }
+
+  // 至少要有一個項目
+  if (selected.length === 0) {
+    const bestMatch = availableItems.reduce((best, item) => {
+      const score = Math.abs(item.calories - targetCalories) +
+                   Math.abs(item.protein_g - targetProtein) * 0.5
+      return !best || score < Math.abs(best.calories - targetCalories) ? item : best
+    })
+    selected.push(bestMatch)
+    reasoning = `預設選擇 ${bestMatch.name}`
+  }
+
+  return {
+    items: selected,
+    total_calories: currentCalories,
+    total_protein_g: currentProtein,
+    total_carbs_g: currentCarbs,
+    total_fat_g: currentFat,
+    reasoning
+  }
+}
+
+// 便利店菜單篩選（舊函數，保留向後相容）
 export function selectConvenienceItemForMeal(
   mealType: 'breakfast' | 'lunch' | 'dinner',
   targetCalories: number,

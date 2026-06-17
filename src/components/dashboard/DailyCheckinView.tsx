@@ -44,24 +44,33 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
         })
       })
     } else if (mealType === 'eat-out') {
-      const mealTypes = ['breakfast', 'lunch', 'dinner'] as const
-      mealTypes.forEach(mt => {
-        const items = getConvenienceItems(mt)
-        const existingItem = dietItems.find(i => i.meal_id === mt && i.convenience_item_id)
-        const selected = existingItem?.convenience_item_id
-          ? items.find(i => i.id === existingItem.convenience_item_id)
-          : items[0]
-
-        if (selected) {
+      // 使用系統預配的便利店方案（用戶無法編輯）
+      if (todayPlan.convenience_meals) {
+        todayPlan.convenience_meals.forEach(meal => {
           newDietItems.push({
-            meal_id: mt,
-            meal_type: mt,
-            completed: completedMap.get(mt) ?? false,
-            convenience_item_id: selected.id,
-            convenience_item: selected,
+            meal_id: meal.meal_type,
+            meal_type: meal.meal_type,
+            completed: completedMap.get(meal.meal_type) ?? false,
+            convenience_combination: meal, // 整個預配方案
           })
-        }
-      })
+        })
+      } else {
+        // 降級：如果沒有預配方案，使用菜單選擇（舊邏輯）
+        const mealTypes = ['breakfast', 'lunch', 'dinner'] as const
+        mealTypes.forEach(mt => {
+          const items = getConvenienceItems(mt)
+          const selected = items[0]
+          if (selected) {
+            newDietItems.push({
+              meal_id: mt,
+              meal_type: mt,
+              completed: completedMap.get(mt) ?? false,
+              convenience_item_id: selected.id,
+              convenience_item: selected,
+            })
+          }
+        })
+      }
     } else if (mealType === 'mixed') {
       todayPlan.meals.forEach(meal => {
         newDietItems.push({
@@ -296,11 +305,10 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
                   )}
                 </div>
               )
-            } else if (mealType === 'eat-out' || mealType === 'mixed') {
-              const convItem = dietItem.convenience_item
-              if (!convItem) return null
-
-              const allItems = getConvenienceItems(dietItem.meal_id as any)
+            } else if (mealType === 'eat-out') {
+              // 顯示系統預配的便利店組合（固定方案）
+              const combination = (dietItem as any).convenience_combination
+              if (!combination || !combination.items) return null
 
               return (
                 <div key={dietItem.meal_id}>
@@ -322,64 +330,99 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
                       <p className="font-medium text-gray-800 text-sm">{mealTypeLabel}</p>
                       <p className="text-xs text-gray-400 truncate flex items-center gap-1">
                         <Store className="h-3 w-3" />
-                        {convItem.name} ({convItem.store})
+                        {combination.items.length} 項搭配
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-xs font-medium text-gray-600">{convItem.calories} kcal</p>
+                      <p className="text-xs font-medium text-gray-600">{combination.total_calories} kcal</p>
                       {expanded ? <ChevronUp className="h-3 w-3 text-gray-400 ml-auto mt-0.5" /> : <ChevronDown className="h-3 w-3 text-gray-400 ml-auto mt-0.5" />}
                     </div>
                   </div>
                   {expanded && (
-                    <div className="px-4 py-3 bg-gray-50 space-y-3">
-                      <div className="flex gap-3">
-                        <div className="w-20 h-20 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden">
-                          <img src={convItem.photo_url} alt={convItem.name} className="w-full h-full object-cover" onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none'
-                          }} />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-bold text-gray-800">{convItem.name}</p>
-                          <p className="text-xs text-gray-500 mb-2">{convItem.store} · {convItem.description}</p>
-                          <div className="flex gap-3 text-xs">
-                            <div>
-                              <span className="text-gray-600">熱量: </span>
-                              <span className="font-bold text-orange-600">{convItem.calories} kcal</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-600">蛋白: </span>
-                              <span className="font-bold text-emerald-600">{convItem.protein_g}g</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-600">價格: </span>
-                              <span className="font-bold">${convItem.price}</span>
-                            </div>
-                          </div>
-                        </div>
+                    <div className="px-4 py-3 bg-emerald-50 space-y-3 border-t border-emerald-100">
+                      <div className="bg-emerald-100 border-l-4 border-emerald-500 px-3 py-2 rounded text-xs text-emerald-800">
+                        <p className="font-bold mb-1">✓ 系統推薦搭配</p>
+                        <p className="text-xs">{combination.reasoning}</p>
                       </div>
 
-                      {/* Item selector for eat-out/mixed mode */}
-                      <div className="mt-4 pt-3 border-t border-gray-200">
-                        <p className="text-xs font-bold text-gray-700 mb-2">選擇{mealTypeLabel}:</p>
-                        <div className="space-y-1 max-h-32 overflow-y-auto">
-                          {allItems.map(option => (
-                            <button
-                              key={option.id}
-                              onClick={() => handleChangeConvenienceItem(dietItem.meal_id, option.id)}
-                              className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors ${
-                                convItem.id === option.id
-                                  ? 'bg-emerald-100 text-emerald-800 font-bold'
-                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                              }`}
-                            >
-                              <div className="font-medium">{option.name}</div>
-                              <div className="text-gray-600">{option.calories} kcal · ${option.price}</div>
-                            </button>
-                          ))}
+                      {/* Show all items in combination */}
+                      <div className="space-y-3">
+                        {combination.items.map((item: any, idx: number) => (
+                          <div key={`${item.id}-${idx}`} className="bg-white rounded-lg p-3 space-y-2">
+                            <div className="flex gap-3">
+                              <div className="w-16 h-16 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden">
+                                <img src={item.photo_url} alt={item.name} className="w-full h-full object-cover" onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none'
+                                }} />
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-bold text-gray-800">{item.name}</p>
+                                <p className="text-xs text-gray-500">{item.store}</p>
+                                <div className="flex gap-2 mt-1 text-xs">
+                                  <span className="text-gray-600">{item.calories} kcal</span>
+                                  <span className="text-emerald-600">蛋{item.protein_g}g</span>
+                                  <span className="text-gray-600">${item.price}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="bg-white rounded-lg p-3 border border-gray-200">
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                          <div>
+                            <p className="text-gray-500">熱量</p>
+                            <p className="font-bold text-lg text-orange-600">{combination.total_calories}</p>
+                            <p className="text-gray-400">kcal</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500">蛋白質</p>
+                            <p className="font-bold text-lg text-emerald-600">{combination.total_protein_g}</p>
+                            <p className="text-gray-400">g</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500">總價</p>
+                            <p className="font-bold text-lg">${combination.items.reduce((sum: number, item: any) => sum + item.price, 0)}</p>
+                            <p className="text-gray-400">元</p>
+                          </div>
                         </div>
                       </div>
                     </div>
                   )}
+                </div>
+              )
+            } else if (mealType === 'mixed') {
+              const meal = todayPlan.meals.find(m => m.type === dietItem.meal_id)
+              if (!meal) return null
+
+              return (
+                <div key={meal.type}>
+                  <div
+                    className="px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setExpandedMeal(expanded ? null : meal.type)}
+                  >
+                    <button
+                      type="button"
+                      onClick={e => { e.stopPropagation(); toggleDiet(meal.type) }}
+                      className="flex-shrink-0"
+                    >
+                      {dietItem.completed
+                        ? <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+                        : <Circle className="h-6 w-6 text-gray-300" />
+                      }
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-800 text-sm">{meal.type_zh}</p>
+                      <p className="text-xs text-gray-400 truncate">
+                        {meal.items.map(i => i.name_zh).join('、')}
+                      </p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-xs font-medium text-gray-600">{meal.total_calories} kcal</p>
+                      {expanded ? <ChevronUp className="h-3 w-3 text-gray-400 ml-auto mt-0.5" /> : <ChevronDown className="h-3 w-3 text-gray-400 ml-auto mt-0.5" />}
+                    </div>
+                  </div>
                 </div>
               )
             }

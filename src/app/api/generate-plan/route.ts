@@ -6,6 +6,7 @@ import {
   calculateNutritionTargets,
   getHomeCookedMeal,
   generateWorkoutPlan,
+  buildMealCombination,
 } from '@/lib/plan-engine'
 import type { UserProfile, Goal } from '@/types'
 
@@ -69,6 +70,22 @@ export async function POST(req: NextRequest) {
     const weekStart = new Date(today)
     weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1)
 
+    // 計算每餐的營養目標（TDEE分配給3餐）
+    const breakfastCals = Math.round(nutrition.dailyCalories * 0.25) // 25%
+    const breakfastProtein = Math.round(nutrition.proteinGrams * 0.25)
+    const breakfastCarbs = Math.round(nutrition.carbsGrams * 0.25)
+    const breakfastFat = Math.round(nutrition.fatGrams * 0.25)
+
+    const lunchCals = Math.round(nutrition.dailyCalories * 0.40) // 40%
+    const lunchProtein = Math.round(nutrition.proteinGrams * 0.40)
+    const lunchCarbs = Math.round(nutrition.carbsGrams * 0.40)
+    const lunchFat = Math.round(nutrition.fatGrams * 0.40)
+
+    const dinnerCals = Math.round(nutrition.dailyCalories * 0.35) // 35%
+    const dinnerProtein = Math.round(nutrition.proteinGrams * 0.35)
+    const dinnerCarbs = Math.round(nutrition.carbsGrams * 0.35)
+    const dinnerFat = Math.round(nutrition.fatGrams * 0.35)
+
     // 生成7天計畫
     const days = Array.from({ length: 7 }, (_, dayIndex) => {
       // 每日菜單（自己煮）
@@ -88,6 +105,35 @@ export async function POST(req: NextRequest) {
       const mealsTotalCalories = meals.reduce((sum, m) => sum + m.total_calories, 0)
       const mealsProtein = meals.reduce((sum, m) => sum + m.protein_g, 0)
 
+      // 便利店最優搭配（固定方案，用戶不能編輯）
+      const convenienceBreakfast = buildMealCombination(
+        'breakfast',
+        breakfastCals,
+        breakfastProtein,
+        breakfastCarbs,
+        breakfastFat
+      )
+      const convenienceLunch = buildMealCombination(
+        'lunch',
+        lunchCals,
+        lunchProtein,
+        lunchCarbs,
+        lunchFat
+      )
+      const convenienceDinner = buildMealCombination(
+        'dinner',
+        dinnerCals,
+        dinnerProtein,
+        dinnerCarbs,
+        dinnerFat
+      )
+
+      const convenience_meals = [
+        { ...convenienceBreakfast, meal_type_zh: '早餐' },
+        { ...convenienceLunch, meal_type_zh: '午餐' },
+        { ...convenienceDinner, meal_type_zh: '晚餐' },
+      ]
+
       // 運動計畫
       const workout = generateWorkoutPlan(
         dayIndex,
@@ -102,6 +148,7 @@ export async function POST(req: NextRequest) {
           weekStart.getTime() + dayIndex * 24 * 60 * 60 * 1000
         ).toISOString().split('T')[0],
         meals,
+        convenience_meals, // 便利店預配方案
         workout,
         daily_targets: {
           calories: nutrition.dailyCalories,

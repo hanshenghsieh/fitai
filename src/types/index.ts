@@ -106,10 +106,22 @@ export interface DailyWorkout {
   calories_burned_est: number
 }
 
+export interface ConvenienceMealCombination {
+  meal_type: 'breakfast' | 'lunch' | 'dinner'
+  meal_type_zh: string
+  items: any[] // ConvenienceItem[]
+  total_calories: number
+  total_protein_g: number
+  total_carbs_g: number
+  total_fat_g: number
+  reasoning: string
+}
+
 export interface DayPlan {
   day: number
   date: string
   meals: DailyMeal[]
+  convenience_meals?: ConvenienceMealCombination[] // 便利店預配方案，用戶不能編輯
   workout: DailyWorkout
   daily_targets: {
     calories: number
