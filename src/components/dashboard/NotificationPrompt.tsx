@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Bell, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { createClient } from '@/lib/supabase/client'
 import { initializeFirebase, requestNotificationPermission, listenForPushMessages } from '@/lib/firebase'
 
 export default function NotificationPrompt() {
@@ -28,7 +29,8 @@ export default function NotificationPrompt() {
 
   async function handleEnableNotifications() {
     try {
-      const { data: { user } } = await fetch('/api/auth/user').then(r => r.json())
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         toast.error('請先登入')
         return
