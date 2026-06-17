@@ -1,5 +1,5 @@
 // 便利店菜單資料庫 - 7-11 & 全家 (爬取真實數據)
-// 數據來源：https://www.7-11.com.tw/freshfoods/19_star/index.aspx
+// 自動生成於 2026-06-17T16:06:08.513Z
 
 export interface ConvenienceItem {
   id: string

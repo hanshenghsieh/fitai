@@ -1,0 +1,127 @@
+{
+  "source": "https://www.7-11.com.tw/freshfoods/19_star/index.aspx",
+  "timestamp": "2026-06-17T16:05:14.272Z",
+  "store": "7-11",
+  "products": [
+    {
+      "name": "泰式酸辣雞腿冷麵",
+      "price": 89,
+      "calories": 369,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_307.png",
+      "full_text": "頌丹樂-泰式酸辣雞腿冷麵\n\n香檸魚露酸辣醬x天禧麵線\n\n熱量369kcal\n89元"
+    },
+    {
+      "name": "未知產品",
+      "price": 89,
+      "calories": 369,
+      "protein_g": null,
+      "image": null,
+      "full_text": "熱量369kcal\n89元"
+    },
+    {
+      "name": "京醬鴨絲飯",
+      "price": 45,
+      "calories": null,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_300.png",
+      "full_text": "潮粵坊-京醬鴨絲飯糰\n45元"
+    },
+    {
+      "name": "港式叉燒油雞飯",
+      "price": 109,
+      "calories": null,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_303.png",
+      "full_text": "潮粵坊-港式叉燒油雞飯\n109元"
+    },
+    {
+      "name": "三杯雞燴飯",
+      "price": 99,
+      "calories": 700,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_306.png",
+      "full_text": "米香-三杯雞燴飯\n熱量700kcal\n99元"
+    },
+    {
+      "name": "麻油雞飯",
+      "price": 49,
+      "calories": 354,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_297.png",
+      "full_text": "星級饗宴-麻油雞飯糰\n熱量354kcal\n49元"
+    },
+    {
+      "name": "四起司香草烤雞握便當",
+      "price": 69,
+      "calories": 414,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_288.png",
+      "full_text": "晶華-四起司香草烤雞握便當\n熱量414kcal\n69元"
+    },
+    {
+      "name": "爆蛋肉燥新極大飯",
+      "price": 55,
+      "calories": 307,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_289.png",
+      "full_text": "晶華-爆蛋肉燥新極大飯糰\n熱量307kcal\n55元"
+    },
+    {
+      "name": "柱侯牛腱飯",
+      "price": 109,
+      "calories": 574,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_292.png",
+      "full_text": "晶華-柱侯牛腱飯\n熱量574kcal\n109元"
+    },
+    {
+      "name": "府城肉燥厚切排骨飯",
+      "price": 129,
+      "calories": null,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_294.png",
+      "full_text": "晶華-府城肉燥厚切排骨飯\n129元"
+    },
+    {
+      "name": "米香鹹酥蝦飯",
+      "price": 49,
+      "calories": 226,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_275.png",
+      "full_text": "星級饗宴-米香鹹酥蝦飯糰\n熱量226kcal\n49元"
+    },
+    {
+      "name": "晶英三杯蛤蜊飯",
+      "price": 39,
+      "calories": 250,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_276.png",
+      "full_text": "星級饗宴-晶英三杯蛤蜊飯糰\n熱量250kcal\n39元"
+    },
+    {
+      "name": "晶英韓式炸豬排起司雙拼飯",
+      "price": 89,
+      "calories": 351,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_277.png",
+      "full_text": "晶英韓式炸豬排起司雙拼飯卷\n熱量351kcal\n89元"
+    },
+    {
+      "name": "麻辣奶油鮮蝦義大利麵",
+      "price": 149,
+      "calories": 586,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_278.png",
+      "full_text": "晶英-麻辣奶油鮮蝦義大利麵\n\n麻香濃郁x白醬滑順\n\n熱量586kcal\n149元"
+    },
+    {
+      "name": "台韓半半炸雞便當",
+      "price": 119,
+      "calories": null,
+      "protein_g": null,
+      "image": "https://www.7-11.com.tw/freshfoods/19_star/images/star_279.png",
+      "full_text": "晶英-台韓半半炸雞便當\n119元"
+    }
+  ]
+}
