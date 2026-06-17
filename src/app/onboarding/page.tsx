@@ -128,6 +128,7 @@ export default function OnboardingPage() {
         end_date: endDate,
         start_weight_kg: weightKg,
         start_body_fat_pct: parseFloat(data.body_fat_pct) || null,
+        is_active: true,
       })
       if (goalError) throw new Error(`Goal error: ${goalError.message}`)
 
