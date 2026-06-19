@@ -10,7 +10,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 export const SUBSCRIPTION_PLANS = {
   monthly: {
-    name: 'FitAI 月付方案',
+    name: '再健一點 月付方案',
     amount: 50000, // $500 台幣，單位為最小單位（分）
     currency: 'twd',
     interval: 'month' as const,
@@ -45,15 +45,23 @@ export async function createCustomerIfNotExists(
   return customer.id
 }
 
-export async function createSubscription(
+export async function createCheckoutSession(
   customerId: string,
-  priceId: string
-): Promise<Stripe.Subscription> {
-  return stripe.subscriptions.create({
+  priceId: string,
+  userId: string,
+  successUrl: string,
+  cancelUrl: string
+): Promise<Stripe.Checkout.Session> {
+  return stripe.checkout.sessions.create({
     customer: customerId,
-    items: [{ price: priceId }],
-    payment_behavior: 'default_incomplete',
-    expand: ['latest_invoice.payment_intent'],
+    mode: 'subscription',
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    subscription_data: {
+      metadata: { user_id: userId },
+    },
+    metadata: { user_id: userId },
   })
 }
 

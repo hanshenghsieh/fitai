@@ -3,9 +3,20 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { colors } from '@/lib/design-system'
 import type { WeeklyFeedback } from '@/types'
+
+const selectedStyle = {
+  border: `2px solid ${colors.accent.action}`,
+  backgroundColor: colors.accent.actionSoft,
+  color: colors.text.primary,
+}
+const idleStyle = {
+  border: `1px solid ${colors.border.subtle}`,
+  backgroundColor: colors.bg.canvas,
+  color: colors.text.secondary,
+}
 
 export default function WeeklyFeedbackForm({ existing }: { existing: WeeklyFeedback | null }) {
   const [hardestPart, setHardestPart] = useState(existing?.hardest_part ?? '')
@@ -32,9 +43,9 @@ export default function WeeklyFeedbackForm({ existing }: { existing: WeeklyFeedb
         }),
       })
       if (!res.ok) throw new Error('提交失敗')
-      toast.success('回饋已提交！AI 教練將根據你的回饋調整下週計畫 🎯')
+      toast.success('收到了。下週再健一點。')
     } catch {
-      toast.error('提交失敗，請再試一次')
+      toast.error('沒送出去，再試一次。')
     } finally {
       setLoading(false)
     }
@@ -42,80 +53,112 @@ export default function WeeklyFeedbackForm({ existing }: { existing: WeeklyFeedb
 
   return (
     <div className="space-y-4">
-      {/* Diet satisfaction */}
       <div>
-        <p className="text-sm font-medium text-gray-700 mb-2">本週飲食計畫滿意度？</p>
+        <p className="text-[14px] font-medium mb-2" style={{ color: colors.text.primary }}>
+          這週吃得還行嗎？
+        </p>
         <div className="flex gap-2">
-          {[1,2,3,4,5].map(n => (
-            <button key={n} type="button" onClick={() => setDietSatisfaction(n)}
-              className={`flex-1 py-2 rounded-lg border-2 text-sm font-bold transition-colors ${dietSatisfaction === n ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-gray-200 text-gray-500'}`}>
+          {[1, 2, 3, 4, 5].map(n => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setDietSatisfaction(n)}
+              className="flex-1 py-2 rounded-xl text-sm font-semibold transition-colors"
+              style={dietSatisfaction === n ? selectedStyle : idleStyle}
+            >
               {n}
             </button>
           ))}
         </div>
-        <div className="flex justify-between text-xs text-gray-400 mt-1">
-          <span>很差</span><span>很好</span>
+        <div className="flex justify-between text-[11px] mt-1" style={{ color: colors.text.tertiary }}>
+          <span>普普</span>
+          <span>還可以</span>
         </div>
       </div>
 
-      {/* Workout intensity */}
       <div>
-        <p className="text-sm font-medium text-gray-700 mb-2">訓練強度感受？</p>
+        <p className="text-[14px] font-medium mb-2" style={{ color: colors.text.primary }}>
+          有動一下嗎？感覺如何？
+        </p>
         <div className="flex gap-2">
-          {[['too_easy','太輕鬆'],['just_right','剛好'],['too_hard','太難']].map(([val, label]) => (
-            <button key={val} type="button" onClick={() => setWorkoutIntensity(val)}
-              className={`flex-1 py-2 rounded-lg border-2 text-xs font-medium transition-colors ${workoutIntensity === val ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-500'}`}>
+          {[
+            ['too_easy', '太輕鬆'],
+            ['just_right', '剛好'],
+            ['too_hard', '太難'],
+          ].map(([val, label]) => (
+            <button
+              key={val}
+              type="button"
+              onClick={() => setWorkoutIntensity(val)}
+              className="flex-1 py-2 rounded-xl text-xs font-medium transition-colors"
+              style={workoutIntensity === val ? selectedStyle : idleStyle}
+            >
               {label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Special situations */}
       <div>
-        <p className="text-sm font-medium text-gray-700 mb-2">本週有無特殊狀況？</p>
-        <div className="flex gap-2">
-          {[['hadSickDays','生病',hadSickDays,setHadSickDays],['hadTravel','出差/旅行',hadTravel,setHadTravel]].map(([key, label, val, setter]) => (
-            <button key={key as string} type="button" onClick={() => (setter as (v: boolean) => void)(!(val as boolean))}
-              className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-colors ${val ? 'border-orange-400 bg-orange-50 text-orange-700' : 'border-gray-200 text-gray-500'}`}>
+        <p className="text-[14px] font-medium mb-2" style={{ color: colors.text.primary }}>
+          本週有沒有什麼事？
+        </p>
+        <div className="flex gap-2 flex-wrap">
+          {[
+            ['生病', hadSickDays, setHadSickDays],
+            ['出差/旅行', hadTravel, setHadTravel],
+          ].map(([label, val, setter]) => (
+            <button
+              key={label as string}
+              type="button"
+              onClick={() => (setter as (v: boolean) => void)(!(val as boolean))}
+              className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+              style={val ? selectedStyle : idleStyle}
+            >
               {label as string}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Hardest part */}
       <div>
-        <p className="text-sm font-medium text-gray-700 mb-1">本週最難執行的是什麼？</p>
+        <p className="text-[14px] font-medium mb-1" style={{ color: colors.text.primary }}>
+          這週最難的是？
+        </p>
         <Textarea
-          placeholder="例：工作太忙所以晚餐常外食、深蹲膝蓋有不舒服..."
+          placeholder="例：加班太晚、聚餐太多、懶得煮…"
           value={hardestPart}
           onChange={e => setHardestPart(e.target.value)}
-          className="resize-none text-sm"
+          className="resize-none text-sm border-0"
+          style={{ backgroundColor: colors.bg.muted, color: colors.text.primary }}
           rows={2}
         />
       </div>
 
-      {/* Additional notes */}
       <div>
-        <p className="text-sm font-medium text-gray-700 mb-1">其他想告訴 AI 教練的？</p>
+        <p className="text-[14px] font-medium mb-1" style={{ color: colors.text.primary }}>
+          還想跟我說什麼？
+        </p>
         <Textarea
-          placeholder="任何想法都可以說..."
+          placeholder="隨便說，我聽。"
           value={notes}
           onChange={e => setNotes(e.target.value)}
-          className="resize-none text-sm"
+          className="resize-none text-sm border-0"
+          style={{ backgroundColor: colors.bg.muted, color: colors.text.primary }}
           rows={2}
         />
       </div>
 
-      <Button
+      <button
+        type="button"
         onClick={handleSubmit}
         disabled={loading || !!existing}
-        className="w-full bg-emerald-500 hover:bg-emerald-600"
+        className="w-full py-3 rounded-xl text-[15px] font-semibold flex items-center justify-center disabled:opacity-50"
+        style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-        {existing ? '已提交回饋' : '提交並生成下週計畫'}
-      </Button>
+        {existing ? '已跟我說過了' : '送出，下週見'}
+      </button>
     </div>
   )
 }

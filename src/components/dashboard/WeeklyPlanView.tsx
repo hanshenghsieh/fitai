@@ -1,281 +1,488 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { format, addDays } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
-import { CheckCircle2, Circle, ChevronDown, ChevronUp, ShoppingCart, MessageSquare } from 'lucide-react'
-import { getConvenienceItems } from '@/lib/convenience-store-menu'
+import { ChevronDown, ChevronUp, ShoppingCart, MessageSquare, RefreshCw } from 'lucide-react'
+import { toast } from 'sonner'
+import { getConvenienceMealsForDay, getHomeMealsForDay } from '@/lib/meal-plan-display'
+import { buildMealCombination, comboToSaved } from '@/lib/meal-combo-engine'
+import { formatEatOutStoreLine } from '@/lib/eat-out-builder'
+import {
+  buildWeekJourney,
+  formatWeeklyGoals,
+  simplifyWorkout,
+  statusLabel,
+} from '@/lib/weekly-journey'
+import { colors, cardStyle } from '@/lib/design-system'
+import { SWAP_BUTTON } from '@/lib/coach-copy'
+import { pickZaiJianLine } from '@/lib/copy/zaijian'
+import CoachPlanSummary from '@/components/coach/CoachPlanSummary'
 import type { WeeklyPlanData, WeeklyFeedback } from '@/types'
+import type { UserProfile } from '@/types'
+import type { ConvenienceMealCombination } from '@/types'
 import WeeklyFeedbackForm from './WeeklyFeedbackForm'
 
 interface Props {
   planData: WeeklyPlanData
   weekStart: string
   todayDayIndex: number
+  profile?: UserProfile | null
   checkinMap: Record<string, { diet_items: { completed: boolean }[]; workout_items: { completed: boolean }[] } | null>
   existingFeedback: WeeklyFeedback | null
+  weekNumber?: number
 }
 
-const DAY_NAMES = ['一', '二', '三', '四', '五', '六', '日']
+type MealSlot = 'breakfast' | 'lunch' | 'dinner'
+type HomeRollState = { rollOffset: number; seen: string[]; totalRolls: number }
+type EatOutRollState = { rollOffset: number; totalRolls: number }
 
-export default function WeeklyPlanView({ planData, weekStart, todayDayIndex, checkinMap, existingFeedback }: Props) {
-  const [selectedDay, setSelectedDay] = useState(Math.min(todayDayIndex, planData?.days?.length - 1 ?? 0))
-  const [mealType, setMealType] = useState<'cook' | 'eat-out' | 'mixed'>('cook')
+const MEAL_RATIOS = { breakfast: 0.25, lunch: 0.4, dinner: 0.35 } as const
+
+function rollKey(day: number, slot: MealSlot) {
+  return `${day}-${slot}`
+}
+
+export default function WeeklyPlanView({
+  planData,
+  weekStart,
+  todayDayIndex,
+  profile,
+  checkinMap,
+  existingFeedback,
+  weekNumber = 1,
+}: Props) {
+  const [selectedDay, setSelectedDay] = useState(Math.min(Math.max(todayDayIndex, 0), (planData?.days?.length ?? 1) - 1))
+  const [mealMode, setMealMode] = useState<'cook' | 'eat-out'>('cook')
   const [showGrocery, setShowGrocery] = useState(false)
-  const [showFeedback, setShowFeedback] = useState(false)
+  const [showFeedback, setShowFeedback] = useState(todayDayIndex >= 6)
+  const [showNutrition, setShowNutrition] = useState(false)
+  const [homeRolls, setHomeRolls] = useState<Record<string, HomeRollState>>({})
+  const [eatOutRolls, setEatOutRolls] = useState<Record<string, EatOutRollState>>({})
+  const [eatOutOverrides, setEatOutOverrides] = useState<Record<number, ConvenienceMealCombination[]>>({})
 
   const todayPlan = planData?.days?.[selectedDay]
-  if (!todayPlan) return <div className="m-4 p-6 text-center text-gray-500">無法載入計畫</div>
+  const weekSeed = planData.week_number ?? weekNumber
 
-  function getDayCompletion(dayIndex: number) {
-    const dateStr = format(addDays(new Date(weekStart), dayIndex), 'yyyy-MM-dd')
-    const checkin = checkinMap[dateStr]
-    if (!checkin) return null
-    const dietDone = checkin.diet_items?.filter(i => i.completed).length ?? 0
-    const dietTotal = checkin.diet_items?.length ?? 0
-    const workDone = checkin.workout_items?.filter(i => i.completed).length ?? 0
-    const workTotal = checkin.workout_items?.length ?? 0
-    const total = dietTotal + workTotal
-    if (total === 0) return null
-    return Math.round(((dietDone + workDone) / total) * 100)
+  const journey = useMemo(
+    () =>
+      buildWeekJourney({
+        todayDayIndex,
+        checkinMap,
+        weekStart,
+        workoutTypes: planData.days.map(d => d.workout.type),
+        dayCalories: planData.days.map(d => d.daily_targets.calories),
+      }),
+    [todayDayIndex, checkinMap, weekStart, planData.days]
+  )
+
+  const weeklyGoals = useMemo(() => formatWeeklyGoals(planData), [planData])
+
+  const homeRollOptions = useMemo(() => {
+    const opts: Partial<Record<MealSlot, { rollOffset?: number; weekSeed?: number; excludeComboIds?: string[] }>> = {}
+    for (const slot of ['breakfast', 'lunch', 'dinner'] as const) {
+      const key = rollKey(selectedDay, slot)
+      const st = homeRolls[key]
+      if (st) {
+        opts[slot] = { rollOffset: st.rollOffset, weekSeed, excludeComboIds: st.seen }
+      } else {
+        opts[slot] = { weekSeed }
+      }
+    }
+    return opts
+  }, [homeRolls, selectedDay, weekSeed])
+
+  const homeMeals = useMemo(() => {
+    if (!todayPlan || !profile) return todayPlan?.meals ?? []
+    return getHomeMealsForDay(todayPlan, selectedDay, profile, homeRollOptions)
+  }, [todayPlan, selectedDay, profile, homeRollOptions])
+
+  const convenienceMeals = useMemo(() => {
+    if (!todayPlan) return []
+    if (eatOutOverrides[selectedDay]) return eatOutOverrides[selectedDay]!
+    return getConvenienceMealsForDay(todayPlan, selectedDay)
+  }, [todayPlan, selectedDay, eatOutOverrides])
+
+  const handleHomeDice = useCallback(
+    (slot: MealSlot) => {
+      if (!profile || !todayPlan) return
+      const key = rollKey(selectedDay, slot)
+      const prev = homeRolls[key] ?? { rollOffset: 0, seen: [], totalRolls: 0 }
+      const currentMeals = getHomeMealsForDay(todayPlan, selectedDay, profile, {
+        ...homeRollOptions,
+        [slot]: { rollOffset: prev.rollOffset, weekSeed, excludeComboIds: prev.seen },
+      })
+      const current = currentMeals.find(m => m.type === slot) as { combo_id?: string } | undefined
+      const seen = current?.combo_id ? [...prev.seen, current.combo_id] : prev.seen
+      const totalRolls = prev.totalRolls + 1
+      setHomeRolls({
+        ...homeRolls,
+        [key]: { rollOffset: prev.rollOffset + 1, seen, totalRolls },
+      })
+      const line = pickZaiJianLine('decide')
+      toast.message(line.subtext ? `${line.text} ${line.subtext}` : line.text)
+    },
+    [profile, todayPlan, selectedDay, homeRolls, homeRollOptions, weekSeed]
+  )
+
+  const handleEatOutDice = useCallback(
+    (slot: MealSlot) => {
+      if (!todayPlan) return
+      const key = rollKey(selectedDay, slot)
+      const prev = eatOutRolls[key] ?? { rollOffset: 0, totalRolls: 0 }
+      const totalRolls = prev.totalRolls + 1
+      const ratio = MEAL_RATIOS[slot]
+      const combo = buildMealCombination(
+        slot,
+        Math.round(todayPlan.daily_targets.calories * ratio),
+        Math.round(todayPlan.daily_targets.protein_g * ratio),
+        selectedDay + prev.rollOffset + 1 + totalRolls,
+        profile ?? undefined
+      )
+      const saved = comboToSaved(slot, combo)
+      const base = eatOutOverrides[selectedDay] ?? getConvenienceMealsForDay(todayPlan, selectedDay)
+      const updated = base.map(m => (m.meal_type === slot ? saved : m))
+      setEatOutOverrides({ ...eatOutOverrides, [selectedDay]: updated })
+      setEatOutRolls({ ...eatOutRolls, [key]: { rollOffset: prev.rollOffset + 1, totalRolls } })
+      const line = pickZaiJianLine('decide')
+      toast.message(line.subtext ? `${line.text} ${line.subtext}` : line.text)
+    },
+    [todayPlan, selectedDay, eatOutRolls, eatOutOverrides, profile]
+  )
+
+  if (!todayPlan) {
+    return (
+      <div className="m-4 p-6 text-center text-[15px]" style={{ color: colors.text.tertiary }}>
+        無法載入計畫
+      </div>
+    )
   }
 
+  const workoutSimple = simplifyWorkout(todayPlan.workout)
+  const isWeekend = selectedDay >= 5
+
   return (
-    <div className="px-4 pb-4 mt-4 space-y-4">
-      {/* Weekly summary */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div>
-            <p className="text-lg font-bold text-gray-800">{planData.weekly_targets.avg_daily_calories}</p>
-            <p className="text-xs text-gray-400">均熱量/天</p>
-          </div>
-          <div>
-            <p className="text-lg font-bold text-emerald-600">{planData.weekly_targets.avg_daily_protein_g}g</p>
-            <p className="text-xs text-gray-400">均蛋白質/天</p>
-          </div>
-          <div>
-            <p className="text-lg font-bold text-purple-600">{planData.weekly_targets.workout_days}</p>
-            <p className="text-xs text-gray-400">訓練天數</p>
-          </div>
+    <div className="px-4 pb-8 space-y-6">
+      {planData.days[todayDayIndex] && (
+        <CoachPlanSummary
+          todayPlan={planData.days[todayDayIndex]!}
+          goalSnapshot={planData.goal_snapshot}
+          weekNumber={weekNumber}
+          coachNote={planData.coach_note}
+        />
+      )}
+
+      {/* Weekly goals */}
+      <div className="rounded-3xl p-6 space-y-4" style={{ ...cardStyle, backgroundColor: colors.bg.elevated }}>
+        <p className="text-[13px] font-medium" style={{ color: colors.text.tertiary }}>
+          本週科學目標
+        </p>
+        <ul className="space-y-3">
+          {weeklyGoals.map((g, i) => (
+            <li key={i} className="text-[17px] font-semibold leading-snug" style={{ color: colors.text.primary }}>
+              {g.icon} {g.text}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Section 3 — Week Journey */}
+      <div className="space-y-2">
+        <p className="text-[13px] font-medium px-1" style={{ color: colors.text.tertiary }}>
+          這週每天
+        </p>
+        <div className="space-y-1.5">
+          {journey.map(node => {
+            const isSelected = node.dayIndex === selectedDay
+            const isToday = node.dayIndex === todayDayIndex
+            return (
+              <button
+                key={node.dayIndex}
+                type="button"
+                onClick={() => setSelectedDay(node.dayIndex)}
+                className="w-full text-left rounded-2xl px-4 py-3 transition-all"
+                style={{
+                  backgroundColor: isSelected ? colors.accent.actionSoft : colors.bg.elevated,
+                  border: `1px solid ${isToday ? colors.accent.action : colors.border.subtle}`,
+                  opacity: node.dayIndex > todayDayIndex && !isSelected ? 0.85 : 1,
+                }}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-[15px] font-semibold" style={{ color: colors.text.primary }}>
+                      {node.label}
+                      {isToday && (
+                        <span className="ml-2 text-[11px] font-medium" style={{ color: colors.accent.action }}>
+                          今天
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-[13px] mt-0.5 truncate" style={{ color: colors.text.secondary }}>
+                      {node.mood}
+                    </p>
+                  </div>
+                  <span
+                    className="text-[11px] flex-shrink-0 px-2 py-1 rounded-full"
+                    style={{
+                      backgroundColor: colors.bg.muted,
+                      color: colors.text.tertiary,
+                    }}
+                  >
+                    {statusLabel(node.status)}
+                  </span>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      {/* Day selector */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1">
-        {planData.days.map((day, i) => {
-          const completion = getDayCompletion(i)
-          const isToday = i === todayDayIndex
-          const isPast = i < todayDayIndex
-          return (
-            <button
-              key={i}
-              onClick={() => setSelectedDay(i)}
-              className={`flex-shrink-0 flex flex-col items-center px-3 py-2 rounded-xl transition-colors min-w-[52px] ${
-                selectedDay === i
-                  ? 'bg-emerald-500 text-white'
-                  : isToday
-                  ? 'bg-emerald-50 border-2 border-emerald-400 text-emerald-700'
-                  : 'bg-white shadow-sm text-gray-600'
-              }`}
-            >
-              <span className="text-xs">{DAY_NAMES[i]}</span>
-              <span className="text-sm font-bold mt-0.5">
-                {format(addDays(new Date(weekStart), i), 'd')}
-              </span>
-              {completion !== null && (
-                <div className={`w-1.5 h-1.5 rounded-full mt-1 ${completion >= 80 ? 'bg-emerald-400' : completion >= 50 ? 'bg-yellow-400' : 'bg-red-400'}`} />
-              )}
-              {completion === null && isPast && (
-                <div className="w-1.5 h-1.5 rounded-full mt-1 bg-gray-200" />
-              )}
-            </button>
-          )
-        })}
-      </div>
+      {/* Section 4 — Day detail */}
+      <div className="space-y-4">
+        <p className="text-[13px] px-1" style={{ color: colors.text.tertiary }}>
+          {format(addDays(new Date(weekStart), selectedDay), 'M月d日 EEEE', { locale: zhTW })}
+          {isWeekend && ' · 週末模式'}
+        </p>
 
-      {/* Selected day detail */}
-      {todayPlan && (
-        <div className="space-y-3">
-          {/* Meal type selector */}
-          <div className="bg-white rounded-xl shadow-sm p-3">
-            <p className="text-xs font-medium text-gray-500 mb-2">今天吃法</p>
-            <div className="flex gap-2">
-              {[
-                { val: 'cook', label: '🍳 自己煮' },
-                { val: 'eat-out', label: '🍱 外食' },
-                { val: 'mixed', label: '🔄 混合' },
-              ].map(({ val, label }) => (
-                <button
-                  key={val}
-                  onClick={() => setMealType(val as any)}
-                  className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${
-                    mealType === val
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+        {isWeekend && (
+          <p className="text-[13px] px-1" style={{ color: colors.text.secondary }}>
+            週末照目標吃，不用報復性節食。
+          </p>
+        )}
+
+        {/* Meal mode */}
+        <div className="flex gap-2">
+          {[
+            { val: 'cook' as const, label: '🍳 自己煮' },
+            { val: 'eat-out' as const, label: '🍱 外食' },
+          ].map(({ val, label }) => (
+            <button
+              key={val}
+              type="button"
+              onClick={() => setMealMode(val)}
+              className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-colors"
+              style={{
+                backgroundColor: mealMode === val ? colors.accent.action : colors.bg.muted,
+                color: mealMode === val ? '#FFFDF9' : colors.text.secondary,
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Meals */}
+        <div className="rounded-2xl overflow-hidden" style={cardStyle}>
+          <div className="px-4 py-3 border-b" style={{ borderColor: colors.border.subtle, backgroundColor: colors.bg.canvas }}>
+            <h3 className="font-semibold text-[15px]" style={{ color: colors.text.primary }}>
+              {mealMode === 'cook' ? '自己煮' : '外食'}
+            </h3>
+            <p className="text-[13px] mt-0.5" style={{ color: colors.text.tertiary }}>
+              {mealMode === 'cook' ? '照計畫煮。不喜歡可換同熱量組合。' : '照計畫吃。不喜歡可換同熱量組合。'}
+            </p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-50 bg-orange-50">
-              <h3 className="font-bold text-gray-800">🥗 飲食計畫</h3>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {mealType === 'cook' ? (
-                  <>總熱量 {todayPlan.meals.reduce((s, m) => s + m.total_calories, 0)} kcal ·
-                  蛋白質 {todayPlan.daily_targets.protein_g.toFixed(0)}g</>
-                ) : (
-                  <>便利店菜單選項</>
-                )}
-              </p>
-            </div>
-            {mealType === 'cook' ? (
-              todayPlan.meals.map(meal => (
-              <div key={meal.type} className="px-4 py-3 border-b border-gray-50 last:border-0">
-                <div className="flex justify-between items-center mb-1">
-                  <p className="font-medium text-sm text-gray-700">{meal.type_zh}</p>
-                  <p className="text-xs text-gray-400">{meal.total_calories} kcal</p>
-                </div>
-                {meal.items.map(item => {
-                  const emoji = item.name_zh === '蛋' ? '🥚' : item.name_zh === '吐司' ? '🍞' : item.name_zh === '雞肉' ? '🍗' : item.name_zh === '白飯' ? '🍚' : item.name_zh === '鮭魚' ? '🐟' : item.name_zh === '地瓜' ? '🍠' : '🍽️';
-                  return (
-                    <div key={item.id} className="flex items-center gap-2 mt-2">
-                      <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-lg flex-shrink-0">
-                        {(item as any).photo_url ? (
-                          <img src={(item as any).photo_url} alt={item.name_zh} className="w-full h-full object-cover rounded-lg" />
-                        ) : emoji}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-gray-700">{item.name_zh}</p>
-                        <p className="text-xs text-gray-400">
-                          {(item as any).quantity ? `${(item as any).quantity} · ` : ''}{item.portion} · {item.preparation}
-                        </p>
-                        {(item as any).portionDesc && (
-                          <p className="text-xs text-gray-500 italic">({(item as any).portionDesc})</p>
-                        )}
-                        <p className="text-xs text-emerald-600 mt-0.5">蛋{item.protein_g}g · {item.calories} kcal</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              ))
-            ) : (
-              // 外食菜單
-              ['breakfast', 'lunch', 'dinner'].map((mealType) => {
-                const convItems = getConvenienceItems(mealType as any)
-                const item = convItems[(selectedDay + (mealType === 'lunch' ? 1 : mealType === 'dinner' ? 2 : 0)) % convItems.length]
-                const mealLabel = mealType === 'breakfast' ? '早餐' : mealType === 'lunch' ? '午餐' : '晚餐'
+          {mealMode === 'cook'
+            ? homeMeals.map(meal => {
+                const ext = meal as {
+                  name_zh?: string
+                  steps?: string[]
+                  zaijian_note?: string
+                }
+                const slot = meal.type as MealSlot
                 return (
-                  <div key={mealType} className="px-4 py-3 border-b border-gray-50 last:border-0">
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="font-medium text-sm text-gray-700">{mealLabel}</p>
-                      <p className="text-xs text-gray-400">{item.calories} kcal</p>
-                    </div>
-                    <div className="flex gap-3">
-                      <div className="w-16 h-16 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden">
-                        <img src={item.photo_url} alt={item.name} className="w-full h-full object-cover" onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none'
-                        }} />
+                  <div
+                    key={meal.type}
+                    className="px-4 py-4 border-b last:border-0"
+                    style={{ borderColor: colors.border.subtle }}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div>
+                        <p className="font-semibold text-[15px]" style={{ color: colors.text.primary }}>
+                          {meal.type_zh}
+                        </p>
+                        {ext.name_zh && (
+                          <p className="text-[14px] mt-0.5" style={{ color: colors.text.secondary }}>
+                            {ext.name_zh}
+                          </p>
+                        )}
+                        {ext.zaijian_note && (
+                          <p className="text-[12px] mt-1 italic" style={{ color: colors.text.tertiary }}>
+                            再健：{ext.zaijian_note}
+                          </p>
+                        )}
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-700">{item.name}</p>
-                        <p className="text-xs text-gray-500">{item.store} · {item.description}</p>
-                        <div className="flex gap-2 mt-2 text-xs">
-                          <span className="text-gray-600">熱量 {item.calories} kcal</span>
-                          <span className="text-emerald-600">蛋{item.protein_g}g</span>
-                          <span className="text-gray-600">${item.price}</span>
-                        </div>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleHomeDice(slot)}
+                        className="flex-shrink-0 p-2 rounded-xl text-[13px] font-medium flex items-center gap-1"
+                        style={{ backgroundColor: colors.bg.muted, color: colors.text.secondary }}
+                        aria-label="換一組自己煮"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        <span className="text-[11px]">{SWAP_BUTTON}</span>
+                      </button>
                     </div>
+                    <ul className="space-y-2">
+                      {meal.items.map(item => (
+                        <li key={item.id} className="flex items-center gap-2 text-[13px]" style={{ color: colors.text.secondary }}>
+                          <span className="text-base">
+                            {item.name_zh.includes('蛋') ? '🥚' : item.name_zh.includes('飯') || item.name_zh.includes('麥') ? '🍚' : '🥗'}
+                          </span>
+                          <span>
+                            {item.name_zh} · {item.portion}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    {ext.steps && ext.steps.length > 0 && (
+                      <ol className="mt-3 space-y-1 list-decimal list-inside text-[12px]" style={{ color: colors.text.tertiary }}>
+                        {ext.steps.map((step, i) => (
+                          <li key={i}>{step}</li>
+                        ))}
+                      </ol>
+                    )}
+                    {showNutrition && (
+                      <p className="text-[11px] mt-2" style={{ color: colors.text.tertiary }}>
+                        約 {meal.total_calories} kcal · 份量剛好
+                      </p>
+                    )}
                   </div>
                 )
               })
-            )}
-          </div>
+            : convenienceMeals.map(conv => {
+                const slot = conv.meal_type as MealSlot
+                return (
+                  <div
+                    key={conv.meal_type}
+                    className="px-4 py-4 border-b last:border-0"
+                    style={{ borderColor: colors.border.subtle }}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <p className="font-semibold text-[15px]" style={{ color: colors.text.primary }}>
+                        {conv.meal_type_zh}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => handleEatOutDice(slot)}
+                        className="flex-shrink-0 p-2 rounded-xl"
+                        style={{ backgroundColor: colors.bg.muted, color: colors.text.secondary }}
+                        aria-label="換一組外食"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        <span className="text-[11px]">{SWAP_BUTTON}</span>
+                      </button>
+                    </div>
+                    {conv.items.length === 0 ? (
+                      <p className="text-[13px]" style={{ color: colors.text.tertiary }}>
+                        到首頁查看今日外食計畫
+                      </p>
+                    ) : (
+                      <ul className="space-y-2">
+                        {conv.items.map((item: { id: string; name: string; store?: string }) => (
+                          <li key={item.id} className="text-[13px]" style={{ color: colors.text.secondary }}>
+                            🍱 {item.name}
+                            {item.store && (
+                              <span className="block text-[11px] mt-0.5" style={{ color: colors.text.tertiary }}>
+                                {formatEatOutStoreLine(item as Parameters<typeof formatEatOutStoreLine>[0])}
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {showNutrition && conv.total_calories > 0 && (
+                      <p className="text-[11px] mt-2" style={{ color: colors.text.tertiary }}>
+                        約 {conv.total_calories} kcal
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
+        </div>
 
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-50 bg-purple-50">
-              <h3 className="font-bold text-gray-800">💪 訓練計畫</h3>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {todayPlan.workout.type_zh} · {todayPlan.workout.estimated_duration_mins} 分鐘
+        <button
+          type="button"
+          onClick={() => setShowNutrition(!showNutrition)}
+          className="text-[12px] w-full text-center py-1"
+          style={{ color: colors.text.tertiary }}
+        >
+          {showNutrition ? '收起數字' : '展開營養數字'}
+        </button>
+
+        {/* Workout — simplified */}
+        <div className="rounded-2xl p-5 space-y-2" style={cardStyle}>
+          <p className="text-[13px] font-medium" style={{ color: colors.text.tertiary }}>
+            今天動一下
+          </p>
+          <p className="text-[17px] font-semibold" style={{ color: colors.text.primary }}>
+            {workoutSimple.title}
+          </p>
+          <p className="text-[14px]" style={{ color: colors.text.secondary }}>
+            {workoutSimple.subtitle}
+          </p>
+          {workoutSimple.duration && (
+            <p className="text-[13px]" style={{ color: colors.text.tertiary }}>
+              {workoutSimple.duration}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Sunday grocery preview */}
+      {todayDayIndex >= 6 && planData.grocery_list.length > 0 && (
+        <div className="rounded-2xl overflow-hidden" style={cardStyle}>
+          <button
+            type="button"
+            className="w-full px-4 py-3 flex items-center gap-2 text-left"
+            onClick={() => setShowGrocery(!showGrocery)}
+          >
+            <ShoppingCart className="h-5 w-5" style={{ color: colors.accent.action }} />
+            <span className="font-semibold text-[15px] flex-1" style={{ color: colors.text.primary }}>
+              下週採買預覽
+            </span>
+            {showGrocery ? <ChevronUp className="h-4 w-4" style={{ color: colors.text.tertiary }} /> : <ChevronDown className="h-4 w-4" style={{ color: colors.text.tertiary }} />}
+          </button>
+          {showGrocery && (
+            <div className="px-4 pb-4 space-y-3">
+              <p className="text-[13px]" style={{ color: colors.text.secondary }}>
+                週日先看一下，下週比較不用想。
               </p>
-            </div>
-            {todayPlan.workout.type === 'rest' ? (
-              <div className="px-4 py-5 text-center text-gray-400 text-sm">😴 休息日 — 充分恢復</div>
-            ) : (
-              <div className="divide-y divide-gray-50">
-                {[
-                  { label: '🔥 暖身', items: todayPlan.workout.warmup },
-                  { label: '💪 主訓練', items: todayPlan.workout.main },
-                  { label: '🧊 收操', items: todayPlan.workout.cooldown },
-                ].filter(s => s.items.length > 0).map(section => (
-                  <div key={section.label} className="px-4 py-2">
-                    <p className="text-xs font-medium text-gray-500 mb-1.5">{section.label}</p>
-                    {section.items.map(ex => (
-                      <div key={ex.exercise_id} className="flex justify-between items-center py-1">
-                        <div>
-                          <p className="text-sm text-gray-700">{ex.exercise_name_zh}</p>
-                          <p className="text-xs text-gray-400">
-                            {ex.sets}組 × {ex.duration_secs ? `${ex.duration_secs}秒` : `${ex.reps}次`} · 休{ex.rest_secs}秒
-                          </p>
-                        </div>
-                        {ex.youtube_id && (
-                          <a href={`https://www.youtube.com/watch?v=${ex.youtube_id}`} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-red-500 hover:underline ml-2 flex-shrink-0">
-                            教學▶
-                          </a>
-                        )}
-                      </div>
+              {planData.grocery_list.map(cat => (
+                <div key={cat.category}>
+                  <p className="text-[12px] font-medium mb-1" style={{ color: colors.text.tertiary }}>
+                    {cat.category}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {cat.items.map(item => (
+                      <span
+                        key={item}
+                        className="px-2.5 py-1 rounded-full text-[12px]"
+                        style={{ backgroundColor: colors.bg.muted, color: colors.text.secondary }}
+                      >
+                        {item}
+                      </span>
                     ))}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Grocery list */}
-      <div className="bg-white rounded-xl shadow-sm">
+      {/* Feedback */}
+      <div className="rounded-2xl overflow-hidden" style={cardStyle}>
         <button
-          className="w-full px-4 py-3 flex items-center gap-2 text-left"
-          onClick={() => setShowGrocery(!showGrocery)}
-        >
-          <ShoppingCart className="h-5 w-5 text-emerald-500" />
-          <span className="font-bold text-gray-800 flex-1">本週採購清單</span>
-          {showGrocery ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
-        </button>
-        {showGrocery && (
-          <div className="px-4 pb-4 pt-0 space-y-3">
-            {planData.grocery_list.map(cat => (
-              <div key={cat.category}>
-                <p className="text-xs font-medium text-gray-500 mb-1">{cat.category}</p>
-                <div className="flex flex-wrap gap-2">
-                  {cat.items.map(item => (
-                    <span key={item} className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">{item}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Weekly feedback */}
-      <div className="bg-white rounded-xl shadow-sm">
-        <button
+          type="button"
           className="w-full px-4 py-3 flex items-center gap-2 text-left"
           onClick={() => setShowFeedback(!showFeedback)}
         >
-          <MessageSquare className="h-5 w-5 text-blue-500" />
-          <span className="font-bold text-gray-800 flex-1">
-            {existingFeedback ? '本週回饋（已提交）' : '本週回饋 · 幫助 AI 調整下週計畫'}
+          <MessageSquare className="h-5 w-5" style={{ color: colors.accent.action }} />
+          <span className="font-semibold text-[15px] flex-1" style={{ color: colors.text.primary }}>
+            {existingFeedback ? '本週回饋（已提交）' : '本週回饋（影響下週計畫）'}
           </span>
-          {showFeedback ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+          {showFeedback ? <ChevronUp className="h-4 w-4" style={{ color: colors.text.tertiary }} /> : <ChevronDown className="h-4 w-4" style={{ color: colors.text.tertiary }} />}
         </button>
         {showFeedback && (
           <div className="px-4 pb-4">

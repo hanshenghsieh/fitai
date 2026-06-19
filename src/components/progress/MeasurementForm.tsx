@@ -3,21 +3,26 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Loader2, Plus, ChevronDown, ChevronUp } from 'lucide-react'
+import { colors, cardStyle } from '@/lib/design-system'
+import { pickZaiJianLine } from '@/lib/copy/zaijian'
+import ZaiJian from '@/components/character/ZaiJian'
 
-export default function MeasurementForm() {
+interface Props {
+  lastWeightKg?: number | null
+}
+
+export default function MeasurementForm({ lastWeightKg }: Props) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({ weight_kg: '', body_fat_pct: '', muscle_mass_kg: '', waist_cm: '', hip_cm: '', chest_cm: '' })
+  const [weight, setWeight] = useState('')
+  const [bodyFat, setBodyFat] = useState('')
   const router = useRouter()
 
-  const set = (k: keyof typeof form, v: string) => setForm(prev => ({ ...prev, [k]: v }))
-
   async function handleSubmit() {
-    if (!form.weight_kg && !form.body_fat_pct) {
-      toast.error('至少填寫體重或體脂率')
+    if (!weight) {
+      toast.error('填個體重就好')
       return
     }
     setLoading(true)
@@ -26,61 +31,70 @@ export default function MeasurementForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          weight_kg: form.weight_kg ? parseFloat(form.weight_kg) : null,
-          body_fat_pct: form.body_fat_pct ? parseFloat(form.body_fat_pct) : null,
-          muscle_mass_kg: form.muscle_mass_kg ? parseFloat(form.muscle_mass_kg) : null,
-          waist_cm: form.waist_cm ? parseFloat(form.waist_cm) : null,
-          hip_cm: form.hip_cm ? parseFloat(form.hip_cm) : null,
-          chest_cm: form.chest_cm ? parseFloat(form.chest_cm) : null,
+          weight_kg: parseFloat(weight),
+          body_fat_pct: bodyFat ? parseFloat(bodyFat) : null,
         }),
       })
-      if (!res.ok) throw new Error()
-      toast.success('記錄已儲存！')
-      setForm({ weight_kg: '', body_fat_pct: '', muscle_mass_kg: '', waist_cm: '', hip_cm: '', chest_cm: '' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'failed')
+
+      setWeight('')
+      setBodyFat('')
       setOpen(false)
       router.refresh()
+
+      if (data.planRegenerated && data.regenSummary) {
+        toast.success('計畫已更新', {
+          description: data.regenSummary,
+          duration: 8000,
+        })
+      } else if (data.regenError) {
+        toast.error('體重記下了，但重算失敗', { description: data.regenError })
+      } else {
+        toast.success('記下了。')
+      }
     } catch {
-      toast.error('儲存失敗，請再試一次')
+      toast.error(pickZaiJianLine('error').text)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <button className="w-full px-4 py-3 flex items-center gap-2" onClick={() => setOpen(!open)}>
-        <Plus className="h-5 w-5 text-emerald-500" />
-        <span className="font-bold text-gray-800 flex-1 text-left">新增今日量測</span>
-        {open ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+    <div className="rounded-2xl overflow-hidden" style={cardStyle}>
+      <button className="w-full px-4 py-4 flex items-center gap-3" onClick={() => setOpen(!open)}>
+        <ZaiJian size="xs" expression="normal" />
+        <span className="text-[15px] font-semibold flex-1 text-left" style={{ color: colors.text.primary }}>
+          記一下體重
+        </span>
+        {open ? <ChevronUp className="h-4 w-4" style={{ color: colors.text.tertiary }} /> : <ChevronDown className="h-4 w-4" style={{ color: colors.text.tertiary }} />}
       </button>
       {open && (
-        <div className="px-4 pb-4 pt-0 space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              ['weight_kg', '體重 (kg)', '70.5'],
-              ['body_fat_pct', '體脂率 (%)', '25.0'],
-              ['muscle_mass_kg', '肌肉量 (kg)', '45.0'],
-              ['waist_cm', '腰圍 (cm)', '80'],
-              ['hip_cm', '臀圍 (cm)', '95'],
-              ['chest_cm', '胸圍 (cm)', '90'],
-            ].map(([key, label, placeholder]) => (
-              <div key={key}>
-                <label className="text-xs font-medium text-gray-600 block mb-1">{label}</label>
-                <Input
-                  type="number"
-                  placeholder={placeholder}
-                  step="0.1"
-                  value={form[key as keyof typeof form]}
-                  onChange={e => set(key as keyof typeof form, e.target.value)}
-                  className="text-sm"
-                />
-              </div>
-            ))}
+        <div className="px-4 pb-4 space-y-3 border-t" style={{ borderColor: colors.border.subtle }}>
+          <p className="text-[12px] pt-3" style={{ color: colors.text.tertiary }}>
+            變化夠大時，系統會自動重算熱量、蛋白質與課表。
+            {lastWeightKg != null && (
+              <span className="block mt-1">上次：{lastWeightKg} kg</span>
+            )}
+          </p>
+          <div>
+            <label className="text-[13px] block mb-1" style={{ color: colors.text.secondary }}>體重 kg</label>
+            <Input type="number" placeholder="70.5" step="0.1" value={weight} onChange={e => setWeight(e.target.value)} />
           </div>
-          <Button onClick={handleSubmit} disabled={loading} className="w-full bg-emerald-500 hover:bg-emerald-600">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            儲存記錄
-          </Button>
+          <div>
+            <label className="text-[13px] block mb-1" style={{ color: colors.text.secondary }}>體脂 %（選填）</label>
+            <Input type="number" placeholder="25" step="0.1" value={bodyFat} onChange={e => setBodyFat(e.target.value)} />
+          </div>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full py-3 rounded-xl text-[15px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40"
+            style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            記錄並更新計畫
+          </button>
         </div>
       )}
     </div>

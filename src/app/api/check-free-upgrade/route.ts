@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
-import { addMonths } from 'date-fns'
+import { countQualifiedDaysInMonth } from '@/lib/checkin-utils'
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,22 +14,22 @@ export async function GET(req: NextRequest) {
 
     const lastMonth = new Date()
     lastMonth.setMonth(lastMonth.getMonth() - 1)
-    const monthStart = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1)
-    const monthEnd = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0)
+    const year = lastMonth.getFullYear()
+    const month = lastMonth.getMonth()
 
-    // 計算上月達標天數
-    const { data: checkIns } = await supabase
-      .from('daily_check_ins')
-      .select('check_in_date')
+    const monthStart = new Date(year, month, 1)
+    const monthEnd = new Date(year, month + 1, 0)
+
+    const { data: checkins } = await supabase
+      .from('daily_checkins')
+      .select('checkin_date, diet_items, workout_items')
       .eq('user_id', user.id)
-      .eq('is_completed', true)
-      .gte('check_in_date', monthStart.toISOString().split('T')[0])
-      .lte('check_in_date', monthEnd.toISOString().split('T')[0])
+      .gte('checkin_date', monthStart.toISOString().split('T')[0])
+      .lte('checkin_date', monthEnd.toISOString().split('T')[0])
 
-    const completedDays = new Set(checkIns?.map(c => c.check_in_date)).size || 0
+    const completedDays = countQualifiedDaysInMonth(checkins ?? [], year, month)
     const qualifiesForFreeUpgrade = completedDays >= 20
 
-    // 獲取當前訂閱信息
     const { data: subscription } = await supabase
       .from('subscriptions')
       .select('*')
@@ -46,30 +46,25 @@ export async function GET(req: NextRequest) {
       })
     }
 
-    // 如果符合免費升級資格，自動延長下月訂閱
     if (qualifiesForFreeUpgrade && subscription.stripe_subscription_id) {
       try {
-        // 延長訂閱至下下月（下月免費）
         const stripeSubscription = await stripe.subscriptions.retrieve(
           subscription.stripe_subscription_id
-        ) as any
+        ) as { current_period_end: number }
 
-        const nextBillingDate = new Date((stripeSubscription.current_period_end as number) * 1000)
+        const nextBillingDate = new Date(stripeSubscription.current_period_end * 1000)
         nextBillingDate.setMonth(nextBillingDate.getMonth() + 1)
 
         await stripe.subscriptions.update(subscription.stripe_subscription_id, {
           trial_end: Math.floor(nextBillingDate.getTime() / 1000),
         })
 
-        // 更新資料庫記錄
         await supabase.from('free_upgrades').insert({
           user_id: user.id,
           completed_days: completedDays,
-          free_month_start: new Date(stripeSubscription.current_period_end * 1000),
-          free_month_end: nextBillingDate,
+          free_month_start: new Date(stripeSubscription.current_period_end * 1000).toISOString(),
+          free_month_end: nextBillingDate.toISOString(),
         })
-
-        console.log(`✅ Free upgrade applied to user ${user.id}`)
 
         return NextResponse.json({
           success: true,

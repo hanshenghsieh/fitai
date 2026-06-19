@@ -1,32 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import Stripe from 'stripe'
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
+async function resolveUserId(subscription: Stripe.Subscription): Promise<string | null> {
+  if (subscription.metadata?.user_id) return subscription.metadata.user_id
+
+  const customerId = typeof subscription.customer === 'string'
+    ? subscription.customer
+    : subscription.customer?.id
+  if (!customerId) return null
+
+  const customer = await stripe.customers.retrieve(customerId)
+  if (!customer.deleted && customer.metadata?.user_id) {
+    return customer.metadata.user_id
+  }
+  return null
+}
+
 async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
-  const supabase = await createClient()
-  const userId = subscription.metadata?.user_id || subscription.customer?.toString()
+  const supabase = createAdminClient()
+  const userId = await resolveUserId(subscription)
 
   if (!userId) return
 
-  const { error } = await supabase.from('subscriptions').insert({
+  const { error } = await supabase.from('subscriptions').upsert({
     user_id: userId,
     stripe_subscription_id: subscription.id,
-    stripe_customer_id: subscription.customer,
+    stripe_customer_id: subscription.customer as string,
     status: subscription.status,
     current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
     current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
     cancel_at_period_end: subscription.cancel_at_period_end,
-  })
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'stripe_subscription_id' })
 
   if (error) console.error('Error creating subscription record:', error)
   else console.log(`✅ Subscription created for user ${userId}`)
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from('subscriptions')
@@ -44,7 +60,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from('subscriptions')
@@ -64,7 +80,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
 
   if (!paymentIntent.subscription) return
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data: subscription } = await supabase
     .from('subscriptions')
     .select('user_id')
@@ -87,7 +103,7 @@ async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
 
   if (!paymentIntent.subscription) return
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data: subscription } = await supabase
     .from('subscriptions')
     .select('user_id')
@@ -133,12 +149,18 @@ export async function POST(req: NextRequest) {
         await handleSubscriptionDeleted(event.data.object as Stripe.Subscription)
         break
 
-      case 'payment_intent.succeeded':
-        await handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent)
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session
+        if (session.subscription && session.metadata?.user_id) {
+          const sub = await stripe.subscriptions.retrieve(session.subscription as string)
+          await handleSubscriptionCreated(sub)
+        }
         break
+      }
 
-      case 'payment_intent.payment_failed':
-        await handlePaymentIntentFailed(event.data.object as Stripe.PaymentIntent)
+      case 'invoice.payment_succeeded':
+      case 'invoice.payment_failed':
+        console.log(`Invoice event: ${event.type}`)
         break
 
       default:

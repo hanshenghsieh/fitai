@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "import-menu": "node scripts/import-menu.js"
+    "import-menu": "node scripts/import-menu.js",
+    "sync-menu": "node scripts/sync-menu.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",

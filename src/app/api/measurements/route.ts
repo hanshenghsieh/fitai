@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { evaluateRegenNeed, triggerPlanRegeneration } from '@/lib/plan-regen'
 
 export async function GET() {
   const supabase = await createClient()
@@ -11,7 +12,7 @@ export async function GET() {
     .select('*')
     .eq('user_id', user.id)
     .order('measured_at', { ascending: true })
-    .limit(52) // 1 year
+    .limit(52)
 
   return NextResponse.json({ measurements: data ?? [] })
 }
@@ -22,6 +23,12 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()
+
+  const { data: prevProfile } = await supabase
+    .from('user_profiles')
+    .select('weight_kg, body_fat_pct')
+    .eq('id', user.id)
+    .single()
 
   const { data, error } = await supabase
     .from('body_measurements')
@@ -40,12 +47,38 @@ export async function POST(request: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Also update user profile with latest weight/body fat
   await supabase.from('user_profiles').update({
     weight_kg: body.weight_kg ?? undefined,
     body_fat_pct: body.body_fat_pct ?? undefined,
     muscle_mass_kg: body.muscle_mass_kg ?? undefined,
   }).eq('id', user.id)
 
-  return NextResponse.json({ measurement: data })
+  const regenDecision = evaluateRegenNeed(
+    {
+      weight_kg: prevProfile?.weight_kg,
+      body_fat_pct: prevProfile?.body_fat_pct,
+    },
+    {
+      weight_kg: body.weight_kg ?? prevProfile?.weight_kg,
+      body_fat_pct: body.body_fat_pct ?? prevProfile?.body_fat_pct,
+    }
+  )
+
+  let planRegenerated = false
+  let regenSummary: string | null = null
+  let regenError: string | null = null
+
+  if (regenDecision.shouldRegen && regenDecision.summary) {
+    const result = await triggerPlanRegeneration(user.id, regenDecision.summary)
+    planRegenerated = result.ok
+    regenSummary = regenDecision.summary
+    if (!result.ok) regenError = result.error ?? '重算失敗'
+  }
+
+  return NextResponse.json({
+    measurement: data,
+    planRegenerated,
+    regenSummary,
+    regenError,
+  })
 }

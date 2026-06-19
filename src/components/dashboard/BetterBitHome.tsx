@@ -1,252 +1,576 @@
 'use client'
 
-import { useState } from 'react'
-import { CheckCircle2, Circle, ChevronDown, ChevronUp } from 'lucide-react'
-import type { DayPlan, DailyCheckin } from '@/types'
+import { useState, useTransition, useCallback, useEffect } from 'react'
+import { CheckCircle2, Circle, ChevronDown, ChevronUp, Play } from 'lucide-react'
+import { toast } from 'sonner'
+import { getConvenienceMealsForDay, getHomeMealsForDay } from '@/lib/meal-plan-display'
+import {
+  buildCheckinPayload,
+  initDietItems,
+  initWorkoutItems,
+  mealModesFromCheckin,
+  customEatOutFromCheckin,
+  mealSuggestFromCheckin,
+  dailyRollsFromCheckin,
+  userMemoryFromCheckin,
+  calcTodayCompletion,
+  isCheckinDayQualified,
+  type MealModes,
+  type MealType,
+  type CustomEatOutSelection,
+  type MealSuggestState,
+  type UserMemoryMeta,
+  type DailyRollState,
+} from '@/lib/checkin-utils'
+import EatOutBuilder from '@/components/dashboard/EatOutBuilder'
+import HomeDecisionHero from '@/components/dashboard/HomeDecisionHero'
+import ScrollFloatCard from '@/components/motion/ScrollFloatCard'
+import BreathingProgress from '@/components/motion/BreathingProgress'
+import ExpandPanel from '@/components/motion/ExpandPanel'
+import { currentMealSlot } from '@/lib/meal-engine'
+import { eatOutMenu } from '@/lib/convenience-store-menu'
+import { deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
+import { colors, cardStyle } from '@/lib/design-system'
+import { pickZaiJianLine, zaijian } from '@/lib/copy/zaijian'
+import {
+  resolveMealCompanion,
+  resolveWaterCompanion,
+  resolveWorkoutCompanion,
+} from '@/lib/companion-state'
+import ZaiJian from '@/components/character/ZaiJian'
+import type { DayPlan, DailyCheckin, DietCheckinItem, WorkoutCheckinItem, UserProfile } from '@/types'
+
+interface GoalSnapshot {
+  current_body_fat?: number | null
+  target_body_fat?: number | null
+  target_weight?: number | null
+  weeks_remaining?: number
+  weekly_fat_loss_g?: number
+  daily_deficit?: number
+}
 
 interface Props {
   todayPlan: DayPlan
   checkin: DailyCheckin | null
   weeklyPlanId: string | null
+  goalSnapshot?: GoalSnapshot | null
+  coachNote?: string | null
+  dayIndex?: number
+  profile?: UserProfile | null
+  weekNumber?: number
+  cheatRecovery?: boolean
+  todayLabel?: string
 }
 
-export default function BetterBitHome({ todayPlan, checkin, weeklyPlanId }: Props) {
-  const [expandedMeal, setExpandedMeal] = useState<string | null>('breakfast')
-  const [dietCompleted, setDietCompleted] = useState(0)
+export default function BetterBitHome({
+  todayPlan,
+  checkin,
+  weeklyPlanId,
+  goalSnapshot,
+  dayIndex = 0,
+  coachNote,
+  profile,
+  weekNumber,
+  cheatRecovery = false,
+  todayLabel,
+}: Props) {
+  const [isPending, startTransition] = useTransition()
+  const [expandedMeal, setExpandedMeal] = useState<string | null>(null)
+  useEffect(() => {
+    setExpandedMeal(currentMealSlot())
+  }, [])
+  const [expandedWorkout, setExpandedWorkout] = useState(false)
+  const [dietItems, setDietItems] = useState<DietCheckinItem[]>(() => initDietItems(checkin))
+  const [workoutItems, setWorkoutItems] = useState<WorkoutCheckinItem[]>(() =>
+    initWorkoutItems(
+      checkin,
+      todayPlan.workout?.main?.map(ex => ({
+        exercise_id: ex.exercise_id,
+        exercise_name_zh: ex.exercise_name_zh,
+      })) ?? []
+    )
+  )
+  const [mealModes, setMealModes] = useState<MealModes>(() => mealModesFromCheckin(checkin))
+  const [customEatOut, setCustomEatOut] = useState<Partial<Record<MealType, CustomEatOutSelection[]>>>(() =>
+    customEatOutFromCheckin(checkin)
+  )
+  const [mealSuggest, setMealSuggest] = useState<Partial<Record<MealType, MealSuggestState>>>(() =>
+    mealSuggestFromCheckin(checkin)
+  )
+  const [dailyRolls, setDailyRolls] = useState<DailyRollState>(() => dailyRollsFromCheckin(checkin))
+  const [userMemory, setUserMemory] = useState<UserMemoryMeta>(() => userMemoryFromCheckin(checkin))
+  const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
 
-  const completedBreakfast = checkin?.diet_items?.find(d => d.meal_id === 'breakfast')?.completed ?? false
-  const completedLunch = checkin?.diet_items?.find(d => d.meal_id === 'lunch')?.completed ?? false
-  const completedDinner = checkin?.diet_items?.find(d => d.meal_id === 'dinner')?.completed ?? false
+  const waterTarget = todayPlan.daily_targets.water_ml
+  const exercises = todayPlan.workout?.main ?? []
 
-  const handleCompleteTask = async (mealId: string) => {
-    // 更新數據庫邏輯
-    console.log('Complete:', mealId)
+  const persist = useCallback(
+    async (patch: {
+      dietItems?: DietCheckinItem[]
+      workoutItems?: WorkoutCheckinItem[]
+      waterMl?: number
+      mealModes?: MealModes
+      customEatOut?: Partial<Record<MealType, CustomEatOutSelection[]>>
+      dailyRolls?: DailyRollState
+      mealSuggest?: Partial<Record<MealType, MealSuggestState>>
+      userMemory?: UserMemoryMeta
+    }) => {
+      const state = {
+        dietItems: patch.dietItems ?? dietItems,
+        workoutItems: patch.workoutItems ?? workoutItems,
+        waterMl: patch.waterMl ?? waterMl,
+        mealModes: patch.mealModes ?? mealModes,
+        customEatOut: patch.customEatOut ?? customEatOut,
+        dailyRolls: patch.dailyRolls ?? dailyRolls,
+        mealSuggest: patch.mealSuggest ?? mealSuggest,
+        userMemory: patch.userMemory ?? userMemory,
+      }
+      try {
+        const res = await fetch('/api/checkin', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId)),
+        })
+        if (!res.ok) throw new Error()
 
-    // 顯示成功反饋
-    setDietCompleted(prev => prev + 1)
+        const qualified = isCheckinDayQualified({
+          diet_items: state.dietItems,
+          workout_items: state.workoutItems,
+        })
+        const pct = calcTodayCompletion(state.dietItems, state.workoutItems, state.waterMl, waterTarget)
+        if (qualified && pct >= 100) {
+          toast.success(pickZaiJianLine('success').subtext ?? pickZaiJianLine('success').text)
+        }
+      } catch {
+        toast.error(pickZaiJianLine('error').text)
+      }
+    },
+    [dietItems, workoutItems, waterMl, mealModes, customEatOut, dailyRolls, mealSuggest, userMemory, weeklyPlanId, waterTarget]
+  )
+
+  const toggleMeal = (mealId: MealType) => {
+    startTransition(() => {
+      const updated = dietItems.map(d =>
+        d.meal_id === mealId ? { ...d, completed: !d.completed } : d
+      )
+      setDietItems(updated)
+      persist({ dietItems: updated })
+    })
+  }
+
+  const toggleExercise = (exerciseId: string) => {
+    startTransition(() => {
+      const updated = workoutItems.map(w =>
+        w.exercise_id === exerciseId ? { ...w, completed: !w.completed } : w
+      )
+      setWorkoutItems(updated)
+      persist({ workoutItems: updated })
+    })
+  }
+
+  const setMealMode = (mealType: MealType, mode: 'cook' | 'convenience') => {
+    startTransition(() => {
+      const updated = { ...mealModes, [mealType]: mode }
+      setMealModes(updated)
+      persist({ mealModes: updated })
+    })
+  }
+
+  const addWater = (ml: number) => {
+    const next = Math.min(waterTarget + 500, waterMl + ml)
+    setWaterMl(next)
+    persist({ waterMl: next })
+  }
+
+  const homeMeals = getHomeMealsForDay(todayPlan, dayIndex, profile)
+  const convenienceMeals = getConvenienceMealsForDay(todayPlan, dayIndex)
+
+  const getMealDisplay = (mealIndex: number, mealType: MealType) => {
+    const labels = ['早餐', '午餐', '晚餐']
+    const convenience = convenienceMeals.find(m => m.meal_type === mealType)
+    const home = homeMeals.find(m => m.type === mealType) ?? homeMeals[mealIndex]
+    const custom = customEatOut[mealType]
+
+    if (mealModes[mealType] === 'cook' && home?.items?.length) {
+      return { label: labels[mealIndex], meal: home, isConvenience: false }
+    }
+
+    if (custom?.length) {
+      const selected = deserializeCustomCombo(custom, eatOutMenu)
+      const display = selectedToDisplayItems(selected)
+      return {
+        label: labels[mealIndex],
+        combo: { items: display },
+        isConvenience: true,
+      }
+    }
+
+    if (convenience?.items?.length) {
+      return {
+        label: labels[mealIndex],
+        combo: { items: convenience.items },
+        isConvenience: true,
+      }
+    }
+    if (home?.items?.length) {
+      return { label: labels[mealIndex], meal: home, isConvenience: false }
+    }
+    return { label: labels[mealIndex], combo: { items: [] }, isConvenience: true }
+  }
+
+  const applyHeroDecision = (payload: {
+    mealType: MealType
+    selection: CustomEatOutSelection[]
+    dailyRolls: DailyRollState
+    mealSuggest: Partial<Record<MealType, MealSuggestState>>
+    userMemory: UserMemoryMeta
+    switchToConvenience?: boolean
+  }) => {
+    const modes = payload.switchToConvenience
+      ? { ...mealModes, [payload.mealType]: 'convenience' as const }
+      : mealModes
+    const eatOut = { ...customEatOut, [payload.mealType]: payload.selection }
+    setMealModes(modes)
+    setCustomEatOut(eatOut)
+    setDailyRolls(payload.dailyRolls)
+    setMealSuggest(payload.mealSuggest)
+    setUserMemory(payload.userMemory)
+    setExpandedMeal(payload.mealType)
+    persist({
+      mealModes: modes,
+      customEatOut: eatOut,
+      dailyRolls: payload.dailyRolls,
+      mealSuggest: payload.mealSuggest,
+      userMemory: payload.userMemory,
+    })
+  }
+
+  const handleMealRoll = (
+    mealType: MealType,
+    payload: {
+      selection: CustomEatOutSelection[]
+      dailyRolls: DailyRollState
+      mealSuggest: MealSuggestState
+    }
+  ) => {
+    const eatOut = { ...customEatOut, [mealType]: payload.selection }
+    const suggest = { ...mealSuggest, [mealType]: payload.mealSuggest }
+    setCustomEatOut(eatOut)
+    setDailyRolls(payload.dailyRolls)
+    setMealSuggest(suggest)
+    persist({ customEatOut: eatOut, dailyRolls: payload.dailyRolls, mealSuggest: suggest })
+  }
+
+  const completionPercent = calcTodayCompletion(dietItems, workoutItems, waterMl, waterTarget)
+
+  const meals = ([0, 1, 2] as const).map(idx => {
+    const types: MealType[] = ['breakfast', 'lunch', 'dinner']
+    const type = types[idx]
+    return {
+      ...getMealDisplay(idx, type),
+      type,
+      completed: dietItems.find(d => d.meal_id === type)?.completed ?? false,
+    }
+  })
+
+  const isRestDay = exercises.length === 0
+  const workoutDone = workoutItems.filter(w => w.completed).length
+
+  const companionCtx = {
+    completionPercent,
+    waterMl,
+    waterTarget,
+    isRestDay,
+    workoutDone,
+    workoutTotal: workoutItems.length,
+    mealsCompleted: {
+      breakfast: dietItems.find(d => d.meal_id === 'breakfast')?.completed ?? false,
+      lunch: dietItems.find(d => d.meal_id === 'lunch')?.completed ?? false,
+      dinner: dietItems.find(d => d.meal_id === 'dinner')?.completed ?? false,
+    },
+    cheatRecovery,
+  }
+
+  const waterLine = resolveWaterCompanion(waterMl, waterTarget)
+  const workoutLine = resolveWorkoutCompanion(companionCtx)
+
+  const mealSummary = (meal: (typeof meals)[0]) => {
+    const items = meal.meal?.items || meal.combo?.items || []
+    return items
+      .slice(0, 2)
+      .map(i => ('name' in i && meal.isConvenience ? i.name : (i as { name_zh?: string }).name_zh))
+      .filter(Boolean)
+      .join(' · ') || '點開查看'
   }
 
   return (
-    <div className="space-y-4 px-4 py-4 pb-24">
-      {/* 今日統計 - 簡潔卡片 */}
-      <div className="grid grid-cols-3 gap-3">
-        <StatCard
-          emoji="🔥"
-          value={`${todayPlan.daily_targets.calories}`}
-          unit="kcal"
-          subtext="目標熱量"
-        />
-        <StatCard
-          emoji="💪"
-          value={`${todayPlan.daily_targets.protein_g}`}
-          unit="g"
-          subtext="蛋白質"
-        />
-        <StatCard
-          emoji="⏱️"
-          value="30"
-          unit="min"
-          subtext="今日運動"
-        />
-      </div>
+    <>
+      <HomeDecisionHero
+        todayPlan={todayPlan}
+        profile={profile}
+        goalSnapshot={goalSnapshot}
+        weekNumber={weekNumber}
+        coachNote={coachNote}
+        dayIndex={dayIndex}
+        todayLabel={todayLabel}
+        dailyRolls={dailyRolls}
+        mealSuggest={mealSuggest}
+        customEatOut={customEatOut}
+        userMemory={userMemory}
+        onApply={applyHeroDecision}
+      />
 
-      {/* 今日任務 - 卡片式，可展開 */}
-      <div className="space-y-2">
-        {/* 早餐 */}
-        <TaskCard
-          mealType="早餐"
-          emoji="☀️"
-          isCompleted={completedBreakfast}
-          isExpanded={expandedMeal === 'breakfast'}
-          onToggleExpand={() => setExpandedMeal(expandedMeal === 'breakfast' ? null : 'breakfast')}
-          onComplete={() => handleCompleteTask('breakfast')}
-          meal={todayPlan.meals[0]}
-        />
+      <div className="px-4 pb-32 space-y-6" style={{ backgroundColor: colors.bg.canvas }}>
+        <ScrollFloatCard depth={0} staggerIndex={2}>
+          <div className="space-y-2">
+            <BreathingProgress percent={completionPercent} />
+            {completionPercent >= 100 && (
+              <ZaiJian size="sm" line={pickZaiJianLine('success')} layout="inline" className="justify-center px-2" />
+            )}
+          </div>
+        </ScrollFloatCard>
 
-        {/* 午餐 */}
-        <TaskCard
-          mealType="午餐"
-          emoji="🌞"
-          isCompleted={completedLunch}
-          isExpanded={expandedMeal === 'lunch'}
-          onToggleExpand={() => setExpandedMeal(expandedMeal === 'lunch' ? null : 'lunch')}
-          onComplete={() => handleCompleteTask('lunch')}
-          meal={todayPlan.meals[1]}
-        />
+        {isPending && (
+          <p className="text-center text-[11px]" style={{ color: colors.text.tertiary }}>{zaijian.saving}</p>
+        )}
 
-        {/* 晚餐 */}
-        <TaskCard
-          mealType="晚餐"
-          emoji="🌙"
-          isCompleted={completedDinner}
-          isExpanded={expandedMeal === 'dinner'}
-          onToggleExpand={() => setExpandedMeal(expandedMeal === 'dinner' ? null : 'dinner')}
-          onComplete={() => handleCompleteTask('dinner')}
-          meal={todayPlan.meals[2]}
-        />
+        <ScrollFloatCard
+          depth={1}
+          staggerIndex={3}
+          className="rounded-2xl p-5"
+          style={cardStyle}
+        >
+          <ZaiJian size="xs" line={waterLine} layout="inline" className="mb-3" />
+          <div className="h-1.5 rounded-full overflow-hidden mb-4" style={{ backgroundColor: colors.bg.muted }}>
+            <div
+              className="h-full rounded-full"
+              style={{
+                backgroundColor: colors.accent.action,
+                width: `${Math.min(100, (waterMl / waterTarget) * 100)}%`,
+                transition: 'width 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
+              }}
+            />
+          </div>
+          <div className="flex gap-2">
+            {[250, 500].map(ml => (
+              <button
+                key={ml}
+                type="button"
+                onClick={() => addWater(ml)}
+                className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold"
+                style={{ backgroundColor: colors.bg.muted, color: colors.text.primary }}
+              >
+                +{ml}ml
+              </button>
+            ))}
+          </div>
+        </ScrollFloatCard>
 
-        {/* 運動 */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100 hover:border-green-300 transition-colors">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => handleCompleteTask('workout')}
-              className="flex-shrink-0"
+        <div className="space-y-6">
+          {meals.map((meal, mealIdx) => {
+            const mealLine = resolveMealCompanion(meal.type, meal.completed)
+            return (
+            <ScrollFloatCard
+              key={meal.type}
+              depth={(mealIdx + 1) as 1 | 2 | 3}
+              staggerIndex={4 + mealIdx}
+              id={`meal-section-${meal.type}`}
+              className="rounded-2xl overflow-hidden"
+              style={{
+                ...cardStyle,
+                backgroundColor: meal.completed ? colors.bg.canvas : colors.bg.elevated,
+                borderColor: expandedMeal === meal.type ? colors.border.focus : colors.border.subtle,
+              }}
             >
-              <Circle className="w-6 h-6 text-gray-300" />
+              <div className="p-5 flex items-center gap-4">
+                <button type="button" onClick={() => toggleMeal(meal.type)} aria-label={`完成${meal.label}`}>
+                  {meal.completed ? (
+                    <CheckCircle2 className="h-6 w-6" style={{ color: colors.accent.action }} />
+                  ) : (
+                    <Circle className="h-6 w-6" style={{ color: colors.border.subtle }} />
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="flex-1 text-left min-w-0"
+                  onClick={() => setExpandedMeal(expandedMeal === meal.type ? null : meal.type)}
+                >
+                  <p
+                    className="font-semibold text-[15px]"
+                    style={{ color: meal.completed ? colors.text.tertiary : colors.text.primary }}
+                  >
+                    {meal.label}
+                  </p>
+                  <p className="text-[12px] truncate mt-0.5" style={{ color: colors.text.secondary }}>
+                    {meal.completed ? mealLine.subtext ?? mealLine.text : mealLine.text}
+                  </p>
+                  {!meal.completed && (
+                    <p className="text-[13px] truncate mt-0.5" style={{ color: colors.text.tertiary }}>
+                      {mealSummary(meal)}
+                    </p>
+                  )}
+                </button>
+                <button type="button" onClick={() => setExpandedMeal(expandedMeal === meal.type ? null : meal.type)}>
+                  {expandedMeal === meal.type ? (
+                    <ChevronUp className="h-5 w-5" style={{ color: colors.text.tertiary }} />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" style={{ color: colors.text.tertiary }} />
+                  )}
+                </button>
+              </div>
+
+              <ExpandPanel
+                open={expandedMeal === meal.type}
+                className="px-5 pb-5 space-y-4 border-t"
+                style={{ borderColor: colors.border.subtle, backgroundColor: colors.bg.canvas }}
+              >
+                <div className="flex gap-2 pt-4">
+                  {(['外食', '自己煮'] as const).map((label, i) => {
+                    const mode = i === 0 ? 'convenience' : 'cook'
+                    const active = mealModes[meal.type] === mode
+                    return (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => setMealMode(meal.type, mode)}
+                        className="flex-1 py-2 rounded-xl text-[12px] font-semibold"
+                        style={{
+                          backgroundColor: active ? colors.accent.action : colors.bg.muted,
+                          color: active ? '#FFFDF9' : colors.text.secondary,
+                        }}
+                      >
+                        {label}
+                      </button>
+                    )
+                  })}
+                </div>
+                {mealModes[meal.type] === 'convenience' ? (
+                  <EatOutBuilder
+                    mealType={meal.type}
+                    dailyTargets={todayPlan.daily_targets}
+                    profile={profile}
+                    userMemory={userMemory}
+                    mealSuggestState={mealSuggest[meal.type]}
+                    dailyRolls={dailyRolls}
+                    dayIndex={dayIndex}
+                    suggestedItems={convenienceMeals.find(m => m.meal_type === meal.type)?.items ?? []}
+                    savedSelection={customEatOut[meal.type]}
+                    onRoll={payload => handleMealRoll(meal.type, payload)}
+                  />
+                ) : (
+                  <div className="space-y-2">
+                    {(meal.meal?.items || []).map((item: { id: string; name_zh?: string }) => (
+                      <div
+                        key={item.id}
+                        className="p-3 rounded-xl"
+                        style={{ backgroundColor: colors.bg.elevated, border: `1px solid ${colors.border.subtle}` }}
+                      >
+                        <p className="font-semibold text-[15px]" style={{ color: colors.text.primary }}>
+                          {item.name_zh}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ExpandPanel>
+            </ScrollFloatCard>
+            )
+          })}
+        </div>
+
+        {todayPlan.workout && (
+          <ScrollFloatCard
+            depth={2}
+            staggerIndex={7}
+            className="rounded-2xl overflow-hidden"
+            style={{
+              ...cardStyle,
+              borderColor: expandedWorkout ? colors.border.focus : colors.border.subtle,
+            }}
+          >
+            <button
+              type="button"
+              className="w-full p-5 flex items-center gap-4 text-left"
+              onClick={() => setExpandedWorkout(!expandedWorkout)}
+            >
+              <ZaiJian size="xs" expression={workoutLine.expression} />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-[15px]" style={{ color: colors.text.primary }}>
+                  {todayPlan.workout.type_zh}
+                </p>
+                <p className="text-[12px] mt-0.5" style={{ color: colors.text.secondary }}>
+                  {workoutLine.text}
+                </p>
+                <p className="text-[13px] mt-0.5 truncate" style={{ color: colors.text.tertiary }}>
+                  {isRestDay
+                    ? workoutLine.subtext
+                    : `${todayPlan.workout.estimated_duration_mins} 分鐘 · ${workoutDone}/${workoutItems.length}${
+                        todayPlan.daily_targets.exercise_burn_kcal
+                          ? ` · 約 ${todayPlan.daily_targets.exercise_burn_kcal} kcal`
+                          : ''
+                      }`}
+                </p>
+              </div>
+              {expandedWorkout ? (
+                <ChevronUp className="h-5 w-5" style={{ color: colors.text.tertiary }} />
+              ) : (
+                <ChevronDown className="h-5 w-5" style={{ color: colors.text.tertiary }} />
+              )}
             </button>
-            <div className="flex-1">
-              <p className="font-semibold text-gray-800">💪 運動</p>
-              <p className="text-sm text-gray-500">快走 30 分鐘</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-gray-400">下午 3 點</p>
-              <p className="text-xs text-green-600 font-medium">已提醒</p>
-            </div>
-          </div>
-        </div>
 
-        {/* 喝水 */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100">
-          <p className="font-semibold text-gray-800 mb-2">💧 喝水進度</p>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-green-400" style={{ width: '37.5%' }} />
-            </div>
-            <p className="text-xs text-gray-500">3/8</p>
-          </div>
-          <p className="text-xs text-gray-500">還需 5 杯</p>
-        </div>
-      </div>
-
-      {/* 本週成績 */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white rounded-2xl p-4 border border-gray-100">
-          <p className="text-xs text-gray-500 mb-1">連續完成</p>
-          <p className="text-2xl font-bold text-green-600">3 天</p>
-          <p className="text-xs text-gray-400 mt-1">✓ ✓ ✓</p>
-        </div>
-        <div className="bg-white rounded-2xl p-4 border border-gray-100">
-          <p className="text-xs text-gray-500 mb-1">本月完成</p>
-          <p className="text-2xl font-bold text-green-600">85%</p>
-          <p className="text-xs text-gray-400 mt-1">15/18 天</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// 統計卡片組件
-function StatCard({ emoji, value, unit, subtext }: any) {
-  return (
-    <div className="bg-white rounded-2xl p-3 border border-gray-100 text-center hover:border-green-300 transition-colors">
-      <p className="text-2xl mb-1">{emoji}</p>
-      <p className="text-xl font-bold text-gray-800">{value}</p>
-      <p className="text-xs text-gray-500">{subtext}</p>
-    </div>
-  )
-}
-
-// 任務卡片組件
-function TaskCard({
-  mealType,
-  emoji,
-  isCompleted,
-  isExpanded,
-  onToggleExpand,
-  onComplete,
-  meal,
-}: any) {
-  return (
-    <div className={`bg-white rounded-2xl border transition-all ${
-      isCompleted
-        ? 'border-gray-200 bg-gray-50'
-        : 'border-gray-100 hover:border-green-300'
-    }`}>
-      {/* 標題欄 */}
-      <div className="p-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onComplete}
-            className="flex-shrink-0 transition-transform hover:scale-110"
-          >
-            {isCompleted ? (
-              <CheckCircle2 className="w-6 h-6 text-green-500" />
-            ) : (
-              <Circle className="w-6 h-6 text-gray-300" />
-            )}
-          </button>
-
-          <button
-            onClick={onToggleExpand}
-            className="flex-1 text-left"
-          >
-            <p className={`font-semibold transition-colors ${
-              isCompleted ? 'text-gray-400' : 'text-gray-800'
-            }`}>
-              {emoji} {mealType}
-            </p>
-            {meal && (
-              <p className={`text-sm transition-colors ${
-                isCompleted ? 'text-gray-400' : 'text-gray-500'
-              }`}>
-                {meal.items.map((i: any) => i.name_zh).join(' · ')}
-              </p>
-            )}
-          </button>
-
-          <button
-            onClick={onToggleExpand}
-            className="flex-shrink-0"
-          >
-            {isExpanded ? (
-              <ChevronUp className="w-4 h-4 text-gray-400" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-gray-400" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* 展開內容 */}
-      {isExpanded && meal && (
-        <>
-          <div className="border-t border-gray-100 px-4 py-3 bg-gray-50">
-            <p className="text-xs font-medium text-gray-600 mb-3">食材明細</p>
-            <div className="space-y-2">
-              {meal.items.map((item: any) => (
-                <div key={item.id} className="flex gap-2 text-xs text-gray-600">
-                  <span className="font-medium">{item.name_zh}</span>
-                  <span className="text-gray-400">{item.portion}</span>
+            <ExpandPanel
+              open={expandedWorkout && !isRestDay}
+              className="px-5 pb-5 space-y-2 border-t"
+              style={{ borderColor: colors.border.subtle, backgroundColor: colors.bg.canvas }}
+            >
+              {workoutItems.map((ex, idx) => (
+                <div
+                  key={ex.exercise_id}
+                  className="flex items-center gap-3 p-3 rounded-xl"
+                  style={{ backgroundColor: colors.bg.elevated, border: `1px solid ${colors.border.subtle}` }}
+                >
+                  <button type="button" onClick={() => toggleExercise(ex.exercise_id)}>
+                    {ex.completed ? (
+                      <CheckCircle2 className="h-5 w-5" style={{ color: colors.accent.action }} />
+                    ) : (
+                      <Circle className="h-5 w-5" style={{ color: colors.border.subtle }} />
+                    )}
+                  </button>
+                  <div className="flex-1">
+                    <p
+                      className="text-[15px] font-semibold"
+                      style={{ color: ex.completed ? colors.text.tertiary : colors.text.primary }}
+                    >
+                      {ex.exercise_name_zh || ex.exercise_name}
+                    </p>
+                    {exercises[idx] && (
+                      <p className="text-[13px]" style={{ color: colors.text.tertiary }}>
+                        {exercises[idx].sets}組
+                        {exercises[idx].duration_secs
+                          ? ` × ${exercises[idx].duration_secs}秒`
+                          : exercises[idx].reps
+                            ? ` × ${exercises[idx].reps}次`
+                            : ''}
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
-            </div>
-          </div>
-
-          <div className="px-4 py-3 bg-white border-t border-gray-100 flex gap-2 justify-end">
-            <button className="text-xs font-medium text-green-600 hover:text-green-700">
-              換菜單
-            </button>
-            <span className="text-gray-300">|</span>
-            <button className="text-xs font-medium text-red-600 hover:text-red-700">
-              刪除
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* 營養概覽 (摺疊時) */}
-      {!isExpanded && meal && (
-        <div className="px-4 pb-3 flex gap-4 text-xs text-gray-500">
-          <div>
-            <span className="font-medium text-gray-700">{meal.total_calories}</span>
-            <span> kcal</span>
-          </div>
-          <div>
-            <span className="font-medium text-green-600">{meal.items.reduce((s: number, i: any) => s + i.protein_g, 0)}</span>
-            <span> g 蛋白</span>
-          </div>
-        </div>
-      )}
-    </div>
+              {exercises[0]?.youtube_id && (
+                <a
+                  href={`https://www.youtube.com/watch?v=${exercises[0].youtube_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 mt-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold"
+                  style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
+                >
+                  <Play className="h-4 w-4" /> 教學影片
+                </a>
+              )}
+            </ExpandPanel>
+          </ScrollFloatCard>
+        )}
+      </div>
+    </>
   )
 }

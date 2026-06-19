@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/weekly-regen",
       "schedule": "1 16 * * 0"
+    },
+    {
+      "path": "/api/cron/send-scheduled-notifications",
+      "schedule": "0 1 * * *"
     }
   ]
 }

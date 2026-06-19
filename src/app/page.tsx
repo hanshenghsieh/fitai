@@ -1,3 +1,4 @@
+import LandingPage from '@/components/marketing/LandingPage'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
@@ -16,5 +17,5 @@ export default async function HomePage() {
     redirect(profile?.onboarding_completed ? '/dashboard' : '/onboarding')
   }
 
-  redirect('/login')
+  return <LandingPage />
 }

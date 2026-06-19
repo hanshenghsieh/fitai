@@ -1,177 +1,16 @@
 import type { UserProfile, Goal } from '@/types'
 import { convenienceStoreMenu } from './convenience-store-menu'
+import {
+  calculateTDEE,
+  calculateNutritionTargets,
+  type NutritionTargets,
+} from './goal-calculator'
+import { buildMealCombinationLegacy as buildMealCombination } from './meal-combo-engine'
+import { buildScaledHomeMeal } from './home-meal-builder'
 
-// TDEE 計算
-export function calculateTDEE(profile: UserProfile): number {
-  if (!profile.weight_kg || !profile.height_cm || !profile.age) return 2200
-
-  // Mifflin-St Jeor formula for BMR
-  const isMale = profile.gender === 'male'
-  const bmr = isMale
-    ? 10 * profile.weight_kg + 6.25 * profile.height_cm - 5 * profile.age + 5
-    : 10 * profile.weight_kg + 6.25 * profile.height_cm - 5 * profile.age - 161
-
-  // Activity multipliers
-  const activityMultipliers: Record<string, number> = {
-    sedentary: 1.2,
-    light: 1.375,
-    moderate: 1.55,
-    active: 1.725,
-    very_active: 1.9,
-  }
-
-  const multiplier = activityMultipliers[profile.activity_level] || 1.55
-  return Math.round(bmr * multiplier)
-}
-
-// 營養目標計算
-export interface NutritionTargets {
-  dailyCalories: number
-  proteinGrams: number
-  carbsGrams: number
-  fatGrams: number
-}
-
-export function calculateNutritionTargets(
-  profile: UserProfile,
-  goal: Goal
-): NutritionTargets {
-  const tdee = calculateTDEE(profile)
-  let dailyCalories = tdee
-
-  // 根據目標調整熱量缺口/盈餘
-  if (goal.goal_type === 'lose_fat' || goal.goal_type === 'lose_weight') {
-    // 減脂：每天缺口 500-750 kcal = 每週減 0.5-0.75 kg
-    // 3個月減 5.6kg 脂肪 ≈ 每天缺口 645 kcal
-    dailyCalories = Math.round(tdee - 650)
-  } else if (goal.goal_type === 'gain_muscle') {
-    // 增肌：每天盈餘 300-500 kcal
-    dailyCalories = Math.round(tdee + 400)
-  }
-  // maintain 和 body_recomp 用 TDEE
-
-  // 蛋白質：減脂 2.2-2.4g/kg，增肌 1.8-2.2g/kg，維持 1.6-2.0g/kg
-  let proteinPerKg = 1.8
-  if (goal.goal_type === 'lose_fat' || goal.goal_type === 'lose_weight') {
-    proteinPerKg = 2.3
-  } else if (goal.goal_type === 'gain_muscle') {
-    proteinPerKg = 2.0
-  }
-  const proteinGrams = Math.round((profile.weight_kg || 70) * proteinPerKg)
-
-  // 脂肪：熱量的 25-35%
-  const fatGrams = Math.round((dailyCalories * 0.3) / 9)
-
-  // 碳水：剩餘熱量
-  const carbsGrams = Math.round(
-    (dailyCalories - proteinGrams * 4 - fatGrams * 9) / 4
-  )
-
-  return {
-    dailyCalories,
-    proteinGrams,
-    carbsGrams,
-    fatGrams,
-  }
-}
-
-// 智能餐點搭配 - 根據營養需求自動組合多個項目
-export interface MealCombination {
-  items: any[] // ConvenienceItem[]
-  total_calories: number
-  total_protein_g: number
-  total_carbs_g: number
-  total_fat_g: number
-  reasoning: string // 說明為什麼這樣搭配
-}
-
-export function buildMealCombination(
-  mealType: 'breakfast' | 'lunch' | 'dinner',
-  targetCalories: number,
-  targetProtein: number,
-  targetCarbs: number,
-  targetFat: number
-): MealCombination {
-  let availableItems = convenienceStoreMenu.filter(
-    item => item.category === mealType
-  )
-
-  // 先找能達到蛋白質目標的高蛋白項目
-  const highProteinItems = availableItems.filter(
-    item => item.protein_g >= targetProtein * 0.6
-  )
-
-  // 按蛋白質排序（高到低）
-  highProteinItems.sort((a, b) => b.protein_g - a.protein_g)
-
-  const selected: any[] = []
-  let currentCalories = 0
-  let currentProtein = 0
-  let currentCarbs = 0
-  let currentFat = 0
-  let reasoning = ''
-
-  // 貪心演算法：優先選擇能達到蛋白質目標的項目
-  for (const item of highProteinItems) {
-    if (currentProtein >= targetProtein) break
-
-    // 檢查加入後是否超過熱量目標太多（>120%）
-    if (currentCalories + item.calories <= targetCalories * 1.2) {
-      selected.push(item)
-      currentCalories += item.calories
-      currentProtein += item.protein_g
-      currentCarbs += item.carbs_g
-      currentFat += item.fat_g
-
-      if (selected.length === 1) {
-        reasoning += `選擇 ${item.name} (${item.protein_g}g蛋白質) `
-      } else {
-        reasoning += `+ ${item.name} `
-      }
-    }
-  }
-
-  // 如果蛋白質還不夠，嘗試加入補充項目
-  if (currentProtein < targetProtein) {
-    const remainingProtein = targetProtein - currentProtein
-    const supplementItems = availableItems.filter(
-      item => !selected.includes(item) && item.protein_g >= remainingProtein * 0.3
-    )
-
-    for (const item of supplementItems) {
-      if (currentProtein >= targetProtein) break
-      if (currentCalories + item.calories <= targetCalories * 1.3) {
-        selected.push(item)
-        currentCalories += item.calories
-        currentProtein += item.protein_g
-        currentCarbs += item.carbs_g
-        currentFat += item.fat_g
-        reasoning += `+ ${item.name}補充`
-        break
-      }
-    }
-  }
-
-  // 至少要有一個項目
-  if (selected.length === 0) {
-    const bestMatch = availableItems.reduce((best, item) => {
-      const score = Math.abs(item.calories - targetCalories) +
-                   Math.abs(item.protein_g - targetProtein) * 0.5
-      return !best || score < Math.abs(best.calories - targetCalories) ? item : best
-    })
-    selected.push(bestMatch)
-    reasoning = `預設選擇 ${bestMatch.name}`
-  }
-
-  return {
-    items: selected,
-    total_calories: currentCalories,
-    total_protein_g: currentProtein,
-    total_carbs_g: currentCarbs,
-    total_fat_g: currentFat,
-    reasoning
-  }
-}
+export { calculateTDEE, calculateNutritionTargets, type NutritionTargets }
+export { buildMealCombination }
+export { buildScaledHomeMeal }
 
 // 便利店菜單篩選（舊函數，保留向後相容）
 export function selectConvenienceItemForMeal(
@@ -204,358 +43,6 @@ export function selectConvenienceItemForMeal(
   return best
 }
 
-// 生成每日菜單（自己煮用虛擬菜單）
-export interface DayMeal {
-  type: 'breakfast' | 'lunch' | 'dinner'
-  type_zh: string
-  name_zh: string
-  calories: number
-  protein_g: number
-  carbs_g: number
-  fat_g: number
-  items: any[]
-  total_calories: number
-}
-
-const cookMealDatabase = {
-  breakfast: [
-    {
-      name_zh: '雞蛋 + 吐司',
-      items: [
-        {
-          id: '1',
-          name: 'Eggs',
-          name_zh: '雞蛋',
-          calories: 160,
-          protein_g: 14,
-          carbs_g: 2,
-          fat_g: 12,
-          portion: '2個',
-          preparation: '炒',
-          portionDesc: '約麻將牌大小',
-        },
-        {
-          id: '2',
-          name: 'Toast',
-          name_zh: '吐司',
-          calories: 120,
-          protein_g: 5,
-          carbs_g: 20,
-          fat_g: 2,
-          portion: '2片',
-          preparation: '烤',
-          portionDesc: '標準切片吐司',
-        },
-      ],
-      calories: 280,
-      protein_g: 19,
-      carbs_g: 22,
-      fat_g: 14,
-    },
-    {
-      name_zh: '燕麥 + 香蕉',
-      items: [
-        {
-          id: 'b1a',
-          name: 'Oatmeal',
-          name_zh: '燕麥',
-          calories: 150,
-          protein_g: 5,
-          carbs_g: 27,
-          fat_g: 3,
-          portion: '50g',
-          preparation: '煮',
-          portionDesc: '即食燕麥片',
-        },
-        {
-          id: 'b1b',
-          name: 'Banana',
-          name_zh: '香蕉',
-          calories: 105,
-          protein_g: 1,
-          carbs_g: 27,
-          fat_g: 0,
-          portion: '1根',
-          preparation: '生',
-          portionDesc: '中等大小',
-        },
-      ],
-      calories: 255,
-      protein_g: 6,
-      carbs_g: 54,
-      fat_g: 3,
-    },
-    {
-      name_zh: '優格 + 麥片',
-      items: [
-        {
-          id: 'b2a',
-          name: 'Yogurt',
-          name_zh: '優格',
-          calories: 100,
-          protein_g: 10,
-          carbs_g: 8,
-          fat_g: 3,
-          portion: '100g',
-          preparation: '-',
-          portionDesc: '原味優格',
-        },
-        {
-          id: 'b2b',
-          name: 'Granola',
-          name_zh: '麥片',
-          calories: 120,
-          protein_g: 3,
-          carbs_g: 20,
-          fat_g: 4,
-          portion: '30g',
-          preparation: '-',
-          portionDesc: '堅果麥片',
-        },
-      ],
-      calories: 220,
-      protein_g: 13,
-      carbs_g: 28,
-      fat_g: 7,
-    },
-  ],
-  lunch: [
-    {
-      name_zh: '雞胸肉 + 白飯',
-      items: [
-        {
-          id: 'l1',
-          name: 'Chicken',
-          name_zh: '雞胸肉',
-          calories: 320,
-          protein_g: 55,
-          carbs_g: 0,
-          fat_g: 8,
-          portion: '160g',
-          preparation: '烤',
-          portionDesc: '約一個手掌大小',
-        },
-        {
-          id: 'l2',
-          name: 'Rice',
-          name_zh: '白飯',
-          calories: 220,
-          protein_g: 5,
-          carbs_g: 50,
-          fat_g: 1,
-          portion: '1碗',
-          preparation: '煮',
-          portionDesc: '標準飯碗8分滿',
-        },
-      ],
-      calories: 540,
-      protein_g: 60,
-      carbs_g: 50,
-      fat_g: 9,
-    },
-    {
-      name_zh: '牛肉 + 番薯飯',
-      items: [
-        {
-          id: 'l1b',
-          name: 'Beef',
-          name_zh: '牛肉',
-          calories: 350,
-          protein_g: 52,
-          carbs_g: 0,
-          fat_g: 15,
-          portion: '150g',
-          preparation: '炒',
-          portionDesc: '里肌肉片',
-        },
-        {
-          id: 'l2b',
-          name: 'Sweet Potato',
-          name_zh: '番薯飯',
-          calories: 200,
-          protein_g: 4,
-          carbs_g: 45,
-          fat_g: 1,
-          portion: '150g',
-          preparation: '煮',
-          portionDesc: '黃色番薯',
-        },
-      ],
-      calories: 550,
-      protein_g: 56,
-      carbs_g: 45,
-      fat_g: 16,
-    },
-    {
-      name_zh: '鱈魚 + 麵條',
-      items: [
-        {
-          id: 'l1c',
-          name: 'Fish',
-          name_zh: '鱈魚',
-          calories: 280,
-          protein_g: 50,
-          carbs_g: 0,
-          fat_g: 6,
-          portion: '150g',
-          preparation: '蒸',
-          portionDesc: '白肉魚',
-        },
-        {
-          id: 'l2c',
-          name: 'Noodles',
-          name_zh: '麵條',
-          calories: 280,
-          protein_g: 8,
-          carbs_g: 54,
-          fat_g: 2,
-          portion: '100g',
-          preparation: '煮',
-          portionDesc: '全麥麵條',
-        },
-      ],
-      calories: 560,
-      protein_g: 58,
-      carbs_g: 54,
-      fat_g: 8,
-    },
-  ],
-  dinner: [
-    {
-      name_zh: '鮭魚 + 地瓜',
-      items: [
-        {
-          id: 'd1',
-          name: 'Salmon',
-          name_zh: '鮭魚',
-          calories: 300,
-          protein_g: 42,
-          carbs_g: 0,
-          fat_g: 16,
-          portion: '130g',
-          preparation: '烤',
-          portionDesc: '約信用卡大小厚度1指',
-        },
-        {
-          id: 'd2',
-          name: 'Sweet Potato',
-          name_zh: '地瓜',
-          calories: 120,
-          protein_g: 2,
-          carbs_g: 27,
-          fat_g: 0,
-          portion: '120g',
-          preparation: '烤',
-          portionDesc: '約拳頭大小',
-        },
-      ],
-      calories: 420,
-      protein_g: 44,
-      carbs_g: 27,
-      fat_g: 16,
-    },
-    {
-      name_zh: '火雞胸 + 花菜',
-      items: [
-        {
-          id: 'd1b',
-          name: 'Turkey',
-          name_zh: '火雞胸',
-          calories: 280,
-          protein_g: 48,
-          carbs_g: 0,
-          fat_g: 8,
-          portion: '140g',
-          preparation: '烤',
-          portionDesc: '低脂肉類',
-        },
-        {
-          id: 'd2b',
-          name: 'Broccoli',
-          name_zh: '花菜',
-          calories: 55,
-          protein_g: 4,
-          carbs_g: 11,
-          fat_g: 1,
-          portion: '200g',
-          preparation: '蒸',
-          portionDesc: '新鮮綠花菜',
-        },
-      ],
-      calories: 335,
-      protein_g: 52,
-      carbs_g: 11,
-      fat_g: 9,
-    },
-    {
-      name_zh: '蝦 + 蘆筍',
-      items: [
-        {
-          id: 'd1c',
-          name: 'Shrimp',
-          name_zh: '蝦',
-          calories: 250,
-          protein_g: 48,
-          carbs_g: 0,
-          fat_g: 5,
-          portion: '150g',
-          preparation: '炒',
-          portionDesc: '中蝦',
-        },
-        {
-          id: 'd2c',
-          name: 'Asparagus',
-          name_zh: '蘆筍',
-          calories: 65,
-          protein_g: 5,
-          carbs_g: 12,
-          fat_g: 1,
-          portion: '150g',
-          preparation: '炒',
-          portionDesc: '新鮮蘆筍',
-        },
-      ],
-      calories: 315,
-      protein_g: 53,
-      carbs_g: 12,
-      fat_g: 6,
-    },
-  ],
-}
-
-export function getHomeCookedMeal(
-  mealType: 'breakfast' | 'lunch' | 'dinner',
-  dayIndex: number
-) {
-  const meals = cookMealDatabase[mealType]
-  // 確保每個 dayIndex 拿到不同的菜單
-  // breakfast: day0→0, day1→1, day2→2, day3→0, day4→1, day5→2, day6→0
-  // lunch: day0→1, day1→2, day2→0, day3→1, day4→2, day5→0, day6→1
-  // dinner: day0→2, day1→0, day2→1, day3→2, day4→0, day5→1, day6→2
-  let mealIndex = dayIndex % meals.length
-
-  if (mealType === 'lunch') {
-    mealIndex = (dayIndex + 1) % meals.length
-  } else if (mealType === 'dinner') {
-    mealIndex = (dayIndex + 2) % meals.length
-  }
-
-  const meal = meals[mealIndex]
-
-  return {
-    type: mealType,
-    type_zh:
-      mealType === 'breakfast' ? '早餐' : mealType === 'lunch' ? '午餐' : '晚餐',
-    items: meal.items,
-    total_calories: meal.calories,
-    name_zh: meal.name_zh,
-    calories: meal.calories,
-    protein_g: meal.protein_g,
-    carbs_g: meal.carbs_g,
-    fat_g: meal.fat_g,
-  }
-}
-
 // 運動計畫生成
 export interface ExerciseSet {
   exercise_id: string
@@ -569,133 +56,163 @@ export interface ExerciseSet {
   notes: string
 }
 
-// 重訓動作庫
-const strengthExercises = {
-  upper: [
-    {
-      id: 'bench-press',
-      name: 'Bench Press',
-      name_zh: '臥推',
-      youtube_id: '4YnVV_Ksb1E',
-      reps: 8,
-      sets: 4,
-      rest: 120,
-      hasEquipment: true,
-      noEquipment: false,
-    },
-    {
-      id: 'dumbbell-rows',
-      name: 'Dumbbell Rows',
-      name_zh: '啞鈴划船',
-      youtube_id: 'w-PL77Umd28',
-      reps: 10,
-      sets: 3,
-      rest: 90,
-      hasEquipment: true,
-      noEquipment: false,
-    },
-    {
-      id: 'shoulder-press',
-      name: 'Shoulder Press',
-      name_zh: '肩推',
-      youtube_id: 'GbnXvEaso8s',
-      reps: 8,
-      sets: 3,
-      rest: 90,
-      hasEquipment: true,
-      noEquipment: false,
-    },
-    {
-      id: 'dumbbell-flyes',
-      name: 'Dumbbell Flyes',
-      name_zh: '飛鳥',
-      youtube_id: 'eozdVT5pDcQ',
-      reps: 12,
-      sets: 3,
-      rest: 60,
-      hasEquipment: true,
-      noEquipment: false,
-    },
-    {
-      id: 'push-ups',
-      name: 'Push-ups',
-      name_zh: '伏地挺身',
-      youtube_id: 'IODxDxX7oi4',
-      reps: 15,
-      sets: 3,
-      rest: 60,
-      hasEquipment: false,
-      noEquipment: true,
-    },
-    {
-      id: 'pike-push-ups',
-      name: 'Pike Push-ups',
-      name_zh: '倒V伏地挺身',
-      youtube_id: 'T4rnpJhyxLY',
-      reps: 12,
-      sets: 3,
-      rest: 60,
-      hasEquipment: false,
-      noEquipment: true,
-    },
-  ],
-  lower: [
-    {
-      id: 'squat',
-      name: 'Squat',
-      name_zh: '深蹲',
-      youtube_id: 'aclHktwnyYs',
-      reps: 8,
-      sets: 4,
-      rest: 120,
-      hasEquipment: true,
-      noEquipment: true,
-    },
-    {
-      id: 'deadlift',
-      name: 'Deadlift',
-      name_zh: '硬舉',
-      youtube_id: 'V1Y_CziDszo',
-      reps: 6,
-      sets: 4,
-      rest: 120,
-      hasEquipment: true,
-      noEquipment: false,
-    },
-    {
-      id: 'leg-press',
-      name: 'Leg Press',
-      name_zh: '腿部推蹬',
-      youtube_id: 'IZxyjW7MIAI',
-      reps: 10,
-      sets: 3,
-      rest: 90,
-      hasEquipment: true,
-      noEquipment: false,
-    },
-    {
-      id: 'lunges',
-      name: 'Lunges',
-      name_zh: '弓步',
-      youtube_id: 'Z2ECwLW4Alk',
-      reps: 10,
-      sets: 3,
-      rest: 90,
-      hasEquipment: false,
-      noEquipment: true,
-    },
-    {
-      id: 'pistol-squats',
-      name: 'Pistol Squats',
-      name_zh: '單腿深蹲',
-      youtube_id: 'WKOwMw7qOv8',
-      reps: 5,
-      sets: 3,
-      rest: 90,
-      hasEquipment: false,
-      noEquipment: true,
-    },
-  ],
+// 重訓動作庫 — equipment 為所需器材（'none'=徒手），可多選
+type EquipTag = 'dumbbells' | 'barbell' | 'pull_up_bar' | 'resistance_bands' | 'jump_rope' | 'gym' | 'none'
+
+interface ExerciseTemplate {
+  id: string
+  name: string
+  name_zh: string
+  youtube_id: string | null
+  reps: number
+  sets: number
+  rest: number
+  equipment: EquipTag[]
+  split: 'upper' | 'lower'
+  avoidIf?: ('knee' | 'back' | 'shoulder' | 'wrist')[]
+}
+
+const EXERCISE_POOL: ExerciseTemplate[] = [
+  // 上肢 — 健身房/槓鈴
+  { id: 'bench-press', name: 'Bench Press', name_zh: '槓鈴臥推', youtube_id: '4YnVV_Ksb1E', reps: 8, sets: 4, rest: 90, equipment: ['barbell', 'gym'], split: 'upper', avoidIf: ['shoulder', 'wrist'] },
+  { id: 'barbell-row', name: 'Barbell Row', name_zh: '槓鈴划船', youtube_id: 'w-PL77Umd28', reps: 8, sets: 4, rest: 90, equipment: ['barbell', 'gym'], split: 'upper', avoidIf: ['back'] },
+  { id: 'ohp', name: 'Overhead Press', name_zh: '槓鈴肩推', youtube_id: 'GbnXvEaso8s', reps: 8, sets: 3, rest: 90, equipment: ['barbell', 'gym'], split: 'upper', avoidIf: ['shoulder'] },
+  // 上肢 — 啞鈴
+  { id: 'db-press', name: 'Dumbbell Press', name_zh: '啞鈴卧推', youtube_id: '4YnVV_Ksb1E', reps: 10, sets: 3, rest: 75, equipment: ['dumbbells'], split: 'upper', avoidIf: ['shoulder'] },
+  { id: 'db-rows', name: 'Dumbbell Rows', name_zh: '啞鈴划船', youtube_id: 'w-PL77Umd28', reps: 10, sets: 3, rest: 75, equipment: ['dumbbells'], split: 'upper' },
+  { id: 'db-shoulder', name: 'Dumbbell Shoulder Press', name_zh: '啞鈴肩推', youtube_id: 'GbnXvEaso8s', reps: 10, sets: 3, rest: 75, equipment: ['dumbbells'], split: 'upper', avoidIf: ['shoulder'] },
+  { id: 'db-flyes', name: 'Dumbbell Flyes', name_zh: '啞鈴飛鳥', youtube_id: 'eozdVT5pDcQ', reps: 12, sets: 3, rest: 60, equipment: ['dumbbells'], split: 'upper' },
+  { id: 'db-curl', name: 'Dumbbell Curl', name_zh: '啞鈴二頭彎舉', youtube_id: 'ykJmrZ5v0Oo', reps: 12, sets: 3, rest: 60, equipment: ['dumbbells'], split: 'upper', avoidIf: ['wrist'] },
+  { id: 'lateral-raise', name: 'Lateral Raise', name_zh: '側平舉', youtube_id: '3VcKaXpzqRo', reps: 12, sets: 3, rest: 60, equipment: ['dumbbells'], split: 'upper', avoidIf: ['shoulder'] },
+  // 上肢 — 引體向上架
+  { id: 'pull-ups', name: 'Pull-ups', name_zh: '引體向上', youtube_id: 'eGo4IYlbE5g', reps: 6, sets: 3, rest: 90, equipment: ['pull_up_bar'], split: 'upper' },
+  { id: 'chin-ups', name: 'Chin-ups', name_zh: '反手引體', youtube_id: 'eGo4IYlbE5g', reps: 6, sets: 3, rest: 90, equipment: ['pull_up_bar'], split: 'upper', avoidIf: ['wrist'] },
+  // 上肢 — 健身房器械
+  { id: 'lat-pulldown', name: 'Lat Pulldown', name_zh: '滑輪下拉', youtube_id: 'CAwf7n6Luuc', reps: 10, sets: 3, rest: 75, equipment: ['gym'], split: 'upper' },
+  { id: 'cable-row', name: 'Cable Row', name_zh: '滑輪划船', youtube_id: 'GZbfZ033f74', reps: 10, sets: 3, rest: 75, equipment: ['gym'], split: 'upper' },
+  { id: 'face-pull', name: 'Face Pull', name_zh: '臉拉', youtube_id: 'rep-qVOAyvg', reps: 15, sets: 3, rest: 60, equipment: ['gym', 'resistance_bands'], split: 'upper' },
+  // 上肢 — 彈力帶
+  { id: 'band-row', name: 'Band Rows', name_zh: '彈力帶划船', youtube_id: 'w-PL77Umd28', reps: 15, sets: 3, rest: 60, equipment: ['resistance_bands'], split: 'upper' },
+  { id: 'band-press', name: 'Band Chest Press', name_zh: '彈力帶胸推', youtube_id: '4YnVV_Ksb1E', reps: 15, sets: 3, rest: 60, equipment: ['resistance_bands'], split: 'upper' },
+  // 上肢 — 徒手
+  { id: 'push-ups', name: 'Push-ups', name_zh: '伏地挺身', youtube_id: 'IODxDxX7oi4', reps: 12, sets: 3, rest: 60, equipment: ['none'], split: 'upper', avoidIf: ['wrist', 'shoulder'] },
+  { id: 'wall-push', name: 'Wall Push-ups', name_zh: '靠牆伏地挺身', youtube_id: 'IODxDxX7oi4', reps: 15, sets: 3, rest: 45, equipment: ['none'], split: 'upper' },
+  { id: 'pike-push', name: 'Pike Push-ups', name_zh: '倒V肩推', youtube_id: 'T4rnpJhyxLY', reps: 10, sets: 3, rest: 60, equipment: ['none'], split: 'upper', avoidIf: ['shoulder'] },
+  { id: 'dips-chair', name: 'Chair Dips', name_zh: '椅撐臂屈伸', youtube_id: '6kALZikKBtc', reps: 12, sets: 3, rest: 60, equipment: ['none'], split: 'upper', avoidIf: ['shoulder', 'wrist'] },
+  { id: 'inverted-row', name: 'Inverted Rows', name_zh: '反向列', youtube_id: 'w-PL77Umd28', reps: 10, sets: 3, rest: 60, equipment: ['none'], split: 'upper' },
+  { id: 'plank', name: 'Plank', name_zh: '棒式', youtube_id: 'pSHjTRCQxIw', reps: 30, sets: 3, rest: 45, equipment: ['none'], split: 'upper' },
+
+  // 下肢 — 槓鈴/健身房
+  { id: 'squat', name: 'Barbell Squat', name_zh: '槓鈴深蹲', youtube_id: 'aclHktwnyYs', reps: 8, sets: 4, rest: 120, equipment: ['barbell', 'gym'], split: 'lower', avoidIf: ['knee'] },
+  { id: 'deadlift', name: 'Deadlift', name_zh: '硬舉', youtube_id: 'V1Y_CziDszo', reps: 6, sets: 3, rest: 120, equipment: ['barbell', 'gym'], split: 'lower', avoidIf: ['back'] },
+  { id: 'leg-press', name: 'Leg Press', name_zh: '腿推機', youtube_id: 'IZxyjW7MIAI', reps: 10, sets: 3, rest: 90, equipment: ['gym'], split: 'lower', avoidIf: ['knee'] },
+  { id: 'rdl', name: 'Romanian Deadlift', name_zh: '羅馬尼亞硬舉', youtube_id: 'V1Y_CziDszo', reps: 10, sets: 3, rest: 90, equipment: ['barbell', 'dumbbells', 'gym'], split: 'lower', avoidIf: ['back'] },
+  // 下肢 — 啞鈴
+  { id: 'goblet-squat', name: 'Goblet Squat', name_zh: '啞鈴高腳杯深蹲', youtube_id: 'aclHktwnyYs', reps: 10, sets: 3, rest: 75, equipment: ['dumbbells'], split: 'lower', avoidIf: ['knee'] },
+  { id: 'db-lunge', name: 'Dumbbell Lunges', name_zh: '啞鈴弓步', youtube_id: 'Z2ECwLW4Alk', reps: 10, sets: 3, rest: 75, equipment: ['dumbbells'], split: 'lower', avoidIf: ['knee'] },
+  { id: 'db-rdl', name: 'Dumbbell RDL', name_zh: '啞鈴羅馬尼亞硬舉', youtube_id: 'V1Y_CziDszo', reps: 10, sets: 3, rest: 75, equipment: ['dumbbells'], split: 'lower', avoidIf: ['back'] },
+  // 下肢 — 徒手
+  { id: 'body-squat', name: 'Bodyweight Squat', name_zh: '徒手深蹲', youtube_id: 'aclHktwnyYs', reps: 15, sets: 3, rest: 60, equipment: ['none'], split: 'lower', avoidIf: ['knee'] },
+  { id: 'lunges', name: 'Lunges', name_zh: '弓步蹲', youtube_id: 'Z2ECwLW4Alk', reps: 12, sets: 3, rest: 60, equipment: ['none'], split: 'lower', avoidIf: ['knee'] },
+  { id: 'glute-bridge', name: 'Glute Bridge', name_zh: '臀橋', youtube_id: 'OUgsJ8-Vi0E', reps: 15, sets: 3, rest: 60, equipment: ['none'], split: 'lower' },
+  { id: 'calf-raise', name: 'Calf Raises', name_zh: '提踵', youtube_id: 'gwLzBJpmKZQ', reps: 15, sets: 3, rest: 45, equipment: ['none'], split: 'lower' },
+  { id: 'step-ups', name: 'Step-ups', name_zh: '登階', youtube_id: 'Z2ECwLW4Alk', reps: 10, sets: 3, rest: 60, equipment: ['none'], split: 'lower', avoidIf: ['knee'] },
+  { id: 'hip-thrust', name: 'Hip Thrust', name_zh: '臀推', youtube_id: 'OUgsJ8-Vi0E', reps: 12, sets: 3, rest: 75, equipment: ['barbell', 'dumbbells', 'gym'], split: 'lower' },
+  { id: 'box-squat', name: 'Box Squat', name_zh: '箱式深蹲', youtube_id: 'aclHktwnyYs', reps: 10, sets: 3, rest: 75, equipment: ['gym', 'barbell'], split: 'lower' },
+  { id: 'sumo-squat', name: 'Sumo Squat', name_zh: '相撲深蹲', youtube_id: 'aclHktwnyYs', reps: 12, sets: 3, rest: 60, equipment: ['dumbbells', 'none'], split: 'lower' },
+  { id: 'wall-sit', name: 'Wall Sit', name_zh: '靠牆蹲', youtube_id: 'aclHktwnyYs', reps: 30, sets: 3, rest: 45, equipment: ['none'], split: 'lower' },
+  { id: 'side-plank', name: 'Side Plank', name_zh: '側棒式', youtube_id: 'pSHjTRCQxIw', reps: 25, sets: 3, rest: 45, equipment: ['none'], split: 'lower' },
+]
+
+const STRENGTH_EXERCISES_PER_SESSION = 4
+const WARMUP_MINS = 5
+const COOLDOWN_MINS = 5
+
+function userHasEquipment(userEquipment: string[], required: EquipTag[]): boolean {
+  if (required.includes('none') && required.length === 1) return true
+  if (userEquipment.includes('none') || userEquipment.length === 0) {
+    return required.every(r => r === 'none')
+  }
+  return required.some(r => r === 'none' || userEquipment.includes(r))
+}
+
+function filterExercises(
+  split: 'upper' | 'lower',
+  userEquipment: string[],
+  injuries: { knee: boolean; back: boolean; shoulder: boolean; wrist: boolean }
+): ExerciseTemplate[] {
+  return EXERCISE_POOL.filter(ex => {
+    if (ex.split !== split) return false
+    if (!userHasEquipment(userEquipment, ex.equipment)) return false
+    if (injuries.knee && ex.avoidIf?.includes('knee')) return false
+    if (injuries.back && ex.avoidIf?.includes('back')) return false
+    if (injuries.shoulder && ex.avoidIf?.includes('shoulder')) return false
+    if (injuries.wrist && ex.avoidIf?.includes('wrist')) return false
+    return true
+  })
+}
+
+function sortPoolByEquipment(pool: ExerciseTemplate[], userEquipment: string[]): ExerciseTemplate[] {
+  const hasReal = userEquipment.some(e => e !== 'none')
+  if (!hasReal) return pool
+  return [...pool].sort((a, b) => {
+    const aBody = a.equipment.every(e => e === 'none') ? 1 : 0
+    const bBody = b.equipment.every(e => e === 'none') ? 1 : 0
+    return aBody - bBody
+  })
+}
+
+function pickSessionExercises(
+  pool: ExerciseTemplate[],
+  sessionIndex: number,
+  count: number,
+  userEquipment: string[]
+): ExerciseTemplate[] {
+  let sorted = sortPoolByEquipment(pool, userEquipment)
+  const hasReal = userEquipment.some(e => e !== 'none')
+  if (hasReal) {
+    const withEquip = sorted.filter(ex => !ex.equipment.every(e => e === 'none'))
+    if (withEquip.length >= count) sorted = withEquip
+  }
+  if (sorted.length === 0) return []
+
+  const step = Math.max(1, Math.floor(sorted.length / 3))
+  const start = (sessionIndex * step) % sorted.length
+  const picked: ExerciseTemplate[] = []
+  const used = new Set<string>()
+  for (let i = 0; picked.length < count && i < sorted.length * 2; i++) {
+    const ex = sorted[(start + i) % sorted.length]!
+    if (used.has(ex.id)) continue
+    used.add(ex.id)
+    picked.push(ex)
+  }
+  return picked
+}
+
+function estimateExerciseMins(sets: number, reps: number, restSecs: number): number {
+  const workSecs = sets * (reps * 3 + 25)
+  const restTotal = Math.max(0, sets - 1) * restSecs
+  return (workSecs + restTotal) / 60
+}
+
+function toWorkoutSet(
+  ex: ExerciseTemplate,
+  volumeMult: number,
+  extraNote = ''
+): ExerciseSet {
+  const sets = Math.max(2, Math.round(ex.sets * volumeMult))
+  const isHold = ['plank', 'wall-sit', 'side-plank'].includes(ex.id)
+  return {
+    exercise_id: ex.id,
+    exercise_name: ex.name,
+    exercise_name_zh: ex.name_zh,
+    youtube_id: ex.youtube_id,
+    sets,
+    reps: isHold ? null : ex.reps,
+    duration_secs: isHold ? ex.reps : null,
+    rest_secs: ex.rest,
+    notes: isHold ? `每組 ${ex.reps} 秒${extraNote ? `，${extraNote}` : ''}` : extraNote,
+  }
 }
 
 // 有氧選項
@@ -746,7 +263,9 @@ export function generateWorkoutPlan(
   dayIndex: number,
   fitnessLevel: string,
   injuries: string[] = [],
-  goalType: string = 'lose_fat'
+  goalType: string = 'lose_fat',
+  equipment: string[] = [],
+  workoutModifier: 'easier' | 'harder' | null = null
 ) {
   const hasKneeInjury = injuries.some(
     i => String(i).toLowerCase().includes('膝') || String(i).toLowerCase().includes('knee')
@@ -754,12 +273,45 @@ export function generateWorkoutPlan(
   const hasBackInjury = injuries.some(
     i => String(i).toLowerCase().includes('腰') || String(i).toLowerCase().includes('back')
   )
+  const hasShoulderInjury = injuries.some(
+    i => String(i).toLowerCase().includes('肩') || String(i).toLowerCase().includes('shoulder')
+  )
+  const hasWristInjury = injuries.some(
+    i => String(i).toLowerCase().includes('腕') || String(i).toLowerCase().includes('wrist')
+  )
+  const injuryFlags = {
+    knee: hasKneeInjury,
+    back: hasBackInjury,
+    shoulder: hasShoulderInjury,
+    wrist: hasWristInjury,
+  }
 
-  // 週期模式：減脂時 Mon/Wed/Fri 重訓，Tue/Thu/Sat 有氧，Sun 休息
+  const hasGym = equipment.some(e =>
+    ['健身房', 'gym', '器械'].some(k => String(e).toLowerCase().includes(k))
+  )
+  const userEquipment = equipment.includes('none') || equipment.length === 0
+    ? ['none']
+    : hasGym
+      ? [...equipment, 'gym', 'dumbbells', 'barbell']
+      : equipment
+  const levelMult =
+    fitnessLevel === 'advanced' ? 1.15 : fitnessLevel === 'beginner' ? 0.85 : 1
+  const modMult = workoutModifier === 'easier' ? 0.85 : workoutModifier === 'harder' ? 1.1 : 1
+  const volumeMult = levelMult * modMult
+
+  // 依目標決定每週訓練配置
+  const schedules: Record<string, { strength: number[]; cardio: number[]; rest: number }> = {
+    lose_fat: { strength: [0, 2, 4], cardio: [1, 3, 5], rest: 6 },
+    lose_weight: { strength: [0, 2, 4], cardio: [1, 3, 5], rest: 6 },
+    gain_muscle: { strength: [0, 1, 3, 4], cardio: [2], rest: 6 },
+    body_recomp: { strength: [0, 2, 4], cardio: [1, 5], rest: 6 },
+    maintain: { strength: [0, 3], cardio: [2], rest: 6 },
+  }
+  const schedule = schedules[goalType] ?? schedules.lose_fat
   const dayOfWeek = dayIndex % 7
-  const isStrengthDay = [0, 2, 4].includes(dayOfWeek) // Mon, Wed, Fri
-  const isCardioDay = [1, 3, 5].includes(dayOfWeek) // Tue, Thu, Sat
-  const isRestDay = dayOfWeek === 6 // Sun
+  const isStrengthDay = schedule.strength.includes(dayOfWeek)
+  const isCardioDay = schedule.cardio.includes(dayOfWeek)
+  const isRestDay = dayOfWeek === schedule.rest
 
   if (isRestDay) {
     return {
@@ -786,18 +338,36 @@ export function generateWorkoutPlan(
   }
 
   if (isStrengthDay) {
-    // 在 upper 和 lower 之間輪換，每天選不同的動作
-    const isUpperDay = dayIndex % 2 === 0
-    const exercises = isUpperDay
-      ? strengthExercises.upper
-      : strengthExercises.lower
+    const sessionIdx = schedule.strength.indexOf(dayOfWeek)
+    const isUpperDay = sessionIdx % 2 === 0
+    const split = isUpperDay ? 'upper' : 'lower'
+    let pool = filterExercises(split, userEquipment, injuryFlags)
 
-    // 選擇 2 個動作組成訓練
-    const exerciseIndex1 = (dayIndex * 2) % exercises.length
-    const exerciseIndex2 = (dayIndex * 2 + 1) % exercises.length
+    // 器材不足時退回徒手
+    if (pool.length < STRENGTH_EXERCISES_PER_SESSION) {
+      pool = filterExercises(split, ['none'], injuryFlags)
+    }
 
-    const exercise1 = exercises[exerciseIndex1]
-    const exercise2 = exercises[exerciseIndex2]
+    const selected = pickSessionExercises(pool, sessionIdx, STRENGTH_EXERCISES_PER_SESSION, userEquipment)
+    const main = selected.map((ex, idx) =>
+      toWorkoutSet(
+        ex,
+        volumeMult,
+        hasBackInjury && idx === 0
+          ? '控制重量，腰背打直'
+          : hasShoulderInjury && ex.avoidIf?.includes('shoulder')
+            ? '肩不舒服就換靠牆伏地挺身'
+            : ''
+      )
+    )
+
+    const mainMins =
+      main.reduce(
+        (sum, s, i) => sum + estimateExerciseMins(s.sets, s.reps ?? 10, selected[i]!.rest),
+        0
+      ) +
+      main.length * 2
+    const totalMins = Math.round(WARMUP_MINS + mainMins + COOLDOWN_MINS)
 
     return {
       type: 'strength',
@@ -810,35 +380,12 @@ export function generateWorkoutPlan(
           youtube_id: null,
           sets: 1,
           reps: null,
-          duration_secs: 300,
+          duration_secs: WARMUP_MINS * 60,
           rest_secs: 0,
-          notes: '輕度有氧或動態伸展',
+          notes: '動態伸展 + 輕度有氧',
         },
       ],
-      main: [
-        {
-          exercise_id: exercise1.id,
-          exercise_name: exercise1.name,
-          exercise_name_zh: exercise1.name_zh,
-          youtube_id: exercise1.youtube_id,
-          sets: exercise1.sets,
-          reps: exercise1.reps,
-          duration_secs: null,
-          rest_secs: exercise1.rest,
-          notes: hasBackInjury ? '控制重量' : '',
-        },
-        {
-          exercise_id: exercise2.id,
-          exercise_name: exercise2.name,
-          exercise_name_zh: exercise2.name_zh,
-          youtube_id: exercise2.youtube_id,
-          sets: exercise2.sets,
-          reps: exercise2.reps,
-          duration_secs: null,
-          rest_secs: exercise2.rest,
-          notes: '',
-        },
-      ],
+      main,
       cooldown: [
         {
           exercise_id: 'cooldown-stretch',
@@ -847,24 +394,33 @@ export function generateWorkoutPlan(
           youtube_id: null,
           sets: 1,
           reps: null,
-          duration_secs: 300,
+          duration_secs: COOLDOWN_MINS * 60,
           rest_secs: 0,
           notes: '放鬆訓練肌群',
         },
       ],
-      estimated_duration_mins: 60,
-      calories_burned_est: 400,
+      estimated_duration_mins: totalMins,
+      calories_burned_est: Math.round(totalMins * 6),
     }
   }
 
   if (isCardioDay) {
-    // 選擇有氧方式，避免膝蓋傷害
-    const availableCardio = hasKneeInjury
+    let availableCardio = hasKneeInjury
       ? cardioExercises.filter(c => c.lowImpact)
-      : cardioExercises
+      : [...cardioExercises]
+
+    if (userEquipment.includes('jump_rope')) {
+      availableCardio = availableCardio.sort((a, b) =>
+        a.id === 'jump-rope' ? -1 : b.id === 'jump-rope' ? 1 : 0
+      )
+    }
+    if (userEquipment.includes('none') && userEquipment.length === 1) {
+      availableCardio = availableCardio.filter(c => ['running', 'jump-rope'].includes(c.id))
+    }
 
     const cardioIndex = dayIndex % availableCardio.length
     const cardio = availableCardio[cardioIndex]
+    const cardioDuration = Math.round(cardio.duration * volumeMult)
 
     return {
       type: 'cardio',
@@ -890,7 +446,7 @@ export function generateWorkoutPlan(
           youtube_id: null,
           sets: 1,
           reps: null,
-          duration_secs: cardio.duration,
+          duration_secs: cardioDuration,
           rest_secs: 0,
           notes: `強度：${cardio.intensity}`,
         },
@@ -908,8 +464,8 @@ export function generateWorkoutPlan(
           notes: '步行 5 分鐘，心率恢復',
         },
       ],
-      estimated_duration_mins: Math.round(cardio.duration / 60 + 10),
-      calories_burned_est: 350,
+      estimated_duration_mins: Math.round(cardioDuration / 60 + 10),
+      calories_burned_est: Math.round(cardioDuration / 60 * 12),
     }
   }
 

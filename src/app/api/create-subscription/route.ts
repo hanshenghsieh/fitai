@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { stripe, createCustomerIfNotExists, createSubscription, SUBSCRIPTION_PLANS } from '@/lib/stripe'
+import { createCustomerIfNotExists, createCheckoutSession } from '@/lib/stripe'
+import { getStripePriceId } from '@/lib/stripe-config'
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,52 +12,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { priceId } = await req.json()
+    const { priceId: bodyPriceId } = await req.json().catch(() => ({}))
+    const priceId = bodyPriceId || getStripePriceId()
 
     if (!priceId) {
-      return NextResponse.json({ error: 'Missing priceId' }, { status: 400 })
+      return NextResponse.json({ error: '訂閱尚未開放，請稍後再試' }, { status: 503 })
     }
 
-    // 獲取用戶信息
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('email:id')
-      .eq('id', user.id)
-      .single()
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-    // 建立或獲取 Stripe customer
     const customerId = await createCustomerIfNotExists(
       user.id,
-      user.email || 'user@fitai.app',
+      user.email || 'user@zaijian.app',
       user.user_metadata?.name
     )
 
-    // 建立訂閱
-    const subscription = await createSubscription(customerId, priceId) as any
+    const session = await createCheckoutSession(
+      customerId,
+      priceId,
+      user.id,
+      `${appUrl}/settings?subscribed=1`,
+      `${appUrl}/settings?canceled=1`
+    )
 
-    // 保存訂閱信息到 Supabase
-    const { error: dbError } = await supabase.from('subscriptions').insert({
-      user_id: user.id,
-      stripe_subscription_id: subscription.id,
-      stripe_customer_id: subscription.customer,
-      status: subscription.status,
-      current_period_start: new Date((subscription.current_period_start as number) * 1000).toISOString(),
-      current_period_end: new Date((subscription.current_period_end as number) * 1000).toISOString(),
-      cancel_at_period_end: false,
-    })
-
-    if (dbError) {
-      console.error('Database error:', dbError)
+    if (!session.url) {
+      return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 })
     }
-
-    // 返回 client secret 用於前端支付
-    const latestInvoice = subscription.latest_invoice as any
-    const clientSecret = latestInvoice?.payment_intent?.client_secret
 
     return NextResponse.json({
       success: true,
-      subscriptionId: subscription.id,
-      clientSecret: clientSecret,
+      url: session.url,
     })
   } catch (err) {
     console.error('Error creating subscription:', err)

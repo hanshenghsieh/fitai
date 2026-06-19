@@ -137,7 +137,7 @@ ${exerciseList}
   },
   "days": [7個DayPlan物件],
   "grocery_list": [{"category": string, "items": string[]}],
-  "coach_note": "給用戶的本週重點提醒（繁體中文，100-200字）"
+  "coach_note": "再健口吻的本週提醒（繁體中文，80-120字，口語、溫暖、略帶幽默，禁止出現 TDEE/BMI/算法/AI 等詞）"
 }
 
 每個DayPlan格式：

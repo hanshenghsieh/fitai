@@ -1,33 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { format, startOfWeek, addMonths } from 'date-fns'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { format, startOfWeek, addMonths, subWeeks } from 'date-fns'
 import {
   calculateTDEE,
-  calculateNutritionTargets,
-  getHomeCookedMeal,
+  buildScaledHomeMeal,
   generateWorkoutPlan,
-  buildMealCombination,
 } from '@/lib/plan-engine'
-import type { UserProfile, Goal } from '@/types'
+import {
+  calculateGoalPlan,
+  calculateNutritionTargets,
+  mealMacroSplit,
+} from '@/lib/goal-calculator'
+import { buildMealCombination, comboToSaved } from '@/lib/meal-combo-engine'
+import { getAccessStatus } from '@/lib/subscription-access'
+import { applyWeeklyFeedback } from '@/lib/feedback-adjustments'
+import {
+  adjustDayNutritionForWorkout,
+  estimateWeeklyWorkoutBurn,
+} from '@/lib/workout-nutrition'
+import type { UserProfile, Goal, WeeklyFeedback } from '@/types'
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const cronAuth = req.headers.get('authorization')
+    const cronUserId = req.headers.get('x-user-id')
+    const isCron =
+      !!process.env.CRON_SECRET &&
+      cronAuth === `Bearer ${process.env.CRON_SECRET}` &&
+      !!cronUserId
+
+    const supabase = isCron ? await createServiceClient() : await createClient()
+
+    let userId: string
+    if (isCron) {
+      userId = cronUserId!
+    } else {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      userId = user.id
     }
 
     let profile: UserProfile | null = null
     let goal: Goal | null = null
+    let regenReason: string | null = null
 
-    // 先嘗試從 request body 讀取
     try {
       const body = await req.json()
+      if (body.regen_reason) regenReason = String(body.regen_reason)
       if (body.profile && body.goal) {
-        console.log('📤 Using profile and goal from request body')
-        // 從 request body 構建完整的 profile 和 goal（Onboarding 時用）
-        const dbProfile = (await supabase.from('user_profiles').select('*').eq('id', user.id).single()).data
+        const dbProfile = (await supabase.from('user_profiles').select('*').eq('id', userId).single()).data
         if (dbProfile) {
           profile = { ...dbProfile, ...body.profile } as UserProfile
         }
@@ -35,172 +58,217 @@ export async function POST(req: NextRequest) {
           goal_type: body.goal,
           start_date: format(new Date(), 'yyyy-MM-dd'),
           end_date: format(addMonths(new Date(), 3), 'yyyy-MM-dd'),
-        } as any
+        } as Goal
       }
-    } catch (e) {
-      console.log('No request body or parsing failed, will fetch from DB')
+    } catch {
+      // no body
     }
 
-    // 如果沒有從 body 讀到，從 DB 查詢
     if (!profile || !goal) {
-      console.log('📥 Fetching profile and goal from database')
       const [{ data: dbProfile }, { data: goals }] = await Promise.all([
-        supabase.from('user_profiles').select('*').eq('id', user.id).single(),
-        supabase.from('goals').select('*').eq('user_id', user.id).eq('is_active', true).order('created_at', { ascending: false }).limit(1),
+        supabase.from('user_profiles').select('*').eq('id', userId).single(),
+        supabase.from('goals').select('*').eq('user_id', userId).eq('is_active', true).order('created_at', { ascending: false }).limit(1),
       ])
-
       profile = dbProfile as UserProfile
       goal = goals?.[0] as Goal
-
       if (!profile || !goal) {
-        return NextResponse.json({ error: 'Missing profile or goal' }, { status: 400 })
+        return NextResponse.json(
+          { error: '請先完成設定：需要體重資料與目標', code: profile ? 'MISSING_GOAL' : 'MISSING_PROFILE' },
+          { status: 400 }
+        )
       }
     }
 
-    console.log(
-      `🤖 Generating plan for ${profile.display_name || 'user'} (${profile.age}y, ${profile.weight_kg}kg, goal: ${goal.goal_type})`
-    )
+    const { data: subscription } = await supabase
+      .from('subscriptions')
+      .select('status')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
 
-    const nutrition = calculateNutritionTargets(profile, goal)
-    console.log(
-      `📊 TDEE: ${calculateTDEE(profile)} kcal | Target: ${nutrition.dailyCalories} kcal | Protein: ${nutrition.proteinGrams}g`
-    )
+    const access = getAccessStatus(profile.created_at, subscription)
+    if (!access.hasFullAccess) {
+      return NextResponse.json(
+        { error: '試用期已結束，請訂閱以繼續生成計畫', code: 'SUBSCRIPTION_REQUIRED' },
+        { status: 403 }
+      )
+    }
 
     const today = new Date()
-    const weekStart = new Date(today)
-    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1)
+    const weekStart = startOfWeek(today, { weekStartsOn: 1 })
+    const currentWeekStart = format(weekStart, 'yyyy-MM-dd')
+    const lastWeekStart = format(startOfWeek(subWeeks(today, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+    const { data: latestFeedback } = await supabase
+      .from('weekly_feedback')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
 
-    // 計算每餐的營養目標（TDEE分配給3餐）
-    const breakfastCals = Math.round(nutrition.dailyCalories * 0.25) // 25%
-    const breakfastProtein = Math.round(nutrition.proteinGrams * 0.25)
-    const breakfastCarbs = Math.round(nutrition.carbsGrams * 0.25)
-    const breakfastFat = Math.round(nutrition.fatGrams * 0.25)
+    const feedbackForAdjust =
+      latestFeedback &&
+      (latestFeedback.week_start === lastWeekStart || latestFeedback.week_start === currentWeekStart)
+        ? (latestFeedback as WeeklyFeedback)
+        : null
 
-    const lunchCals = Math.round(nutrition.dailyCalories * 0.40) // 40%
-    const lunchProtein = Math.round(nutrition.proteinGrams * 0.40)
-    const lunchCarbs = Math.round(nutrition.carbsGrams * 0.40)
-    const lunchFat = Math.round(nutrition.fatGrams * 0.40)
+    const goalPlan = calculateGoalPlan(profile, goal)
+    const baseNutrition = calculateNutritionTargets(profile, goal)
+    const { nutrition, coachNoteExtra, workoutModifier } = applyWeeklyFeedback(
+      baseNutrition,
+      feedbackForAdjust
+    )
 
-    const dinnerCals = Math.round(nutrition.dailyCalories * 0.35) // 35%
-    const dinnerProtein = Math.round(nutrition.proteinGrams * 0.35)
-    const dinnerCarbs = Math.round(nutrition.carbsGrams * 0.35)
-    const dinnerFat = Math.round(nutrition.fatGrams * 0.35)
+    const usedByCategory: Record<'breakfast' | 'lunch' | 'dinner', Set<string>> = {
+      breakfast: new Set(),
+      lunch: new Set(),
+      dinner: new Set(),
+    }
 
-    // 生成7天計畫
     const days = Array.from({ length: 7 }, (_, dayIndex) => {
-      // 每日菜單（自己煮）
-      const breakfast = getHomeCookedMeal('breakfast', dayIndex)
-      const lunch = getHomeCookedMeal('lunch', dayIndex)
-      const dinner = getHomeCookedMeal('dinner', dayIndex)
+      const workout = generateWorkoutPlan(
+        dayIndex,
+        profile!.fitness_level || 'beginner',
+        profile!.injuries || [],
+        goal.goal_type,
+        profile!.equipment || [],
+        workoutModifier
+      )
 
-      // 調試：確保菜單轉換
-      if (dayIndex === 0 || dayIndex === 3 || dayIndex === 6) {
-        console.log(
-          `Day ${dayIndex + 1}: ${breakfast.name_zh} | ${lunch.name_zh} | ${dinner.name_zh}`
-        )
-      }
+      const dayNutrition = adjustDayNutritionForWorkout(
+        nutrition,
+        workout,
+        goalPlan.dailyDeficit
+      )
+
+      const breakfastTargets = mealMacroSplit(dayNutrition, 'breakfast')
+      const lunchTargets = mealMacroSplit(dayNutrition, 'lunch')
+      const dinnerTargets = mealMacroSplit(dayNutrition, 'dinner')
+
+      const breakfast = buildScaledHomeMeal(
+        'breakfast',
+        dayIndex,
+        breakfastTargets.calories,
+        breakfastTargets.protein,
+        profile!
+      )
+      const lunch = buildScaledHomeMeal(
+        'lunch',
+        dayIndex,
+        lunchTargets.calories,
+        lunchTargets.protein,
+        profile!
+      )
+      const dinner = buildScaledHomeMeal(
+        'dinner',
+        dayIndex,
+        dinnerTargets.calories,
+        dinnerTargets.protein,
+        profile!
+      )
 
       const meals = [breakfast, lunch, dinner]
 
-      const mealsTotalCalories = meals.reduce((sum, m) => sum + m.total_calories, 0)
-      const mealsProtein = meals.reduce((sum, m) => sum + m.protein_g, 0)
+      const convenience_meals = (['breakfast', 'lunch', 'dinner'] as const).map(mt => {
+        const t = mealMacroSplit(dayNutrition, mt)
+        const combo = buildMealCombination(
+          mt,
+          t.calories,
+          t.protein,
+          dayIndex,
+          profile!,
+          [...usedByCategory[mt]]
+        )
+        if (combo.items[0]) usedByCategory[mt].add(combo.items[0].name)
+        return comboToSaved(mt, combo)
+      })
 
-      // 便利店最優搭配（固定方案，用戶不能編輯）
-      const convenienceBreakfast = buildMealCombination(
-        'breakfast',
-        breakfastCals,
-        breakfastProtein,
-        breakfastCarbs,
-        breakfastFat
-      )
-      const convenienceLunch = buildMealCombination(
-        'lunch',
-        lunchCals,
-        lunchProtein,
-        lunchCarbs,
-        lunchFat
-      )
-      const convenienceDinner = buildMealCombination(
-        'dinner',
-        dinnerCals,
-        dinnerProtein,
-        dinnerCarbs,
-        dinnerFat
-      )
-
-      const convenience_meals = [
-        { ...convenienceBreakfast, meal_type_zh: '早餐' },
-        { ...convenienceLunch, meal_type_zh: '午餐' },
-        { ...convenienceDinner, meal_type_zh: '晚餐' },
-      ]
-
-      // 運動計畫
-      const workout = generateWorkoutPlan(
-        dayIndex,
-        profile.fitness_level || 'beginner',
-        profile.injuries || [],
-        goal.goal_type
-      )
+      const mealsTotalCalories = meals.reduce((s, m) => s + m.total_calories, 0)
+      const mealsProtein = meals.reduce((s, m) => s + m.protein_g, 0)
 
       return {
         day: dayIndex + 1,
-        date: new Date(
-          weekStart.getTime() + dayIndex * 24 * 60 * 60 * 1000
-        ).toISOString().split('T')[0],
+        date: format(new Date(weekStart.getTime() + dayIndex * 86400000), 'yyyy-MM-dd'),
         meals,
-        convenience_meals, // 便利店預配方案
+        convenience_meals,
         workout,
         daily_targets: {
-          calories: nutrition.dailyCalories,
-          protein_g: nutrition.proteinGrams,
-          carbs_g: nutrition.carbsGrams,
-          fat_g: nutrition.fatGrams,
-          water_ml: Math.round((profile.weight_kg || 70) * 35), // 35ml per kg
+          calories: dayNutrition.dailyCalories,
+          protein_g: dayNutrition.proteinGrams,
+          carbs_g: dayNutrition.carbsGrams,
+          fat_g: dayNutrition.fatGrams,
+          water_ml: Math.round((profile!.weight_kg || 70) * 35),
+          exercise_burn_kcal: dayNutrition.exercise_burn_kcal,
+          intake_adjustment_kcal: dayNutrition.intake_adjustment_kcal,
+          net_deficit_kcal: dayNutrition.net_deficit_kcal,
         },
         meal_summary: {
           total_calories: mealsTotalCalories,
           total_protein: mealsProtein,
+          target_calories: dayNutrition.dailyCalories,
+          target_protein: dayNutrition.proteinGrams,
         },
       }
     })
 
+    const workoutBurn = estimateWeeklyWorkoutBurn(days.map(d => d.workout))
+
+    const workoutDays = days.filter(d => d.workout.type !== 'rest').length
+
+    const weekStartStr = format(weekStart, 'yyyy-MM-dd')
+    const [{ data: existingPlan }, { data: maxPlan }] = await Promise.all([
+      supabase.from('weekly_plans').select('week_number').eq('user_id', userId).eq('week_start', weekStartStr).single(),
+      supabase.from('weekly_plans').select('week_number').eq('user_id', userId).order('week_number', { ascending: false }).limit(1).single(),
+    ])
+    const weekNumber = existingPlan?.week_number ?? ((maxPlan?.week_number ?? 0) + 1)
+
     const planData = {
-      week_number: 1,
+      week_number: weekNumber,
       weekly_targets: {
         avg_daily_calories: nutrition.dailyCalories,
         avg_daily_protein_g: nutrition.proteinGrams,
-        workout_days: 5,
+        workout_days: workoutDays,
+        weekly_exercise_burn_kcal: workoutBurn.totalBurn,
+        avg_exercise_burn_kcal: workoutBurn.avgBurn,
+      },
+      goal_snapshot: {
+        tdee: goalPlan.tdee,
+        daily_deficit: goalPlan.dailyDeficit,
+        current_body_fat: profile!.body_fat_pct,
+        target_body_fat: goal.target_body_fat_pct,
+        target_weight: goal.target_weight_kg,
+        fat_to_lose_kg: goalPlan.fatToLoseKg,
+        total_deficit_kcal: goalPlan.totalDeficitKcal,
+        weeks_remaining: goalPlan.weeksRemaining,
+        weekly_fat_loss_g: Math.round(goalPlan.weeklyChangeKg * 1000),
+        lean_mass_kg: goalPlan.leanMassKg,
+        weekly_exercise_burn_kcal: workoutBurn.totalBurn,
       },
       days,
       grocery_list: generateGroceryList(days),
-      coach_note: generateCoachNote(profile, goal, nutrition),
+      coach_note:
+        (regenReason ? `【已依最新數據重算】${regenReason}\n\n` : '') +
+        buildCoachNote(profile!, goal, goalPlan, nutrition, workoutBurn) +
+        (coachNoteExtra ? `\n\n${coachNoteExtra}` : ''),
     }
 
-    // 保存到數據庫
-    const weekStartStr = format(weekStart, 'yyyy-MM-dd')
-    const { error: upsertError } = await supabase
-      .from('weekly_plans')
-      .upsert(
-        {
-          user_id: user.id,
-          week_start: weekStartStr,
-          week_number: 1,
-          plan_data: planData,
-          coach_note: planData.coach_note,
-          generation_status: 'completed',
-        },
-        { onConflict: 'user_id,week_start' }
-      )
+    const { error: upsertError } = await supabase.from('weekly_plans').upsert(
+      {
+        user_id: userId,
+        week_start: weekStartStr,
+        week_number: weekNumber,
+        plan_data: planData,
+        coach_note: planData.coach_note,
+        generation_status: 'completed',
+      },
+      { onConflict: 'user_id,week_start' }
+    )
 
     if (upsertError) {
-      console.error('Error saving plan:', upsertError)
-      return NextResponse.json(
-        { error: 'Failed to save plan to database' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to save plan' }, { status: 500 })
     }
 
-    console.log(`✅ Plan saved for user ${user.id}, week ${weekStart}`)
     return NextResponse.json({ success: true, data: planData })
   } catch (err) {
     console.error('Error generating plan:', err)
@@ -211,170 +279,38 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function generateGroceryList(
-  days: any[]
-): Array<{ category: string; items: string[] }> {
+function generateGroceryList(days: { meals: { items: { name_zh: string }[] }[] }[]) {
   const items = new Set<string>()
-
   days.forEach(day => {
-    day.meals.forEach((meal: any) => {
-      meal.items.forEach((item: any) => {
-        items.add(item.name_zh)
-      })
-    })
+    day.meals.forEach(meal => meal.items.forEach(item => items.add(item.name_zh)))
   })
-
+  const all = Array.from(items)
   return [
-    {
-      category: '🥚 蛋白質',
-      items: Array.from(items).filter(
-        i =>
-          ['雞蛋', '雞胸肉', '牛肉', '鮭魚', '火雞胸', '鱈魚', '蝦', '優格'].includes(i)
-      ),
-    },
-    {
-      category: '🍚 碳水化合物',
-      items: Array.from(items).filter(
-        i =>
-          ['吐司', '白飯', '番薯飯', '地瓜', '麵條', '燕麥', '香蕉', '麥片'].includes(i)
-      ),
-    },
-    {
-      category: '🥦 蔬菜與補充',
-      items: Array.from(items).filter(i => ['花菜', '蘆筍'].includes(i)),
-    },
-  ]
+    { category: '蛋白質', items: all.filter(i => /雞|牛|鮭|蝦|蛋|豆腐/.test(i)) },
+    { category: '碳水', items: all.filter(i => /飯|地瓜|燕麥|吐司/.test(i)) },
+    { category: '蔬菜', items: all.filter(i => /花椰|菠菜/.test(i)) },
+  ].filter(c => c.items.length > 0)
 }
 
-function generateCoachNote(profile: UserProfile, goal: Goal, nutrition: any): string {
-  const tdee = calculateTDEE(profile)
-  const deficit = tdee - nutrition.dailyCalories
-  const deficitPerWeek = deficit * 7
-  const lossPerMonth = (deficitPerWeek / 7700) * 30 // 1 kg fat ≈ 7700 kcal
-
-  let note = `根據你的數據：\n`
-  note += `• TDEE: ${tdee} kcal | 目標: ${nutrition.dailyCalories} kcal | 每日赤字: ${deficit} kcal\n`
-  note += `• 預計每月減重: ${lossPerMonth.toFixed(1)} kg\n`
-  note += `• 蛋白質目標: ${nutrition.proteinGrams}g (保護肌肉)\n`
-
-  if (goal.goal_type === 'lose_fat' || goal.goal_type === 'lose_weight') {
-    note += `\n減脂策略：\n`
-    note += `✓ 周一三五：重訓 (保持肌肉)\n`
-    note += `✓ 周二四六：有氧 (消耗熱量)\n`
-    note += `✓ 周日：充分休息\n`
+function buildCoachNote(
+  profile: UserProfile,
+  goal: Goal,
+  goalPlan: ReturnType<typeof calculateGoalPlan>,
+  nutrition: ReturnType<typeof calculateNutritionTargets>,
+  workoutBurn: ReturnType<typeof estimateWeeklyWorkoutBurn>
+) {
+  const weekPhrase = goalPlan.coachSummary?.replace(/TDEE|赤字|kcal/gi, '').trim() || '本週照著吃就好。'
+  let note = `本週重點：${weekPhrase}\n\n`
+  note += `每日目標 ${nutrition.dailyCalories} kcal、蛋白質 ${nutrition.proteinGrams}g。\n`
+  if (workoutBurn.totalBurn > 0) {
+    note += `本週運動預估消耗約 ${workoutBurn.totalBurn} kcal（${workoutBurn.activeDays} 天），運動日已自動調整攝取量，維持淨赤字。\n`
   }
-
+  note += `照著每天的餐與運動做就好。不喜歡可以換同熱量組合。\n`
+  if (goalPlan.projectedEndDate) {
+    note += `照這個節奏，${goalPlan.projectedEndDate} 前會慢慢靠近目標。\n`
+  }
   if (profile.injuries?.length) {
-    note += `\n⚠️ 受傷注意事項：\n`
-    profile.injuries.forEach(injury => {
-      note += `• ${injury}\n`
-    })
+    note += `\n受傷的話動作有調整過：${profile.injuries.join('、')}。不舒服就休息。`
   }
-
   return note
-}
-
-function generateDefaultPlan(profile: any, goal: any, hasKneeInjury: boolean, hasBackInjury: boolean) {
-  const today = new Date()
-  const weekStart = new Date(today)
-  weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1)
-
-  // 3 套早午晚菜單輪換
-  const breakfastOptions = [
-    [
-      { id: '1', name: 'Eggs', name_zh: '雞蛋', calories: 160, protein_g: 14, carbs_g: 2, fat_g: 12, portion: '2個', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '約麻將牌大小' },
-      { id: '2', name: 'Toast', name_zh: '吐司', calories: 120, protein_g: 5, carbs_g: 20, fat_g: 2, portion: '2片', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1599599810694-b5ac4dd0alec?w=200&h=200&fit=crop', portionDesc: '標準切片吐司' },
-    ],
-    [
-      { id: 'b1a', name: 'Oatmeal', name_zh: '燕麥', calories: 150, protein_g: 5, carbs_g: 27, fat_g: 3, portion: '50g', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '即食燕麥片' },
-      { id: 'b1b', name: 'Banana', name_zh: '香蕉', calories: 105, protein_g: 1, carbs_g: 27, fat_g: 0, portion: '1根', preparation: '生', photo_url: 'https://images.unsplash.com/photo-1587859211519-2d0a825f2f43?w=200&h=200&fit=crop', portionDesc: '中等大小' },
-    ],
-    [
-      { id: 'b2a', name: 'Yogurt', name_zh: '優格', calories: 100, protein_g: 10, carbs_g: 8, fat_g: 3, portion: '100g', preparation: '-', photo_url: 'https://images.unsplash.com/photo-1488477181946-6428a0291840?w=200&h=200&fit=crop', portionDesc: '原味優格' },
-      { id: 'b2b', name: 'Granola', name_zh: '麥片', calories: 120, protein_g: 3, carbs_g: 20, fat_g: 4, portion: '30g', preparation: '-', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '堅果麥片' },
-    ],
-  ]
-
-  const lunchOptions = [
-    [
-      { id: 'l1', name: 'Chicken', name_zh: '雞胸肉', calories: 320, protein_g: 55, carbs_g: 0, fat_g: 8, portion: '160g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop', portionDesc: '約一個手掌大小' },
-      { id: 'l2', name: 'Rice', name_zh: '白飯', calories: 220, protein_g: 5, carbs_g: 50, fat_g: 1, portion: '1碗', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '標準飯碗8分滿' },
-    ],
-    [
-      { id: 'l1b', name: 'Beef', name_zh: '牛肉', calories: 350, protein_g: 52, carbs_g: 0, fat_g: 15, portion: '150g', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', portionDesc: '里肌肉片' },
-      { id: 'l2b', name: 'Sweet Potato', name_zh: '番薯飯', calories: 200, protein_g: 4, carbs_g: 45, fat_g: 1, portion: '150g', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1596535542636-922503f663d7?w=200&h=200&fit=crop', portionDesc: '黃色番薯' },
-    ],
-    [
-      { id: 'l1c', name: 'Fish', name_zh: '鱈魚', calories: 280, protein_g: 50, carbs_g: 0, fat_g: 6, portion: '150g', preparation: '蒸', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', portionDesc: '白肉魚' },
-      { id: 'l2c', name: 'Noodles', name_zh: '麵條', calories: 280, protein_g: 8, carbs_g: 54, fat_g: 2, portion: '100g', preparation: '煮', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '全麥麵條' },
-    ],
-  ]
-
-  const dinnerOptions = [
-    [
-      { id: 'd1', name: 'Salmon', name_zh: '鮭魚', calories: 300, protein_g: 42, carbs_g: 0, fat_g: 16, portion: '130g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', portionDesc: '約信用卡大小厚度1指' },
-      { id: 'd2', name: 'Sweet Potato', name_zh: '地瓜', calories: 120, protein_g: 2, carbs_g: 27, fat_g: 0, portion: '120g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1596535542636-922503f663d7?w=200&h=200&fit=crop', portionDesc: '約拳頭大小' },
-    ],
-    [
-      { id: 'd1b', name: 'Turkey', name_zh: '火雞胸', calories: 280, protein_g: 48, carbs_g: 0, fat_g: 8, portion: '140g', preparation: '烤', photo_url: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop', portionDesc: '低脂肉類' },
-      { id: 'd2b', name: 'Broccoli', name_zh: '花菜', calories: 55, protein_g: 4, carbs_g: 11, fat_g: 1, portion: '200g', preparation: '蒸', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '新鮮綠花菜' },
-    ],
-    [
-      { id: 'd1c', name: 'Shrimp', name_zh: '蝦', calories: 250, protein_g: 48, carbs_g: 0, fat_g: 5, portion: '150g', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop', portionDesc: '中蝦' },
-      { id: 'd2c', name: 'Asparagus', name_zh: '蘆筍', calories: 65, protein_g: 5, carbs_g: 12, fat_g: 1, portion: '150g', preparation: '炒', photo_url: 'https://images.unsplash.com/photo-1585238341710-4abb7692202b?w=200&h=200&fit=crop', portionDesc: '新鮮蘆筍' },
-    ],
-  ]
-
-  return {
-    week_number: 1,
-    weekly_targets: { avg_daily_calories: 2300, avg_daily_protein_g: 160, workout_days: 5 },
-    days: Array.from({ length: 7 }, (_, i) => {
-      const bIdx = i % 3
-      const lIdx = (i + 1) % 3
-      const dIdx = (i + 2) % 3
-
-      return {
-        day: i + 1,
-        date: new Date(weekStart.getTime() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        meals: [
-          {
-            type: 'breakfast',
-            type_zh: '早餐',
-            items: breakfastOptions[bIdx],
-            total_calories: breakfastOptions[bIdx].reduce((sum, item) => sum + item.calories, 0),
-          },
-          {
-            type: 'lunch',
-            type_zh: '午餐',
-            items: lunchOptions[lIdx],
-            total_calories: lunchOptions[lIdx].reduce((sum, item) => sum + item.calories, 0),
-          },
-          {
-            type: 'dinner',
-            type_zh: '晚餐',
-            items: dinnerOptions[dIdx],
-            total_calories: dinnerOptions[dIdx].reduce((sum, item) => sum + item.calories, 0),
-          },
-        ],
-        workout: {
-          type: i % 2 === 0 ? 'strength' : 'cardio',
-          type_zh: i % 2 === 0 ? '重訓' : hasKneeInjury ? '上肢有氧' : '有氧',
-          warmup: [{ exercise_id: '1', exercise_name: 'Warm up', exercise_name_zh: '熱身', youtube_id: 'dQw4w9WgXcQ', sets: 1, reps: 15, duration_secs: null, rest_secs: 30, notes: '' }],
-          main: i % 2 === 0
-            ? [{ exercise_id: '2', exercise_name: 'Bench Press', exercise_name_zh: '臥推', youtube_id: '4YnVV_Ksb1E', sets: 4, reps: 6, duration_secs: null, rest_secs: 120, notes: hasKneeInjury ? '下肢受限' : '' }]
-            : [{ exercise_id: '4', exercise_name: hasKneeInjury ? 'Upper Body Cardio' : 'Running', exercise_name_zh: hasKneeInjury ? '上肢訓練' : '跑步', youtube_id: null, sets: 1, reps: null, duration_secs: hasKneeInjury ? 1800 : 2400, rest_secs: 0, notes: hasKneeInjury ? '低衝擊訓練' : '' }],
-          cooldown: [{ exercise_id: '5', exercise_name: 'Stretching', exercise_name_zh: '伸展', youtube_id: 'J8epyPNR-x0', sets: 1, reps: null, duration_secs: 300, rest_secs: 0, notes: '' }],
-          estimated_duration_mins: i % 2 === 0 ? 60 : 40,
-          calories_burned_est: 400,
-        },
-        daily_targets: { calories: 2300, protein_g: 160, carbs_g: 300, fat_g: 80, water_ml: 3500 },
-      }
-    }),
-    grocery_list: [
-      { category: '🥚 蛋白質', items: ['雞胸肉', '鮭魚', '蛋'] },
-      { category: '🍚 碳水', items: ['白米', '地瓜', '吐司'] },
-      { category: '🥦 蔬菜', items: ['花菜', '菠菜'] },
-    ],
-    coach_note: `根據你的需求調整的計畫${hasKneeInjury ? '（避免膝蓋禁忌運動）' : ''}`,
-  }
 }

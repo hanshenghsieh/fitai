@@ -1,56 +1,44 @@
-// BetterBit Design System
-// 再健一點 - 完整設計規範
+// BetterBit Design System — 再健一點
+// Calm · Warm · Premium · Execution-first
 
 export const colors = {
-  // Primary - Fresh Green
-  primary: {
-    50: '#ECFDF5',
-    100: '#D1FAE5',
-    200: '#A7F3D0',
-    300: '#6EE7B7',
-    400: '#2DD4BF', // Main
-    500: '#14B8A6',
-    600: '#0D9488',
-    700: '#047857',
-    800: '#065F46',
-    900: '#064E3B',
+  bg: {
+    canvas: '#F7F3EC',
+    elevated: '#FFFDF9',
+    muted: '#E8DED1',
   },
 
-  // Secondary - Sky Blue
-  secondary: {
-    50: '#F0F9FF',
-    100: '#E0F2FE',
-    200: '#BAE6FD',
-    300: '#7DD3FC',
-    400: '#38BDF8', // Main
-    500: '#0EA5E9',
-    600: '#0284C7',
-    700: '#0369A1',
-    800: '#075985',
-    900: '#0C4A6E',
+  text: {
+    primary: '#2B2B2B',
+    secondary: '#6B6560',
+    tertiary: '#9C958D',
   },
 
-  // Neutral - Soft Gray & White
-  neutral: {
-    0: '#FFFFFF',
-    50: '#F9FAFB',
-    100: '#F3F4F6',
-    200: '#E5E7EB',
-    300: '#D1D5DB',
-    400: '#9CA3AF',
-    500: '#6B7280',
-    600: '#4B5563',
-    700: '#374151',
-    800: '#1F2937',
-    900: '#111827',
+  accent: {
+    action: '#B8895B',
+    actionHover: '#A6784E',
+    actionSoft: 'rgba(184, 137, 91, 0.08)',
   },
 
-  // Semantic
-  success: '#10B981',
-  warning: '#F59E0B',
-  error: '#EF4444',
-  info: '#0EA5E9',
-  milestone: '#8B5CF6',
+  border: {
+    subtle: '#E8DED1',
+    focus: '#B8895B',
+  },
+
+  state: {
+    complete: '#B8895B',
+    rest: '#9C958D',
+    error: '#C4483C',
+    errorBg: '#FFE4E4',
+  },
+} as const
+
+/** @deprecated Use colors.bg.* — kept for gradual migration */
+export const legacy = {
+  background: colors.bg.canvas,
+  card: colors.bg.elevated,
+  cardMuted: colors.bg.muted,
+  accent: colors.accent.action,
 }
 
 export const spacing = {
@@ -61,73 +49,35 @@ export const spacing = {
   xl: 24,
   '2xl': 32,
   '3xl': 48,
-}
+} as const
 
 export const borderRadius = {
-  xs: 4,
   sm: 8,
   md: 12,
   lg: 16,
   xl: 20,
-  full: 50,
-}
+  '2xl': 24,
+  full: 9999,
+} as const
 
 export const typography = {
-  h1: {
-    fontSize: 32,
-    fontWeight: 700,
-    lineHeight: 1.2,
-  },
-  h2: {
-    fontSize: 24,
-    fontWeight: 600,
-    lineHeight: 1.3,
-  },
-  h3: {
-    fontSize: 18,
-    fontWeight: 600,
-    lineHeight: 1.4,
-  },
-  body: {
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: 1.5,
-  },
-  caption: {
-    fontSize: 14,
-    fontWeight: 400,
-    lineHeight: 1.5,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: 1.4,
-  },
-}
+  display: { fontSize: 28, fontWeight: 600, lineHeight: 1.2 },
+  title: { fontSize: 22, fontWeight: 600, lineHeight: 1.25 },
+  headline: { fontSize: 17, fontWeight: 600, lineHeight: 1.3 },
+  body: { fontSize: 15, fontWeight: 400, lineHeight: 1.5 },
+  caption: { fontSize: 13, fontWeight: 400, lineHeight: 1.4 },
+  micro: { fontSize: 11, fontWeight: 500, lineHeight: 1.3 },
+} as const
 
-export const shadows = {
-  sm: {
-    shadowColor: '#000000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-  },
-  md: {
-    shadowColor: '#000000',
-    shadowOpacity: 0.08,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
-  },
-  lg: {
-    shadowColor: '#000000',
-    shadowOpacity: 0.12,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 16,
-  },
-}
+export const motion = {
+  fast: 150,
+  standard: 300,
+  slow: 500,
+  easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+} as const
 
-export const animations = {
-  fast: 150,      // 按鈕點擊、複選框
-  standard: 300,  // 頁面轉換、模態
-  slow: 500,      // 成就動畫
-}
+/** Card surface — border over shadow */
+export const cardStyle = {
+  backgroundColor: colors.bg.elevated,
+  border: `1px solid ${colors.border.subtle}`,
+} as const

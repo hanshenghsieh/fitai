@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { format, startOfWeek } from 'date-fns'
 
 // 定時通知時間配置 (24小時制)
 const NOTIFICATION_SCHEDULE = {
@@ -19,11 +20,9 @@ function isTimeToNotify(targetHour: number, targetMin: number, tolerance: number
   return currentHour === targetHour && Math.abs(currentMin - targetMin) <= tolerance
 }
 
-async function getActivePlanForToday(supabase: any, userId: string): Promise<any> {
-  const today = new Date().toISOString().split('T')[0]
-  const weekStart = new Date()
-  weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1)
-  const weekStartStr = weekStart.toISOString().split('T')[0]
+async function getActivePlanForToday(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const today = format(new Date(), 'yyyy-MM-dd')
+  const weekStartStr = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
 
   const { data } = await supabase
     .from('weekly_plans')
@@ -34,7 +33,7 @@ async function getActivePlanForToday(supabase: any, userId: string): Promise<any
 
   if (!data?.plan_data?.days) return null
 
-  const dayIndex = new Date(today).getDay() - 1 // 0=Monday
+  const dayIndex = Math.max(0, new Date(today).getDay() === 0 ? 6 : new Date(today).getDay() - 1)
   return data.plan_data.days[dayIndex] || null
 }
 
@@ -53,7 +52,9 @@ async function sendScheduledNotifications() {
     if (users) {
       for (const { user_id } of users) {
         const plan = await getActivePlanForToday(supabase, user_id)
-        const mealName = plan?.meals?.[0]?.items?.[0]?.name_zh || '查看計畫'
+        const mealName = plan?.convenience_meals?.[0]?.items?.[0]?.name
+          || plan?.meals?.[0]?.items?.[0]?.name_zh
+          || '查看計畫'
 
         await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-notifications`, {
           method: 'POST',
@@ -80,7 +81,9 @@ async function sendScheduledNotifications() {
     if (users) {
       for (const { user_id } of users) {
         const plan = await getActivePlanForToday(supabase, user_id)
-        const mealName = plan?.meals?.[1]?.items?.[0]?.name_zh || '查看計畫'
+        const mealName = plan?.convenience_meals?.[1]?.items?.[0]?.name
+          || plan?.meals?.[1]?.items?.[0]?.name_zh
+          || '查看計畫'
 
         await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-notifications`, {
           method: 'POST',
@@ -107,7 +110,9 @@ async function sendScheduledNotifications() {
     if (users) {
       for (const { user_id } of users) {
         const plan = await getActivePlanForToday(supabase, user_id)
-        const mealName = plan?.meals?.[2]?.items?.[0]?.name_zh || '查看計畫'
+        const mealName = plan?.convenience_meals?.[2]?.items?.[0]?.name
+          || plan?.meals?.[2]?.items?.[0]?.name_zh
+          || '查看計畫'
 
         await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-notifications`, {
           method: 'POST',
@@ -159,27 +164,26 @@ async function sendScheduledNotifications() {
       .gt('updated_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
 
     if (users) {
-      const today = new Date().toISOString().split('T')[0]
+      const today = format(new Date(), 'yyyy-MM-dd')
 
       for (const { user_id } of users) {
-        const { data: checkIns } = await supabase
-          .from('daily_check_ins')
-          .select('is_completed')
+        const { data: checkin } = await supabase
+          .from('daily_checkins')
+          .select('diet_items, workout_items, water_ml')
           .eq('user_id', user_id)
-          .eq('check_in_date', today)
+          .eq('checkin_date', today)
           .single()
 
-        const completed = checkIns?.is_completed || false
-        const { count: completedItems } = await supabase
-          .from('daily_check_ins')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user_id)
-          .eq('check_in_date', today)
-          .eq('item_type', 'meal')
+        const diet = checkin?.diet_items ?? []
+        const workout = checkin?.workout_items ?? []
+        const dietDone = diet.filter((i: { completed: boolean }) => i.completed).length
+        const workoutDone = workout.filter((i: { completed: boolean }) => i.completed).length
+        const total = diet.length + workout.length
+        const done = dietDone + workoutDone
+        const progress = total > 0 ? Math.round((done / total) * 100) : 0
+        const qualified = total > 0 && dietDone >= diet.length && workoutDone >= workout.length
 
-        const progress = completedItems ? Math.min(Math.floor((completedItems / 4) * 100), 100) : 0
-
-        if (!completed) {
+        if (!qualified) {
           await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-notifications`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

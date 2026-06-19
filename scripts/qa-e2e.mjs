@@ -1,0 +1,186 @@
+import puppeteer from 'puppeteer'
+
+const BASE = process.env.QA_BASE_URL || 'https://fitai-taupe-sigma.vercel.app'
+const EMAIL = '123@gmail.com'
+const PASS = '00000000'
+
+const results = []
+
+function log(path, status, detail) {
+  results.push({ path, status, detail })
+  console.log(`[${status}] ${path}: ${detail}`)
+}
+
+async function wait(ms) {
+  return new Promise(r => setTimeout(r, ms))
+}
+
+async function main() {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  })
+  const page = await browser.newPage()
+  await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true })
+
+  const consoleErrors = []
+  const pageErrors = []
+  page.on('console', msg => {
+    if (msg.type() === 'error') consoleErrors.push(msg.text())
+  })
+  page.on('pageerror', err => pageErrors.push(err.message))
+
+  try {
+    // 1. Homepage
+    await page.goto(BASE, { waitUntil: 'networkidle2', timeout: 60000 })
+    const homeTitle = await page.title()
+    const homeText = await page.evaluate(() => document.body.innerText.slice(0, 500))
+    if (homeText.includes("couldn't load") || homeText.includes('Reload')) {
+      log('1. 首頁', 'FAIL', '顯示錯誤頁 This page could not load')
+    } else {
+      log('1. 首頁', 'PASS', `title=${homeTitle}, 有內容`)
+    }
+
+    // 2. Login
+    await page.goto(`${BASE}/login`, { waitUntil: 'networkidle2', timeout: 60000 })
+    await page.waitForSelector('input[type="email"], input[name="email"]', { timeout: 15000 }).catch(() => null)
+    const emailSel = 'input[type="email"]'
+    const passSel = 'input[type="password"]'
+    const hasLogin = await page.$(emailSel)
+    if (!hasLogin) {
+      log('2. 登入', 'FAIL', '找不到 email 輸入框')
+    } else {
+      await page.type(emailSel, EMAIL, { delay: 20 })
+      await page.type(passSel, PASS, { delay: 20 })
+      await Promise.all([
+        page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }).catch(() => null),
+        page.click('button[type="submit"]'),
+      ])
+      await wait(2000)
+      const afterLoginUrl = page.url()
+      const afterLoginText = await page.evaluate(() => document.body.innerText.slice(0, 800))
+      if (afterLoginUrl.includes('/login')) {
+        log('2. 登入', 'FAIL', `仍停留在 login: ${afterLoginText.slice(0, 120)}`)
+      } else if (afterLoginText.includes("couldn't load")) {
+        log('2. 登入', 'FAIL', '登入後顯示錯誤頁')
+      } else {
+        log('2. 登入', 'PASS', `導向 ${afterLoginUrl}`)
+      }
+    }
+
+    // 3b. 新版 UI 標記
+    await page.goto(`${BASE}/dashboard`, { waitUntil: 'networkidle2', timeout: 60000 })
+    await wait(1500)
+    const dashText = await page.evaluate(() => document.body.innerText)
+    const hasNewUI = dashText.includes('你的計畫')
+    log('3b. 新版 UI', hasNewUI ? 'PASS' : 'FAIL', hasNewUI ? '找到「你的計畫」' : '仍為舊版 UI')
+
+    // 3c. PWA icon
+    const iconRes = await page.goto(`${BASE}/icon.svg`, { waitUntil: 'networkidle2', timeout: 15000 }).catch(() => null)
+    const iconOk = iconRes && iconRes.status() === 200
+    log('3c. PWA icon', iconOk ? 'PASS' : 'FAIL', iconOk ? '/icon.svg 200' : 'icon 404')
+
+    // 3-5 Dashboard / weekly
+    for (const [name, path] of [
+      ['4. 今日任務/dashboard', '/dashboard'],
+      ['5. 本週/weekly', '/weekly'],
+      ['8. 進度/progress', '/progress'],
+      ['10. 設定/settings', '/settings'],
+    ]) {
+      await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle2', timeout: 60000 })
+      await wait(1500)
+      const url = page.url()
+      const text = await page.evaluate(() => document.body.innerText)
+      if (url.includes('/login')) {
+        log(name, 'FAIL', '被導回登入頁')
+      } else if (text.includes("couldn't load") || text.includes('Reload to try')) {
+        log(name, 'FAIL', '頁面無法載入錯誤')
+      } else if (text.length < 50) {
+        log(name, 'WARN', `內容過少 (${text.length} chars)`)
+      } else {
+        log(name, 'PASS', `載入成功 ${text.slice(0, 80).replace(/\n/g, ' ')}...`)
+      }
+    }
+
+    // 6. 換一個同熱量的
+    await page.goto(`${BASE}/dashboard`, { waitUntil: 'networkidle2', timeout: 60000 })
+    await wait(2000)
+    const swapBtn = await page.evaluate(() => {
+      const buttons = [...document.querySelectorAll('button')]
+      return buttons.find(b => /換一個同熱量的/.test(b.innerText))?.innerText
+    })
+    if (swapBtn) {
+      log('6. 換餐組合', 'PASS', `找到按鈕: ${swapBtn}`)
+      const clicked = await page.evaluate(() => {
+        const buttons = [...document.querySelectorAll('button')]
+        const btn = buttons.find(b => /換一個同熱量的/.test(b.innerText))
+        if (btn) { btn.click(); return true }
+        return false
+      })
+      if (clicked) {
+        await wait(2500)
+        const after = await page.evaluate(() => document.body.innerText)
+        log('6. 換餐組合-點擊', after.length > 200 ? 'PASS' : 'WARN', '點擊後狀態')
+      }
+    } else {
+      log('6. 換餐組合', 'WARN', '未找到替換按鈕')
+    }
+
+    // 7. 餐點替換
+    const reroll = await page.evaluate(() => {
+      const buttons = [...document.querySelectorAll('button')]
+      return buttons.some(b => /換一個同熱量的|再骰一次/.test(b.innerText))
+    })
+    log('7. 餐點替換', reroll ? 'PASS' : 'WARN', reroll ? '找到替換按鈕' : '未展開餐卡或未找到')
+
+    // 12. Refresh persistence
+    const beforeRefresh = await page.evaluate(() => document.body.innerText.slice(0, 200))
+    await page.reload({ waitUntil: 'networkidle2' })
+    await wait(2000)
+    const afterRefresh = await page.evaluate(() => document.body.innerText.slice(0, 200))
+    const stillAuthed = !page.url().includes('/login')
+    log('12. 重新整理', stillAuthed ? 'PASS' : 'FAIL', stillAuthed ? '仍保持登入' : '登入狀態遺失')
+
+    // 13. Logout and login
+    await page.goto(`${BASE}/settings`, { waitUntil: 'networkidle2', timeout: 60000 })
+    await wait(1000)
+    const logoutClicked = await page.evaluate(() => {
+      const buttons = [...document.querySelectorAll('button, a')]
+      const el = buttons.find(b => /登出|logout/i.test(b.innerText))
+      if (el) { el.click(); return true }
+      return false
+    })
+    if (logoutClicked) {
+      await wait(3000)
+      await page.goto(`${BASE}/login`, { waitUntil: 'networkidle2' })
+      await wait(500)
+      await page.type('input[type="email"]', EMAIL, { delay: 20 })
+      await page.type('input[type="password"]', PASS, { delay: 20 })
+      await page.click('button[type="submit"]')
+      try {
+        await page.waitForFunction(() => !window.location.pathname.includes('/login'), { timeout: 20000 })
+        log('13. 登出再登入', 'PASS', page.url())
+      } catch {
+        log('13. 登出再登入', 'WARN', `登入逾時: ${page.url()}`)
+      }
+    } else {
+      log('13. 登出再登入', 'WARN', '找不到登出按鈕')
+    }
+
+    if (consoleErrors.length) {
+      log('Console errors', 'WARN', consoleErrors.slice(0, 5).join(' | '))
+    }
+    if (pageErrors.length) {
+      log('Page errors', 'FAIL', pageErrors.slice(0, 5).join(' | '))
+    }
+  } catch (err) {
+    log('FATAL', 'FAIL', err.message)
+  } finally {
+    await browser.close()
+  }
+
+  console.log('\n--- JSON ---')
+  console.log(JSON.stringify(results, null, 2))
+}
+
+main()

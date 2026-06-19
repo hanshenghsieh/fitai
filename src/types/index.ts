@@ -129,6 +129,9 @@ export interface DayPlan {
     carbs_g: number
     fat_g: number
     water_ml: number
+    exercise_burn_kcal?: number
+    intake_adjustment_kcal?: number
+    net_deficit_kcal?: number
   }
 }
 
@@ -138,6 +141,21 @@ export interface WeeklyPlanData {
     avg_daily_calories: number
     avg_daily_protein_g: number
     workout_days: number
+    weekly_exercise_burn_kcal?: number
+    avg_exercise_burn_kcal?: number
+  }
+  goal_snapshot?: {
+    tdee: number
+    daily_deficit: number
+    current_body_fat: number | null
+    target_body_fat: number | null
+    target_weight: number | null
+    fat_to_lose_kg?: number
+    total_deficit_kcal?: number
+    weeks_remaining: number
+    weekly_fat_loss_g: number
+    lean_mass_kg: number
+    weekly_exercise_burn_kcal?: number
   }
   days: DayPlan[]
   grocery_list: { category: string; items: string[] }[]
