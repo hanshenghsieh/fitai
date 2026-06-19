@@ -3,12 +3,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MapPin, Navigation, Heart, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
+import { currentMealSlotForSchedule, getMealLabels, type WorkSchedule } from '@/lib/human-mode'
+import { getTaipeiHour } from '@/lib/timezone'
+import { humanizeMealReasoning } from '@/lib/meal-trust-copy'
+import MealTrustCard from '@/components/dashboard/MealTrustCard'
 import {
   rollMealSuggestion,
   suggestionToSelections,
   recordFavorite,
   memoryFromCheckinMeta,
-  currentMealSlot,
   type MealSuggestion,
 } from '@/lib/meal-engine'
 import { eatOutMenu } from '@/lib/convenience-store-menu'
@@ -77,15 +80,18 @@ export default function HomeDecisionHero({
   userMemory,
   onApply,
 }: Props) {
+  const schedule: WorkSchedule = userMemory.work_schedule ?? 'standard'
+  const lifeEvent = userMemory.life_event_mode ?? null
+
   const [nowSlot, setNowSlot] = useState<MealType>('breakfast')
   const [selectedMeal, setSelectedMeal] = useState<MealType>('breakfast')
   useEffect(() => {
-    const slot = currentMealSlot()
+    const slot = currentMealSlotForSchedule(schedule)
     setNowSlot(slot)
     setSelectedMeal(slot)
-  }, [])
+  }, [schedule])
 
-  const mealLabels = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' } as const
+  const mealLabels = getMealLabels(schedule)
   const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner']
 
   const coords = useGeolocation(userMemory.eat_out_prefs?.work_location)
@@ -246,6 +252,12 @@ export default function HomeDecisionHero({
       : '全台便利店菜單'
 
   const planReasoning = todayPlan.convenience_meals?.find(m => m.meal_type === selectedMeal)?.reasoning
+  const trustCopy = humanizeMealReasoning(planReasoning, {
+    mealType: selectedMeal,
+    schedule,
+    lifeEvent,
+    isConvenience: true,
+  })
 
   return (
     <div className="pt-12 pb-2 px-4 space-y-4" style={{ backgroundColor: colors.bg.canvas }}>
@@ -271,36 +283,44 @@ export default function HomeDecisionHero({
             </p>
           </div>
 
+          <MealTrustCard title={trustCopy.title} body={trustCopy.body} />
+
           <div className="flex gap-2">
             {mealTypes.map(mt => {
               const active = selectedMeal === mt
               const isNow = nowSlot === mt
+              const nowHint = schedule === 'shift' && mt === 'dinner' && isNow && (getTaipeiHour() >= 22 || getTaipeiHour() < 5)
+                ? '睡前'
+                : isNow && !active
+                  ? '現在'
+                  : ''
               return (
                 <button
                   key={mt}
                   type="button"
                   onClick={() => setSelectedMeal(mt)}
-                  className="flex-1 py-2 rounded-xl text-[12px] font-semibold"
+                  className="flex-1 min-h-[44px] py-1.5 rounded-xl text-[12px] font-semibold flex flex-col items-center justify-center"
                   style={{
                     backgroundColor: active ? colors.accent.action : colors.bg.muted,
                     color: active ? '#FFFDF9' : colors.text.secondary,
                     border: `1px solid ${active ? colors.accent.action : colors.border.subtle}`,
                   }}
                 >
-                  {mealLabels[mt]}
-                  {isNow && !active && (
-                    <span className="block text-[10px] font-normal opacity-70">現在</span>
-                  )}
+                  <span>{mealLabels[mt]}</span>
+                  <span
+                    className="text-[10px] font-normal leading-[14px] h-[14px]"
+                    style={{ opacity: nowHint ? 0.7 : 0 }}
+                    aria-hidden={!nowHint}
+                  >
+                    {nowHint || '現在'}
+                  </span>
                 </button>
               )
             })}
           </div>
 
-          <p className="text-[12px]" style={{ color: colors.text.secondary }}>
-            目標 {mealTargets.calories} kcal · 蛋白 {mealTargets.protein}g
-            {planReasoning && !activeSuggestion && (
-              <span className="block mt-1" style={{ color: colors.text.tertiary }}>{planReasoning}</span>
-            )}
+          <p className="text-[12px]" style={{ color: colors.text.tertiary }}>
+            {PLAN_FIRST_HINT}
           </p>
 
           <ExpandPanel open={displayItems.length > 0} className="space-y-2">

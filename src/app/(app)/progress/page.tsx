@@ -39,7 +39,7 @@ export default async function ProgressPage() {
           你有在變嗎？
         </h1>
         <p className="text-[13px] mt-1" style={{ color: colors.text.secondary }}>
-          體重變化夠大時，系統會自動重算熱量、蛋白質與課表。
+          體重沒變，不代表失敗。我會幫你看發生了什麼。
         </p>
       </div>
 

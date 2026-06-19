@@ -38,6 +38,10 @@ export interface UserMemoryMeta {
   eat_out_prefs?: EatOutPreferences
   favorite_item_ids?: string[]
   favorite_brands?: string[]
+  /** standard | shift — 輪班用第一餐/第二餐/第三餐 */
+  work_schedule?: 'standard' | 'shift'
+  /** 生活事件模式，不懲罰 */
+  life_event_mode?: 'cheat' | 'travel' | 'family' | 'cny' | 'sick' | 'stress' | 'bad_week' | null
 }
 
 export interface CheckinMeta {

@@ -26,6 +26,14 @@ export interface SavedMealCombo {
 const MEAL_LABELS = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' }
 const CATEGORY_OFFSET = { breakfast: 0, lunch: 2, dinner: 5 }
 
+function buildComboTrustReason(
+  category: 'breakfast' | 'lunch' | 'dinner',
+  _names: string
+): string {
+  const meal = MEAL_LABELS[category]
+  return `今天${meal}幫你選方便買得到、蛋白質夠、也符合今天目標的組合。你不用自己想。`
+}
+
 function filterMenu(
   category: 'breakfast' | 'lunch' | 'dinner',
   profile?: UserProfile
@@ -289,7 +297,7 @@ export function comboToSaved(
     total_protein_g: combo.totalProtein,
     total_carbs_g: combo.totalCarbs,
     total_fat_g: combo.totalFat,
-    reasoning: `依每日目標配餐：${names}`,
+    reasoning: buildComboTrustReason(category, names),
   }
 }
 

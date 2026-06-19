@@ -6,6 +6,7 @@ import {
 import { format } from 'date-fns'
 import { colors, cardStyle } from '@/lib/design-system'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
+import { buildPlateauStory } from '@/lib/plateau-story'
 import { detectWeightPlateau } from '@/lib/companion-state'
 import ZaiJian from '@/components/character/ZaiJian'
 import type { BodyMeasurement, Goal } from '@/types'
@@ -29,6 +30,11 @@ export default function ProgressCharts({ measurements, plans, goal }: Props) {
     .map(m => ({ date: format(new Date(m.measured_at), 'M/d'), weight: m.weight_kg }))
 
   const isPlateau = detectWeightPlateau(measurements)
+  const plateauStory = buildPlateauStory({
+    measurements,
+    mealAdherence: plans[plans.length - 1]?.previous_completion_rate,
+    workoutAdherence: plans[plans.length - 1]?.previous_workout_rate,
+  })
 
   if (measurements.length === 0 && plans.length === 0) {
     return (
@@ -44,7 +50,15 @@ export default function ProgressCharts({ measurements, plans, goal }: Props) {
 
   return (
     <div className="space-y-4">
-      {isPlateau && (
+      {plateauStory && (
+        <ZaiJian
+          size="sm"
+          layout="bubble"
+          line={{ text: plateauStory.text, subtext: plateauStory.subtext, expression: 'plateau' }}
+        />
+      )}
+
+      {!plateauStory && isPlateau && (
         <ZaiJian size="sm" line={pickZaiJianLine('plateau')} layout="bubble" />
       )}
 

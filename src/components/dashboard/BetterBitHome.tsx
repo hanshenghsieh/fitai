@@ -27,7 +27,8 @@ import HomeDecisionHero from '@/components/dashboard/HomeDecisionHero'
 import ScrollFloatCard from '@/components/motion/ScrollFloatCard'
 import BreathingProgress from '@/components/motion/BreathingProgress'
 import ExpandPanel from '@/components/motion/ExpandPanel'
-import { currentMealSlot } from '@/lib/meal-engine'
+import { currentMealSlotForSchedule, getMealLabels, type WorkSchedule } from '@/lib/human-mode'
+import { getTaipeiHour } from '@/lib/timezone'
 import { eatOutMenu } from '@/lib/convenience-store-menu'
 import { deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
 import { colors, cardStyle } from '@/lib/design-system'
@@ -37,6 +38,12 @@ import {
   resolveWaterCompanion,
   resolveWorkoutCompanion,
 } from '@/lib/companion-state'
+import LifeEventPicker from '@/components/dashboard/LifeEventPicker'
+import D3VictoryBanner from '@/components/dashboard/D3VictoryBanner'
+import { getD3VictoryLine } from '@/lib/d3-victory'
+import { humanizeMealReasoning } from '@/lib/meal-trust-copy'
+import MealTrustCard from '@/components/dashboard/MealTrustCard'
+import type { LifeEventMode } from '@/lib/human-mode'
 import ZaiJian from '@/components/character/ZaiJian'
 import type { DayPlan, DailyCheckin, DietCheckinItem, WorkoutCheckinItem, UserProfile } from '@/types'
 
@@ -76,9 +83,6 @@ export default function BetterBitHome({
 }: Props) {
   const [isPending, startTransition] = useTransition()
   const [expandedMeal, setExpandedMeal] = useState<string | null>(null)
-  useEffect(() => {
-    setExpandedMeal(currentMealSlot())
-  }, [])
   const [expandedWorkout, setExpandedWorkout] = useState(false)
   const [dietItems, setDietItems] = useState<DietCheckinItem[]>(() => initDietItems(checkin))
   const [workoutItems, setWorkoutItems] = useState<WorkoutCheckinItem[]>(() =>
@@ -100,6 +104,21 @@ export default function BetterBitHome({
   const [dailyRolls, setDailyRolls] = useState<DailyRollState>(() => dailyRollsFromCheckin(checkin))
   const [userMemory, setUserMemory] = useState<UserMemoryMeta>(() => userMemoryFromCheckin(checkin))
   const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
+
+  const schedule: WorkSchedule = userMemory.work_schedule ?? 'standard'
+  const mealLabelMap = getMealLabels(schedule)
+
+  useEffect(() => {
+    setExpandedMeal(currentMealSlotForSchedule(schedule))
+  }, [schedule])
+
+  const mealsCompletedToday = dietItems.filter(d => d.completed).length
+  const d3Line = profile?.created_at
+    ? getD3VictoryLine({
+        profileCreatedAt: profile.created_at,
+        mealsCompletedToday,
+      })
+    : null
 
   const waterTarget = todayPlan.daily_targets.water_ml
   const exercises = todayPlan.workout?.main ?? []
@@ -148,6 +167,12 @@ export default function BetterBitHome({
     [dietItems, workoutItems, waterMl, mealModes, customEatOut, dailyRolls, mealSuggest, userMemory, weeklyPlanId, waterTarget]
   )
 
+  const setLifeEvent = (mode: LifeEventMode | null) => {
+    const next = { ...userMemory, life_event_mode: mode }
+    setUserMemory(next)
+    persist({ userMemory: next })
+  }
+
   const toggleMeal = (mealId: MealType) => {
     startTransition(() => {
       const updated = dietItems.map(d =>
@@ -186,20 +211,21 @@ export default function BetterBitHome({
   const convenienceMeals = getConvenienceMealsForDay(todayPlan, dayIndex)
 
   const getMealDisplay = (mealIndex: number, mealType: MealType) => {
-    const labels = ['早餐', '午餐', '晚餐']
+    const types: MealType[] = ['breakfast', 'lunch', 'dinner']
+    const label = mealLabelMap[types[mealIndex]]
     const convenience = convenienceMeals.find(m => m.meal_type === mealType)
     const home = homeMeals.find(m => m.type === mealType) ?? homeMeals[mealIndex]
     const custom = customEatOut[mealType]
 
     if (mealModes[mealType] === 'cook' && home?.items?.length) {
-      return { label: labels[mealIndex], meal: home, isConvenience: false }
+      return { label, meal: home, isConvenience: false }
     }
 
     if (custom?.length) {
       const selected = deserializeCustomCombo(custom, eatOutMenu)
       const display = selectedToDisplayItems(selected)
       return {
-        label: labels[mealIndex],
+        label,
         combo: { items: display },
         isConvenience: true,
       }
@@ -207,15 +233,15 @@ export default function BetterBitHome({
 
     if (convenience?.items?.length) {
       return {
-        label: labels[mealIndex],
+        label,
         combo: { items: convenience.items },
         isConvenience: true,
       }
     }
     if (home?.items?.length) {
-      return { label: labels[mealIndex], meal: home, isConvenience: false }
+      return { label, meal: home, isConvenience: false }
     }
-    return { label: labels[mealIndex], combo: { items: [] }, isConvenience: true }
+    return { label, combo: { items: [] }, isConvenience: true }
   }
 
   const applyHeroDecision = (payload: {
@@ -305,6 +331,8 @@ export default function BetterBitHome({
 
   return (
     <>
+      {d3Line && <D3VictoryBanner line={d3Line} />}
+
       <HomeDecisionHero
         todayPlan={todayPlan}
         profile={profile}
@@ -321,6 +349,11 @@ export default function BetterBitHome({
       />
 
       <div className="px-4 pb-32 space-y-6" style={{ backgroundColor: colors.bg.canvas }}>
+        <LifeEventPicker
+          active={userMemory.life_event_mode}
+          onSelect={setLifeEvent}
+        />
+
         <ScrollFloatCard depth={0} staggerIndex={2}>
           <div className="space-y-2">
             <BreathingProgress percent={completionPercent} />

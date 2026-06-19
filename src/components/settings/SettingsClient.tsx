@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -13,6 +13,8 @@ import { colors, cardStyle } from '@/lib/design-system'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
 import SubscriptionManager from './SubscriptionManager'
 import { parseGeneratePlanError } from '@/lib/api-errors'
+import type { WorkSchedule } from '@/lib/human-mode'
+import { userMemoryFromCheckin, parseCheckinMeta, buildCheckinPayload, initDietItems, initWorkoutItems, mealModesFromCheckin } from '@/lib/checkin-utils'
 
 export default function SettingsClient({ profile, goal }: { profile: UserProfile | null; goal: Goal | null }) {
   const [weight, setWeight] = useState(profile?.weight_kg?.toString() ?? '')
@@ -20,7 +22,56 @@ export default function SettingsClient({ profile, goal }: { profile: UserProfile
   const [water, setWater] = useState(profile?.water_ml_target?.toString() ?? '2000')
   const [loading, setLoading] = useState(false)
   const [regenLoading, setRegenLoading] = useState(false)
+  const [workSchedule, setWorkSchedule] = useState<WorkSchedule>('standard')
+  const [scheduleSaving, setScheduleSaving] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    fetch('/api/checkin')
+      .then(r => r.json())
+      .then(data => {
+        const mem = userMemoryFromCheckin(data.checkin ?? null)
+        if (mem.work_schedule) setWorkSchedule(mem.work_schedule)
+      })
+      .catch(() => {})
+  }, [])
+
+  async function saveWorkSchedule(next: WorkSchedule) {
+    setScheduleSaving(true)
+    setWorkSchedule(next)
+    try {
+      const res = await fetch('/api/checkin')
+      const data = await res.json()
+      const checkin = data.checkin
+      const meta = parseCheckinMeta(checkin ?? null)
+      const mem = { ...(meta.user_memory ?? {}), work_schedule: next }
+      const payload = buildCheckinPayload(
+        {
+          dietItems: checkin?.diet_items ?? initDietItems(checkin),
+          workoutItems: checkin?.workout_items ?? initWorkoutItems(checkin, []),
+          waterMl: checkin?.water_ml ?? 0,
+          mealModes: mealModesFromCheckin(checkin),
+          customEatOut: meta.custom_eat_out,
+          dailyRolls: meta.daily_rolls,
+          mealSuggest: meta.meal_suggest,
+          userMemory: mem,
+        },
+        checkin?.weekly_plan_id ?? null
+      )
+      const saveRes = await fetch('/api/checkin', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!saveRes.ok) throw new Error()
+      toast.success(next === 'shift' ? '好，改用第一餐/第二餐/第三餐。' : '好，改回早餐/午餐/晚餐。')
+      router.refresh()
+    } catch {
+      toast.error('存不了，稍後再試')
+    } finally {
+      setScheduleSaving(false)
+    }
+  }
 
   async function handleSave() {
     setLoading(true)
@@ -131,6 +182,30 @@ export default function SettingsClient({ profile, goal }: { profile: UserProfile
           </div>
         </div>
       )}
+
+      <div className="rounded-2xl p-4 space-y-3" style={cardStyle}>
+        <h3 className="text-[15px] font-semibold" style={{ color: colors.text.primary }}>作息</h3>
+        <p className="text-[12px]" style={{ color: colors.text.tertiary }}>
+          大夜班或輪班？餐次會改成第一餐、第二餐、第三餐（睡前）。
+        </p>
+        <div className="flex gap-2">
+          {(['standard', 'shift'] as const).map(s => (
+            <button
+              key={s}
+              type="button"
+              disabled={scheduleSaving}
+              onClick={() => saveWorkSchedule(s)}
+              className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold"
+              style={{
+                backgroundColor: workSchedule === s ? colors.accent.action : colors.bg.muted,
+                color: workSchedule === s ? '#FFFDF9' : colors.text.secondary,
+              }}
+            >
+              {s === 'standard' ? '一般' : '輪班/夜班'}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <Suspense fallback={<div className="px-4 h-24" />}>
         <SubscriptionManager />

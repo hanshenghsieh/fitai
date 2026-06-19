@@ -1,6 +1,15 @@
 # Changelog
 
-## [2026-06-19] — Production Deploy + Hardening
+## Phase 3 — Market Humility (2026-06-19)
+
+### P0 shipped
+- **Meal trust:** `MealTrustCard` + `meal-trust-copy.ts` — 白話「為什麼這餐？」取代 TDEE/配餐術語
+- **D3 victory:** `d3-victory.ts` + banner — 進步=少做決定，不是體重
+- **Plateau story:** `plateau-story.ts` — 沒瘦≠失敗，進度頁敘事
+- **Life events:** `LifeEventPicker` — 亂吃/出差/過年/生病等，不懲罰
+- **Shift work:** 設定頁輪班模式 → 第一餐/第二餐/第三餐/睡前
+
+---
 
 ### Deploy
 - Commits `601e526`, `5bee96b`, `a9ef970` pushed to `main` → Vercel production.
