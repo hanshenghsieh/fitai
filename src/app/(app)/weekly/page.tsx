@@ -28,9 +28,9 @@ export default async function WeeklyPage() {
   return (
     <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: colors.bg.canvas }}>
       <div className="pt-12 px-4 pb-2">
-        <h1 className="text-[22px] font-semibold" style={{ color: colors.text.primary }}>本週計畫</h1>
+        <h1 className="text-[22px] font-semibold" style={{ color: colors.text.primary }}>本週</h1>
         <p className="text-[13px] mt-1" style={{ color: colors.text.secondary }}>
-          系統依你的目標設計。照著做，不用自己想。
+          這週照你能做到的走。想吃什麼，去 Today 記就好。
         </p>
       </div>
 

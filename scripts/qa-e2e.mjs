@@ -123,19 +123,26 @@ async function main() {
       if (clicked) {
         await page.evaluate(() => {
           const buttons = [...document.querySelectorAll('button')]
-          const btn = buttons.find(b => /🎲 交給我/.test(b.innerText))
+          const btn = buttons.find(b => /骰一個/.test(b.innerText))
           if (btn) btn.click()
         })
         await wait(3000)
-        log('6. 骰子救援-點擊', 'PASS', '已觸發')
+        const hasPreview = await page.evaluate(() => /就這個/.test(document.body.innerText))
+        log('6. 骰子救援-預覽', hasPreview ? 'PASS' : 'WARN', hasPreview ? '有預覽未自動記錄' : '無預覽')
       }
     } else {
       log('6. 骰子救援', 'WARN', '未找到按鈕')
     }
 
-    // 7. 食物搜尋
+    // 7. 食物搜尋 + 自填
     const hasSearch = await page.evaluate(() => !!document.querySelector('input[aria-label="搜尋食物"]'))
     log('7. 食物搜尋', hasSearch ? 'PASS' : 'WARN', hasSearch ? '搜尋框存在' : '未找到')
+    if (hasSearch) {
+      await page.type('input[aria-label="搜尋食物"]', '阿嬤滷肉飯', { delay: 20 })
+      await wait(1000)
+      const hasFreeText = await page.evaluate(() => /菜單沒有也 OK/.test(document.body.innerText))
+      log('7b. 自填食物', hasFreeText ? 'PASS' : 'WARN', hasFreeText ? '可記錄菜單外品項' : '未找到')
+    }
 
     // 12. Refresh persistence
     const beforeRefresh = await page.evaluate(() => document.body.innerText.slice(0, 200))

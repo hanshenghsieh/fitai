@@ -48,6 +48,6 @@ export function getLifeEventClearLine(): ZaiJianLine {
   return {
     text: '好，回到平常模式。',
     expression: 'normal',
-    subtext: '照著做就好。',
+    subtext: '今天照常過。想吃什麼就記。',
   }
 }

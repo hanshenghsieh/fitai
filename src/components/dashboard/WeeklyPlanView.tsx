@@ -1,13 +1,10 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { format, addDays } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
-import { ChevronDown, ChevronUp, ShoppingCart, MessageSquare, RefreshCw } from 'lucide-react'
-import { toast } from 'sonner'
-import { getConvenienceMealsForDay, getHomeMealsForDay } from '@/lib/meal-plan-display'
-import { buildMealCombination, comboToSaved } from '@/lib/meal-combo-engine'
-import { formatEatOutStoreLine } from '@/lib/eat-out-builder'
+import Link from 'next/link'
+import { ChevronDown, ChevronUp, ShoppingCart, MessageSquare } from 'lucide-react'
 import {
   buildWeekJourney,
   formatWeeklyGoals,
@@ -15,12 +12,8 @@ import {
   statusLabel,
 } from '@/lib/weekly-journey'
 import { colors, cardStyle } from '@/lib/design-system'
-import { SWAP_BUTTON } from '@/lib/coach-copy'
-import { pickZaiJianLine } from '@/lib/copy/zaijian'
-import CoachPlanSummary from '@/components/coach/CoachPlanSummary'
 import type { WeeklyPlanData, WeeklyFeedback } from '@/types'
 import type { UserProfile } from '@/types'
-import type { ConvenienceMealCombination } from '@/types'
 import WeeklyFeedbackForm from './WeeklyFeedbackForm'
 
 interface Props {
@@ -33,16 +26,6 @@ interface Props {
   weekNumber?: number
 }
 
-type MealSlot = 'breakfast' | 'lunch' | 'dinner'
-type HomeRollState = { rollOffset: number; seen: string[]; totalRolls: number }
-type EatOutRollState = { rollOffset: number; totalRolls: number }
-
-const MEAL_RATIOS = { breakfast: 0.25, lunch: 0.4, dinner: 0.35 } as const
-
-function rollKey(day: number, slot: MealSlot) {
-  return `${day}-${slot}`
-}
-
 export default function WeeklyPlanView({
   planData,
   weekStart,
@@ -53,16 +36,10 @@ export default function WeeklyPlanView({
   weekNumber = 1,
 }: Props) {
   const [selectedDay, setSelectedDay] = useState(Math.min(Math.max(todayDayIndex, 0), (planData?.days?.length ?? 1) - 1))
-  const [mealMode, setMealMode] = useState<'cook' | 'eat-out'>('cook')
   const [showGrocery, setShowGrocery] = useState(false)
   const [showFeedback, setShowFeedback] = useState(todayDayIndex >= 6)
-  const [showNutrition, setShowNutrition] = useState(false)
-  const [homeRolls, setHomeRolls] = useState<Record<string, HomeRollState>>({})
-  const [eatOutRolls, setEatOutRolls] = useState<Record<string, EatOutRollState>>({})
-  const [eatOutOverrides, setEatOutOverrides] = useState<Record<number, ConvenienceMealCombination[]>>({})
 
   const todayPlan = planData?.days?.[selectedDay]
-  const weekSeed = planData.week_number ?? weekNumber
 
   const journey = useMemo(
     () =>
@@ -78,78 +55,6 @@ export default function WeeklyPlanView({
 
   const weeklyGoals = useMemo(() => formatWeeklyGoals(planData), [planData])
 
-  const homeRollOptions = useMemo(() => {
-    const opts: Partial<Record<MealSlot, { rollOffset?: number; weekSeed?: number; excludeComboIds?: string[] }>> = {}
-    for (const slot of ['breakfast', 'lunch', 'dinner'] as const) {
-      const key = rollKey(selectedDay, slot)
-      const st = homeRolls[key]
-      if (st) {
-        opts[slot] = { rollOffset: st.rollOffset, weekSeed, excludeComboIds: st.seen }
-      } else {
-        opts[slot] = { weekSeed }
-      }
-    }
-    return opts
-  }, [homeRolls, selectedDay, weekSeed])
-
-  const homeMeals = useMemo(() => {
-    if (!todayPlan || !profile) return todayPlan?.meals ?? []
-    return getHomeMealsForDay(todayPlan, selectedDay, profile, homeRollOptions)
-  }, [todayPlan, selectedDay, profile, homeRollOptions])
-
-  const convenienceMeals = useMemo(() => {
-    if (!todayPlan) return []
-    if (eatOutOverrides[selectedDay]) return eatOutOverrides[selectedDay]!
-    return getConvenienceMealsForDay(todayPlan, selectedDay)
-  }, [todayPlan, selectedDay, eatOutOverrides])
-
-  const handleHomeDice = useCallback(
-    (slot: MealSlot) => {
-      if (!profile || !todayPlan) return
-      const key = rollKey(selectedDay, slot)
-      const prev = homeRolls[key] ?? { rollOffset: 0, seen: [], totalRolls: 0 }
-      const currentMeals = getHomeMealsForDay(todayPlan, selectedDay, profile, {
-        ...homeRollOptions,
-        [slot]: { rollOffset: prev.rollOffset, weekSeed, excludeComboIds: prev.seen },
-      })
-      const current = currentMeals.find(m => m.type === slot) as { combo_id?: string } | undefined
-      const seen = current?.combo_id ? [...prev.seen, current.combo_id] : prev.seen
-      const totalRolls = prev.totalRolls + 1
-      setHomeRolls({
-        ...homeRolls,
-        [key]: { rollOffset: prev.rollOffset + 1, seen, totalRolls },
-      })
-      const line = pickZaiJianLine('decide')
-      toast.message(line.subtext ? `${line.text} ${line.subtext}` : line.text)
-    },
-    [profile, todayPlan, selectedDay, homeRolls, homeRollOptions, weekSeed]
-  )
-
-  const handleEatOutDice = useCallback(
-    (slot: MealSlot) => {
-      if (!todayPlan) return
-      const key = rollKey(selectedDay, slot)
-      const prev = eatOutRolls[key] ?? { rollOffset: 0, totalRolls: 0 }
-      const totalRolls = prev.totalRolls + 1
-      const ratio = MEAL_RATIOS[slot]
-      const combo = buildMealCombination(
-        slot,
-        Math.round(todayPlan.daily_targets.calories * ratio),
-        Math.round(todayPlan.daily_targets.protein_g * ratio),
-        selectedDay + prev.rollOffset + 1 + totalRolls,
-        profile ?? undefined
-      )
-      const saved = comboToSaved(slot, combo)
-      const base = eatOutOverrides[selectedDay] ?? getConvenienceMealsForDay(todayPlan, selectedDay)
-      const updated = base.map(m => (m.meal_type === slot ? saved : m))
-      setEatOutOverrides({ ...eatOutOverrides, [selectedDay]: updated })
-      setEatOutRolls({ ...eatOutRolls, [key]: { rollOffset: prev.rollOffset + 1, totalRolls } })
-      const line = pickZaiJianLine('decide')
-      toast.message(line.subtext ? `${line.text} ${line.subtext}` : line.text)
-    },
-    [todayPlan, selectedDay, eatOutRolls, eatOutOverrides, profile]
-  )
-
   if (!todayPlan) {
     return (
       <div className="m-4 p-6 text-center text-[15px]" style={{ color: colors.text.tertiary }}>
@@ -163,14 +68,13 @@ export default function WeeklyPlanView({
 
   return (
     <div className="px-4 pb-8 space-y-6">
-      {planData.days[todayDayIndex] && (
-        <CoachPlanSummary
-          todayPlan={planData.days[todayDayIndex]!}
-          goalSnapshot={planData.goal_snapshot}
-          weekNumber={weekNumber}
-          coachNote={planData.coach_note}
-        />
-      )}
+      <Link
+        href="/dashboard"
+        className="block rounded-2xl p-4 text-[13px] font-medium"
+        style={{ ...cardStyle, backgroundColor: colors.accent.actionSoft, color: colors.accent.action }}
+      >
+        想吃什麼？去 Today 搜尋或記錄 →
+      </Link>
 
       {/* Weekly goals */}
       <div className="rounded-3xl p-6 space-y-4" style={{ ...cardStyle, backgroundColor: colors.bg.elevated }}>
@@ -246,169 +150,9 @@ export default function WeeklyPlanView({
 
         {isWeekend && (
           <p className="text-[13px] px-1" style={{ color: colors.text.secondary }}>
-            週末照目標吃，不用報復性節食。
+            週末照你能做到的走，不用報復性節食。
           </p>
         )}
-
-        {/* Meal mode */}
-        <div className="flex gap-2">
-          {[
-            { val: 'cook' as const, label: '🍳 自己煮' },
-            { val: 'eat-out' as const, label: '🍱 外食' },
-          ].map(({ val, label }) => (
-            <button
-              key={val}
-              type="button"
-              onClick={() => setMealMode(val)}
-              className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-colors"
-              style={{
-                backgroundColor: mealMode === val ? colors.accent.action : colors.bg.muted,
-                color: mealMode === val ? '#FFFDF9' : colors.text.secondary,
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Meals */}
-        <div className="rounded-2xl overflow-hidden" style={cardStyle}>
-          <div className="px-4 py-3 border-b" style={{ borderColor: colors.border.subtle, backgroundColor: colors.bg.canvas }}>
-            <h3 className="font-semibold text-[15px]" style={{ color: colors.text.primary }}>
-              {mealMode === 'cook' ? '自己煮' : '外食'}
-            </h3>
-            <p className="text-[13px] mt-0.5" style={{ color: colors.text.tertiary }}>
-              {mealMode === 'cook' ? '照計畫煮。不喜歡可換同熱量組合。' : '照計畫吃。不喜歡可換同熱量組合。'}
-            </p>
-          </div>
-
-          {mealMode === 'cook'
-            ? homeMeals.map(meal => {
-                const ext = meal as {
-                  name_zh?: string
-                  steps?: string[]
-                  zaijian_note?: string
-                }
-                const slot = meal.type as MealSlot
-                return (
-                  <div
-                    key={meal.type}
-                    className="px-4 py-4 border-b last:border-0"
-                    style={{ borderColor: colors.border.subtle }}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div>
-                        <p className="font-semibold text-[15px]" style={{ color: colors.text.primary }}>
-                          {meal.type_zh}
-                        </p>
-                        {ext.name_zh && (
-                          <p className="text-[14px] mt-0.5" style={{ color: colors.text.secondary }}>
-                            {ext.name_zh}
-                          </p>
-                        )}
-                        {ext.zaijian_note && (
-                          <p className="text-[12px] mt-1 italic" style={{ color: colors.text.tertiary }}>
-                            再健：{ext.zaijian_note}
-                          </p>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleHomeDice(slot)}
-                        className="flex-shrink-0 p-2 rounded-xl text-[13px] font-medium flex items-center gap-1"
-                        style={{ backgroundColor: colors.bg.muted, color: colors.text.secondary }}
-                        aria-label="換一組自己煮"
-                      >
-                        <RefreshCw className="h-3.5 w-3.5" />
-                        <span className="text-[11px]">{SWAP_BUTTON}</span>
-                      </button>
-                    </div>
-                    <ul className="space-y-2">
-                      {meal.items.map(item => (
-                        <li key={item.id} className="flex items-center gap-2 text-[13px]" style={{ color: colors.text.secondary }}>
-                          <span className="text-base">
-                            {item.name_zh.includes('蛋') ? '🥚' : item.name_zh.includes('飯') || item.name_zh.includes('麥') ? '🍚' : '🥗'}
-                          </span>
-                          <span>
-                            {item.name_zh} · {item.portion}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                    {ext.steps && ext.steps.length > 0 && (
-                      <ol className="mt-3 space-y-1 list-decimal list-inside text-[12px]" style={{ color: colors.text.tertiary }}>
-                        {ext.steps.map((step, i) => (
-                          <li key={i}>{step}</li>
-                        ))}
-                      </ol>
-                    )}
-                    {showNutrition && (
-                      <p className="text-[11px] mt-2" style={{ color: colors.text.tertiary }}>
-                        約 {meal.total_calories} kcal · 份量剛好
-                      </p>
-                    )}
-                  </div>
-                )
-              })
-            : convenienceMeals.map(conv => {
-                const slot = conv.meal_type as MealSlot
-                return (
-                  <div
-                    key={conv.meal_type}
-                    className="px-4 py-4 border-b last:border-0"
-                    style={{ borderColor: colors.border.subtle }}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <p className="font-semibold text-[15px]" style={{ color: colors.text.primary }}>
-                        {conv.meal_type_zh}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => handleEatOutDice(slot)}
-                        className="flex-shrink-0 p-2 rounded-xl"
-                        style={{ backgroundColor: colors.bg.muted, color: colors.text.secondary }}
-                        aria-label="換一組外食"
-                      >
-                        <RefreshCw className="h-3.5 w-3.5" />
-                        <span className="text-[11px]">{SWAP_BUTTON}</span>
-                      </button>
-                    </div>
-                    {conv.items.length === 0 ? (
-                      <p className="text-[13px]" style={{ color: colors.text.tertiary }}>
-                        到首頁查看今日外食計畫
-                      </p>
-                    ) : (
-                      <ul className="space-y-2">
-                        {conv.items.map((item: { id: string; name: string; store?: string }) => (
-                          <li key={item.id} className="text-[13px]" style={{ color: colors.text.secondary }}>
-                            🍱 {item.name}
-                            {item.store && (
-                              <span className="block text-[11px] mt-0.5" style={{ color: colors.text.tertiary }}>
-                                {formatEatOutStoreLine(item as Parameters<typeof formatEatOutStoreLine>[0])}
-                              </span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    {showNutrition && conv.total_calories > 0 && (
-                      <p className="text-[11px] mt-2" style={{ color: colors.text.tertiary }}>
-                        約 {conv.total_calories} kcal
-                      </p>
-                    )}
-                  </div>
-                )
-              })}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setShowNutrition(!showNutrition)}
-          className="text-[12px] w-full text-center py-1"
-          style={{ color: colors.text.tertiary }}
-        >
-          {showNutrition ? '收起數字' : '展開營養數字'}
-        </button>
 
         {/* Workout — simplified */}
         <div className="rounded-2xl p-5 space-y-2" style={cardStyle}>
