@@ -77,9 +77,12 @@ export default function HomeDecisionHero({
   userMemory,
   onApply,
 }: Props) {
+  const [nowSlot, setNowSlot] = useState<MealType>('breakfast')
   const [selectedMeal, setSelectedMeal] = useState<MealType>('breakfast')
   useEffect(() => {
-    setSelectedMeal(currentMealSlot())
+    const slot = currentMealSlot()
+    setNowSlot(slot)
+    setSelectedMeal(slot)
   }, [])
 
   const mealLabels = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' } as const
