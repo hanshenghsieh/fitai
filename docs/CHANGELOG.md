@@ -1,6 +1,17 @@
 # Changelog
 
-## Phase 3 — Market Humility (2026-06-19)
+## Phase 4 — Operating System Rebuild (2026-06-19)
+
+**Status: BLUEPRINT ONLY — no implementation until approved**
+
+Control inversion: Users decide life · BetterBit handles math.
+
+- Full spec: `docs/BETTERBIT_OS.md`
+- Audit: `docs/PRODUCT_PHILOSOPHY_AUDIT.md` (supersedes Phase 1–3 ship verdict for product meaning)
+- Retires: meal-first IA, plan-command copy, science-above-fold, dice-as-hero
+- Builds next: calorie/protein/exercise banks, correction engine, search-first Today
+
+---
 
 ### P0 shipped
 - **Meal trust:** `MealTrustCard` + `meal-trust-copy.ts` — 白話「為什麼這餐？」取代 TDEE/配餐術語

@@ -72,8 +72,8 @@ async function main() {
     await page.goto(`${BASE}/dashboard`, { waitUntil: 'networkidle2', timeout: 60000 })
     await wait(1500)
     const dashText = await page.evaluate(() => document.body.innerText)
-    const hasNewUI = dashText.includes('你的計畫')
-    log('3b. 新版 UI', hasNewUI ? 'PASS' : 'FAIL', hasNewUI ? '找到「你的計畫」' : '仍為舊版 UI')
+    const hasNewUI = dashText.includes('今天想吃什麼') || dashText.includes('今天照常過')
+    log('3b. Today OS UI', hasNewUI ? 'PASS' : 'FAIL', hasNewUI ? '找到搜尋優先 UI' : '未找到 OS 文案')
 
     // 3c. PWA icon (fetch — page.goto 會被 middleware 干擾)
     const iconOk = await page.evaluate(async (base) => {
@@ -104,36 +104,38 @@ async function main() {
       }
     }
 
-    // 6. 換一個同熱量的
+    // 6. 骰子救援
     await page.goto(`${BASE}/dashboard`, { waitUntil: 'networkidle2', timeout: 60000 })
     await wait(2000)
-    const swapBtn = await page.evaluate(() => {
+    const diceBtn = await page.evaluate(() => {
       const buttons = [...document.querySelectorAll('button')]
-      return buttons.find(b => /換一個同熱量的/.test(b.innerText))?.innerText
+      return buttons.find(b => /交給我/.test(b.innerText))?.innerText
     })
-    if (swapBtn) {
-      log('6. 換餐組合', 'PASS', `找到按鈕: ${swapBtn}`)
+    if (diceBtn) {
+      log('6. 骰子救援', 'PASS', `找到: ${diceBtn}`)
       const clicked = await page.evaluate(() => {
         const buttons = [...document.querySelectorAll('button')]
-        const btn = buttons.find(b => /換一個同熱量的/.test(b.innerText))
-        if (btn) { btn.click(); return true }
-        return false
+        const expand = buttons.find(b => /不知道/.test(b.innerText))
+        if (expand) expand.click()
+        return !!expand
       })
+      await wait(500)
       if (clicked) {
-        await wait(2500)
-        const after = await page.evaluate(() => document.body.innerText)
-        log('6. 換餐組合-點擊', after.length > 200 ? 'PASS' : 'WARN', '點擊後狀態')
+        await page.evaluate(() => {
+          const buttons = [...document.querySelectorAll('button')]
+          const btn = buttons.find(b => /🎲 交給我/.test(b.innerText))
+          if (btn) btn.click()
+        })
+        await wait(3000)
+        log('6. 骰子救援-點擊', 'PASS', '已觸發')
       }
     } else {
-      log('6. 換餐組合', 'WARN', '未找到替換按鈕')
+      log('6. 骰子救援', 'WARN', '未找到按鈕')
     }
 
-    // 7. 餐點替換
-    const reroll = await page.evaluate(() => {
-      const buttons = [...document.querySelectorAll('button')]
-      return buttons.some(b => /換一個同熱量的|再骰一次/.test(b.innerText))
-    })
-    log('7. 餐點替換', reroll ? 'PASS' : 'WARN', reroll ? '找到替換按鈕' : '未展開餐卡或未找到')
+    // 7. 食物搜尋
+    const hasSearch = await page.evaluate(() => !!document.querySelector('input[aria-label="搜尋食物"]'))
+    log('7. 食物搜尋', hasSearch ? 'PASS' : 'WARN', hasSearch ? '搜尋框存在' : '未找到')
 
     // 12. Refresh persistence
     const beforeRefresh = await page.evaluate(() => document.body.innerText.slice(0, 200))

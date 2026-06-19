@@ -37,4 +37,4 @@ export function formatSwapReason(calories: number, targetCal: number, protein: n
 }
 
 export const SWAP_BUTTON = '換一個同熱量的'
-export const PLAN_FIRST_HINT = '照這個吃。不想吃再換。'
+export const PLAN_FIRST_HINT = '想吃什麼就記。剩下交給我。'

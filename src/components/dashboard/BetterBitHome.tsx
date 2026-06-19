@@ -23,11 +23,13 @@ import {
   type DailyRollState,
 } from '@/lib/checkin-utils'
 import EatOutBuilder from '@/components/dashboard/EatOutBuilder'
-import HomeDecisionHero from '@/components/dashboard/HomeDecisionHero'
+import TodayOS from '@/components/dashboard/TodayOS'
+import SystemStatus from '@/components/dashboard/SystemStatus'
 import ScrollFloatCard from '@/components/motion/ScrollFloatCard'
-import BreathingProgress from '@/components/motion/BreathingProgress'
 import ExpandPanel from '@/components/motion/ExpandPanel'
 import { currentMealSlotForSchedule, getMealLabels, type WorkSchedule } from '@/lib/human-mode'
+import { buildUserBanks } from '@/lib/banks/build-banks'
+import type { FoodLogEntry } from '@/lib/banks/types'
 import { eatOutMenu } from '@/lib/convenience-store-menu'
 import { deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
 import { colors, cardStyle } from '@/lib/design-system'
@@ -101,6 +103,7 @@ export default function BetterBitHome({
   const [dailyRolls, setDailyRolls] = useState<DailyRollState>(() => dailyRollsFromCheckin(checkin))
   const [userMemory, setUserMemory] = useState<UserMemoryMeta>(() => userMemoryFromCheckin(checkin))
   const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
+  const [showPlanMeals, setShowPlanMeals] = useState(false)
 
   const schedule: WorkSchedule = userMemory.work_schedule ?? 'standard'
   const mealLabelMap = getMealLabels(schedule)
@@ -168,6 +171,34 @@ export default function BetterBitHome({
     const next = { ...userMemory, life_event_mode: mode }
     setUserMemory(next)
     persist({ userMemory: next })
+  }
+
+  const handleLogFood = (logs: FoodLogEntry[], nextMemory: UserMemoryMeta) => {
+    setUserMemory(nextMemory)
+    persist({ userMemory: nextMemory })
+  }
+
+  const handleDiceApply = (payload: {
+    mealType: MealType
+    selection: CustomEatOutSelection[]
+    dailyRolls: DailyRollState
+    mealSuggest: Partial<Record<MealType, MealSuggestState>>
+    userMemory: UserMemoryMeta
+  }) => {
+    const modes = { ...mealModes, [payload.mealType]: 'convenience' as const }
+    const eatOut = { ...customEatOut, [payload.mealType]: payload.selection }
+    setMealModes(modes)
+    setCustomEatOut(eatOut)
+    setDailyRolls(payload.dailyRolls)
+    setMealSuggest(payload.mealSuggest)
+    setUserMemory(payload.userMemory)
+    persist({
+      mealModes: modes,
+      customEatOut: eatOut,
+      dailyRolls: payload.dailyRolls,
+      mealSuggest: payload.mealSuggest,
+      userMemory: payload.userMemory,
+    })
   }
 
   const toggleMeal = (mealId: MealType) => {
@@ -241,33 +272,6 @@ export default function BetterBitHome({
     return { label, combo: { items: [] }, isConvenience: true }
   }
 
-  const applyHeroDecision = (payload: {
-    mealType: MealType
-    selection: CustomEatOutSelection[]
-    dailyRolls: DailyRollState
-    mealSuggest: Partial<Record<MealType, MealSuggestState>>
-    userMemory: UserMemoryMeta
-    switchToConvenience?: boolean
-  }) => {
-    const modes = payload.switchToConvenience
-      ? { ...mealModes, [payload.mealType]: 'convenience' as const }
-      : mealModes
-    const eatOut = { ...customEatOut, [payload.mealType]: payload.selection }
-    setMealModes(modes)
-    setCustomEatOut(eatOut)
-    setDailyRolls(payload.dailyRolls)
-    setMealSuggest(payload.mealSuggest)
-    setUserMemory(payload.userMemory)
-    setExpandedMeal(payload.mealType)
-    persist({
-      mealModes: modes,
-      customEatOut: eatOut,
-      dailyRolls: payload.dailyRolls,
-      mealSuggest: payload.mealSuggest,
-      userMemory: payload.userMemory,
-    })
-  }
-
   const handleMealRoll = (
     mealType: MealType,
     payload: {
@@ -298,6 +302,13 @@ export default function BetterBitHome({
 
   const isRestDay = exercises.length === 0
   const workoutDone = workoutItems.filter(w => w.completed).length
+  const userBanks = buildUserBanks(
+    todayPlan,
+    goalSnapshot,
+    userMemory.food_logs_today ?? [],
+    workoutDone,
+    workoutItems.length
+  )
 
   const companionCtx = {
     completionPercent,
@@ -330,36 +341,31 @@ export default function BetterBitHome({
     <>
       {d3Line && <D3VictoryBanner line={d3Line} />}
 
-      <HomeDecisionHero
-        todayPlan={todayPlan}
-        profile={profile}
-        goalSnapshot={goalSnapshot}
-        weekNumber={weekNumber}
-        coachNote={coachNote}
-        dayIndex={dayIndex}
-        todayLabel={todayLabel}
-        dailyRolls={dailyRolls}
-        mealSuggest={mealSuggest}
-        customEatOut={customEatOut}
-        userMemory={userMemory}
-        onApply={applyHeroDecision}
-      />
-
-      <div className="px-4 pb-32 space-y-6" style={{ backgroundColor: colors.bg.canvas }}>
+      <div className="px-4 pt-2">
         <LifeEventPicker
           active={userMemory.life_event_mode}
           onSelect={setLifeEvent}
         />
+      </div>
 
-        <ScrollFloatCard depth={0} staggerIndex={2}>
-          <div className="space-y-2">
-            <BreathingProgress percent={completionPercent} />
-            {completionPercent >= 100 && (
-              <ZaiJian size="sm" line={pickZaiJianLine('success')} layout="inline" className="justify-center px-2" />
-            )}
-          </div>
-        </ScrollFloatCard>
+      <TodayOS
+        todayPlan={todayPlan}
+        profile={profile}
+        goalSnapshot={goalSnapshot}
+        userMemory={userMemory}
+        dailyRolls={dailyRolls}
+        mealSuggest={mealSuggest}
+        customEatOut={customEatOut}
+        dayIndex={dayIndex}
+        workoutDone={workoutDone}
+        workoutTotal={workoutItems.length}
+        onLogFood={handleLogFood}
+        onDiceApply={handleDiceApply}
+      />
 
+      <SystemStatus banks={userBanks} goalSnapshot={goalSnapshot} />
+
+      <div className="px-4 pb-32 space-y-6" style={{ backgroundColor: colors.bg.canvas }}>
         {isPending && (
           <p className="text-center text-[11px]" style={{ color: colors.text.tertiary }}>{zaijian.saving}</p>
         )}
@@ -396,8 +402,18 @@ export default function BetterBitHome({
           </div>
         </ScrollFloatCard>
 
-        <div className="space-y-6">
-          {meals.map((meal, mealIdx) => {
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={() => setShowPlanMeals(!showPlanMeals)}
+            className="w-full flex items-center justify-between py-2 text-[12px] font-medium"
+            style={{ color: colors.text.tertiary }}
+          >
+            從本週計畫記錄（可選）
+            {showPlanMeals ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+
+          {showPlanMeals && meals.map((meal, mealIdx) => {
             const mealLine = resolveMealCompanion(meal.type, meal.completed)
             return (
             <ScrollFloatCard

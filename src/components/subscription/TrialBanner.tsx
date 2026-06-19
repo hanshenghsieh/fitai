@@ -32,7 +32,7 @@ export default function TrialBanner({ access }: { access: AccessStatus }) {
   if (access.trialExpired) {
     return (
       <div className="mx-4 mt-4 px-4 py-3 rounded-2xl space-y-2" style={{ backgroundColor: colors.bg.muted, border: `1px solid ${colors.border.subtle}` }}>
-        <ZaiJian size="sm" line={{ text: '試用結束了。', expression: 'tired', subtext: '要繼續讓我幫你想吃什麼嗎？' }} layout="inline" />
+        <ZaiJian size="sm" line={{ text: '試用結束了。', expression: 'tired', subtext: '要繼續讓我幫你調整嗎？' }} layout="inline" />
         <Link
           href="/settings"
           className="inline-block text-[12px] font-semibold px-3 py-1.5 rounded-lg"

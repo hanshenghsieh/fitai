@@ -42,6 +42,17 @@ export interface UserMemoryMeta {
   work_schedule?: 'standard' | 'shift'
   /** 生活事件模式，不懲罰 */
   life_event_mode?: 'cheat' | 'travel' | 'family' | 'cny' | 'sick' | 'stress' | 'bad_week' | null
+  /** Phase 4 — 使用者宣告今日吃了什麼 */
+  food_logs_today?: {
+    id: string
+    name: string
+    store?: string
+    calories: number
+    protein_g: number
+    logged_at: string
+    user_declared: true
+    source: 'search' | 'dice' | 'plan' | 'free_text'
+  }[]
 }
 
 export interface CheckinMeta {
