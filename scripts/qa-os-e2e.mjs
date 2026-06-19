@@ -54,7 +54,8 @@ async function login(page, email) {
 }
 
 async function runAccount(browser, email, index) {
-  const page = await browser.newPage()
+  const context = await browser.createBrowserContext()
+  const page = await context.newPage()
   await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true })
 
   const pageErrors = []
@@ -132,6 +133,7 @@ async function runAccount(browser, email, index) {
     log(email, 'FATAL', 'FAIL', err.message)
   } finally {
     await page.close()
+    await context.close()
   }
 }
 

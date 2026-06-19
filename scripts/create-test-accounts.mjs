@@ -49,13 +49,36 @@ const PERSONAS = [
   { email: 'test10@betterbit.test', name: '試用到期測', gender: 'male', age: 33, height: 176, weight: 80, bf: 23, goal: 'lose_fat', target: 74, activity: 'moderate', fitness: 'beginner', schedule: 'standard' },
 ]
 
-async function createOrGetUser(email, displayName) {
-  const listRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users?email=${encodeURIComponent(email)}`, {
-    headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY },
+async function updatePassword(userId) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${userId}`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({ password: PASSWORD }),
   })
-  const listData = await listRes.json()
-  if (listData.users?.length) {
-    return { id: listData.users[0].id, created: false }
+  if (!res.ok) throw new Error(`Password reset failed: ${await res.text()}`)
+}
+
+async function findUserByEmail(email) {
+  let page = 1
+  while (page <= 20) {
+    const listRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users?page=${page}&per_page=100`, {
+      headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY },
+    })
+    const listData = await listRes.json()
+    const users = listData.users ?? []
+    const found = users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+    if (found) return found
+    if (users.length < 100) break
+    page++
+  }
+  return null
+}
+
+async function createOrGetUser(email, displayName) {
+  const existing = await findUserByEmail(email)
+  if (existing) {
+    await updatePassword(existing.id)
+    return { id: existing.id, created: false }
   }
 
   const signupRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
@@ -130,33 +153,6 @@ async function insertGoal(userId, p) {
     }),
   })
   if (!res.ok) throw new Error(`Goal failed ${p.email}: ${await res.text()}`)
-}
-
-async function generatePlan(userId) {
-  if (CRON_SECRET) {
-    const res = await fetch(`${BASE}/api/generate-plan`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${CRON_SECRET}`,
-        'x-user-id': userId,
-        'Content-Type': 'application/json',
-      },
-      body: '{}',
-    })
-    const data = await res.json().catch(() => ({}))
-    if (res.ok) return { ok: true, via: 'cron' }
-    console.warn(`  cron generate-plan failed, trying password auth: ${data.error || res.status}`)
-  }
-
-  if (!ANON_KEY) throw new Error('Need ANON_KEY for password auth generate-plan')
-
-  const tokenRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-    method: 'POST',
-    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: PERSONAS.find(x => x.email)?.email, password: PASSWORD }),
-  })
-  // sign in per user below
-  return { ok: false, via: 'pending' }
 }
 
 async function generatePlanForUser(email, userId) {
