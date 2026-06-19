@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+scripts/test-accounts.json
 
 # next.js
 /.next/
