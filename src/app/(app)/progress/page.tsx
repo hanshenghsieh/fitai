@@ -34,14 +34,14 @@ export default async function ProgressPage() {
 
   return (
     <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: colors.bg.canvas }}>
-      <div className="px-4 pt-12 pb-6">
-        <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: colors.accent.action }}>
-          進度追蹤
+      <div className="px-5 pt-14 pb-6">
+        <p className="text-[11px] font-medium tracking-wide" style={{ color: colors.text.tertiary }}>
+          進度
         </p>
-        <h1 className="text-[22px] font-semibold mt-1" style={{ color: colors.text.primary }}>
+        <h1 className="text-[22px] font-medium mt-1 tracking-tight" style={{ color: colors.text.primary }}>
           趨勢，不是考試
         </h1>
-        <p className="text-[13px] mt-1" style={{ color: colors.text.secondary }}>
+        <p className="text-[14px] mt-2 leading-relaxed" style={{ color: colors.text.secondary }}>
           脂肪銀行在背後跑。你不用每天盯體重秤。
         </p>
       </div>

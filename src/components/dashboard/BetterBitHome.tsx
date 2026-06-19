@@ -26,7 +26,6 @@ import type { FoodDna } from '@/lib/food-memory'
 import { colors, cardStyle } from '@/lib/design-system'
 import { pickZaiJianLine, zaijian } from '@/lib/copy/zaijian'
 import { resolveWorkoutCompanion } from '@/lib/companion-state'
-import ZaiJian from '@/components/character/ZaiJian'
 import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile } from '@/types'
 
 interface GoalSnapshot {
@@ -201,18 +200,17 @@ export default function BetterBitHome({
         )}
 
         {todayPlan.workout && !isRestDay && (
-          <ScrollFloatCard depth={1} staggerIndex={2} className="rounded-2xl overflow-hidden" style={cardStyle}>
+          <ScrollFloatCard staggerIndex={2} className="overflow-hidden" style={cardStyle}>
             <button
               type="button"
-              className="w-full p-4 flex items-center gap-3 text-left"
+              className="w-full p-5 flex items-center justify-between text-left"
               onClick={() => setExpandedWorkout(!expandedWorkout)}
             >
-              <ZaiJian size="xs" expression={workoutLine.expression} />
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-[14px]" style={{ color: colors.text.primary }}>
+              <div className="min-w-0">
+                <p className="font-medium text-[14px]" style={{ color: colors.text.primary }}>
                   {todayPlan.workout.type_zh}
                 </p>
-                <p className="text-[12px]" style={{ color: colors.text.secondary }}>{workoutLine.text}</p>
+                <p className="text-[12px] mt-1" style={{ color: colors.text.secondary }}>{workoutLine.text}</p>
               </div>
               {expandedWorkout ? <ChevronUp className="h-4 w-4" style={{ color: colors.text.tertiary }} /> : <ChevronDown className="h-4 w-4" style={{ color: colors.text.tertiary }} />}
             </button>
@@ -236,8 +234,8 @@ export default function BetterBitHome({
                   href={`https://www.youtube.com/watch?v=${exercises[0].youtube_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 mt-1 px-3 py-2 rounded-xl text-[12px] font-semibold"
-                  style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
+                  className="inline-flex items-center gap-2 mt-1 px-3 py-2 text-[12px] font-medium"
+                  style={{ backgroundColor: colors.accent.action, color: colors.bg.elevated, borderRadius: 12 }}
                 >
                   <Play className="h-3.5 w-3.5" /> 教學
                 </a>

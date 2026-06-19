@@ -52,9 +52,9 @@ export default function ProgressCharts({ measurements, plans, goal, goalSnapshot
     return (
       <div className="p-6 rounded-2xl" style={cardStyle}>
         <ZaiJian
-          size="lg"
+          size="sm"
+          layout="whisper"
           line={{ text: '還沒記錄。', expression: 'normal', subtext: '量個體重，我幫你看趨勢。' }}
-          layout="bubble"
         />
       </div>
     )
@@ -63,12 +63,12 @@ export default function ProgressCharts({ measurements, plans, goal, goalSnapshot
   return (
     <div className="space-y-4">
       {fatBank && (
-        <div className="rounded-2xl p-5 space-y-3" style={cardStyle}>
-          <h3 className="text-[15px] font-semibold" style={{ color: colors.text.primary }}>脂肪銀行</h3>
+        <div className="p-5 space-y-4" style={cardStyle}>
+          <h3 className="text-[15px] font-medium" style={{ color: colors.text.primary }}>脂肪銀行</h3>
           <div className="grid grid-cols-2 gap-3 text-[13px]">
             <div>
               <p style={{ color: colors.text.tertiary }}>目標減脂</p>
-              <p className="font-semibold text-[16px]" style={{ color: colors.text.primary }}>
+              <p className="font-medium text-[15px]" style={{ color: colors.text.primary }}>
                 {fatBank.targetFatLossKg.toFixed(1)} kg
               </p>
             </div>
@@ -80,13 +80,13 @@ export default function ProgressCharts({ measurements, plans, goal, goalSnapshot
             </div>
             <div>
               <p style={{ color: colors.text.tertiary }}>還差</p>
-              <p className="font-semibold text-[16px]" style={{ color: colors.text.primary }}>
+              <p className="font-medium text-[15px]" style={{ color: colors.text.primary }}>
                 {fatBank.remainingKg.toFixed(1)} kg
               </p>
             </div>
             <div>
               <p style={{ color: colors.text.tertiary }}>預估達成</p>
-              <p className="font-semibold text-[16px]" style={{ color: colors.text.primary }}>
+              <p className="font-medium text-[15px]" style={{ color: colors.text.primary }}>
                 {fatBank.estimatedDate ?? '—'}
               </p>
             </div>
@@ -104,15 +104,11 @@ export default function ProgressCharts({ measurements, plans, goal, goalSnapshot
       )}
 
       {plateauStory && (
-        <ZaiJian
-          size="sm"
-          layout="bubble"
-          line={{ text: plateauStory.text, subtext: plateauStory.subtext, expression: 'plateau' }}
-        />
+        <ZaiJian size="sm" layout="whisper" line={{ text: plateauStory.text, subtext: plateauStory.subtext, expression: 'plateau' }} />
       )}
 
       {!plateauStory && isPlateau && (
-        <ZaiJian size="sm" line={pickZaiJianLine('plateau')} layout="bubble" />
+        <ZaiJian size="sm" layout="whisper" line={pickZaiJianLine('plateau')} />
       )}
 
       {weightData.length >= 2 && (

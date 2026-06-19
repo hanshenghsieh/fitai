@@ -16,21 +16,21 @@ export default function BottomNav() {
   const pathname = usePathname()
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t safe-area-pb"
       style={{ backgroundColor: colors.bg.elevated, borderColor: colors.border.subtle }}
     >
-      <div className="flex max-w-lg mx-auto">
+      <div className="flex max-w-lg mx-auto px-2">
         {navItems.map(({ href, label, icon: Icon }) => {
           const active = pathname === href
           return (
             <Link
               key={href}
               href={href}
-              className="flex-1 flex flex-col items-center py-2.5 gap-1 transition-colors"
-              style={{ color: active ? colors.accent.action : colors.text.tertiary }}
+              className="flex-1 flex flex-col items-center py-3 gap-1"
+              style={{ color: active ? colors.text.primary : colors.text.tertiary }}
             >
-              <Icon className="h-5 w-5" />
-              <span className="text-[11px] font-medium">{label}</span>
+              <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2 : 1.5} />
+              <span className="text-[10px] font-medium tracking-wide">{label}</span>
             </Link>
           )
         })}

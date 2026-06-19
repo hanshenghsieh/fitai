@@ -339,9 +339,9 @@ export default function TodayOS({
   ]
 
   return (
-    <div className="px-4 pt-2 pb-4" style={{ backgroundColor: colors.bg.canvas }}>
-      <ScrollFloatCard depth={0} staggerIndex={0} className="rounded-2xl p-5 space-y-4" style={cardStyle}>
-        <ZaiJian size="md" line={correctionLine} layout="stacked" />
+    <div className="px-5 pt-3 pb-5" style={{ backgroundColor: colors.bg.canvas }}>
+      <ScrollFloatCard depth={0} staggerIndex={0} className="p-6 space-y-5" style={cardStyle}>
+        <ZaiJian size="md" line={correctionLine} layout="whisper" />
 
         <div className="flex gap-1.5 overflow-x-auto pb-0.5">
           {FOOD_SLOTS.map(s => (
@@ -352,7 +352,7 @@ export default function TodayOS({
               className="flex-shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium"
               style={{
                 backgroundColor: activeSlot === s.id ? colors.accent.action : colors.bg.muted,
-                color: activeSlot === s.id ? '#FFFDF9' : colors.text.secondary,
+                color: activeSlot === s.id ? colors.bg.elevated : colors.text.secondary,
               }}
             >
               {s.label}
@@ -411,7 +411,7 @@ export default function TodayOS({
             </button>
             {photoPreview && (
               <div className="rounded-xl p-4 space-y-3" style={{ backgroundColor: colors.bg.muted }}>
-                <p className="font-semibold text-[14px]" style={{ color: colors.text.primary }}>{photoPreview.name}</p>
+                <p className="font-medium text-[14px]" style={{ color: colors.text.primary }}>{photoPreview.name}</p>
                 <p className="text-[12px]" style={{ color: colors.text.secondary }}>
                   約 {photoPreview.calories} kcal · {Math.round(photoPreview.protein_g)}g 蛋白
                   {photoPreview.confidence && ` · 信心 ${photoPreview.confidence}`}
@@ -431,15 +431,15 @@ export default function TodayOS({
                         source: 'photo',
                       })
                     }
-                    className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold"
-                    style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
+                    className="flex-1 py-2.5 rounded-xl text-[13px] font-medium"
+                    style={{ backgroundColor: colors.accent.action, color: colors.bg.elevated }}
                   >
                     確認記錄
                   </button>
                   <button
                     type="button"
                     onClick={() => setPhotoPreview(null)}
-                    className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold"
+                    className="flex-1 py-2.5 rounded-xl text-[13px] font-medium"
                     style={{ backgroundColor: colors.bg.elevated, color: colors.text.secondary }}
                   >
                     重拍
@@ -491,7 +491,7 @@ export default function TodayOS({
                       className="w-full text-left p-3 rounded-xl"
                       style={{ backgroundColor: colors.bg.elevated, border: `1px solid ${colors.border.subtle}` }}
                     >
-                      <p className="font-semibold text-[14px]" style={{ color: colors.text.primary }}>{item.name}</p>
+                      <p className="font-medium text-[14px]" style={{ color: colors.text.primary }}>{item.name}</p>
                       <p className="text-[12px] mt-0.5" style={{ color: colors.text.secondary }}>
                         {item.store} · {item.calories} kcal
                       </p>
@@ -507,26 +507,26 @@ export default function TodayOS({
                 className="w-full text-left p-3 rounded-xl"
                 style={{ backgroundColor: colors.bg.elevated, border: `1px dashed ${colors.border.focus}` }}
               >
-                <p className="font-semibold text-[14px]" style={{ color: colors.text.primary }}>記錄「{trimmedQuery}」</p>
+                <p className="font-medium text-[14px]" style={{ color: colors.text.primary }}>記錄「{trimmedQuery}」</p>
                 <p className="text-[12px] mt-0.5" style={{ color: colors.text.tertiary }}>菜單沒有也 OK</p>
               </button>
             )}
             {pendingFreeText && (
               <div className="rounded-xl p-4 space-y-3" style={{ backgroundColor: colors.bg.muted }}>
-                <p className="text-[14px] font-semibold" style={{ color: colors.text.primary }}>記下「{pendingFreeText}」？</p>
+                <p className="text-[14px] font-medium" style={{ color: colors.text.primary }}>記下「{pendingFreeText}」？</p>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => commitLog(estimateFreeTextMeal(pendingFreeText, mealTargets.calories, mealTargets.protein))}
-                    className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold"
-                    style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
+                    className="flex-1 py-2.5 rounded-xl text-[13px] font-medium"
+                    style={{ backgroundColor: colors.accent.action, color: colors.bg.elevated }}
                   >
                     確認
                   </button>
                   <button
                     type="button"
                     onClick={() => setPendingFreeText(null)}
-                    className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold"
+                    className="flex-1 py-2.5 rounded-xl text-[13px] font-medium"
                     style={{ backgroundColor: colors.bg.elevated, color: colors.text.secondary }}
                   >
                     取消
@@ -558,7 +558,7 @@ export default function TodayOS({
 
         {foodLogs.length > 0 && (
           <div>
-            <p className="text-[11px] font-semibold mb-2" style={{ color: colors.text.tertiary }}>今天</p>
+            <p className="text-[11px] font-medium mb-2" style={{ color: colors.text.tertiary }}>今天</p>
             <ul className="space-y-1">
               {foodLogs.map((log, i) => (
                 <li
@@ -586,7 +586,7 @@ export default function TodayOS({
           style={{ color: colors.text.tertiary }}
         >
           <Dices className="h-3.5 w-3.5" />
-          不知道吃什麼？🎲 交給我
+          不知道吃什麼？交給我
         </button>
 
         <ExpandPanel open={diceOpen} className="space-y-3">
@@ -595,7 +595,7 @@ export default function TodayOS({
               type="button"
               disabled={rolling}
               onClick={rollDice}
-              className="w-full py-2.5 rounded-xl text-[13px] font-semibold"
+              className="w-full py-2.5 rounded-xl text-[13px] font-medium"
               style={{ backgroundColor: colors.bg.muted, color: colors.text.secondary }}
             >
               {rolling ? '想一下…' : '骰一個'}
@@ -606,10 +606,10 @@ export default function TodayOS({
                 <p key={i} className="text-[13px]" style={{ color: colors.text.primary }}>{item.name}</p>
               ))}
               <div className="flex gap-2 pt-1">
-                <button type="button" onClick={confirmDice} className="flex-1 py-2 rounded-xl text-[12px] font-semibold" style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}>
+                <button type="button" onClick={confirmDice} className="flex-1 py-2 rounded-xl text-[12px] font-medium" style={{ backgroundColor: colors.accent.action, color: colors.bg.elevated }}>
                   就這個
                 </button>
-                <button type="button" disabled={rolling} onClick={rollDice} className="flex-1 py-2 rounded-xl text-[12px] font-semibold flex items-center justify-center gap-1" style={{ backgroundColor: colors.bg.elevated, color: colors.text.secondary }}>
+                <button type="button" disabled={rolling} onClick={rollDice} className="flex-1 py-2 rounded-xl text-[12px] font-medium flex items-center justify-center gap-1" style={{ backgroundColor: colors.bg.elevated, color: colors.text.secondary }}>
                   <RefreshCw className={`h-3 w-3 ${rolling ? 'animate-spin' : ''}`} /> 再骰
                 </button>
               </div>

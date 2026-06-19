@@ -1,7 +1,6 @@
 'use client'
 
 import type { ReactNode, CSSProperties } from 'react'
-import { useScrollBreath } from './useScrollBreath'
 import { useReveal } from './useReveal'
 
 interface Props {
@@ -13,15 +12,14 @@ interface Props {
   id?: string
 }
 
+/** Phase 5.5 — fade reveal only, no scroll float */
 export default function ScrollFloatCard({
   children,
   className = '',
   style,
-  depth = 1,
   staggerIndex = 0,
   id,
 }: Props) {
-  const breath = useScrollBreath(depth)
   const reveal = useReveal(staggerIndex)
 
   return (
@@ -31,9 +29,7 @@ export default function ScrollFloatCard({
       className={`${reveal.className} ${className}`.trim()}
       style={{ ...style, ...reveal.style }}
     >
-      <div ref={breath.ref} className="mi-scroll-float h-full" style={breath.style}>
-        {children}
-      </div>
+      {children}
     </div>
   )
 }

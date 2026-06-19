@@ -1,11 +1,11 @@
 {
-  "name": "再健一點 - 照著做就好",
+  "name": "再健一點",
   "short_name": "再健一點",
-  "description": "依你的體態目標，自動設計每日餐點與運動計畫",
+  "description": "安靜陪伴你的健康節奏",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#F7F3EC",
-  "theme_color": "#B8895B",
+  "background_color": "#F4F2EE",
+  "theme_color": "#F4F2EE",
   "orientation": "portrait",
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },

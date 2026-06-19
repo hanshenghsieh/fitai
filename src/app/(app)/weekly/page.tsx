@@ -27,9 +27,9 @@ export default async function WeeklyPage() {
 
   return (
     <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: colors.bg.canvas }}>
-      <div className="pt-12 px-4 pb-2">
-        <h1 className="text-[22px] font-semibold" style={{ color: colors.text.primary }}>本週</h1>
-        <p className="text-[13px] mt-1" style={{ color: colors.text.secondary }}>
+      <div className="pt-14 px-5 pb-3">
+        <h1 className="text-[22px] font-medium tracking-tight" style={{ color: colors.text.primary }}>本週</h1>
+        <p className="text-[14px] mt-2 leading-relaxed" style={{ color: colors.text.secondary }}>
           這週照你能做到的走。想吃什麼，去 Today 記就好。
         </p>
       </div>

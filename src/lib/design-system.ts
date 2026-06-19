@@ -1,39 +1,41 @@
-// BetterBit Design System — 再健一點
-// Calm · Warm · Premium · Execution-first
+// BetterBit Design System — Phase 5.5 Brand Maturity
+// MUJI calm · Oura trust · Headspace warmth · Apple restraint
 
 export const colors = {
   bg: {
-    canvas: '#F7F3EC',
-    elevated: '#FFFDF9',
-    muted: '#E8DED1',
+    canvas: '#F4F2EE',
+    elevated: '#FCFBF9',
+    muted: '#EAE7E1',
   },
 
   text: {
-    primary: '#2B2B2B',
-    secondary: '#6B6560',
-    tertiary: '#9C958D',
+    primary: '#3A3835',
+    secondary: '#6D6A65',
+    tertiary: '#9A9690',
   },
 
   accent: {
-    action: '#B8895B',
-    actionHover: '#A6784E',
-    actionSoft: 'rgba(184, 137, 91, 0.08)',
+    action: '#7A756D',
+    actionHover: '#6A655E',
+    actionSoft: 'rgba(122, 117, 109, 0.08)',
+    sage: '#7D8B7A',
+    sageSoft: 'rgba(125, 139, 122, 0.1)',
   },
 
   border: {
-    subtle: '#E8DED1',
-    focus: '#B8895B',
+    subtle: '#E3E0DA',
+    focus: '#7A756D',
   },
 
   state: {
-    complete: '#B8895B',
-    rest: '#9C958D',
-    error: '#C4483C',
-    errorBg: '#FFE4E4',
+    complete: '#7D8B7A',
+    rest: '#9A9690',
+    error: '#A65D55',
+    errorBg: '#F5EDEC',
   },
 } as const
 
-/** @deprecated Use colors.bg.* — kept for gradual migration */
+/** @deprecated Use colors.bg.* */
 export const legacy = {
   background: colors.bg.canvas,
   card: colors.bg.elevated,
@@ -49,35 +51,51 @@ export const spacing = {
   xl: 24,
   '2xl': 32,
   '3xl': 48,
+  '4xl': 64,
 } as const
 
 export const borderRadius = {
   sm: 8,
   md: 12,
   lg: 16,
-  xl: 20,
-  '2xl': 24,
+  xl: 18,
+  card: 18,
   full: 9999,
 } as const
 
 export const typography = {
-  display: { fontSize: 28, fontWeight: 600, lineHeight: 1.2 },
-  title: { fontSize: 22, fontWeight: 600, lineHeight: 1.25 },
-  headline: { fontSize: 17, fontWeight: 600, lineHeight: 1.3 },
-  body: { fontSize: 15, fontWeight: 400, lineHeight: 1.5 },
-  caption: { fontSize: 13, fontWeight: 400, lineHeight: 1.4 },
-  micro: { fontSize: 11, fontWeight: 500, lineHeight: 1.3 },
+  display: { fontSize: 28, fontWeight: 500, lineHeight: 1.25, letterSpacing: '-0.02em' },
+  title: { fontSize: 22, fontWeight: 500, lineHeight: 1.3, letterSpacing: '-0.01em' },
+  headline: { fontSize: 17, fontWeight: 500, lineHeight: 1.35 },
+  body: { fontSize: 15, fontWeight: 400, lineHeight: 1.55 },
+  caption: { fontSize: 13, fontWeight: 400, lineHeight: 1.45 },
+  micro: { fontSize: 11, fontWeight: 500, lineHeight: 1.35, letterSpacing: '0.02em' },
 } as const
 
 export const motion = {
-  fast: 150,
-  standard: 300,
-  slow: 500,
-  easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+  fast: 180,
+  standard: 320,
+  slow: 480,
+  easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
 } as const
 
-/** Card surface — border over shadow */
+/** Card — restrained radius, border not shadow */
 export const cardStyle = {
   backgroundColor: colors.bg.elevated,
   border: `1px solid ${colors.border.subtle}`,
+  borderRadius: borderRadius.card,
+} as const
+
+export const buttonPrimary = {
+  backgroundColor: colors.accent.action,
+  color: colors.bg.elevated,
+  borderRadius: borderRadius.lg,
+  fontWeight: 500,
+} as const
+
+export const buttonGhost = {
+  backgroundColor: colors.bg.muted,
+  color: colors.text.secondary,
+  borderRadius: borderRadius.lg,
+  fontWeight: 500,
 } as const
