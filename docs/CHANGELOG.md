@@ -1,5 +1,23 @@
 # Changelog
 
+## [2026-06-19] — Production Deploy + Hardening
+
+### Deploy
+- Commits `601e526`, `5bee96b`, `a9ef970` pushed to `main` → Vercel production.
+- All users now receive science-first UI (`CoachPlanSummary`,「換一個同熱量的」).
+
+### Production Fixes
+- **Mixed UI:** `Cache-Control: no-store` on HTML routes.
+- **Dashboard crash:** `nowSlot` state restored in `HomeDecisionHero`.
+- **Error UX:** `src/lib/api-errors.ts` — trial/profile/500 messages in Chinese.
+- **Hydration #418:** `src/lib/timezone.ts` (Asia/Taipei), Sonner `theme="light"`, defer meal slot to `useEffect`.
+- **PWA:** `public/icon.svg`, manifest, layout icons, SW badge paths.
+
+### QA
+- Production E2E: 12 PASS, 1 WARN (logout flake), 0 page errors.
+
+---
+
 ## [Unreleased] — 2026-06-19 — Phase 2: Ship-Ready
 
 ### Closed Loop (P0)

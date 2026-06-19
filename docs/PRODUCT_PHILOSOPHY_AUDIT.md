@@ -1,7 +1,7 @@
 # BetterBit 產品哲學審查 — Ship 版本
 
-**日期：** 2026-06-19 Phase 2 完成  
-**結論：** ✅ **Nothing major. Ship it.**（部署時需設定 Stripe env）
+**日期：** 2026-06-19 — **Production deployed** (`fitai-taupe-sigma.vercel.app`)  
+**結論：** ✅ **Nothing major. Ship it.**（收款需 Stripe env）
 
 ---
 

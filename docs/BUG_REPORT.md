@@ -25,11 +25,15 @@
 - **Fix:** Hardcode Sonner `theme="light"`. Defer meal slot to `useEffect`. Pass `todayLabel` from server dashboard page.
 - **Verify:** Production E2E reports zero `Page errors`.
 
+### BUG-003 — React hydration error #418
+- **Status:** ✅ Fixed (`a9ef970`)
+- **Fix:** Asia/Taipei timezone for meal slot + character messages; Sonner without `useTheme`; `suppressHydrationWarning` on html/body.
+
 ### BUG-004 — PWA icon 404
-- **Severity:** P2
-- **Root cause:** `icon.svg` not deployed; `firebase-messaging-sw.js` referenced `/icon-192.png`.
-- **Fix:** `public/icon.svg`, manifest icons, layout metadata, SW badge paths.
-- **Verify:** No 404 for `/icon.svg` in network tab.
+- **Status:** ✅ Fixed — `/icon.svg` returns 200 on production.
+
+### BUG-007 — Dashboard crash `nowSlot is not defined`
+- **Status:** ✅ Fixed (`5bee96b`) — hotfix deployed before timezone patch.
 
 ---
 
