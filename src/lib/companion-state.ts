@@ -2,6 +2,8 @@ import { currentMealSlot } from '@/lib/meal-engine'
 import { pickZaiJianLine, type ZaiJianLine, type ZaiJianMoment } from '@/lib/copy/zaijian'
 import type { MealType } from '@/lib/checkin-utils'
 
+import { getTaipeiHour } from '@/lib/timezone'
+
 export interface CompanionContext {
   completionPercent: number
   waterMl: number
@@ -16,7 +18,7 @@ export interface CompanionContext {
 }
 
 function hourNow() {
-  return new Date().getHours()
+  return getTaipeiHour()
 }
 
 export function detectWeightPlateau(

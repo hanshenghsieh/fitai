@@ -75,10 +75,12 @@ async function main() {
     const hasNewUI = dashText.includes('你的計畫')
     log('3b. 新版 UI', hasNewUI ? 'PASS' : 'FAIL', hasNewUI ? '找到「你的計畫」' : '仍為舊版 UI')
 
-    // 3c. PWA icon
-    const iconRes = await page.goto(`${BASE}/icon.svg`, { waitUntil: 'networkidle2', timeout: 15000 }).catch(() => null)
-    const iconOk = iconRes && iconRes.status() === 200
-    log('3c. PWA icon', iconOk ? 'PASS' : 'FAIL', iconOk ? '/icon.svg 200' : 'icon 404')
+    // 3c. PWA icon (fetch — page.goto 會被 middleware 干擾)
+    const iconOk = await page.evaluate(async (base) => {
+      const res = await fetch(`${base}/icon.svg`)
+      return res.ok
+    }, BASE)
+    log('3c. PWA icon', iconOk ? 'PASS' : 'FAIL', iconOk ? '/icon.svg OK' : 'icon 404')
 
     // 3-5 Dashboard / weekly
     for (const [name, path] of [

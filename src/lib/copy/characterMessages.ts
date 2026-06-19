@@ -1,5 +1,7 @@
 /** 再健 permanent message database */
 
+import { getTaipeiDateKey } from '@/lib/timezone'
+
 export type ZaijianExpression =
   | 'normal'
   | 'happy'
@@ -846,7 +848,7 @@ export function pickCharacterMessage(category: MessageCategory, salt = ''): Char
   if (!pool.length) {
     return { id: 'fallback', text: '照著做就好。', expression: 'normal', category }
   }
-  const key = `${category}:${salt}:${new Date().toDateString()}`
+  const key = `${category}:${salt}:${getTaipeiDateKey()}`
   let hash = 0
   for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) | 0
   return pool[Math.abs(hash) % pool.length]
@@ -866,7 +868,7 @@ export function getDiceRollTier(rollCount: number): DiceRollTier {
 export function pickDiceRerollMessage(rollCount: number): CharacterMessage {
   const tier = getDiceRollTier(rollCount)
   const pool = DICE_REROLL_MESSAGES[tier]
-  const key = `dice:${rollCount}:${new Date().toDateString()}`
+  const key = `dice:${rollCount}:${getTaipeiDateKey()}`
   let hash = 0
   for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) | 0
   return pool[Math.abs(hash) % pool.length]

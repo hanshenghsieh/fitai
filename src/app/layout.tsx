@@ -24,8 +24,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-TW">
-      <body className={`${inter.className} min-h-screen`} style={{ backgroundColor: '#F8F6EF' }}>
+    <html lang="zh-TW" suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen`} style={{ backgroundColor: '#F8F6EF' }} suppressHydrationWarning>
         {children}
         <Toaster richColors position="top-center" />
       </body>

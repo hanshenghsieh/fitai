@@ -17,8 +17,10 @@ export function memoryFromCheckinMeta(meta: CheckinMeta): UserMemoryState {
   }
 }
 
+import { getTaipeiHour } from '@/lib/timezone'
+
 export function currentMealSlot(): MealType {
-  const h = new Date().getHours()
+  const h = getTaipeiHour()
   if (h < 10) return 'breakfast'
   if (h < 15) return 'lunch'
   return 'dinner'

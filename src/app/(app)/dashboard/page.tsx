@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { createClient } from '@/lib/supabase/server'
 import { format, startOfWeek, differenceInDays, subDays } from 'date-fns'
-import { zhTW } from 'date-fns/locale'
+import { formatTaipeiDateLabel } from '@/lib/timezone'
 import { redirect } from 'next/navigation'
 import type { WeeklyPlanData, DayPlan, UserProfile } from '@/types'
 import { colors } from '@/lib/design-system'
@@ -44,7 +44,7 @@ export default async function DashboardPage() {
     yesterdayDiet.filter((i: { completed: boolean }) => i.completed).length +
     yesterdayWork.filter((i: { completed: boolean }) => i.completed).length
   const cheatRecovery = yesterdayTotal > 0 && yesterdayDone / yesterdayTotal < 0.5
-  const todayLabel = format(today, 'M月d日 EEEE', { locale: zhTW })
+  const todayLabel = formatTaipeiDateLabel(today)
 
   return (
     <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: colors.bg.canvas }}>
