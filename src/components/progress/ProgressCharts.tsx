@@ -8,8 +8,16 @@ import { colors, cardStyle } from '@/lib/design-system'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
 import { buildPlateauStory } from '@/lib/plateau-story'
 import { detectWeightPlateau } from '@/lib/companion-state'
+import { buildFatBank } from '@/lib/fat-bank'
 import ZaiJian from '@/components/character/ZaiJian'
 import type { BodyMeasurement, Goal } from '@/types'
+
+interface GoalSnapshot {
+  fat_to_lose_kg?: number
+  weekly_fat_loss_g?: number
+  weeks_remaining?: number
+  target_weight?: number | null
+}
 
 interface WeekStats {
   week_start: string
@@ -22,12 +30,16 @@ interface Props {
   measurements: BodyMeasurement[]
   plans: WeekStats[]
   goal: Goal | null
+  goalSnapshot?: GoalSnapshot | null
 }
 
-export default function ProgressCharts({ measurements, plans, goal }: Props) {
+export default function ProgressCharts({ measurements, plans, goal, goalSnapshot }: Props) {
   const weightData = measurements
     .filter(m => m.weight_kg !== null)
     .map(m => ({ date: format(new Date(m.measured_at), 'M/d'), weight: m.weight_kg }))
+
+  const latestWeight = measurements[measurements.length - 1]?.weight_kg ?? null
+  const fatBank = buildFatBank(goalSnapshot, goal, latestWeight)
 
   const isPlateau = detectWeightPlateau(measurements)
   const plateauStory = buildPlateauStory({
@@ -41,7 +53,7 @@ export default function ProgressCharts({ measurements, plans, goal }: Props) {
       <div className="p-6 rounded-2xl" style={cardStyle}>
         <ZaiJian
           size="lg"
-          line={{ text: '還沒記錄。', expression: 'normal', subtext: '量個體重，我幫你看。' }}
+          line={{ text: '還沒記錄。', expression: 'normal', subtext: '量個體重，我幫你看趨勢。' }}
           layout="bubble"
         />
       </div>
@@ -50,6 +62,47 @@ export default function ProgressCharts({ measurements, plans, goal }: Props) {
 
   return (
     <div className="space-y-4">
+      {fatBank && (
+        <div className="rounded-2xl p-5 space-y-3" style={cardStyle}>
+          <h3 className="text-[15px] font-semibold" style={{ color: colors.text.primary }}>脂肪銀行</h3>
+          <div className="grid grid-cols-2 gap-3 text-[13px]">
+            <div>
+              <p style={{ color: colors.text.tertiary }}>目標減脂</p>
+              <p className="font-semibold text-[16px]" style={{ color: colors.text.primary }}>
+                {fatBank.targetFatLossKg.toFixed(1)} kg
+              </p>
+            </div>
+            <div>
+              <p style={{ color: colors.text.tertiary }}>已完成</p>
+              <p className="font-semibold text-[16px]" style={{ color: colors.accent.action }}>
+                {fatBank.completedKg.toFixed(1)} kg
+              </p>
+            </div>
+            <div>
+              <p style={{ color: colors.text.tertiary }}>還差</p>
+              <p className="font-semibold text-[16px]" style={{ color: colors.text.primary }}>
+                {fatBank.remainingKg.toFixed(1)} kg
+              </p>
+            </div>
+            <div>
+              <p style={{ color: colors.text.tertiary }}>預估達成</p>
+              <p className="font-semibold text-[16px]" style={{ color: colors.text.primary }}>
+                {fatBank.estimatedDate ?? '—'}
+              </p>
+            </div>
+          </div>
+          <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: colors.bg.muted }}>
+            <div
+              className="h-full rounded-full"
+              style={{ width: `${fatBank.progressPct}%`, backgroundColor: colors.accent.action }}
+            />
+          </div>
+          <p className="text-[12px]" style={{ color: colors.text.secondary }}>
+            速度約每週 {(fatBank.weeklySpeedG / 1000).toFixed(1)} kg · 看趨勢，不用每天量
+          </p>
+        </div>
+      )}
+
       {plateauStory && (
         <ZaiJian
           size="sm"
@@ -62,16 +115,9 @@ export default function ProgressCharts({ measurements, plans, goal }: Props) {
         <ZaiJian size="sm" line={pickZaiJianLine('plateau')} layout="bubble" />
       )}
 
-      {goal && measurements.length > 0 && (
-        <div className="rounded-2xl p-5" style={cardStyle}>
-          <h3 className="text-[15px] font-semibold mb-3" style={{ color: colors.text.primary }}>離目標多遠</h3>
-          <GoalProgressBar goal={goal} measurements={measurements} />
-        </div>
-      )}
-
       {weightData.length >= 2 && (
         <div className="rounded-2xl p-5" style={cardStyle}>
-          <h3 className="text-[15px] font-semibold mb-3" style={{ color: colors.text.primary }}>體重</h3>
+          <h3 className="text-[15px] font-semibold mb-3" style={{ color: colors.text.primary }}>體重趨勢</h3>
           <ResponsiveContainer width="100%" height={140}>
             <LineChart data={weightData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: colors.text.tertiary }} />
@@ -107,31 +153,6 @@ export default function ProgressCharts({ measurements, plans, goal }: Props) {
           </div>
         </div>
       )}
-    </div>
-  )
-}
-
-function GoalProgressBar({ goal, measurements }: { goal: Goal; measurements: BodyMeasurement[] }) {
-  const latest = measurements[measurements.length - 1]
-  if (!latest?.weight_kg || !goal.target_weight_kg) return null
-
-  const start = goal.start_weight_kg ?? latest.weight_kg
-  const target = goal.target_weight_kg
-  const current = latest.weight_kg
-  const totalToLose = start - target
-  const lostSoFar = start - current
-  const pct = totalToLose > 0 ? Math.min(100, Math.max(0, (lostSoFar / totalToLose) * 100)) : 0
-
-  return (
-    <div>
-      <div className="flex justify-between text-[13px] mb-2" style={{ color: colors.text.secondary }}>
-        <span>{start} kg</span>
-        <span style={{ color: colors.accent.action }}>{current} kg</span>
-        <span>{target} kg</span>
-      </div>
-      <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: colors.bg.muted }}>
-        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: colors.accent.action }} />
-      </div>
     </div>
   )
 }

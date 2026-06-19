@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { WeeklyPlanSchema, InBodyParseSchema, type WeeklyPlanOutput } from './schemas'
+import { WeeklyPlanSchema, InBodyParseSchema, FoodPhotoParseSchema, type WeeklyPlanOutput } from './schemas'
 
 const anthropic = new Anthropic(
   process.env.ANTHROPIC_API_KEY
@@ -102,6 +102,56 @@ confidence為你對解析準確度的評估。raw_values放入你看到的所有
     const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) ?? [null, text]
     const parsed = JSON.parse((jsonMatch[1] ?? text).trim())
     const validated = InBodyParseSchema.parse(parsed)
+
+    return { data: validated, tokensUsed: response.usage.input_tokens + response.usage.output_tokens }
+  })
+}
+
+export async function parseFoodImage(imageBase64: string, mimeType: string): Promise<{
+  data: ReturnType<typeof FoodPhotoParseSchema.parse>
+  tokensUsed: number
+}> {
+  return retryWithBackoff(async () => {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1536,
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: mimeType as 'image/jpeg' | 'image/png' | 'image/webp',
+              data: imageBase64,
+            },
+          },
+          {
+            type: 'text',
+            text: `分析這張食物照片（台灣常見外食/便利商店/手搖/便當皆可）。
+輸出 JSON：
+{
+  "items": [{
+    "name": "食物名稱",
+    "calories": number,
+    "protein_g": number,
+    "carbs_g": number,
+    "fat_g": number,
+    "portion": "份量描述",
+    "confidence": "high"|"medium"|"low"
+  }],
+  "meal_summary": "一句話描述"
+}
+估算可接受誤差。多項食物分開列。只輸出 JSON。`,
+          },
+        ],
+      }],
+    })
+
+    const text = response.content[0].type === 'text' ? response.content[0].text : ''
+    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) ?? [null, text]
+    const parsed = JSON.parse((jsonMatch[1] ?? text).trim())
+    const validated = FoodPhotoParseSchema.parse(parsed)
 
     return { data: validated, tokensUsed: response.usage.input_tokens + response.usage.output_tokens }
   })

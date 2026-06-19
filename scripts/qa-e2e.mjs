@@ -72,8 +72,8 @@ async function main() {
     await page.goto(`${BASE}/dashboard`, { waitUntil: 'networkidle2', timeout: 60000 })
     await wait(1500)
     const dashText = await page.evaluate(() => document.body.innerText)
-    const hasNewUI = dashText.includes('今天想吃什麼') || dashText.includes('今天照常過')
-    log('3b. Today OS UI', hasNewUI ? 'PASS' : 'FAIL', hasNewUI ? '找到搜尋優先 UI' : '未找到 OS 文案')
+    const hasNewUI = dashText.includes('今天吃了什麼') || dashText.includes('常吃')
+    log('3b. Food Memory UI', hasNewUI ? 'PASS' : 'FAIL', hasNewUI ? '找到 Food Memory' : '未找到')
 
     // 3c. PWA icon (fetch — page.goto 會被 middleware 干擾)
     const iconOk = await page.evaluate(async (base) => {

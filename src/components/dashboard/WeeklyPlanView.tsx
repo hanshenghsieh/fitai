@@ -7,7 +7,6 @@ import Link from 'next/link'
 import { ChevronDown, ChevronUp, ShoppingCart, MessageSquare } from 'lucide-react'
 import {
   buildWeekJourney,
-  formatWeeklyGoals,
   simplifyWorkout,
   statusLabel,
 } from '@/lib/weekly-journey'
@@ -53,8 +52,6 @@ export default function WeeklyPlanView({
     [todayDayIndex, checkinMap, weekStart, planData.days]
   )
 
-  const weeklyGoals = useMemo(() => formatWeeklyGoals(planData), [planData])
-
   if (!todayPlan) {
     return (
       <div className="m-4 p-6 text-center text-[15px]" style={{ color: colors.text.tertiary }}>
@@ -76,18 +73,20 @@ export default function WeeklyPlanView({
         想吃什麼？去 Today 搜尋或記錄 →
       </Link>
 
-      {/* Weekly goals */}
-      <div className="rounded-3xl p-6 space-y-4" style={{ ...cardStyle, backgroundColor: colors.bg.elevated }}>
-        <p className="text-[13px] font-medium" style={{ color: colors.text.tertiary }}>
-          本週科學目標
-        </p>
-        <ul className="space-y-3">
-          {weeklyGoals.map((g, i) => (
-            <li key={i} className="text-[17px] font-semibold leading-snug" style={{ color: colors.text.primary }}>
-              {g.icon} {g.text}
-            </li>
-          ))}
-        </ul>
+      {/* Weekly rhythm — 熱量/蛋白/運動/睡眠 */}
+      <div className="rounded-3xl p-5 space-y-3" style={{ ...cardStyle, backgroundColor: colors.bg.elevated }}>
+        <p className="text-[13px] font-medium" style={{ color: colors.text.tertiary }}>本週節奏</p>
+        <div className="grid grid-cols-2 gap-3 text-[13px]">
+          <Stat label="日均熱量" value={`${planData.weekly_targets.avg_daily_calories} kcal`} />
+          <Stat label="日均蛋白" value={`${planData.weekly_targets.avg_daily_protein_g} g`} />
+          <Stat label="運動" value={`${planData.weekly_targets.workout_days} 次/週`} />
+          <Stat label="睡眠目標" value={`${profile?.sleep_hours_target ?? 7.5} 小時`} />
+        </div>
+        {planData.goal_snapshot?.weekly_fat_loss_g != null && (
+          <p className="text-[12px]" style={{ color: colors.text.secondary }}>
+            體重趨勢：每週約 {(planData.goal_snapshot.weekly_fat_loss_g / 1000).toFixed(1)} kg（趨勢，不是考試）
+          </p>
+        )}
       </div>
 
       {/* Section 3 — Week Journey */}
@@ -234,6 +233,15 @@ export default function WeeklyPlanView({
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl px-3 py-2" style={{ backgroundColor: colors.bg.muted }}>
+      <p className="text-[10px]" style={{ color: colors.text.tertiary }}>{label}</p>
+      <p className="font-semibold text-[14px]" style={{ color: colors.text.primary }}>{value}</p>
     </div>
   )
 }

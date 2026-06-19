@@ -78,8 +78,8 @@ async function runAccount(browser, email, index) {
       return
     }
 
-    const hasOS = dashText.includes('今天想吃什麼') || dashText.includes('今天照常過')
-    log(email, 'Today OS', hasOS ? 'PASS' : 'FAIL', hasOS ? '搜尋優先 UI' : '未找到 OS 文案')
+    const hasOS = dashText.includes('今天吃了什麼') || dashText.includes('跟我說')
+    log(email, 'Food Memory', hasOS ? 'PASS' : 'FAIL', hasOS ? 'Food Memory UI' : '未找到')
 
     const searchInput = await page.$('input[aria-label="搜尋食物"]')
     if (searchInput) {
@@ -99,14 +99,8 @@ async function runAccount(browser, email, index) {
       log(email, '食物記錄', 'FAIL', '無搜尋框')
     }
 
-    const lifeClicked = await page.evaluate(() => {
-      const buttons = [...document.querySelectorAll('button')]
-      const btn = buttons.find(b => /聚餐|出差|過年|不舒服|壓力/.test(b.innerText))
-      if (btn) { btn.click(); return btn.innerText.slice(0, 20) }
-      return null
-    })
-    await wait(1000)
-    log(email, '生活事件', lifeClicked ? 'PASS' : 'WARN', lifeClicked || '未找到按鈕')
+    const noLifeModes = !dashText.includes('生活模式（點一下')
+    log(email, '隱形事件', noLifeModes ? 'PASS' : 'WARN', noLifeModes ? '無手動生活模式' : '仍有模式按鈕')
 
     await page.goto(`${BASE}/weekly`, { waitUntil: 'networkidle2', timeout: 60000 })
     await wait(1500)

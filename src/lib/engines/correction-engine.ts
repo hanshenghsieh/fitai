@@ -1,36 +1,58 @@
 import type { ZaiJianLine } from '@/lib/copy/zaijian'
-import type { LifeEventMode } from '@/lib/human-mode'
+import type { InferredEvent } from '@/lib/engines/event-engine'
 import type { UserBanks } from '@/lib/banks/types'
 
 export interface CorrectionInput {
   banks: UserBanks
-  lifeEvent?: LifeEventMode | null
-  /** kcal added by latest log vs meal slot target */
+  inferredEvents?: InferredEvent[]
+  /** @deprecated use inferredEvents */
+  lifeEvent?: string | null
   lastLogDeltaKcal?: number
 }
 
 export function getCorrectionMessage(input: CorrectionInput): ZaiJianLine {
-  const { banks, lifeEvent, lastLogDeltaKcal = 0 } = input
+  const { banks, inferredEvents = [], lastLogDeltaKcal = 0 } = input
 
-  if (lifeEvent === 'cheat' || lifeEvent === 'cny' || lifeEvent === 'family') {
+  if (inferredEvents.includes('overeat_today')) {
     return {
       text: '吃得很開心也很好。',
       expression: 'normal',
       subtext: '接下來幾天照常過就好。我幫你調。',
     }
   }
-  if (lifeEvent === 'sick' || lifeEvent === 'stress' || lifeEvent === 'bad_week') {
+  if (inferredEvents.includes('plateau')) {
+    return {
+      text: '體重暫時沒動，正常。',
+      expression: 'normal',
+      subtext: '脂肪還在掉。繼續照常過。',
+    }
+  }
+  if (inferredEvents.includes('missing_days') || inferredEvents.includes('stress_week')) {
     return {
       text: '這週不用完美。',
       expression: 'tired',
       subtext: '照你能做到的就好。剩下交給我。',
     }
   }
-  if (lifeEvent === 'travel') {
+  if (inferredEvents.includes('night_shift')) {
     return {
-      text: '好 choice。',
+      text: '夜班辛苦了。',
+      expression: 'tired',
+      subtext: '能吃多少記多少就好。',
+    }
+  }
+  if (inferredEvents.includes('sick_signal')) {
+    return {
+      text: '先休息。',
+      expression: 'tired',
+      subtext: '吃好消化的。運動先擺一邊。',
+    }
+  }
+  if (inferredEvents.includes('travel_pattern')) {
+    return {
+      text: '出門方便最重要。',
       expression: 'normal',
-      subtext: '出門方便最重要。回來再說。',
+      subtext: '回來再說。',
     }
   }
 
@@ -82,8 +104,8 @@ export function getCorrectionMessage(input: CorrectionInput): ZaiJianLine {
 
 export function getOsGreeting(): ZaiJianLine {
   return {
-    text: '今天照常過。',
+    text: '今天吃了什麼？',
     expression: 'normal',
-    subtext: '想吃什麼？',
+    subtext: '跟我說就好。我來幫你處理。',
   }
 }

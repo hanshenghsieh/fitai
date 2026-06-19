@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic'
 
 import { createClient } from '@/lib/supabase/server'
 import { format, startOfWeek, differenceInDays, subDays } from 'date-fns'
-import { formatTaipeiDateLabel } from '@/lib/timezone'
 import { redirect } from 'next/navigation'
 import type { WeeklyPlanData, DayPlan, UserProfile } from '@/types'
 import { colors } from '@/lib/design-system'
@@ -12,6 +11,7 @@ import GeneratePlanButton from '@/components/dashboard/GeneratePlanButton'
 import ZaiJianPanel from '@/components/character/ZaiJianPanel'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
 import ZaiJian from '@/components/character/ZaiJian'
+import { buildFoodDnaFromCheckins } from '@/lib/food-memory'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -21,30 +21,42 @@ export default async function DashboardPage() {
   const today = new Date()
   const todayStr = format(today, 'yyyy-MM-dd')
   const weekStart = format(startOfWeek(today, { weekStartsOn: 1 }), 'yyyy-MM-dd')
-  const yesterdayStr = format(subDays(today, 1), 'yyyy-MM-dd')
+  const fourteenDaysAgo = format(subDays(today, 14), 'yyyy-MM-dd')
+  const dayOfWeek = differenceInDays(today, new Date(weekStart))
 
-  const [{ data: weeklyPlan }, { data: checkin }, { data: profileRow }, { data: yesterdayCheckin }] = await Promise.all([
+  const [
+    { data: weeklyPlan },
+    { data: checkin },
+    { data: profileRow },
+    { data: recentCheckins },
+  ] = await Promise.all([
     supabase.from('weekly_plans').select('*').eq('user_id', user.id).eq('week_start', weekStart).single(),
     supabase.from('daily_checkins').select('*').eq('user_id', user.id).eq('checkin_date', todayStr).single(),
     supabase.from('user_profiles').select('*').eq('id', user.id).single(),
-    supabase.from('daily_checkins').select('diet_items, workout_items').eq('user_id', user.id).eq('checkin_date', yesterdayStr).single(),
+    supabase.from('daily_checkins')
+      .select('notes, checkin_date, diet_items, workout_items')
+      .eq('user_id', user.id)
+      .gte('checkin_date', fourteenDaysAgo)
+      .lt('checkin_date', todayStr)
+      .order('checkin_date', { ascending: true }),
   ])
 
   const planData = weeklyPlan?.plan_data as WeeklyPlanData | null
   const goalSnapshot = planData?.goal_snapshot
-  const dayOfWeek = differenceInDays(today, new Date(weekStart))
   const safeDayIndex = Math.min(Math.max(0, dayOfWeek), Math.max(0, (planData?.days?.length ?? 1) - 1))
   const todayPlan: DayPlan | null = planData?.days?.[safeDayIndex] ?? planData?.days?.[0] ?? null
   const profile = profileRow as UserProfile | null
 
-  const yesterdayDiet = yesterdayCheckin?.diet_items ?? []
-  const yesterdayWork = yesterdayCheckin?.workout_items ?? []
-  const yesterdayTotal = yesterdayDiet.length + yesterdayWork.length
-  const yesterdayDone =
-    yesterdayDiet.filter((i: { completed: boolean }) => i.completed).length +
-    yesterdayWork.filter((i: { completed: boolean }) => i.completed).length
-  const cheatRecovery = yesterdayTotal > 0 && yesterdayDone / yesterdayTotal < 0.5
-  const todayLabel = formatTaipeiDateLabel(today)
+  const foodDna = buildFoodDnaFromCheckins(recentCheckins ?? [])
+  const recentMissedDays = (recentCheckins ?? []).filter(c => {
+    const diet = c.diet_items ?? []
+    const work = c.workout_items ?? []
+    const total = diet.length + work.length
+    if (total === 0) return true
+    const done = diet.filter((i: { completed: boolean }) => i.completed).length +
+      work.filter((i: { completed: boolean }) => i.completed).length
+    return done / total < 0.3
+  }).length
 
   return (
     <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: colors.bg.canvas }}>
@@ -70,12 +82,11 @@ export default async function DashboardPage() {
           checkin={checkin}
           weeklyPlanId={weeklyPlan?.id ?? null}
           goalSnapshot={goalSnapshot}
-          coachNote={planData?.coach_note ?? weeklyPlan?.coach_note ?? null}
           dayIndex={safeDayIndex}
           profile={profile}
-          weekNumber={weeklyPlan?.week_number ?? 1}
-          cheatRecovery={cheatRecovery}
-          todayLabel={todayLabel}
+          foodDna={foodDna}
+          dayOfWeek={dayOfWeek}
+          recentMissedDays={recentMissedDays}
         />
       ) : (
         <ZaiJianPanel moment="empty">

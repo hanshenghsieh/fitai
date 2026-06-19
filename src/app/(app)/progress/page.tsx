@@ -15,15 +15,18 @@ export default async function ProgressPage() {
 
   const eightWeeksAgo = format(subWeeks(new Date(), 8), 'yyyy-MM-dd')
 
-  const [{ data: profile }, { data: subscription }, { data: measurements }, { data: plans }, { data: goal }] = await Promise.all([
-    supabase.from('user_profiles').select('created_at, weight_kg').eq('id', user.id).single(),
+  const [{ data: profile }, { data: subscription }, { data: measurements }, { data: plans }, { data: goal }, { data: weeklyPlan }] = await Promise.all([
+    supabase.from('user_profiles').select('created_at, weight_kg, sleep_hours_target').eq('id', user.id).single(),
     supabase.from('subscriptions').select('status').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).single(),
     supabase.from('body_measurements').select('*').eq('user_id', user.id)
       .gte('measured_at', eightWeeksAgo).order('measured_at', { ascending: true }),
-    supabase.from('weekly_plans').select('week_start,week_number,previous_completion_rate,previous_workout_rate')
+    supabase.from('weekly_plans').select('week_start,week_number,previous_completion_rate,previous_workout_rate,plan_data')
       .eq('user_id', user.id).order('week_start', { ascending: true }).limit(12),
     supabase.from('goals').select('*').eq('user_id', user.id).eq('is_active', true).order('created_at', { ascending: false }).limit(1),
+    supabase.from('weekly_plans').select('plan_data').eq('user_id', user.id).order('week_start', { ascending: false }).limit(1),
   ])
+
+  const goalSnapshot = (weeklyPlan?.plan_data as { goal_snapshot?: Record<string, unknown> } | null)?.goal_snapshot ?? null
 
   const access = getAccessStatus(profile?.created_at ?? new Date().toISOString(), subscription)
   const activeGoal = goal?.[0] ?? null
@@ -36,10 +39,10 @@ export default async function ProgressPage() {
           進度追蹤
         </p>
         <h1 className="text-[22px] font-semibold mt-1" style={{ color: colors.text.primary }}>
-          你有在變嗎？
+          趨勢，不是考試
         </h1>
         <p className="text-[13px] mt-1" style={{ color: colors.text.secondary }}>
-          體重沒變，不代表失敗。我會幫你看發生了什麼。
+          脂肪銀行在背後跑。你不用每天盯體重秤。
         </p>
       </div>
 
@@ -50,6 +53,7 @@ export default async function ProgressPage() {
             measurements={measurements ?? []}
             plans={plans ?? []}
             goal={activeGoal}
+            goalSnapshot={goalSnapshot}
           />
         </UpgradeGate>
       </div>

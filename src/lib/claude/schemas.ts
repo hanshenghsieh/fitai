@@ -81,5 +81,18 @@ export const InBodyParseSchema = z.object({
   visceral_fat_level: z.number().nullable(),
   basal_metabolic_rate: z.number().nullable(),
   confidence: z.enum(['high', 'medium', 'low']),
-  raw_values: z.record(z.string(), z.string()),
+  raw_values: z.record(z.string(), z.union([z.string(), z.number()])).optional(),
+})
+
+export const FoodPhotoParseSchema = z.object({
+  items: z.array(z.object({
+    name: z.string(),
+    calories: z.number().min(0).max(5000),
+    protein_g: z.number().min(0).max(500),
+    carbs_g: z.number().min(0).max(500),
+    fat_g: z.number().min(0).max(500),
+    portion: z.string(),
+    confidence: z.enum(['high', 'medium', 'low']),
+  })).min(1).max(8),
+  meal_summary: z.string().optional(),
 })

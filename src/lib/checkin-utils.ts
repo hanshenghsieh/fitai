@@ -2,6 +2,8 @@ import { format, subDays } from 'date-fns'
 import type { DailyCheckin, DietCheckinItem, WorkoutCheckinItem } from '@/types'
 
 import type { PortionId } from '@/lib/eat-out-builder'
+import type { FoodDna } from '@/lib/food-memory'
+import type { FoodSlot } from '@/lib/food-slots'
 import type { EatOutPreferences } from '@/lib/meal-engine-types'
 import type { HighlightKey } from '@/lib/meal-engine-types'
 
@@ -40,18 +42,24 @@ export interface UserMemoryMeta {
   favorite_brands?: string[]
   /** standard | shift — 輪班用第一餐/第二餐/第三餐 */
   work_schedule?: 'standard' | 'shift'
-  /** 生活事件模式，不懲罰 */
+  /** Phase 5 — 常吃食物 DNA（跨日累積） */
+  food_dna?: FoodDna
+  /** @deprecated Phase 5 隱形事件引擎取代手動模式 */
   life_event_mode?: 'cheat' | 'travel' | 'family' | 'cny' | 'sick' | 'stress' | 'bad_week' | null
-  /** Phase 4 — 使用者宣告今日吃了什麼 */
+  /** 使用者宣告今日吃了什麼 */
   food_logs_today?: {
     id: string
     name: string
     store?: string
     calories: number
     protein_g: number
+    carbs_g?: number
+    fat_g?: number
+    confidence?: 'high' | 'medium' | 'low'
+    slot?: FoodSlot
     logged_at: string
     user_declared: true
-    source: 'search' | 'dice' | 'plan' | 'free_text'
+    source: 'search' | 'dice' | 'plan' | 'free_text' | 'photo' | 'frequent'
   }[]
 }
 

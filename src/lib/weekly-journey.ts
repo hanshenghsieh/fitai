@@ -26,17 +26,17 @@ const DAY_NAMES = ['週一', '週二', '週三', '週四', '週五', '週六', '
 export function statusLabel(status: DayJourneyStatus): string {
   switch (status) {
     case 'upcoming':
-      return '即將到來'
+      return '還沒到'
     case 'today':
-      return '就是今天'
+      return '今天'
     case 'done':
-      return '有在撐'
+      return '有記錄'
     case 'missed':
-      return '沒關係'
+      return '跳過了'
     case 'rest':
-      return '今天先活著'
+      return '休息'
     case 'weekend':
-      return '週末模式'
+      return '週末'
   }
 }
 

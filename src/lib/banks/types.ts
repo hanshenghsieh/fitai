@@ -34,7 +34,11 @@ export interface FoodLogEntry {
   store?: string
   calories: number
   protein_g: number
+  carbs_g?: number
+  fat_g?: number
+  confidence?: 'high' | 'medium' | 'low'
+  slot?: import('@/lib/food-slots').FoodSlot
   logged_at: string
   user_declared: true
-  source: 'search' | 'dice' | 'plan' | 'free_text'
+  source: 'search' | 'dice' | 'plan' | 'free_text' | 'photo' | 'frequent'
 }
