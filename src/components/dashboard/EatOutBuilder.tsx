@@ -8,7 +8,7 @@ import {
   deserializeCustomCombo,
   selectedToDisplayItems,
   validateEatOutCombo,
-  formatEatOutStoreLine,
+  formatEatOutItemMeta,
 } from '@/lib/eat-out-builder'
 import { rollMealSuggestion, suggestionToSelections, memoryFromCheckinMeta } from '@/lib/meal-engine'
 import { suggestionId } from '@/lib/meal-engine-types'
@@ -130,7 +130,7 @@ export default function EatOutBuilder({
           >
             <p className="font-semibold text-[15px]" style={{ color: colors.text.primary }}>{item.name}</p>
             <p className="text-[13px] mt-0.5" style={{ color: colors.text.tertiary }}>
-              {formatEatOutStoreLine(item)}
+              {formatEatOutItemMeta(item)}
               {item.price ? ` · $${item.price}` : ''}
             </p>
           </div>

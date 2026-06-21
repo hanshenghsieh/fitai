@@ -4,6 +4,7 @@ import type { UserProfile } from '@/types'
 import type { EatOutPreferences, UserMemoryState } from './meal-engine-types'
 import { budgetMaxForMeal } from './meal-engine-types'
 import { isSanitizedMenuItem } from './meal-combo-validity'
+import { isPlausibleBrandItem } from './store-menu-plausibility'
 
 const MEAT_KEYWORDS = ['雞', '鴨', '肉', '蝦', '鮪', '牛', '豬', '魚', '蛤', '蚵', '鮭', '培根', '香腸']
 const DAIRY_KEYWORDS = ['蛋', '乳', '奶', '起司', '優格']
@@ -86,9 +87,15 @@ export function filterByNearbyBrands(
 export function getFilteredMenu(
   mealType: MealType,
   profile?: UserProfile | null,
-  memory?: UserMemoryState
+  memory?: UserMemoryState,
+  opts?: { includeBeverages?: boolean; source?: ConvenienceItem[] }
 ): ConvenienceItem[] {
-  let items = eatOutMenu.filter(i => i.category === mealType && isSanitizedMenuItem(i))
+  let items = (opts?.source ?? eatOutMenu).filter(
+    i =>
+      i.category === mealType &&
+      isSanitizedMenuItem(i, { allowBeverages: opts?.includeBeverages }) &&
+      isPlausibleBrandItem(i)
+  )
   items = filterByProfile(items, profile)
   items = filterByBudget(items, mealType, profile, memory?.eat_out_prefs)
   items = filterByStorePrefs(items, memory?.eat_out_prefs)

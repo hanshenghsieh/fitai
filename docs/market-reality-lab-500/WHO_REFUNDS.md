@@ -1,0 +1,34 @@
+# Who Refunds (n=32)
+
+- **#1 鄭冠廷** 22 小店老闆 · 台南 · entrepreneur · discipline 8 · 跟免費ChatGPT差不多
+- **#3 周彥廷** 56 健檢紅字 · 苗栗 · medical_anxiety · discipline 7 · 跟免費ChatGPT差不多
+- **#11 魏宥蓁** 30 全職媽媽 · 台南 · mother · discipline 4 · 跟免費ChatGPT差不多
+- **#24 詹姿君** 43 計程車司機 · 澎湖 · driver · discipline 8 · 跟免費ChatGPT差不多
+- **#68 洪佳慧** 45 資料工程師 · 基隆 · engineer · discipline 10 · 跟免費ChatGPT差不多
+- **#76 張婉婷** 30 ICU護理 · 台北 · night_nurse · discipline 8 · 跟免費ChatGPT差不多
+- **#83 游建宏** 24 吧台 · 台東 · food_service · discipline 9 · 跟免費ChatGPT差不多
+- **#97 顏彥儒** 46 行銷專員 · 花蓮 · office_worker · discipline 5 · 跟免費ChatGPT差不多
+- **#101 詹柏翰** 55 文案 · 澎湖 · freelancer · discipline 5 · 跟免費ChatGPT差不多
+- **#128 施心怡** 32 產品企劃 · 南投 · office_worker · discipline 7 · 跟免費ChatGPT差不多
+- **#182 蔡宜萱** 43 行政助理 · 新北 · office_worker · discipline 5 · 跟免費ChatGPT差不多
+- **#184 簡柏翰** 61 巴士司機 · 新竹 · driver · discipline 5 · 跟免費ChatGPT差不多
+- **#205 劉昱廷** 28 專案經理 · 雲林 · office_worker · discipline 4 · 跟免費ChatGPT差不多
+- **#208 郭建宏** 62 軟體工程師 · 高雄 · engineer · discipline 8 · 跟免費ChatGPT差不多
+- **#210 施柏翰** 61 創業者 · 花蓮 · entrepreneur · discipline 6 · 跟免費ChatGPT差不多
+- **#231 柯宜庭** 21 人資 · 南投 · office_worker · discipline 7 · 跟免費ChatGPT差不多
+- **#241 趙彥廷** 27 文案 · 台中 · freelancer · discipline 9 · 跟免費ChatGPT差不多
+- **#254 施冠霖** 42 品管 · 台中 · factory_worker · discipline 8 · 跟免費ChatGPT差不多
+- **#283 蕭彥儒** 32 資料工程師 · 南投 · engineer · discipline 10 · 跟免費ChatGPT差不多
+- **#290 洪柏均** 58 計程車司機 · 新竹 · driver · discipline 5 · 跟免費ChatGPT差不多
+- **#301 王志偉** 19 健檢紅字 · 嘉義 · medical_anxiety · discipline 8 · 跟免費ChatGPT差不多
+- **#332 莊俊宏** 57 計程車司機 · 苗栗 · driver · discipline 6 · 跟免費ChatGPT差不多
+- **#358 盧婉婷** 42 行政助理 · 高雄 · office_worker · discipline 9 · 跟免費ChatGPT差不多
+- **#374 何宗翰** 37 ICU護理 · 桃園 · night_nurse · discipline 7 · 跟免費ChatGPT差不多
+- **#376 楊冠廷** 56 業務 · 彰化 · sales · discipline 7 · 跟免費ChatGPT差不多
+- **#387 黃宥萱** 32 補教老師 · 宜蘭 · teacher · discipline 9 · 跟免費ChatGPT差不多
+- **#389 梁宇軒** 51 攝影師 · 台北 · freelancer · discipline 4 · 跟免費ChatGPT差不多
+- **#405 梁品妍** 30 業務 · 高雄 · sales · discipline 5 · 跟免費ChatGPT差不多
+- **#428 吳宗翰** 36 DevOps · 花蓮 · engineer · discipline 10 · 跟免費ChatGPT差不多
+- **#459 胡冠廷** 54 會計 · 台中 · office_worker · discipline 7 · 跟免費ChatGPT差不多
+- **#472 梁思妤** 21 助產士 · 澎湖 · night_nurse · discipline 9 · 跟免費ChatGPT差不多
+- **#482 杜冠霖** 37 汽車業務 · 嘉義 · sales · discipline 4 · 跟免費ChatGPT差不多

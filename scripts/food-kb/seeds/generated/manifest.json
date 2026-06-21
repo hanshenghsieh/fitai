@@ -1,0 +1,75 @@
+{
+  "generated_at": "2026-06-20T06:52:18.414Z",
+  "catalog_brands": 150,
+  "categories": {
+    "convenience": {
+      "count": 140,
+      "brands": 4
+    },
+    "breakfast": {
+      "count": 350,
+      "brands": 10
+    },
+    "coffee": {
+      "count": 350,
+      "brands": 10
+    },
+    "bubbletea": {
+      "count": 805,
+      "brands": 23
+    },
+    "fastfood": {
+      "count": 385,
+      "brands": 11
+    },
+    "japanese": {
+      "count": 455,
+      "brands": 13
+    },
+    "bento": {
+      "count": 315,
+      "brands": 9
+    },
+    "hotpot": {
+      "count": 455,
+      "brands": 13
+    },
+    "bbq": {
+      "count": 245,
+      "brands": 7
+    },
+    "noodles": {
+      "count": 490,
+      "brands": 14
+    },
+    "thai": {
+      "count": 140,
+      "brands": 4
+    },
+    "korean": {
+      "count": 175,
+      "brands": 5
+    },
+    "american": {
+      "count": 175,
+      "brands": 5
+    },
+    "healthy": {
+      "count": 350,
+      "brands": 10
+    },
+    "desserts": {
+      "count": 140,
+      "brands": 4
+    },
+    "supermarket": {
+      "count": 245,
+      "brands": 7
+    },
+    "night_market": {
+      "count": 35,
+      "brands": 1
+    }
+  },
+  "total": 5250
+}

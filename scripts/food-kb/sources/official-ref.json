@@ -1,0 +1,99 @@
+[
+  {
+    "brand": "麥當勞",
+    "store": "麥當勞",
+    "name": "大麥克",
+    "aliases": ["Big Mac"],
+    "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+    "nutrition": { "calories": 563, "protein_g": 26, "carbs_g": 42, "fat_g": 30 }
+  },
+  {
+    "brand": "麥當勞",
+    "store": "麥當勞",
+    "name": "雙層牛肉吉士堡",
+    "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+    "nutrition": { "calories": 480, "protein_g": 28, "carbs_g": 35, "fat_g": 26 }
+  },
+  {
+    "brand": "麥當勞",
+    "store": "麥當勞",
+    "name": "麥香雞",
+    "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+    "nutrition": { "calories": 400, "protein_g": 18, "carbs_g": 36, "fat_g": 18 }
+  },
+  {
+    "brand": "麥當勞",
+    "store": "麥當勞",
+    "name": "麥香魚",
+    "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+    "nutrition": { "calories": 340, "protein_g": 16, "carbs_g": 38, "fat_g": 16 }
+  },
+  {
+    "brand": "麥當勞",
+    "store": "麥當勞",
+    "name": "勁辣雞腿堡",
+    "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+    "nutrition": { "calories": 480, "protein_g": 26, "carbs_g": 40, "fat_g": 24 }
+  },
+  {
+    "brand": "麥當勞",
+    "store": "麥當勞",
+    "name": "麥克雞塊（6塊）",
+    "aliases": ["麥克雞塊", "雞塊（6塊）"],
+    "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+    "nutrition": { "calories": 280, "protein_g": 16, "carbs_g": 18, "fat_g": 16 }
+  },
+  {
+    "brand": "麥當勞",
+    "store": "麥當勞",
+    "name": "薯條（中）",
+    "aliases": ["中薯", "薯條"],
+    "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+    "nutrition": { "calories": 340, "protein_g": 4, "carbs_g": 42, "fat_g": 16 }
+  },
+  {
+    "brand": "吉野家",
+    "store": "吉野家",
+    "name": "牛丼（中）",
+    "aliases": ["牛丼", "牛肉丼（中）"],
+    "source_url": "https://www.yoshinoya.com.tw/menu",
+    "nutrition": { "calories": 733, "protein_g": 30, "carbs_g": 82, "fat_g": 18 }
+  },
+  {
+    "brand": "吉野家",
+    "store": "吉野家",
+    "name": "親子丼（中）",
+    "aliases": ["親子丼"],
+    "source_url": "https://www.yoshinoya.com.tw/menu",
+    "nutrition": { "calories": 580, "protein_g": 28, "carbs_g": 72, "fat_g": 16 }
+  },
+  {
+    "brand": "摩斯漢堡",
+    "store": "摩斯漢堡",
+    "name": "摩斯漢堡",
+    "source_url": "https://www.mos.com.tw/menu",
+    "nutrition": { "calories": 380, "protein_g": 18, "carbs_g": 36, "fat_g": 18 }
+  },
+  {
+    "brand": "摩斯漢堡",
+    "store": "摩斯漢堡",
+    "name": "摩斯雞腿堡",
+    "source_url": "https://www.mos.com.tw/menu",
+    "nutrition": { "calories": 480, "protein_g": 26, "carbs_g": 40, "fat_g": 22 }
+  },
+  {
+    "brand": "肯德基",
+    "store": "肯德基",
+    "name": "咔啦脆雞腿堡",
+    "source_url": "https://www.kfcclub.com.tw/menu",
+    "nutrition": { "calories": 450, "protein_g": 24, "carbs_g": 38, "fat_g": 24 }
+  },
+  {
+    "brand": "肯德基",
+    "store": "肯德基",
+    "name": "原味炸雞（2塊）",
+    "aliases": ["咔啦脆雞（2塊）"],
+    "source_url": "https://www.kfcclub.com.tw/menu",
+    "nutrition": { "calories": 380, "protein_g": 24, "carbs_g": 18, "fat_g": 22 }
+  }
+]

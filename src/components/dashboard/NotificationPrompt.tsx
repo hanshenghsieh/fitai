@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { initializeFirebase, requestNotificationPermission, listenForPushMessages } from '@/lib/firebase'
 import { colors } from '@/lib/design-system'
+import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
 import ZaiJian from '@/components/character/ZaiJian'
 
@@ -50,10 +51,10 @@ export default function NotificationPrompt() {
         listenForPushMessages()
         toast.success('好，我會提醒你。')
       } else {
-        toast.error(pickZaiJianLine('error').text)
+        toast.error(GENTLE_ERROR_MESSAGE)
       }
     } catch {
-      toast.error(pickZaiJianLine('error').text)
+      toast.error(GENTLE_ERROR_MESSAGE)
     }
   }
 

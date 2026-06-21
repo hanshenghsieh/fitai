@@ -1,0 +1,2410 @@
+{
+  "generated_at": "2026-06-20T06:06:37.239Z",
+  "observations_added": 89,
+  "stats": {
+    "total_items": 2159,
+    "total_clusters": 2159,
+    "total_brands": 316,
+    "total_observations": 3118,
+    "by_source_type": {},
+    "by_brand_type": {
+      "convenience": 4,
+      "fast_food": 5,
+      "coffee": 6,
+      "other": 280,
+      "chain_restaurant": 8,
+      "bubble_tea": 11,
+      "buffet": 2
+    },
+    "avg_confidence": 0.559,
+    "low_confidence_count": 858,
+    "missing_nutrition_count": 9
+  },
+  "summary": {
+    "total_items": 2159,
+    "validated": 60,
+    "conflicts": 78,
+    "insufficient": 1181,
+    "estimated_only": 840
+  },
+  "validated_samples": [
+    {
+      "item_id": "item_mql8paia_21",
+      "store": "7-11",
+      "name": "四起司香草烤雞握便當",
+      "status": "validated",
+      "confidence": 0.325,
+      "source_types": [
+        "legacy_import",
+        "official_website",
+        "estimated"
+      ],
+      "source_count": 8,
+      "calories_estimated": 520,
+      "calories_validated": 438.3333333333333,
+      "cal_delta_pct": 15.7,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "四起司香草烤雞握便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 414
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "台韓半半炸雞便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 650
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-scraped-711",
+          "raw_name": "四起司香草烤雞握便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 414
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-scraped-711",
+          "raw_name": "台韓半半炸雞便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 500
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "雙起司青醬海鮮排握便當",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 421
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "嫩烤里肌多彩便當",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 520
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "香蒜烤雞鮮蔬餐盒",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 374
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:convenience",
+          "raw_name": "義大利麵餐盒",
+          "url": "internal://seeds/generated/convenience.json#7-11-御飯糰-鮭魚",
+          "calories": 520
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8paig_39",
+      "store": "7-11",
+      "name": "晶英韓式炸豬排起司雙拼飯",
+      "status": "validated",
+      "confidence": 0.85,
+      "source_types": [
+        "legacy_import",
+        "official_website"
+      ],
+      "source_count": 2,
+      "calories_estimated": 351,
+      "calories_validated": 351,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "晶英韓式炸豬排起司雙拼飯",
+          "url": "internal://convenience-store-menu",
+          "calories": 351
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "晶英韓式炸豬排起司雙拼飯卷",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 351
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pak3_112",
+      "store": "全家",
+      "name": "御飯糰-梅子紫蘇",
+      "status": "validated",
+      "confidence": 0.23,
+      "source_types": [
+        "legacy_import",
+        "estimated"
+      ],
+      "source_count": 5,
+      "calories_estimated": 210,
+      "calories_validated": 190,
+      "cal_delta_pct": 9.5,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "御飯糰-梅子紫蘇",
+          "url": "internal://convenience-store-menu",
+          "calories": 180
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "御飯糰-鮭魚",
+          "url": "internal://convenience-store-menu",
+          "calories": 190
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "御飯糰-鮪魚起司",
+          "url": "internal://convenience-store-menu",
+          "calories": 200
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:convenience",
+          "raw_name": "御飯糰（鮭魚）",
+          "url": "internal://seeds/generated/convenience.json#7-11-御飯糰-鮭魚",
+          "calories": 210
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:convenience",
+          "raw_name": "御飯糰（鮪魚）",
+          "url": "internal://seeds/generated/convenience.json#7-11-御飯糰-鮭魚",
+          "calories": 200
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakj_161",
+      "store": "星巴克",
+      "name": "雞肉沙拉三明治",
+      "status": "validated",
+      "confidence": 0.75,
+      "source_types": [
+        "legacy_import",
+        "estimated"
+      ],
+      "source_count": 3,
+      "calories_estimated": 350,
+      "calories_validated": 350,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "雞肉沙拉三明治",
+          "url": "internal://convenience-store-menu",
+          "calories": 350
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞肉沙拉三明治",
+          "url": "internal://convenience-store-menu",
+          "calories": 350
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:coffee",
+          "raw_name": "雞肉沙拉三明治",
+          "url": "internal://seeds/generated/coffee.json#starbucks-美式咖啡-中杯",
+          "calories": 350
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakm_187",
+      "store": "麥當勞",
+      "name": "雙層牛肉吉士堡",
+      "status": "validated",
+      "confidence": 0.34,
+      "source_types": [
+        "legacy_import",
+        "estimated",
+        "official_website"
+      ],
+      "source_count": 5,
+      "calories_estimated": 480,
+      "calories_validated": 480,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "雙層牛肉吉士堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雙層吉士堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 525
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "雙層牛肉吉士堡",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 480
+        },
+        {
+          "type": "official_website",
+          "name": "麥當勞",
+          "raw_name": "雙層牛肉吉士堡",
+          "url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+          "calories": 480
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "雙層牛肉吉士堡",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 491.25
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pako_197",
+      "store": "麥當勞",
+      "name": "嫩雞蔬食卷",
+      "status": "validated",
+      "confidence": 0.85,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 380,
+      "calories_validated": 380,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "嫩雞蔬食卷",
+          "url": "internal://convenience-store-menu",
+          "calories": 380
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "嫩雞蔬食卷",
+          "url": "internal://convenience-store-menu",
+          "calories": 380
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakp_203",
+      "store": "肯德基",
+      "name": "卡洛卡羅烤雞腿排餐",
+      "status": "validated",
+      "confidence": 0.57,
+      "source_types": [
+        "legacy_import",
+        "estimated"
+      ],
+      "source_count": 5,
+      "calories_estimated": 520,
+      "calories_validated": 500,
+      "cal_delta_pct": 3.8,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "卡洛卡羅烤雞腿排餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 520
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "烤雞腿排餐（去皮）",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "卡洛卡羅烤雞腿排餐",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 520
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "烤雞腿排餐（去皮）",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 480
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "卡洛卡羅烤雞腿排餐",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 500
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakq_212",
+      "store": "摩斯漢堡",
+      "name": "海洋堡",
+      "status": "validated",
+      "confidence": 0.75,
+      "source_types": [
+        "legacy_import",
+        "estimated"
+      ],
+      "source_count": 3,
+      "calories_estimated": 420,
+      "calories_validated": 420,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "海洋堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 420
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "海洋堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 420
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "海洋堡",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 420
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakr_218",
+      "store": "Subway",
+      "name": "烤雞沙拉潛艇堡（6吋）",
+      "status": "validated",
+      "confidence": 0.85,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 3,
+      "calories_estimated": 320,
+      "calories_validated": 320,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "烤雞沙拉潛艇堡（6吋）",
+          "url": "internal://convenience-store-menu",
+          "calories": 320
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "烤雞沙拉潛艇堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 320
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "烤雞沙拉潛艇堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 320
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pal5_239",
+      "store": "丼丼屋",
+      "name": "燒肉丼（中）",
+      "status": "validated",
+      "confidence": 0.85,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 620,
+      "calories_validated": 620,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "燒肉丼（中）",
+          "url": "internal://convenience-store-menu",
+          "calories": 620
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "燒肉丼（中）",
+          "url": "internal://convenience-store-menu",
+          "calories": 620
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pal5_242",
+      "store": "丼丼屋",
+      "name": "親子丼（中）",
+      "status": "validated",
+      "confidence": 0.85,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 570,
+      "calories_validated": 570,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "親子丼（中）",
+          "url": "internal://convenience-store-menu",
+          "calories": 580
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "鮭魚親子丼",
+          "url": "internal://convenience-store-menu",
+          "calories": 560
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8palm_265",
+      "store": "健人餐廚",
+      "name": "炙烤雞腿餐盒",
+      "status": "validated",
+      "confidence": 0.279,
+      "source_types": [
+        "legacy_import",
+        "estimated"
+      ],
+      "source_count": 7,
+      "calories_estimated": 460,
+      "calories_validated": 486.6666666666667,
+      "cal_delta_pct": 5.5,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "炙烤雞腿餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 500
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "炙烤雞腿餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 500
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "舒肥牛腱餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 460
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:healthy",
+          "raw_name": "舒肥雞胸餐盒",
+          "url": "internal://seeds/generated/healthy.json#72c-舒肥雞胸餐盒",
+          "calories": 460
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:healthy",
+          "raw_name": "舒肥牛腱餐盒",
+          "url": "internal://seeds/generated/healthy.json#72c-舒肥雞胸餐盒",
+          "calories": 520
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:healthy",
+          "raw_name": "鮭魚糙米餐盒",
+          "url": "internal://seeds/generated/healthy.json#72c-舒肥雞胸餐盒",
+          "calories": 450
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:healthy",
+          "raw_name": "炙烤雞腿餐盒",
+          "url": "internal://seeds/generated/healthy.json#72c-舒肥雞胸餐盒",
+          "calories": 500
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8palo_269",
+      "store": "麥當勞",
+      "name": "勁辣雞腿堡套餐",
+      "status": "validated",
+      "confidence": 0.25,
+      "source_types": [
+        "legacy_import",
+        "estimated",
+        "official_website"
+      ],
+      "source_count": 5,
+      "calories_estimated": 480,
+      "calories_validated": 480,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "勁辣雞腿堡套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 680
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "勁辣雞腿堡（單點）",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "勁辣雞腿堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 455
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "勁辣雞腿堡",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 480
+        },
+        {
+          "type": "official_website",
+          "name": "麥當勞",
+          "raw_name": "勁辣雞腿堡",
+          "url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+          "calories": 480
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8palx_287",
+      "store": "森度餐廚",
+      "name": "糖心蛋雞胸餐",
+      "status": "validated",
+      "confidence": 0.85,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 400,
+      "calories_validated": 400,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "糖心蛋雞胸餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 400
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "糖心蛋雞胸餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 400
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8paom_389",
+      "store": "悟饕池上飯包",
+      "name": "雞排便當",
+      "status": "validated",
+      "confidence": 0.75,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 675,
+      "calories_validated": 675,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞排便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 650
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "排骨便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 700
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8papd_520",
+      "store": "洪廣德",
+      "name": "燒肉蛋餅",
+      "status": "validated",
+      "confidence": 0.75,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 380,
+      "calories_validated": 380,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "燒肉蛋餅",
+          "url": "internal://convenience-store-menu",
+          "calories": 390
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞肉蛋餅",
+          "url": "internal://convenience-store-menu",
+          "calories": 370
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8park_646",
+      "store": "爭鮮迴轉壽司",
+      "name": "鮭魚握壽司（2貫）",
+      "status": "validated",
+      "confidence": 0.317,
+      "source_types": [
+        "legacy_import",
+        "official_website",
+        "estimated"
+      ],
+      "source_count": 9,
+      "calories_estimated": 140,
+      "calories_validated": 146.66666666666666,
+      "cal_delta_pct": 4.5,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "鮭魚握壽司（2貫）",
+          "url": "internal://convenience-store-menu",
+          "calories": 140
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "鮪魚握壽司（2貫）",
+          "url": "internal://convenience-store-menu",
+          "calories": 120
+        },
+        {
+          "type": "official_website",
+          "name": "chain-seed:爭鮮迴轉壽司",
+          "raw_name": "鮭魚握壽司（2貫）",
+          "url": "internal://food-kb/seeds/chain-expansion.json#sushi-salmon-nigiri",
+          "calories": 140
+        },
+        {
+          "type": "official_website",
+          "name": "chain-seed:爭鮮迴轉壽司",
+          "raw_name": "鮪魚握壽司（2貫）",
+          "url": "internal://food-kb/seeds/chain-expansion.json#sushi-salmon-nigiri",
+          "calories": 120
+        },
+        {
+          "type": "official_website",
+          "name": "chain-seed:爭鮮迴轉壽司",
+          "raw_name": "鰻魚握壽司（2貫）",
+          "url": "internal://food-kb/seeds/chain-expansion.json#sushi-salmon-nigiri",
+          "calories": 180
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:japanese",
+          "raw_name": "鮭魚握壽司（2貫）",
+          "url": "internal://seeds/generated/japanese.json#sushiro-鮭魚握壽司-2貫",
+          "calories": 140
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:japanese",
+          "raw_name": "鮪魚握壽司（2貫）",
+          "url": "internal://seeds/generated/japanese.json#sushiro-鮭魚握壽司-2貫",
+          "calories": 120
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:japanese",
+          "raw_name": "鰻魚握壽司（2貫）",
+          "url": "internal://seeds/generated/japanese.json#sushiro-鮭魚握壽司-2貫",
+          "calories": 180
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:japanese",
+          "raw_name": "鮭魚握壽司（2貫）",
+          "url": "internal://seeds/generated/japanese.json#sushiro-鮭魚握壽司-2貫",
+          "calories": 142.5
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8parl_650",
+      "store": "爭鮮迴轉壽司",
+      "name": "綜合壽司套餐",
+      "status": "validated",
+      "confidence": 0.85,
+      "source_types": [
+        "legacy_import",
+        "official_website",
+        "estimated"
+      ],
+      "source_count": 3,
+      "calories_estimated": 480,
+      "calories_validated": 480,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "綜合壽司套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        },
+        {
+          "type": "official_website",
+          "name": "chain-seed:爭鮮迴轉壽司",
+          "raw_name": "綜合壽司拼盤（10貫）",
+          "url": "internal://food-kb/seeds/chain-expansion.json#sushi-salmon-nigiri",
+          "calories": 480
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:japanese",
+          "raw_name": "綜合壽司拼盤（10貫）",
+          "url": "internal://seeds/generated/japanese.json#sushiro-鮭魚握壽司-2貫",
+          "calories": 480
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8paur_783",
+      "store": "奪有味",
+      "name": "雞排便當",
+      "status": "validated",
+      "confidence": 0.65,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 3,
+      "calories_estimated": 683.33,
+      "calories_validated": 683.3333333333334,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞排便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 680
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "排骨便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 720
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "焢肉便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 650
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8paut_789",
+      "store": "廣味香",
+      "name": "雞排便當",
+      "status": "validated",
+      "confidence": 0.8,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 3,
+      "calories_estimated": 693.33,
+      "calories_validated": 693.3333333333334,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞排便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 660
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "排骨便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 700
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "腿庫便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 720
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pavc_795",
+      "store": "圓福",
+      "name": "雞排便當",
+      "status": "validated",
+      "confidence": 0.8,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 630,
+      "calories_validated": 630,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞排便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 640
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "燒肉便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 620
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pavf_800",
+      "store": "松花湖便當",
+      "name": "雞排便當",
+      "status": "validated",
+      "confidence": 0.75,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 3,
+      "calories_estimated": 703.33,
+      "calories_validated": 703.3333333333334,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞排便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 670
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "排骨便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 710
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "腿庫便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 730
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pavr_816",
+      "store": "阿光排骨",
+      "name": "排骨便當",
+      "status": "validated",
+      "confidence": 0.7,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 3,
+      "calories_estimated": 696.67,
+      "calories_validated": 696.6666666666666,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "排骨便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 720
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "腿庫便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 710
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞排便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 660
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pavt_822",
+      "store": "九如排骨",
+      "name": "排骨便當",
+      "status": "validated",
+      "confidence": 0.75,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 705,
+      "calories_validated": 705,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "排骨便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 730
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞腿便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 680
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pawr_851",
+      "store": "豐原排骨酥",
+      "name": "排骨酥便當",
+      "status": "validated",
+      "confidence": 0.65,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 710,
+      "calories_validated": 710,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "排骨酥便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 740
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞腿便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 680
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pawt_863",
+      "store": "萬年排骨",
+      "name": "排骨便當",
+      "status": "validated",
+      "confidence": 0.75,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 675,
+      "calories_validated": 675,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "排骨便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 710
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "焢肉便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 640
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8paxl_904",
+      "store": "奮起湖便當",
+      "name": "鐵路便當（雞腿）",
+      "status": "validated",
+      "confidence": 0.75,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 710,
+      "calories_validated": 710,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "鐵路便當（雞腿）",
+          "url": "internal://convenience-store-menu",
+          "calories": 700
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "鐵路便當（排骨）",
+          "url": "internal://convenience-store-menu",
+          "calories": 720
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8paxo_916",
+      "store": "岔路二股便當",
+      "name": "雞腿便當",
+      "status": "validated",
+      "confidence": 0.75,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 695,
+      "calories_validated": 695,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞腿便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 680
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "排骨便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 710
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pay0_945",
+      "store": "錢櫃自助餐",
+      "name": "雞腿便當",
+      "status": "validated",
+      "confidence": 0.75,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 700,
+      "calories_validated": 700,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞腿便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 680
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "排骨便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 720
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8payn_1000",
+      "store": "肯德基",
+      "name": "香雞飯套餐",
+      "status": "validated",
+      "confidence": 0.55,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 675,
+      "calories_validated": 675,
+      "cal_delta_pct": 0,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "香雞飯套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 650
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "香雞飯",
+          "url": "internal://convenience-store-menu",
+          "calories": 700
+        }
+      ]
+    }
+  ],
+  "conflict_samples": [
+    {
+      "item_id": "item_mql8pais_45",
+      "store": "7-11",
+      "name": "御飯糰-梅子紫蘇",
+      "status": "conflict",
+      "confidence": 0.485,
+      "source_types": [
+        "legacy_import",
+        "official_website",
+        "estimated"
+      ],
+      "source_count": 23,
+      "calories_estimated": 210,
+      "calories_validated": 219.6315789473684,
+      "cal_delta_pct": 13.5,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "御飯糰-梅子紫蘇",
+          "url": "internal://convenience-store-menu",
+          "calories": 180
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "御飯糰-鮭魚",
+          "url": "internal://convenience-store-menu",
+          "calories": 190
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "御飯糰-鮪魚起司",
+          "url": "internal://convenience-store-menu",
+          "calories": 200
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "韓式海陸包醬新極大飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 291
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "晶英府城肉燥米糕飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 429
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "祥和塔香香鬆飯糰28元",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 200
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "陽明春天菇菇毛豆飯糰熱量202kcal39元",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 202
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "塔香杏鮑菇飯糰藜麥飯X塔香醬燒菇菇區域販售熱量215kcal",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 215
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "陽明春天野菇炊飯飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 213
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "新極上飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 200
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "海南雞飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 200
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "魚卵龍蝦風味沙拉飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 227
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "新極大飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 200
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "哇沙米秋鮭飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 198
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "炙烤鹽蔥燒肉飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 191
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "石安牧場溏心蛋飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 168
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "炙燒明太子鮭魚飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 185
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "韓式燒肉泡菜飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 203
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "炭火燒肉飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 179
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "櫸木燻雞飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 203
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "御選肉鬆飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 248
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "雙蔬鮪魚飯糰",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 221
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:convenience",
+          "raw_name": "御飯糰（鮭魚）",
+          "url": "internal://seeds/generated/convenience.json#7-11-御飯糰-鮭魚",
+          "calories": 210
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8paiv_50",
+      "store": "7-11",
+      "name": "原賞三明治-火腿起司蛋",
+      "status": "conflict",
+      "confidence": 0.5,
+      "source_types": [
+        "legacy_import",
+        "official_website"
+      ],
+      "source_count": 2,
+      "calories_estimated": 339.38,
+      "calories_validated": 380,
+      "cal_delta_pct": 26.3,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "原賞三明治-火腿起司蛋",
+          "url": "internal://convenience-store-menu",
+          "calories": 280
+        },
+        {
+          "type": "official_website",
+          "name": "7-11.com.tw",
+          "raw_name": "金黃起司火腿蛋三明治",
+          "url": "https://www.7-11.com.tw/freshfoods/",
+          "calories": 380
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pajd_88",
+      "store": "全家",
+      "name": "四起司香草烤雞握便當",
+      "status": "conflict",
+      "confidence": 0.15,
+      "source_types": [
+        "legacy_import",
+        "estimated"
+      ],
+      "source_count": 6,
+      "calories_estimated": 520,
+      "calories_validated": 494.5,
+      "cal_delta_pct": 36.3,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "四起司香草烤雞握便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 414
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-convenience",
+          "raw_name": "台韓半半炸雞便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 650
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-scraped-711",
+          "raw_name": "四起司香草烤雞握便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 414
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-scraped-711",
+          "raw_name": "台韓半半炸雞便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 500
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:convenience",
+          "raw_name": "義大利麵餐盒",
+          "url": "internal://seeds/generated/convenience.json#7-11-御飯糰-鮭魚",
+          "calories": 520
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:convenience",
+          "raw_name": "韓式拌飯餐盒",
+          "url": "internal://seeds/generated/convenience.json#7-11-御飯糰-鮭魚",
+          "calories": 480
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8paki_144",
+      "store": "麥當勞",
+      "name": "咔啦豬肉滿福堡加蛋",
+      "status": "conflict",
+      "confidence": 0.25,
+      "source_types": [
+        "legacy_import",
+        "estimated"
+      ],
+      "source_count": 3,
+      "calories_estimated": 480,
+      "calories_validated": 415,
+      "cal_delta_pct": 27.1,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "咔啦豬肉滿福堡加蛋",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "豬肉滿福堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 350
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "咔啦豬肉滿福堡加蛋",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 480
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8paki_147",
+      "store": "麥當勞",
+      "name": "麥香魚早餐套餐",
+      "status": "conflict",
+      "confidence": 0.25,
+      "source_types": [
+        "legacy_import",
+        "estimated",
+        "official_website"
+      ],
+      "source_count": 4,
+      "calories_estimated": 340,
+      "calories_validated": 340,
+      "cal_delta_pct": 29.9,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "麥香魚早餐套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 450
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "麥香魚套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 520
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "麥香魚",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 340
+        },
+        {
+          "type": "official_website",
+          "name": "麥當勞",
+          "raw_name": "麥香魚",
+          "url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+          "calories": 340
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakk_169",
+      "store": "八方雲集",
+      "name": "鍋貼套餐（10顆+酸辣湯）",
+      "status": "conflict",
+      "confidence": 0.1,
+      "source_types": [
+        "legacy_import",
+        "estimated"
+      ],
+      "source_count": 6,
+      "calories_estimated": 380,
+      "calories_validated": 473.3333333333333,
+      "cal_delta_pct": 48.4,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "鍋貼套餐（10顆+酸辣湯）",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "鍋貼套餐（15顆+玉米湯）",
+          "url": "internal://convenience-store-menu",
+          "calories": 620
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "鍋貼（8顆）",
+          "url": "internal://convenience-store-menu",
+          "calories": 320
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:bento",
+          "raw_name": "鍋貼（10顆）",
+          "url": "internal://seeds/generated/bento.json#bdf-排骨飯",
+          "calories": 380
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:bento",
+          "raw_name": "鍋貼套餐（10顆+酸辣湯）",
+          "url": "internal://seeds/generated/bento.json#bdf-排骨飯",
+          "calories": 480
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:bento",
+          "raw_name": "鍋貼套餐（15顆+玉米湯）",
+          "url": "internal://seeds/generated/bento.json#bdf-排骨飯",
+          "calories": 620
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakk_173",
+      "store": "肯德基",
+      "name": "咔啦脆雞捲餅",
+      "status": "conflict",
+      "confidence": 0.2,
+      "source_types": [
+        "legacy_import",
+        "estimated",
+        "official_website"
+      ],
+      "source_count": 6,
+      "calories_estimated": 280,
+      "calories_validated": 380,
+      "cal_delta_pct": 16.5,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "咔啦脆雞捲餅",
+          "url": "internal://convenience-store-menu",
+          "calories": 390
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "咔啦脆雞（二塊）",
+          "url": "internal://convenience-store-menu",
+          "calories": 380
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "咔啦脆雞套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 595
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "咔啦脆雞（2塊）",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 280
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "咔啦脆雞捲餅",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 390
+        },
+        {
+          "type": "official_website",
+          "name": "肯德基",
+          "raw_name": "原味炸雞（2塊）",
+          "url": "https://www.kfcclub.com.tw/menu",
+          "calories": 380
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakm_184",
+      "store": "麥當勞",
+      "name": "大麥克",
+      "status": "conflict",
+      "confidence": 0.22,
+      "source_types": [
+        "legacy_import",
+        "estimated",
+        "official_website"
+      ],
+      "source_count": 10,
+      "calories_estimated": 550,
+      "calories_validated": 421.5,
+      "cal_delta_pct": 14.3,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "大麥克",
+          "url": "internal://convenience-store-menu",
+          "calories": 550
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "六塊麥克雞塊+中薯",
+          "url": "internal://convenience-store-menu",
+          "calories": 580
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "麥克雞塊（6塊）",
+          "url": "internal://convenience-store-menu",
+          "calories": 280
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "大麥克",
+          "url": "internal://convenience-store-menu",
+          "calories": 490
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "麥克雞塊",
+          "url": "internal://convenience-store-menu",
+          "calories": 560
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "大麥克",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 550
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "麥克雞塊（6塊）",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 280
+        },
+        {
+          "type": "official_website",
+          "name": "麥當勞",
+          "raw_name": "大麥克",
+          "url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+          "calories": 563
+        },
+        {
+          "type": "official_website",
+          "name": "麥當勞",
+          "raw_name": "麥克雞塊（6塊）",
+          "url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+          "calories": 280
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "大麥克",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 563
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakn_193",
+      "store": "麥當勞",
+      "name": "麥香雞套餐（中薯+飲）",
+      "status": "conflict",
+      "confidence": 0.25,
+      "source_types": [
+        "legacy_import",
+        "estimated",
+        "official_website"
+      ],
+      "source_count": 4,
+      "calories_estimated": 380,
+      "calories_validated": 400,
+      "cal_delta_pct": 29.8,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "麥香雞套餐（中薯+飲）",
+          "url": "internal://convenience-store-menu",
+          "calories": 720
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "麥香雞",
+          "url": "internal://convenience-store-menu",
+          "calories": 420
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "麥香雞",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 380
+        },
+        {
+          "type": "official_website",
+          "name": "麥當勞",
+          "raw_name": "麥香雞",
+          "url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+          "calories": 400
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pako_200",
+      "store": "肯德基",
+      "name": "咔啦脆雞腿堡套餐",
+      "status": "conflict",
+      "confidence": 0.375,
+      "source_types": [
+        "legacy_import",
+        "estimated",
+        "official_website"
+      ],
+      "source_count": 4,
+      "calories_estimated": 720,
+      "calories_validated": 450,
+      "cal_delta_pct": 33.8,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "咔啦脆雞腿堡套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 680
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "雞腿堡套餐",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 720
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "咔啦脆雞腿堡",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 450
+        },
+        {
+          "type": "official_website",
+          "name": "肯德基",
+          "raw_name": "咔啦脆雞腿堡",
+          "url": "https://www.kfcclub.com.tw/menu",
+          "calories": 450
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakq_209",
+      "store": "摩斯漢堡",
+      "name": "摩斯漢堡套餐",
+      "status": "conflict",
+      "confidence": 0.25,
+      "source_types": [
+        "legacy_import",
+        "estimated",
+        "official_website"
+      ],
+      "source_count": 6,
+      "calories_estimated": 380,
+      "calories_validated": 380,
+      "cal_delta_pct": 25.7,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "摩斯漢堡套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 650
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "摩斯漢堡（單點）",
+          "url": "internal://convenience-store-menu",
+          "calories": 380
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "摩斯吉士漢堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 420
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "摩斯漢堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 595
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "摩斯漢堡",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 380
+        },
+        {
+          "type": "official_website",
+          "name": "摩斯漢堡",
+          "raw_name": "摩斯漢堡",
+          "url": "https://www.mos.com.tw/menu",
+          "calories": 380
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pakr_215",
+      "store": "摩斯漢堡",
+      "name": "摩斯雞腿堡",
+      "status": "conflict",
+      "confidence": 0.275,
+      "source_types": [
+        "legacy_import",
+        "estimated",
+        "official_website"
+      ],
+      "source_count": 4,
+      "calories_estimated": 720,
+      "calories_validated": 480,
+      "cal_delta_pct": 33.3,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "摩斯雞腿堡",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "雞腿堡套餐",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 720
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "摩斯雞腿堡",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 480
+        },
+        {
+          "type": "official_website",
+          "name": "摩斯漢堡",
+          "raw_name": "摩斯雞腿堡",
+          "url": "https://www.mos.com.tw/menu",
+          "calories": 480
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8paks_221",
+      "store": "Subway",
+      "name": "火雞胸潛艇堡（6吋）",
+      "status": "conflict",
+      "confidence": 0.362,
+      "source_types": [
+        "legacy_import",
+        "official_website",
+        "estimated"
+      ],
+      "source_count": 8,
+      "calories_estimated": 300,
+      "calories_validated": 406,
+      "cal_delta_pct": 31,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "火雞胸潛艇堡（6吋）",
+          "url": "internal://convenience-store-menu",
+          "calories": 280
+        },
+        {
+          "type": "official_website",
+          "name": "chain-seed:Subway",
+          "raw_name": "火雞胸潛艇堡（6吋·全麥·不加醬）",
+          "url": "internal://food-kb/seeds/chain-expansion.json#sub-6in-veg-delite",
+          "calories": 280
+        },
+        {
+          "type": "official_website",
+          "name": "chain-seed:Subway",
+          "raw_name": "烤雞胸潛艇堡（6吋·全麥·不加醬）",
+          "url": "internal://food-kb/seeds/chain-expansion.json#sub-6in-veg-delite",
+          "calories": 300
+        },
+        {
+          "type": "official_website",
+          "name": "chain-seed:Subway",
+          "raw_name": "火腿潛艇堡（6吋·全麥·不加醬）",
+          "url": "internal://food-kb/seeds/chain-expansion.json#sub-6in-veg-delite",
+          "calories": 290
+        },
+        {
+          "type": "official_website",
+          "name": "chain-seed:Subway",
+          "raw_name": "火雞胸潛艇堡（12吋·全麥·不加醬）",
+          "url": "internal://food-kb/seeds/chain-expansion.json#sub-6in-veg-delite",
+          "calories": 560
+        },
+        {
+          "type": "official_website",
+          "name": "chain-seed:Subway",
+          "raw_name": "烤雞胸潛艇堡（12吋·全麥·不加醬）",
+          "url": "internal://food-kb/seeds/chain-expansion.json#sub-6in-veg-delite",
+          "calories": 600
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "烤雞胸潛艇堡（6吋·全麥）",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 300
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:fastfood",
+          "raw_name": "火雞胸潛艇堡（6吋·全麥）",
+          "url": "internal://seeds/generated/fastfood.json#mcdonalds-經典牛肉堡",
+          "calories": 280
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pal0_228",
+      "store": "梁社漢",
+      "name": "舒肥雞胸健康餐盒",
+      "status": "conflict",
+      "confidence": 0.35,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 9,
+      "calories_estimated": 472.22,
+      "calories_validated": 472.22222222222223,
+      "cal_delta_pct": 41.2,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "舒肥雞胸健康餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "舒肥牛腱健康餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 520
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "鮭魚健康餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 450
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "舒肥雞胸+地瓜餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 420
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "鯛魚健康餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 400
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞排便當",
+          "url": "internal://convenience-store-menu",
+          "calories": 680
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "舒肥雞胸+地瓜餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 420
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "鯛魚健康餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 400
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "舒肥雞胸健康餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pal4_234",
+      "store": "野宴",
+      "name": "炭烤雞腿排餐盒",
+      "status": "conflict",
+      "confidence": 0.7,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 5,
+      "calories_estimated": 460,
+      "calories_validated": 460,
+      "cal_delta_pct": 12,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "炭烤雞腿排餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 500
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "舒肥雞胸餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 460
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "舒肥雞胸+糙米餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 440
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "舒肥雞胸+糙米餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 440
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "舒肥雞胸餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 460
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8palf_246",
+      "store": "吉野家",
+      "name": "牛丼（中）",
+      "status": "conflict",
+      "confidence": 0.337,
+      "source_types": [
+        "legacy_import",
+        "estimated",
+        "official_website"
+      ],
+      "source_count": 8,
+      "calories_estimated": 650,
+      "calories_validated": 733,
+      "cal_delta_pct": 19.1,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "牛丼（中）",
+          "url": "internal://convenience-store-menu",
+          "calories": 650
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "牛丼（小）",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "牛丼（中）",
+          "url": "internal://convenience-store-menu",
+          "calories": 650
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:japanese",
+          "raw_name": "牛肉丼（中）",
+          "url": "internal://seeds/generated/japanese.json#sushiro-鮭魚握壽司-2貫",
+          "calories": 650
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:japanese",
+          "raw_name": "牛丼（中）",
+          "url": "internal://seeds/generated/japanese.json#sushiro-鮭魚握壽司-2貫",
+          "calories": 650
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:japanese",
+          "raw_name": "牛丼（小）",
+          "url": "internal://seeds/generated/japanese.json#sushiro-鮭魚握壽司-2貫",
+          "calories": 480
+        },
+        {
+          "type": "official_website",
+          "name": "吉野家",
+          "raw_name": "牛丼（中）",
+          "url": "https://www.yoshinoya.com.tw/menu",
+          "calories": 733
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:japanese",
+          "raw_name": "牛丼（中）",
+          "url": "internal://seeds/generated/japanese.json#sushiro-鮭魚握壽司-2貫",
+          "calories": 733
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8palh_250",
+      "store": "瓦城",
+      "name": "綠咖哩雞套餐",
+      "status": "conflict",
+      "confidence": 0.275,
+      "source_types": [
+        "legacy_import",
+        "estimated"
+      ],
+      "source_count": 4,
+      "calories_estimated": 680,
+      "calories_validated": 651.6666666666666,
+      "cal_delta_pct": 12.5,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "綠咖哩雞套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 680
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "綠咖哩雞套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 680
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "綠咖哩",
+          "url": "internal://convenience-store-menu",
+          "calories": 595
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:thai",
+          "raw_name": "綠咖哩雞套餐",
+          "url": "internal://seeds/generated/thai.json#wangcheng-綠咖哩雞套餐",
+          "calories": 680
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pali_253",
+      "store": "瓦城",
+      "name": "打拋豬肉片套餐",
+      "status": "conflict",
+      "confidence": 0.275,
+      "source_types": [
+        "legacy_import",
+        "estimated"
+      ],
+      "source_count": 4,
+      "calories_estimated": 720,
+      "calories_validated": 690,
+      "cal_delta_pct": 12.5,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "打拋豬肉片套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 720
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "打拋豬肉片套餐",
+          "url": "internal://convenience-store-menu",
+          "calories": 720
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "打拋豬",
+          "url": "internal://convenience-store-menu",
+          "calories": 630
+        },
+        {
+          "type": "estimated",
+          "name": "category-seed:thai",
+          "raw_name": "打拋豬肉片套餐",
+          "url": "internal://seeds/generated/thai.json#wangcheng-綠咖哩雞套餐",
+          "calories": 720
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pali_258",
+      "store": "蛋白盒子",
+      "name": "雞胸沙拉碗",
+      "status": "conflict",
+      "confidence": 0.5,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 2,
+      "calories_estimated": 370,
+      "calories_validated": 370,
+      "cal_delta_pct": 23.8,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "雞胸沙拉碗",
+          "url": "internal://convenience-store-menu",
+          "calories": 420
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞胸沙拉碗",
+          "url": "internal://convenience-store-menu",
+          "calories": 320
+        }
+      ]
+    },
+    {
+      "item_id": "item_mql8pall_261",
+      "store": "蛋白盒子",
+      "name": "舒肥雞胸餐盒",
+      "status": "conflict",
+      "confidence": 0.6,
+      "source_types": [
+        "legacy_import"
+      ],
+      "source_count": 3,
+      "calories_estimated": 426.67,
+      "calories_validated": 426.6666666666667,
+      "cal_delta_pct": 16.7,
+      "sources": [
+        {
+          "type": "legacy_import",
+          "name": "legacy-chains",
+          "raw_name": "舒肥雞胸餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 400
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "雞腿肉餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 480
+        },
+        {
+          "type": "legacy_import",
+          "name": "legacy-expanded",
+          "raw_name": "舒肥雞胸餐盒",
+          "url": "internal://convenience-store-menu",
+          "calories": 400
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

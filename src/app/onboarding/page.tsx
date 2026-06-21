@@ -16,7 +16,7 @@ import ZaiJian from '@/components/character/ZaiJian'
 import { OnboardingCard, OnboardingChip } from '@/components/onboarding/OnboardingChip'
 import type { ActivityLevel, FitnessLevel, Goal, UserProfile } from '@/types'
 
-const TOTAL_STEPS = 5
+const TOTAL_STEPS = 3
 
 interface FormData {
   gender: string
@@ -51,12 +51,6 @@ function toggle<T>(arr: T[], val: T): T[] {
   return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]
 }
 
-function toggleEquipment(arr: string[], val: string): string[] {
-  if (val === 'none') return ['none']
-  const next = arr.filter(e => e !== 'none')
-  return next.includes(val) ? next.filter(e => e !== val) : [...next, val]
-}
-
 export default function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [data, setData] = useState<FormData>(initialData)
@@ -65,7 +59,7 @@ export default function OnboardingPage() {
   const set = (key: keyof FormData, val: unknown) => setData(prev => ({ ...prev, [key]: val }))
 
   const planPreview = useMemo(() => {
-    if (step < 5 || !data.weight_kg || !data.gender) return null
+    if (step < 3 || !data.weight_kg || !data.gender) return null
     const weightKg = parseFloat(data.weight_kg) || 70
     const profile = {
       gender: data.gender,
@@ -147,7 +141,7 @@ export default function OnboardingPage() {
         toast.error(pickZaiJianLine('error').text)
       }
 
-      router.push('/dashboard')
+      router.push('/dashboard?welcome=1')
       router.refresh()
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : pickZaiJianLine('error').text)
@@ -157,9 +151,8 @@ export default function OnboardingPage() {
   }
 
   const canNext = () => {
-    if (step === 1) return data.gender && data.age && data.height_cm && data.weight_kg
-    if (step === 2) return data.goal_type
-    if (step === 3) return !!data.activity_level
+    if (step === 1) return data.gender && data.age && data.height_cm && data.weight_kg && data.goal_type
+    if (step === 2) return !!data.activity_level
     return true
   }
 
@@ -178,11 +171,9 @@ export default function OnboardingPage() {
           />
         </div>
 
-        {step === 1 && <StepBasics data={data} set={set} />}
-        {step === 2 && <StepGoal data={data} set={set} />}
-        {step === 3 && <StepLifestyle data={data} set={set} />}
-        {step === 4 && <StepEatOut data={data} set={set} />}
-        {step === 5 && <StepFinish data={data} set={set} planPreview={planPreview} />}
+        {step === 1 && <StepStart data={data} set={set} />}
+        {step === 2 && <StepLifestyle data={data} set={set} />}
+        {step === 3 && <StepFinish data={data} set={set} planPreview={planPreview} />}
 
         <div className="flex gap-3">
           {step > 1 && (
@@ -223,9 +214,14 @@ export default function OnboardingPage() {
   )
 }
 
-function StepBasics({ data, set }: { data: FormData; set: (k: keyof FormData, v: unknown) => void }) {
+function StepStart({ data, set }: { data: FormData; set: (k: keyof FormData, v: unknown) => void }) {
+  const goals = [
+    { val: 'lose_fat', label: '想瘦一點（減脂）' },
+    { val: 'lose_weight', label: '體重輕一點' },
+    { val: 'maintain', label: '維持就好' },
+  ]
   return (
-    <OnboardingCard title="基本資料" desc="用來算你的熱量缺口與蛋白質，不會公開。">
+    <OnboardingCard title="快速開始" desc="3 步完成。體脂、過敏之後在設定補就好。">
       <div>
         <Label className="text-[13px]" style={{ color: colors.text.secondary }}>性別</Label>
         <div className="flex gap-2 mt-2">
@@ -245,46 +241,21 @@ function StepBasics({ data, set }: { data: FormData; set: (k: keyof FormData, v:
           <Label htmlFor="height" className="text-[13px]">身高 cm</Label>
           <Input id="height" type="number" placeholder="170" value={data.height_cm} onChange={e => set('height_cm', e.target.value)} className="mt-1" />
         </div>
-        <div>
+        <div className="col-span-2">
           <Label htmlFor="weight" className="text-[13px]">體重 kg</Label>
           <Input id="weight" type="number" placeholder="70" value={data.weight_kg} onChange={e => set('weight_kg', e.target.value)} step="0.1" className="mt-1" />
         </div>
-        <div>
-          <Label htmlFor="bf" className="text-[13px]">體脂 %（選填）</Label>
-          <Input id="bf" type="number" placeholder="25" value={data.body_fat_pct} onChange={e => set('body_fat_pct', e.target.value)} step="0.1" className="mt-1" />
+      </div>
+      <div>
+        <Label className="text-[13px]">目標</Label>
+        <div className="grid grid-cols-1 gap-2 mt-2">
+          {goals.map(g => (
+            <OnboardingChip key={g.val} active={data.goal_type === g.val} onClick={() => set('goal_type', g.val)} className="w-full py-2.5 px-4 text-left">
+              {g.label}
+            </OnboardingChip>
+          ))}
         </div>
       </div>
-    </OnboardingCard>
-  )
-}
-
-function StepGoal({ data, set }: { data: FormData; set: (k: keyof FormData, v: unknown) => void }) {
-  const goals = [
-    { val: 'lose_fat', label: '想瘦一點（減脂）' },
-    { val: 'lose_weight', label: '體重輕一點' },
-    { val: 'maintain', label: '維持就好' },
-  ]
-  return (
-    <OnboardingCard title="目標體態" desc="系統會依目標與時間，算出每日該吃多少、動多少。">
-      <div className="grid grid-cols-1 gap-2">
-        {goals.map(g => (
-          <OnboardingChip key={g.val} active={data.goal_type === g.val} onClick={() => set('goal_type', g.val)} className="w-full py-3 px-4 text-left">
-            {g.label}
-          </OnboardingChip>
-        ))}
-      </div>
-      {(data.goal_type === 'lose_weight' || data.goal_type === 'lose_fat') && (
-        <>
-          <div>
-            <Label htmlFor="tw" className="text-[13px]">目標體重 kg（選填）</Label>
-            <Input id="tw" type="number" placeholder="65" value={data.target_weight_kg} onChange={e => set('target_weight_kg', e.target.value)} className="mt-1" />
-          </div>
-          <div>
-            <Label htmlFor="tbf" className="text-[13px]">目標體脂 %（選填，會影響赤字計算）</Label>
-            <Input id="tbf" type="number" placeholder="22" value={data.target_body_fat_pct} onChange={e => set('target_body_fat_pct', e.target.value)} step="0.1" className="mt-1" />
-          </div>
-        </>
-      )}
       <div>
         <Label className="text-[13px]">大概多久</Label>
         <div className="flex gap-2 mt-2">
@@ -307,18 +278,8 @@ function StepLifestyle({ data, set }: { data: FormData; set: (k: keyof FormData,
     { val: 'active', label: '活躍', desc: '每週運動 4–5 次' },
     { val: 'very_active', label: '高強度', desc: '體力工作或每天動' },
   ]
-  const equipOptions = [
-    { val: 'none', label: '徒手' },
-    { val: 'dumbbells', label: '啞鈴' },
-    { val: 'gym', label: '健身房' },
-  ]
-  const levels: { val: FitnessLevel; label: string }[] = [
-    { val: 'beginner', label: '初學' },
-    { val: 'intermediate', label: '有些經驗' },
-    { val: 'advanced', label: '熟練' },
-  ]
   return (
-    <OnboardingCard title="生活型態" desc="活動量差很多，熱量算錯。大概選就好。">
+    <OnboardingCard title="生活型態" desc="活動量與飲食習慣，大概選就好。過敏可在設定補。">
       <div>
         <Label className="text-[13px]">平常活動量</Label>
         <div className="grid grid-cols-1 gap-2 mt-2">
@@ -331,35 +292,7 @@ function StepLifestyle({ data, set }: { data: FormData; set: (k: keyof FormData,
         </div>
       </div>
       <div>
-        <Label className="text-[13px]">可用器材</Label>
-        <div className="flex gap-2 mt-2 flex-wrap">
-          {equipOptions.map(e => (
-            <OnboardingChip key={e.val} active={data.equipment.includes(e.val)} onClick={() => set('equipment', toggleEquipment(data.equipment, e.val))} className="px-3 py-2">
-              {e.label}
-            </OnboardingChip>
-          ))}
-        </div>
-      </div>
-      <div>
-        <Label className="text-[13px]">運動經驗</Label>
-        <div className="flex gap-2 mt-2">
-          {levels.map(l => (
-            <OnboardingChip key={l.val} active={data.fitness_level === l.val} onClick={() => set('fitness_level', l.val)} className="flex-1 py-2">
-              {l.label}
-            </OnboardingChip>
-          ))}
-        </div>
-      </div>
-    </OnboardingCard>
-  )
-}
-
-function StepEatOut({ data, set }: { data: FormData; set: (k: keyof FormData, v: unknown) => void }) {
-  const allergens = ['堅果', '乳製品', '海鮮', '蛋', '麩質']
-  return (
-    <OnboardingCard title="飲食習慣" desc="外食為主完全 OK，系統會從便利店菜單配餐。">
-      <div>
-        <Label className="text-[13px]">預算</Label>
+        <Label className="text-[13px]">外食預算</Label>
         <div className="flex gap-2 mt-2">
           {[['low', '省'], ['medium', '中'], ['high', '高']].map(([val, label]) => (
             <OnboardingChip key={val} active={data.food_budget === val} onClick={() => set('food_budget', val)} className="flex-1 py-2">
@@ -368,28 +301,9 @@ function StepEatOut({ data, set }: { data: FormData; set: (k: keyof FormData, v:
           ))}
         </div>
       </div>
-      <div>
-        <Label className="text-[13px]">過敏（選填）</Label>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {allergens.map(a => (
-            <OnboardingChip key={a} active={data.allergens.includes(a)} onClick={() => set('allergens', toggle(data.allergens, a))} className="px-3 py-1.5">
-              {a}
-            </OnboardingChip>
-          ))}
-        </div>
-      </div>
-      <div>
-        <Label htmlFor="dislikes" className="text-[13px]">不吃的（選填）</Label>
-        <Input id="dislikes" placeholder="香菜、苦瓜…" value={data.disliked_foods} onChange={e => set('disliked_foods', e.target.value)} className="mt-1" />
-      </div>
-      <div className="flex gap-2">
-        <OnboardingChip active={data.is_vegetarian} onClick={() => set('is_vegetarian', !data.is_vegetarian)} className="px-3 py-2">
-          素食
-        </OnboardingChip>
-        <OnboardingChip active={data.is_vegan} onClick={() => { set('is_vegan', !data.is_vegan); if (!data.is_vegan) set('is_vegetarian', true) }} className="px-3 py-2">
-          全素
-        </OnboardingChip>
-      </div>
+      <p className="text-[12px] leading-relaxed" style={{ color: colors.text.tertiary }}>
+        外食、自己煮、家庭共餐都可以。完成後首頁會直接給你一餐建議，不用先記帳。
+      </p>
     </OnboardingCard>
   )
 }
@@ -447,8 +361,8 @@ function StepFinish({
       )}
 
       <ul className="text-[13px] space-y-1.5 px-1" style={{ color: colors.text.secondary }}>
-        <li>· 7 天免費試用，完整計畫</li>
-        <li>· 每日餐點與運動照表操課</li>
+        <li>· 14 天免費試用，完整計畫</li>
+        <li>· 進首頁就有第一餐建議（mini-win）</li>
         <li>· 不喜歡可換同熱量組合</li>
       </ul>
     </div>

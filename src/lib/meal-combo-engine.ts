@@ -1,6 +1,12 @@
 import { eatOutMenu, type ConvenienceItem } from './convenience-store-menu'
-import { getItemRole, isStarchMain, isBeverage, isSolidFood, isSideCandidate } from './eat-out-builder'
-import { isPlantBasedItem } from './eat-out-filters'
+import { isBeverage, isSolidFood, isSoupLike, normalizeDishKey } from './eat-out-builder'
+import {
+  getDiceMenuPool,
+  getDiceMainPool,
+  isDiceMainCandidate,
+  isDiceSideCandidate,
+  isDiceDrinkCandidate,
+} from './dice-menu-pool'
 import type { UserProfile } from '@/types'
 
 export interface MealCombo {
@@ -26,6 +32,38 @@ export interface SavedMealCombo {
 const MEAL_LABELS = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' }
 const CATEGORY_OFFSET = { breakfast: 0, lunch: 2, dinner: 5 }
 
+function seededShuffle<T>(items: T[], seed: number): T[] {
+  const arr = [...items]
+  let s = seed >>> 0
+  for (let i = arr.length - 1; i > 0; i--) {
+    s = (Math.imul(1664525, s) + 1013904223) >>> 0
+    const j = s % (i + 1)
+    ;[arr[i], arr[j]] = [arr[j]!, arr[i]!]
+  }
+  return arr
+}
+
+function hashStoreSeed(store: string, seed: number): number {
+  let h = seed
+  for (let i = 0; i < store.length; i++) h = (Math.imul(31, h) + store.charCodeAt(i)) | 0
+  return Math.abs(h)
+}
+
+function isPlateStyleStore(store: string): boolean {
+  return /壽司|飯卷|日式|丼|拉麵|燒臘|港式/.test(store)
+}
+
+function itemsToCombo(items: ConvenienceItem[]): MealCombo {
+  return {
+    items,
+    totalCalories: items.reduce((s, i) => s + i.calories, 0),
+    totalProtein: items.reduce((s, i) => s + i.protein_g, 0),
+    totalCarbs: items.reduce((s, i) => s + i.carbs_g, 0),
+    totalFat: items.reduce((s, i) => s + i.fat_g, 0),
+    price: items.reduce((s, i) => s + i.price, 0),
+  }
+}
+
 function buildComboTrustReason(
   category: 'breakfast' | 'lunch' | 'dinner',
   _names: string
@@ -36,23 +74,10 @@ function buildComboTrustReason(
 
 function filterMenu(
   category: 'breakfast' | 'lunch' | 'dinner',
-  profile?: UserProfile
+  profile?: UserProfile,
+  memory?: import('./meal-engine-types').UserMemoryState
 ): ConvenienceItem[] {
-  let items = eatOutMenu.filter(i => i.category === category && !isBeverage(i))
-  if (!profile) return items
-
-  if (profile.is_vegan || profile.is_vegetarian) {
-    items = items.filter(i => isPlantBasedItem(i, profile))
-  }
-  for (const a of profile.allergens ?? []) {
-    items = items.filter(i => !i.name.includes(a) && !(i.description ?? '').includes(a))
-  }
-  for (const d of profile.disliked_foods ?? []) {
-    items = items.filter(i => !i.name.includes(d))
-  }
-  if (items.length) return items
-  const fallback = eatOutMenu.filter(i => i.category === category && isPlantBasedItem(i, profile))
-  return fallback.length ? fallback : eatOutMenu.filter(i => i.category === category)
+  return getDiceMenuPool(category, profile, memory)
 }
 
 /** 同名商品（7-11/全家）依日期輪流選店，避免重複 */
@@ -79,7 +104,8 @@ function buildComboForMain(
   sides: ConvenienceItem[],
   beverages: ConvenienceItem[],
   maxCalories: number,
-  targetProtein: number
+  targetProtein: number,
+  variantSeed = 0
 ): MealCombo {
   let combo: MealCombo = {
     items: [main],
@@ -91,14 +117,24 @@ function buildComboForMain(
   }
 
   const usedNames = new Set([main.name])
-  const sortedSides = [...sides].sort(
-    (a, b) => b.protein_g / Math.max(b.calories, 1) - a.protein_g / Math.max(a.calories, 1)
+  const usedKeys = new Set([normalizeDishKey(main.name)])
+  let soupCount = isSoupLike(main.name) ? 1 : 0
+  const sortedSides = seededShuffle(
+    [...sides].sort(
+      (a, b) => b.protein_g / Math.max(b.calories, 1) - a.protein_g / Math.max(a.calories, 1)
+    ),
+    variantSeed
   )
 
   for (const side of sortedSides) {
-    if (side.id === main.id || usedNames.has(side.name)) continue
-    if (combo.totalCalories + side.calories > maxCalories * 1.05) continue
-    if (combo.items.filter(i => isSideCandidate(i)).length >= 3) continue
+    const dishKey = normalizeDishKey(side.name)
+    if (side.id === main.id || usedNames.has(side.name) || usedKeys.has(dishKey)) continue
+    if (isSoupLike(side.name)) {
+      if (soupCount >= 1) continue
+      soupCount++
+    }
+    if (combo.totalCalories + side.calories > maxCalories * 1.08) continue
+    if (combo.items.length >= 5) continue
 
     combo = {
       items: [...combo.items, side],
@@ -109,14 +145,16 @@ function buildComboForMain(
       price: combo.price + side.price,
     }
     usedNames.add(side.name)
+    usedKeys.add(dishKey)
 
-    if (combo.totalProtein >= targetProtein * 0.9 && combo.totalCalories >= maxCalories * 0.85) break
+    if (combo.totalProtein >= targetProtein * 0.92 && combo.totalCalories >= maxCalories * 0.88) break
   }
 
-  for (const drink of beverages) {
+  const shuffledDrinks = seededShuffle(beverages, variantSeed + 13)
+  for (const drink of shuffledDrinks) {
     if (isBeverage(main) || combo.items.some(i => isBeverage(i))) break
     if (usedNames.has(drink.name) || combo.items.some(i => i.id === drink.id)) continue
-    if (combo.totalCalories + drink.calories <= maxCalories * 1.05) {
+    if (combo.totalCalories + drink.calories <= maxCalories * 1.08) {
       combo = {
         items: [...combo.items, drink],
         totalCalories: combo.totalCalories + drink.calories,
@@ -132,44 +170,127 @@ function buildComboForMain(
   return combo
 }
 
-function sidesForMain(main: ConvenienceItem, uniqueItems: ConvenienceItem[]): {
+/** 同店多品項拼盤（壽司 2–5 貫、小份主餐組合） */
+export function buildStorePlateCombo(
+  store: string,
+  menuItems: ConvenienceItem[],
+  maxCalories: number,
+  targetProtein: number,
+  seed: number,
+  excludeNames: Set<string> = new Set()
+): MealCombo | null {
+  const pieces = menuItems.filter(
+    i =>
+      i.store === store &&
+      !isBeverage(i) &&
+      !excludeNames.has(i.name) &&
+      i.calories >= 45 &&
+      i.calories <= 380 &&
+      isSolidFood(i) &&
+      (/壽司|握|卷|生魚|軍艦|丼|手卷|壽喜|刺身/.test(i.name) ||
+        (i.protein_g >= 4 && i.calories <= 260))
+  )
+  if (pieces.length < 2) return null
+
+  const order = seededShuffle(pieces, seed)
+  const picked: ConvenienceItem[] = []
+  const used = new Set<string>()
+  const usedKeys = new Set<string>()
+  let soupCount = 0
+
+  for (const p of order) {
+    const dishKey = normalizeDishKey(p.name)
+    if (used.has(p.name) || usedKeys.has(dishKey)) continue
+    if (isSoupLike(p.name)) {
+      if (soupCount >= 1) continue
+      soupCount++
+    }
+    const cal = picked.reduce((s, x) => s + x.calories, 0) + p.calories
+    if (cal > maxCalories * 1.06) continue
+    picked.push(p)
+    used.add(p.name)
+    usedKeys.add(dishKey)
+    const pro = picked.reduce((s, x) => s + x.protein_g, 0)
+    if (picked.length >= 2 && cal >= maxCalories * 0.82 && pro >= targetProtein * 0.75) break
+    if (picked.length >= 5) break
+  }
+
+  if (picked.length < 2) return null
+  let combo = itemsToCombo(picked)
+
+  const drinks = seededShuffle(
+    menuItems.filter(i => i.store === store && isDiceDrinkCandidate(i, picked[0]!)),
+    seed + 7
+  )
+  for (const drink of drinks) {
+    if (combo.totalCalories + drink.calories <= maxCalories * 1.06) {
+      combo = itemsToCombo([...combo.items, drink])
+      break
+    }
+  }
+
+  return combo.items.length >= 2 ? combo : null
+}
+
+/** 同店多組合變體（不同主餐 × 不同配菜順序 × 拼盤） */
+export function enumerateStoreComboVariants(
+  store: string,
+  category: 'breakfast' | 'lunch' | 'dinner',
+  menuItems: ConvenienceItem[],
+  maxCalories: number,
+  targetProtein: number,
+  seed: number,
+  excludeNames: Set<string> = new Set(),
+  limit = 24
+): MealCombo[] {
+  const out: MealCombo[] = []
+  const seen = new Set<string>()
+  const storeSeed = hashStoreSeed(store, seed)
+
+  if (isPlateStyleStore(store)) {
+    for (let v = 0; v < 8 && out.length < limit; v++) {
+      const plate = buildStorePlateCombo(store, menuItems, maxCalories, targetProtein, storeSeed + v * 991, excludeNames)
+      if (!plate) continue
+      const key = plate.items.map(i => i.id).sort().join('|')
+      if (seen.has(key)) continue
+      seen.add(key)
+      out.push(plate)
+    }
+  }
+
+  const mains = seededShuffle(
+    menuItems.filter(i => i.store === store && isDiceMainCandidate(i, category) && !excludeNames.has(i.name)),
+    storeSeed + 3
+  )
+
+  for (let mi = 0; mi < mains.length && out.length < limit; mi++) {
+    const main = mains[mi]!
+    const { sides, beverages } = sidesForMain(main, menuItems)
+    for (let v = 0; v < 4 && out.length < limit; v++) {
+      const combo = buildComboForMain(main, sides, beverages, maxCalories, targetProtein, storeSeed + mi * 17 + v * 131)
+      if (combo.items.length < 2) continue
+      const key = combo.items.map(i => i.id).sort().join('|')
+      if (seen.has(key)) continue
+      seen.add(key)
+      out.push(combo)
+    }
+  }
+
+  return out
+}
+
+export function sidesForMain(main: ConvenienceItem, uniqueItems: ConvenienceItem[]): {
   sides: ConvenienceItem[]
   beverages: ConvenienceItem[]
 } {
-  if (main.source === 'chain' || main.source === 'delivery') {
-    const sameStore = uniqueItems.filter(i => i.store === main.store && i.id !== main.id)
-    return {
-      sides: sameStore.filter(
-        i =>
-          (i.role === 'side' || i.role === 'protein') &&
-          i.calories < 200 &&
-          !(i.role === 'combo' || (!i.role && i.calories >= 250))
-      ),
-      beverages: sameStore.filter(
-        i =>
-          isBeverage(i) ||
-          i.name.includes('豆漿') ||
-          (i.name.includes('茶') && !i.name.includes('茶葉蛋')) ||
-          i.name.includes('飲') ||
-          i.name.includes('湯')
-      ),
-    }
-  }
-  const convenience = eatOutMenu.filter(
-    i => i.source === 'convenience' && i.store === main.store && i.id !== main.id
-  )
+  const sameStore = uniqueItems.filter(i => i.store === main.store && i.id !== main.id)
   return {
-    sides: convenience.filter(i => isSideCandidate(i, main.store)),
-    beverages: convenience.filter(
-      i =>
-        i.role === 'drink' ||
-        i.name.includes('豆漿') ||
-        (i.name.includes('茶') && !i.name.includes('茶葉蛋')) ||
-        i.name.includes('飲') ||
-        i.name.includes('湯')
-    ),
+    sides: sameStore.filter(i => isDiceSideCandidate(i, main)),
+    beverages: sameStore.filter(i => isDiceDrinkCandidate(i, main)),
   }
 }
+
+export { buildComboForMain }
 
 /**
  * 依熱量/蛋白質目標配餐
@@ -196,26 +317,14 @@ export function buildMealCombination(
     uniqueItems = uniqueByNameRotating(items, dayIndex)
   }
 
-  let mains = uniqueItems.filter(i => {
-    if (isBeverage(i)) return false
-    if (category === 'breakfast') {
-      return (
-        isStarchMain(i) ||
-        isSolidFood(i) ||
-        (i.source === 'convenience' && i.calories >= 80 && i.protein_g >= 4)
-      )
-    }
-    return isStarchMain(i) && i.calories >= 150
-  })
+  let mains = uniqueItems.filter(i => isDiceMainCandidate(i, category))
 
   if (!mains.length && category === 'breakfast') {
-    mains = eatOutMenu.filter(
-      i =>
-        i.category === 'breakfast' &&
-        i.source === 'convenience' &&
-        !isBeverage(i) &&
-        isSolidFood(i)
-    )
+    mains = getDiceMainPool('breakfast', profile)
+  }
+
+  if (!mains.length) {
+    mains = uniqueItems.filter(i => !isBeverage(i) && isSolidFood(i) && i.calories >= 100)
   }
 
   if (!mains.length) return emptyCombo()
@@ -274,14 +383,50 @@ export function buildMealCombination(
   }
 
   const fallback = uniqueItems.find(i => !exclude.has(i.name)) ?? uniqueItems[0]!
-  return {
-    items: [fallback],
-    totalCalories: fallback.calories,
-    totalProtein: fallback.protein_g,
-    totalCarbs: fallback.carbs_g,
-    totalFat: fallback.fat_g,
-    price: fallback.price,
+  const { sides, beverages } = sidesForMain(fallback, uniqueItems)
+  const forced = buildComboForMain(fallback, sides, beverages, maxCalories, targetProtein)
+  if (forced.items.length > 1) return forced
+  return forced
+}
+
+/** 各店主餐 enumerate 組合候選（骰子路徑 E） */
+export function enumerateStoreCombos(
+  category: 'breakfast' | 'lunch' | 'dinner',
+  maxCalories: number,
+  targetProtein: number,
+  profile?: UserProfile,
+  memory?: import('./meal-engine-types').UserMemoryState,
+  seed = 0,
+  excludeNames: string[] = []
+): MealCombo[] {
+  const items = filterMenu(category, profile, memory)
+  const uniqueItems = uniqueByNameRotating(items, seed)
+  const exclude = new Set(excludeNames)
+  const out: MealCombo[] = []
+  const seen = new Set<string>()
+
+  const stores = [...new Set(uniqueItems.filter(i => isDiceMainCandidate(i, category)).map(m => m.store))]
+  const order = seededShuffle(stores, seed + 99).slice(0, 80)
+
+  for (const store of order) {
+    const variants = enumerateStoreComboVariants(
+      store,
+      category,
+      uniqueItems,
+      maxCalories,
+      targetProtein,
+      seed + hashStoreSeed(store, seed),
+      exclude,
+      6
+    )
+    for (const combo of variants) {
+      const key = combo.items.map(i => i.id).sort().join('|')
+      if (seen.has(key)) continue
+      seen.add(key)
+      out.push(combo)
+    }
   }
+  return out
 }
 
 export function comboToSaved(

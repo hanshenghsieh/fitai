@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
       customerId,
       priceId,
       user.id,
-      `${appUrl}/settings?subscribed=1`,
-      `${appUrl}/settings?canceled=1`
+      `${appUrl}/settings/premium?subscribed=1`,
+      `${appUrl}/settings/premium?canceled=1`
     )
 
     if (!session.url) {

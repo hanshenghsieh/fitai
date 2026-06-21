@@ -126,10 +126,18 @@ export default function SubscriptionManager() {
             {isSubscribed ? '計畫持續更新中' : '解鎖每週自動重算'}
           </h3>
           <p className="text-[13px] mt-1" style={{ color: colors.text.secondary }}>
-            {SUBSCRIPTION_PRICE_LABEL} — 體重變化、每週回饋後，系統自動重算熱量、蛋白質與課表。
+            {SUBSCRIPTION_PRICE_LABEL} — 約兩杯手搖/月，比單次營養諮詢便宜。體重變化後自動重算計畫。
           </p>
         </div>
       </div>
+
+      {!isSubscribed && (
+        <ul className="text-[12px] space-y-1 pl-1" style={{ color: colors.text.tertiary }}>
+          <li>· 比 ChatGPT 多：記住你的常吃、幫你兜外食組合</li>
+          <li>· 比 MFP 少煩：不用從零搜每一口</li>
+          <li>· 可隨時在帳單管理取消</li>
+        </ul>
+      )}
 
       {isSubscribed ? (
         <div className="rounded-xl p-4 space-y-3" style={{ backgroundColor: colors.accent.actionSoft }}>

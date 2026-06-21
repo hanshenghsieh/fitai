@@ -465,6 +465,9 @@ const healthSignatures = [
   ['蛋白盒子', '雞腿肉餐盒', 'lunch', 480, 38, 42, 18, 99],
   ['蛋白盒子', '雙倍蛋白雞胸餐', 'lunch', 420, 52, 28, 10, 150],
   ['蛋白盒子', '鮭魚雞腿雙主餐', 'dinner', 520, 44, 38, 20, 165],
+  ['蛋白盒子', '烤地瓜（小）', 'dinner', 120, 2, 28, 0, 25, { role: 'side' }],
+  ['蛋白盒子', '蛋白乳清飲', 'dinner', 150, 24, 6, 2, 45, { role: 'drink' }],
+  ['蛋白盒子', '時蔬沙拉（小）', 'dinner', 80, 4, 10, 4, 35, { role: 'side' }],
   ['能量小姐', '低GI雞胸餐盒', 'lunch', 390, 40, 30, 10, 140],
   ['能量小姐', '低卡鮭魚餐盒', 'lunch', 410, 36, 28, 14, 165],
   ['能量小姐', '蔬食堅果沙拉碗', 'dinner', 340, 18, 32, 14, 130],
@@ -520,10 +523,13 @@ const healthSignatures = [
   ['Subway', '鮪魚沙拉碗', 'lunch', 260, 28, 16, 8, 115],
   ['Subway', '照燒雞胸潛艇堡套餐', 'lunch', 380, 30, 42, 10, 145],
 ]
-for (const [store, name, cat, cal, pro, carb, fat, price] of healthSignatures) {
+for (const row of healthSignatures) {
+  const [store, name, cat, cal, pro, carb, fat, price, extra = {}] = row
+  const opts = typeof extra === 'object' && extra !== null ? extra : {}
   add(mk(store, 'chain', cat, name, cal, pro, carb, fat, price, '健康餐盒連鎖營養參考', {
-    portionable: name.includes('飯') || name.includes('米') || name.includes('糙米'),
-    tags: name.includes('糙米') || name.includes('米') || name.includes('黑米') ? ['rice'] : [],
+    ...opts,
+    portionable: opts.portionable ?? (name.includes('飯') || name.includes('米') || name.includes('糙米')),
+    tags: opts.tags ?? (name.includes('糙米') || name.includes('米') || name.includes('黑米') ? ['rice'] : []),
   }))
 }
 

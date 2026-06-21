@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { colors } from '@/lib/design-system'
-import { pickZaiJianLine, zaijian } from '@/lib/copy/zaijian'
-import { parseGeneratePlanError } from '@/lib/api-errors'
+import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
+import { zaijian } from '@/lib/copy/zaijian'
 
 export default function GeneratePlanButton() {
   const [loading, setLoading] = useState(false)
@@ -15,14 +15,14 @@ export default function GeneratePlanButton() {
     try {
       const res = await fetch('/api/generate-plan', { method: 'POST' })
       if (!res.ok) {
-        toast.error(await parseGeneratePlanError(res))
+        toast.error(GENTLE_ERROR_MESSAGE)
         setLoading(false)
         return
       }
       toast.success('好，本週開始。')
       window.location.reload()
     } catch {
-      toast.error('網路連線失敗，請檢查網路後再試')
+      toast.error(GENTLE_ERROR_MESSAGE)
       setLoading(false)
     }
   }

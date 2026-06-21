@@ -1,6 +1,10 @@
-import { buildMealCombination } from './meal-combo-engine'
-import { applyPortion, type PortionId, isBeverage, isSolidFood } from './eat-out-builder'
+import { buildMealCombination, enumerateStoreCombos, enumerateStoreComboVariants, buildComboForMain, sidesForMain } from './meal-combo-engine'
+import { applyPortion, type PortionId, isSolidFood, isBeverage } from './eat-out-builder'
 import { getFilteredMenu, preferredBrandBoost } from './eat-out-filters'
+import { getDiceMainPool, isDiceSideCandidate, isDiceDrinkCandidate, getDiceMenuPool } from './dice-menu-pool'
+import { effectiveMealCalTarget, enjoyableDiceBonus } from './engines/adherence-engine'
+import { recoveryFoodScoreAdjust } from './engines/calorie-bank-engine'
+import { isRecoveryActive } from './engines/calorie-bank-engine'
 import { isValidMealLines } from './meal-combo-validity'
 import { nearestPlaceForBrand } from './nearby-engine'
 import type { ConvenienceItem } from './convenience-store-menu'
@@ -58,6 +62,37 @@ function passesRelaxedGate(
   )
 }
 
+function passesSingleItemGate(
+  calories: number,
+  protein: number,
+  targetCal: number,
+  isDrink: boolean
+): boolean {
+  if (isDrink) return calories >= 0 && calories <= Math.max(650, targetCal * 1.4)
+  return calories >= 40 && calories <= targetCal * 1.35 && protein >= 2
+}
+
+/** 單品是否已滿足該餐次營養缺口（才允許只推一個品項） */
+export function satisfiesMealTargets(
+  calories: number,
+  protein: number,
+  targetCal: number,
+  targetPro: number,
+  mealType: SuggestContext['meal_type'],
+  relaxed = false
+): boolean {
+  const gate = relaxed ? passesRelaxedGate : passesStrictGate
+  return gate(calories, protein, targetCal, targetPro, mealType)
+}
+
+function isComboSuggestion(lines: MealLine[]): boolean {
+  return lines.length > 1
+}
+
+function uniqueStoreCount(list: MealSuggestion[]): number {
+  return new Set(list.map(c => c.stores[0]).filter(Boolean)).size
+}
+
 function linesToTotals(lines: MealLine[]) {
   const items = lines.map(l => applyPortion(l.item, l.portion))
   return {
@@ -93,6 +128,28 @@ function tryPortionVariants(
   return candidates
 }
 
+function shuffledBySeed<T>(items: T[], seed: number, limit: number): T[] {
+  const arr = [...items]
+  let s = seed >>> 0
+  for (let i = arr.length - 1; i > 0; i--) {
+    s = (Math.imul(1664525, s) + 1013904223) >>> 0
+    const j = s % (i + 1)
+    ;[arr[i], arr[j]] = [arr[j]!, arr[i]!]
+  }
+  return arr.slice(0, Math.min(limit, arr.length))
+}
+
+function seededBySeed<T>(items: T[], seed: number): T[] {
+  const arr = [...items]
+  let s = seed >>> 0
+  for (let i = arr.length - 1; i > 0; i--) {
+    s = (Math.imul(1664525, s) + 1013904223) >>> 0
+    const j = s % (i + 1)
+    ;[arr[i], arr[j]] = [arr[j]!, arr[i]!]
+  }
+  return arr
+}
+
 function scoreCandidate(
   totals: ReturnType<typeof linesToTotals>,
   targets: { calories: number; protein_g: number },
@@ -103,19 +160,117 @@ function scoreCandidate(
   distance_m?: number,
   nearbyBrands?: string[],
   itemNames?: string[],
-  excludeNames?: string[]
+  excludeNames?: string[],
+  lineCount = 1,
+  excludeStores?: string[],
+  rollsUsed = 0,
+  adherence?: SuggestContext['adherence'],
+  calorieBank?: SuggestContext['calorie_bank']
 ): number {
   let score =
     Math.abs(totals.calories - targets.calories) * 2 +
     Math.abs(totals.protein_g - targets.protein_g) * 3
+  if (lineCount > 1) score -= rollsUsed > 0 ? 18 : 45
+  else score += rollsUsed > 0 ? 8 : 30
   if (price > budgetMax) score += (price - budgetMax) * 4
   score += preferredBrandBoost(store, memory)
-  if (nearbyBrands?.includes(store)) score -= 30
-  if (distance_m != null) score += distance_m * 0.008
+  if (nearbyBrands?.includes(store) && (rollsUsed ?? 0) < 2) score -= 10
+  if (distance_m != null) score += distance_m * 0.004
   if (excludeNames?.length && itemNames?.some(n => excludeNames.includes(n))) {
     score += 500
   }
+  if (excludeNames?.length && itemNames?.length === 1 && excludeNames.includes(itemNames[0]!)) {
+    score += 300
+  }
+  if (excludeStores?.length) {
+    const idx = excludeStores.indexOf(store)
+    if (idx >= 0) score += 900 + idx * 120
+    const count = excludeStores.filter(s => s === store).length
+    if (count > 1) score += count * 200
+  }
+  if (adherence) {
+    for (const n of itemNames ?? []) score += enjoyableDiceBonus(n, adherence)
+    if (adherence.dice.proteinBoost > 1 && totals.protein_g >= targets.protein_g * 0.9) score -= 6
+  }
+  const recoveryActive = calorieBank ? isRecoveryActive(calorieBank) : false
+  if (recoveryActive && itemNames) {
+    for (const n of itemNames) score += recoveryFoodScoreAdjust(n, true)
+  }
   return score
+}
+
+type ScoredSuggestion = MealSuggestion & { score: number }
+
+function stratifiedStorePick(
+  pool: ScoredSuggestion[],
+  seed: number,
+  reroll: number,
+  excludeStores: string[] = []
+): ScoredSuggestion | null {
+  if (!pool.length) return null
+  const blocked = new Set(excludeStores)
+  const byStore = new Map<string, ScoredSuggestion[]>()
+  for (const c of pool) {
+    const store = c.stores[0] ?? ''
+    if (blocked.has(store)) continue
+    const list = byStore.get(store) ?? []
+    list.push(c)
+    byStore.set(store, list)
+  }
+
+  const stores = [...byStore.keys()]
+  if (!stores.length) {
+    const softBlock = new Set(excludeStores.slice(-2))
+    for (const c of pool) {
+      const store = c.stores[0] ?? ''
+      if (softBlock.has(store)) continue
+      const list = byStore.get(store) ?? []
+      list.push(c)
+      byStore.set(store, list)
+    }
+    const softStores = [...byStore.keys()]
+    if (softStores.length) {
+      const storeIdx = (seed + reroll * 9973) % softStores.length
+      const store = softStores[storeIdx]!
+      const storePool = seededBySeed([...(byStore.get(store) ?? [])], seed + reroll * 31)
+      return storePool[reroll % Math.max(1, storePool.length)] ?? storePool[0]!
+    }
+    return weightedPick(pool, seed, reroll)
+  }
+
+  if (reroll > 0) {
+    const storeIdx = (seed + reroll * 9973 + stores.length * 13) % stores.length
+    const store = stores[storeIdx]!
+    const storePool = seededBySeed([...(byStore.get(store) ?? [])], seed + reroll * 31)
+    const idx = reroll % Math.max(1, storePool.length)
+    return storePool[idx] ?? storePool[0]!
+  }
+
+  const storeIdx = (seed % stores.length + stores.length) % stores.length
+  const rotateStores = [...stores.slice(storeIdx), ...stores.slice(0, storeIdx)]
+  const roundRobin: ScoredSuggestion[] = []
+  for (const store of rotateStores) {
+    const best = [...(byStore.get(store) ?? [])].sort((a, b) => a.score - b.score)[0]
+    if (best) roundRobin.push(best)
+  }
+  return weightedPick(roundRobin.length ? roundRobin : pool, seed, reroll)
+}
+
+function medianPrice(prices: number[]): number {
+  if (!prices.length) return 0
+  const sorted = [...prices].sort((a, b) => a - b)
+  const mid = Math.floor(sorted.length / 2)
+  return sorted.length % 2 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2
+}
+
+function isVerifiedBudgetFriendly(
+  price: number,
+  budgetMax: number,
+  poolPrices: number[]
+): boolean {
+  if (!poolPrices.length) return price <= budgetMax * 0.85
+  const median = medianPrice(poolPrices)
+  return price <= budgetMax && price <= median * 0.92 && price < median - 8
 }
 
 function pickHighlight(
@@ -126,8 +281,9 @@ function pickHighlight(
   store: string,
   memory: SuggestContext['memory'],
   distance_m?: number,
-  prev?: MealSuggestion | null
-): { key: HighlightKey; text: string } {
+  prev?: MealSuggestion | null,
+  poolPrices: number[] = []
+): { key: HighlightKey; text: string; priceMeta?: MealSuggestion['highlight_price_meta'] } {
   const preferred = new Set([
     ...(memory?.eat_out_prefs?.preferred_brands ?? []),
     ...(memory?.favorite_brands ?? []),
@@ -136,7 +292,10 @@ function pickHighlight(
   const deltas: { key: HighlightKey; weight: number }[] = []
 
   if (totals.protein_g >= targets.protein_g * 1.05) deltas.push({ key: 'high_protein', weight: totals.protein_g - targets.protein_g })
-  if (price <= budgetMax * 0.75) deltas.push({ key: 'budget_friendly', weight: budgetMax - price })
+  if (isVerifiedBudgetFriendly(price, budgetMax, poolPrices)) {
+    const median = medianPrice(poolPrices)
+    deltas.push({ key: 'budget_friendly', weight: median - price + (budgetMax - price) })
+  }
   if (Math.abs(totals.calories - targets.calories) < targets.calories * 0.05) {
     deltas.push({ key: 'calorie_fit', weight: 10 })
   }
@@ -153,7 +312,23 @@ function pickHighlight(
     key = deltas[1]?.key ?? 'balanced'
   }
 
-  return { key, text: HIGHLIGHT_COPY[key] }
+  let priceMeta: MealSuggestion['highlight_price_meta'] | undefined
+  if (key === 'budget_friendly' && poolPrices.length) {
+    const median = medianPrice(poolPrices)
+    const saved = Math.round(median - price)
+    if (saved > 0) {
+      priceMeta = {
+        total_price: Math.round(price),
+        budget_max: budgetMax,
+        pool_median_price: Math.round(median),
+        saved_vs_median: saved,
+      }
+    } else {
+      key = deltas.find(d => d.key !== 'budget_friendly')?.key ?? 'balanced'
+    }
+  }
+
+  return { key, text: HIGHLIGHT_COPY[key], priceMeta }
 }
 
 function nutritionScore(totals: ReturnType<typeof linesToTotals>, targets: { calories: number; protein_g: number }): number {
@@ -165,8 +340,11 @@ function nutritionScore(totals: ReturnType<typeof linesToTotals>, targets: { cal
 function weightedPick<T extends { score: number }>(pool: T[], seed: number, reroll = 0): T | null {
   if (!pool.length) return null
   const sorted = [...pool].sort((a, b) => a.score - b.score)
-  const windowSize = reroll > 0 ? Math.min(10, sorted.length) : Math.min(12, sorted.length)
-  const window = sorted.slice(0, windowSize)
+  const windowSize = reroll > 0 ? Math.min(20, sorted.length) : Math.min(16, sorted.length)
+  const offset = (seed % 7) * 2
+  const window = sorted.slice(offset, offset + windowSize).length >= windowSize
+    ? sorted.slice(offset, offset + windowSize)
+    : sorted.slice(0, windowSize)
   if (reroll > 0 && window.length > 1) {
     const idx = (seed % 10000) / 10000 * window.length
     return window[Math.floor(idx)] ?? window[0]!
@@ -192,8 +370,24 @@ function isExcludedByName(lines: MealLine[], excludeNames?: string[]): boolean {
 }
 
 export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSuggestion[] {
-  const targets = mealTargetsFromDaily(ctx.daily_targets, ctx.meal_type)
-  const menu = getFilteredMenu(ctx.meal_type, ctx.profile, ctx.memory)
+  const baseTargets = mealTargetsFromDaily(
+    {
+      ...ctx.daily_targets,
+      calories:
+        ctx.calorie_bank?.internal_target_kcal && ctx.calorie_bank.internal_target_kcal > 0
+          ? ctx.calorie_bank.internal_target_kcal
+          : ctx.daily_targets.calories,
+    },
+    ctx.meal_type
+  )
+  const targets = ctx.adherence
+    ? {
+        ...baseTargets,
+        calories: effectiveMealCalTarget(baseTargets.calories, ctx.adherence),
+        protein_g: Math.round(baseTargets.protein_g * ctx.adherence.dice.proteinBoost),
+      }
+    : baseTargets
+  const menu = getDiceMenuPool(ctx.meal_type, ctx.profile, ctx.memory)
   const exclude = new Set(ctx.exclude_ids ?? [])
   const excludeNames = new Set(ctx.exclude_names ?? [])
   const gate = relaxed ? passesRelaxedGate : passesStrictGate
@@ -207,14 +401,23 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
   const raw: MealSuggestion[] = []
   const seen = new Set<string>()
 
-  const addLines = (lines: MealLine[], distance_m?: number, restaurant_name?: string, maps_url?: string) => {
+  const addLines = (
+    lines: MealLine[],
+    distance_m?: number,
+    restaurant_name?: string,
+    maps_url?: string
+  ) => {
     if (!lines.length || friedCount(lines.map(l => l.item)) > 1) return
     if (!isValidMealLines(lines)) return
     if (isExcludedByName(lines, [...excludeNames])) return
     const id = suggestionId(lines)
     if (seen.has(id) || exclude.has(id)) return
     const totals = linesToTotals(lines)
-    if (!gate(totals.calories, totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type)) return
+    const solo = !isComboSuggestion(lines)
+    const passes = solo
+      ? satisfiesMealTargets(totals.calories, totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type, relaxed)
+      : gate(totals.calories, totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type)
+    if (!passes) return
     seen.add(id)
     const store = lines[0]!.item.store
     const place =
@@ -239,35 +442,30 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
     })
   }
 
-  // 路徑 A：套餐單品 + 份量（連鎖主餐）
-  const combos = menu.filter(
-    i =>
-      !isBeverage(i) &&
-      isSolidFood(i) &&
-      (i.role === 'combo' || !i.role) &&
-      i.calories >= (ctx.meal_type === 'breakfast' ? 120 : 200)
-  )
-  for (let i = 0; i < Math.min(combos.length, 120); i++) {
-    const item = combos[(i + (ctx.seed ?? 0)) % combos.length]!
-    const variants = tryPortionVariants(item, targets, ctx.meal_type, relaxed)
-    for (const line of variants) {
+  // 路徑 A：單品僅在主餐本身已達標該餐營養缺口時
+  const soloMains = getDiceMainPool(ctx.meal_type, ctx.profile, ctx.memory)
+  const soloSample = shuffledBySeed(soloMains, (ctx.seed ?? 0) + 17, 200)
+  for (const item of soloSample) {
+    for (const line of tryPortionVariants(item, targets, ctx.meal_type, relaxed)) {
+      const totals = linesToTotals([line])
+      if (!satisfiesMealTargets(totals.calories, totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type, relaxed)) {
+        continue
+      }
       addLines([line])
-    }
-    if (!variants.length && relaxed) {
-      addLines([{ item, portion: 'full' }])
     }
   }
 
-  // 路徑 B：引擎組合（僅便利店/自助餐，避免連鎖主餐混搭）
-  for (let d = 0; d < 12; d++) {
+  // 路徑 B：引擎組合（便利店 + 連鎖同店加點）
+  for (let d = 0; d < 48; d++) {
     const combo = buildMealCombination(
       ctx.meal_type,
       targets.calories,
       targets.protein_g,
       (ctx.day_index ?? 0) + d + (ctx.seed ?? 0),
-      ctx.profile ?? undefined
+      ctx.profile ?? undefined,
+      [...excludeNames]
     )
-    if (!combo.items.length) continue
+    if (!combo.items.length || combo.items.length < 2) continue
     const chainCombos = combo.items.filter(
       i => i.source === 'chain' && (i.role ?? 'combo') === 'combo' && i.store !== '自助餐組件'
     )
@@ -284,13 +482,13 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
   const proteins = components.filter(i => i.role === 'protein')
   const carbs = components.filter(i => i.role === 'carb')
   const sides = components.filter(i => i.role === 'side')
-  for (const pro of proteins.slice(0, 8)) {
-    for (const carb of carbs.slice(0, 3)) {
+  for (const pro of proteins.slice(0, 12)) {
+    for (const carb of carbs.slice(0, 5)) {
       addLines([
         { item: pro, portion: 'full' },
         { item: carb, portion: 'half' },
       ])
-      for (const side of sides.slice(0, 2)) {
+      for (const side of sides.slice(0, 4)) {
         addLines([
           { item: pro, portion: 'full' },
           { item: carb, portion: 'half' },
@@ -300,7 +498,86 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
     }
   }
 
+  // 路徑 D：同店雙品組合（主餐 + 小配菜）
+  const menuByStore = new Map<string, ConvenienceItem[]>()
+  for (const i of menu) {
+    const list = menuByStore.get(i.store) ?? []
+    list.push(i)
+    menuByStore.set(i.store, list)
+  }
+  const mainsByStore = new Map<string, ReturnType<typeof getDiceMainPool>>()
+  for (const main of soloSample.slice(0, 80)) {
+    const list = mainsByStore.get(main.store) ?? []
+    list.push(main)
+    mainsByStore.set(main.store, list)
+  }
+  for (const [, mains] of mainsByStore) {
+    const storeItems = menuByStore.get(mains[0]!.store) ?? []
+    const sides = storeItems.filter(i => isDiceSideCandidate(i, mains[0]!))
+    for (const main of mains.slice(0, 6)) {
+      for (const side of sides.slice(0, 5)) {
+        if (side.id === main.id) continue
+        addLines([
+          { item: main, portion: 'full' },
+          { item: side, portion: 'full' },
+        ])
+      }
+      for (let v = 0; v < 2; v++) {
+        const { sides: s2, beverages } = sidesForMain(main, storeItems)
+        const combo = buildComboForMain(
+          main,
+          s2,
+          beverages,
+          targets.calories,
+          targets.protein_g,
+          hashStoreSeed(main.store, (ctx.seed ?? 0) + v * 41)
+        )
+        if (combo.items.length >= 2) addLines(comboToLines(combo))
+      }
+    }
+  }
+
+  // 路徑 E：各店 enumerate 組合（主餐 + 配菜 + 飲料）
+  for (const combo of enumerateStoreCombos(
+    ctx.meal_type,
+    targets.calories,
+    targets.protein_g,
+    ctx.profile ?? undefined,
+    ctx.memory,
+    (ctx.seed ?? 0) + (ctx.day_index ?? 0) + (ctx.rolls_used ?? 0) * 17,
+    [...excludeNames]
+  )) {
+    if (combo.items.length < 2) continue
+    addLines(comboToLines(combo))
+  }
+
+  // 路徑 F：全品牌輪替（每店至少一組候選）
+  const allStores = [...new Set(soloMains.map(m => m.store))]
+  const storeOrder = shuffledBySeed(allStores, (ctx.seed ?? 0) + 99, allStores.length)
+  const comboSeed = (ctx.seed ?? 0) + (ctx.rolls_used ?? 0) * 53 + 99
+  for (const store of storeOrder.slice(0, 80)) {
+    const variants = enumerateStoreComboVariants(
+      store,
+      ctx.meal_type,
+      menu,
+      targets.calories,
+      targets.protein_g,
+      comboSeed + hashStoreSeed(store, ctx.seed ?? 0),
+      excludeNames,
+      5
+    )
+    for (const combo of variants) {
+      if (combo.items.length >= 2) addLines(comboToLines(combo))
+    }
+  }
+
   return raw
+}
+
+function hashStoreSeed(store: string, seed: number): number {
+  let h = seed
+  for (let i = 0; i < store.length; i++) h = (Math.imul(31, h) + store.charCodeAt(i)) | 0
+  return Math.abs(h)
 }
 
 export function suggestNextMeal(
@@ -309,12 +586,63 @@ export function suggestNextMeal(
 ): { suggestion: MealSuggestion | null; pool_exhausted: boolean } {
   const reroll = ctx.rolls_used ?? 0
   let candidates = generateCandidates(ctx, false)
-  if (!candidates.length) {
-    candidates = generateCandidates(ctx, true)
+  if (candidates.length < 40) {
+    const relaxed = generateCandidates(ctx, true)
+    const seen = new Set(candidates.map(c => c.id))
+    for (const c of relaxed) {
+      if (!seen.has(c.id)) {
+        candidates.push(c)
+        seen.add(c.id)
+      }
+    }
   }
   if (!candidates.length) return { suggestion: null, pool_exhausted: true }
 
-  const targets = mealTargetsFromDaily(ctx.daily_targets, ctx.meal_type)
+  const baseTargets = mealTargetsFromDaily(
+    {
+      ...ctx.daily_targets,
+      calories:
+        ctx.calorie_bank?.internal_target_kcal && ctx.calorie_bank.internal_target_kcal > 0
+          ? ctx.calorie_bank.internal_target_kcal
+          : ctx.daily_targets.calories,
+    },
+    ctx.meal_type
+  )
+  const targets = ctx.adherence
+    ? {
+        ...baseTargets,
+        calories: effectiveMealCalTarget(baseTargets.calories, ctx.adherence),
+        protein_g: Math.round(baseTargets.protein_g * ctx.adherence.dice.proteinBoost),
+      }
+    : baseTargets
+  const comboFirst = candidates.filter(
+    c =>
+      isComboSuggestion(c.lines) ||
+      satisfiesMealTargets(c.totals.calories, c.totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type, false)
+  )
+  const comboPreferred = comboFirst.filter(c => isComboSuggestion(c.lines))
+  const comboStoreCount = uniqueStoreCount(comboPreferred)
+  const comboFirstStoreCount = uniqueStoreCount(comboFirst)
+  const fullStoreCount = uniqueStoreCount(candidates)
+  if (comboPreferred.length >= 1) {
+    // 連鎖套餐常霸榜；換過或店數不足時保留完整池輪替
+    const allowComboOnly =
+      reroll === 0 &&
+      comboStoreCount >= 8 &&
+      fullStoreCount <= comboStoreCount + 2
+    if (allowComboOnly) {
+      candidates = comboPreferred
+    } else if (reroll > 0 && fullStoreCount >= 6) {
+      // 換一個時優先完整池
+    } else if (comboStoreCount >= 6 && reroll === 0 && comboStoreCount >= 3) {
+      candidates = comboPreferred
+    } else if (comboFirst.length >= 3 && comboFirstStoreCount >= 4) {
+      candidates = comboFirst
+    }
+  } else if (comboFirst.length >= 3) {
+    candidates = comboFirst
+  }
+
   const budgetMax =
     ctx.meal_type === 'breakfast'
       ? ctx.memory?.eat_out_prefs?.breakfast_max_price ?? 120
@@ -334,16 +662,27 @@ export function suggestNextMeal(
       c.distance_m,
       ctx.nearby_brands,
       primaryItemNames(c.lines),
-      ctx.exclude_names
+      ctx.exclude_names,
+      c.lines.length,
+      ctx.exclude_stores,
+      reroll,
+      ctx.adherence,
+      ctx.calorie_bank
     ),
   }))
 
-  const seed = (ctx.seed ?? Date.now()) + (ctx.exclude_ids?.length ?? 0) * 17 + (ctx.exclude_names?.length ?? 0) * 31
-  const picked = weightedPick(scored, seed, reroll)
+  const seed =
+    (ctx.seed ?? Date.now()) +
+    (ctx.day_index ?? 0) * 7919 +
+    (ctx.exclude_ids?.length ?? 0) * 17 +
+    (ctx.exclude_names?.length ?? 0) * 31 +
+    (ctx.exclude_stores?.length ?? 0) * 53
+  const picked = stratifiedStorePick(scored, seed, reroll, ctx.exclude_stores ?? [])
   if (!picked) return { suggestion: null, pool_exhausted: true }
 
   const { score: _s, ...base } = picked
 
+  const poolPrices = scored.map(c => c.totals.price)
   const highlight = pickHighlight(
     base.totals,
     targets,
@@ -352,12 +691,54 @@ export function suggestNextMeal(
     base.stores[0] ?? '',
     ctx.memory,
     base.distance_m,
-    prev
+    prev,
+    poolPrices
   )
 
   return {
-    suggestion: { ...base, highlight: highlight.text, highlight_key: highlight.key },
+    suggestion: enrichSuggestionWithSides(
+      {
+        ...base,
+        highlight: highlight.text,
+        highlight_key: highlight.key,
+        highlight_price_meta: highlight.priceMeta,
+      },
+      ctx
+    ),
     pool_exhausted: candidates.length <= (ctx.exclude_ids?.length ?? 0) + 1,
+  }
+}
+
+/** 單品結果自動加同店配菜／飲料，組成完整一餐 */
+export function enrichSuggestionWithSides(
+  suggestion: MealSuggestion,
+  ctx: SuggestContext
+): MealSuggestion {
+  if (suggestion.lines.length > 1) return suggestion
+  const main = suggestion.lines[0]!.item
+  if (isBeverage(main)) return suggestion
+
+  const targets = mealTargetsFromDaily(ctx.daily_targets, ctx.meal_type)
+  const menu = getDiceMenuPool(ctx.meal_type, ctx.profile, ctx.memory)
+  const { sides, beverages } = sidesForMain(main, menu)
+  const combo = buildComboForMain(main, sides, beverages, targets.calories, targets.protein_g)
+  if (combo.items.length <= 1) return suggestion
+
+  const lines: MealLine[] = combo.items.map(item => ({ item, portion: 'full' as PortionId }))
+  const totals = linesToTotals(lines)
+  if (
+    !satisfiesMealTargets(totals.calories, totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type, false) &&
+    !satisfiesMealTargets(totals.calories, totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type, true)
+  ) {
+    return suggestion
+  }
+
+  return {
+    ...suggestion,
+    id: suggestionId(lines),
+    lines,
+    totals,
+    stores: [...new Set(combo.items.map(i => i.store))],
   }
 }
 

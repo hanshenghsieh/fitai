@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-06-20T06:06:25.136Z",
+  "missing_brands": [
+    "路易莎",
+    "cama",
+    "FitBox"
+  ],
+  "gaps": [
+    {
+      "gap_type": "missing_brand",
+      "brand_slug": "fitbox",
+      "description": "尚未收錄品牌：FitBox",
+      "priority": 9
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "50嵐",
+      "description": "缺少熱量：50嵐 無糖烏龍（L）",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "coca-cola",
+      "description": "缺少熱量：Coca-Cola 可口可乐无糖",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "oreo",
+      "description": "缺少熱量：Oreo Oreo Dutch Cocoa Wafer",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "i-mei",
+      "description": "缺少熱量：I-MEI Imei Egg Roll - Original Flavour",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "unknown",
+      "description": "缺少熱量：supermarket 4511413404133",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "三叔公",
+      "description": "缺少熱量：三叔公 Nougat Biscuit",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "organic-shop",
+      "description": "缺少熱量：Organic Shop Organic Jumbo Oat Flakes",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "airwaves",
+      "description": "缺少熱量：Airwaves Airwaves",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "7-11",
+      "description": "缺少熱量：7-11 無糖綠茶（600ml）",
+      "priority": 7
+    }
+  ]
+}

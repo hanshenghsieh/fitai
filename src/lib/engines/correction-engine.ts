@@ -1,17 +1,35 @@
 import type { ZaiJianLine } from '@/lib/copy/zaijian'
 import type { InferredEvent } from '@/lib/engines/event-engine'
 import type { UserBanks } from '@/lib/banks/types'
+import type { AdherenceState } from '@/lib/engines/adherence-types'
+import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
+import { adherenceToCorrectionLine } from '@/lib/engines/adherence-engine'
+import { getRecoveryPostureLine } from '@/lib/engines/recovery-copy'
+import { isRecoveryActive } from '@/lib/engines/calorie-bank-engine'
 
 export interface CorrectionInput {
   banks: UserBanks
   inferredEvents?: InferredEvent[]
-  /** @deprecated use inferredEvents */
+  adherence?: AdherenceState | null
+  calorieBank?: CalorieBankRow | null
+  /** @deprecated use adherence */
   lifeEvent?: string | null
   lastLogDeltaKcal?: number
 }
 
 export function getCorrectionMessage(input: CorrectionInput): ZaiJianLine {
-  const { banks, inferredEvents = [], lastLogDeltaKcal = 0 } = input
+  const { banks, adherence, calorieBank, lastLogDeltaKcal = 0 } = input
+
+  const recoveryLine = getRecoveryPostureLine(calorieBank)
+  if (recoveryLine && (isRecoveryActive(calorieBank ?? { recovery_balance_kcal: 0, spread_days_remaining: 0 }) || lastLogDeltaKcal >= 100)) {
+    return recoveryLine
+  }
+
+  if (adherence) {
+    return adherenceToCorrectionLine(adherence, banks, lastLogDeltaKcal)
+  }
+
+  const { inferredEvents = [] } = input
 
   if (inferredEvents.includes('overeat_today')) {
     return {

@@ -1,6 +1,6 @@
 import { differenceInDays } from 'date-fns'
 
-export const TRIAL_DAYS = 7
+export const TRIAL_DAYS = 14
 
 export interface AccessStatus {
   hasFullAccess: boolean

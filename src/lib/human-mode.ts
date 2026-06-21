@@ -60,19 +60,22 @@ export function getNowTabHint(schedule: WorkSchedule, meal: MealType): string | 
 export function currentMealSlotForSchedule(schedule: WorkSchedule = 'standard'): MealType {
   const h = getTaipeiHour()
   if (schedule === 'shift') {
+    if (h >= 22 || h < 5) return 'dinner'
     if (h >= 5 && h < 11) return 'breakfast'
     if (h >= 11 && h < 17) return 'lunch'
     return 'dinner'
   }
+  if (h >= 22 || h < 5) return 'dinner'
   if (h < 10) return 'breakfast'
   if (h < 15) return 'lunch'
   return 'dinner'
 }
 
 export function decideButtonLabel(schedule: WorkSchedule, meal: MealType): string {
-  const label = getMealLabel(schedule, meal)
-  if (schedule === 'shift' && meal === 'dinner' && isBeforeSleepWindow()) {
-    return '幫我決定睡前這餐'
+  const h = getTaipeiHour()
+  if (meal === 'dinner' && (h >= 22 || h < 5)) {
+    return schedule === 'shift' ? '幫我決定睡前這餐' : '幫我決定宵夜這餐'
   }
+  const label = getMealLabel(schedule, meal)
   return `幫我決定${label}`
 }

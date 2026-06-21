@@ -8,7 +8,25 @@
     "start": "next start",
     "lint": "eslint",
     "import-menu": "node scripts/import-menu.js",
-    "sync-menu": "node scripts/sync-menu.mjs"
+    "sync-menu": "node scripts/sync-menu.mjs",
+    "food-kb:sync": "npx tsx scripts/food-kb/pipeline.ts",
+    "food-kb:build-seeds": "npx tsx scripts/food-kb/build-category-seeds.ts",
+    "food-kb:coverage": "npx tsx scripts/food-kb/coverage-report.ts",
+    "food-kb:dashboard": "npx tsx scripts/food-kb/dashboard.ts",
+    "food-kb:export": "npx tsx scripts/food-kb/export-runtime.ts",
+    "food-kb:xval": "npx tsx scripts/food-kb/strict-xval.ts",
+    "food-kb:apply-conflicts": "npx tsx scripts/food-kb/apply-conflict-patches.ts",
+    "food-kb:full": "npm run food-kb:build-seeds && npm run food-kb:sync && npm run sync-menu",
+    "food-kb:strict": "npm run food-kb:xval && npm run food-kb:apply-conflicts && npm run food-kb:build-seeds && npm run food-kb:sync -- --adapters category-seeds,official-nutrition,blog-nutrition && npm run sync-menu",
+    "food-kb:bulk-dice": "npx tsx scripts/food-kb/generate-bulk-dice-menu.ts",
+    "market-lab:500": "npx tsx scripts/market-reality-lab-500/run.ts",
+    "mr500:goal-visibility": "npx tsx scripts/market-reality-lab-500/run-goal-visibility.ts",
+    "food-photo:verify": "npx tsx scripts/food-photo-verify.ts",
+    "food-images:setup": "npx tsx scripts/setup-food-images.ts",
+    "food-images:reset": "npx tsx scripts/setup-food-images.ts -- --force",
+    "market-loop": "npx tsx scripts/market-loop/run.ts",
+    "test": "node --import tsx --test src/lib/engines/calorie-bank-engine.test.ts",
+    "migrate:calorie-bank": "node scripts/apply-calorie-bank-migration.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",
@@ -43,8 +61,10 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "pg": "^8.22.0",
     "puppeteer": "^25.1.0",
     "tailwindcss": "^4",
+    "tsx": "^4.19.4",
     "typescript": "^5"
   }
 }

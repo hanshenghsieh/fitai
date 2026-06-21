@@ -1,5 +1,6 @@
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { FoodSlot } from '@/lib/food-slots'
+import { classifyImageCategory, type ImageCategory } from '@/lib/food-image-system'
 
 export interface FrequentFood {
   id: string
@@ -11,6 +12,8 @@ export interface FrequentFood {
   fat_g?: number
   count: number
   last_used: string
+  imageCategory?: ImageCategory
+  cluster_hero_image?: string
 }
 
 export interface FoodDna {
@@ -27,6 +30,8 @@ export function learnFromLog(dna: FoodDna | undefined, entry: FoodLogEntry): Foo
 
   if (idx >= 0) {
     const prev = list[idx]
+    const nextCount = prev.count + 1
+    const imageCategory = classifyImageCategory(entry.name, entry.store ?? prev.store)
     list[idx] = {
       ...prev,
       calories: entry.calories,
@@ -34,8 +39,13 @@ export function learnFromLog(dna: FoodDna | undefined, entry: FoodLogEntry): Foo
       carbs_g: entry.carbs_g ?? prev.carbs_g,
       fat_g: entry.fat_g ?? prev.fat_g,
       store: entry.store ?? prev.store,
-      count: prev.count + 1,
+      count: nextCount,
       last_used: now,
+      imageCategory,
+      cluster_hero_image:
+        entry.photo_data_url && nextCount >= 2
+          ? entry.photo_data_url
+          : prev.cluster_hero_image,
     }
   } else {
     list.unshift({
@@ -48,6 +58,8 @@ export function learnFromLog(dna: FoodDna | undefined, entry: FoodLogEntry): Foo
       fat_g: entry.fat_g,
       count: 1,
       last_used: now,
+      imageCategory: classifyImageCategory(entry.name, entry.store),
+      cluster_hero_image: entry.photo_data_url,
     })
   }
 
@@ -90,6 +102,25 @@ export function buildFoodDnaFromCheckins(
     }
   }
   return dna
+}
+
+/** Phase 7 — 近 14 日食物紀錄供 adherence 推斷 */
+export function extractRecentFoodLogsFromCheckins(
+  checkins: { notes?: string | null; checkin_date: string }[]
+): FoodLogEntry[] {
+  const logs: FoodLogEntry[] = []
+  for (const c of checkins) {
+    if (!c.notes) continue
+    try {
+      const meta = JSON.parse(c.notes) as { user_memory?: { food_logs_today?: FoodLogEntry[] } }
+      for (const log of meta.user_memory?.food_logs_today ?? []) {
+        logs.push({ ...log, logged_at: log.logged_at || `${c.checkin_date}T12:00:00.000Z` })
+      }
+    } catch {
+      // skip
+    }
+  }
+  return logs
 }
 
 export const STARTER_FREQUENT: FrequentFood[] = [

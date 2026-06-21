@@ -1,12 +1,17 @@
 import type { ZaiJianExpression } from '@/lib/copy/zaijian'
+import { colors } from '@/lib/design-system'
 
 interface Props {
   expression: ZaiJianExpression
   className?: string
 }
 
-/** 再健臉部 — 扁平極簡 SVG，對齊官方角色風格 */
+/** 再健 — 扁平 SVG 角色（帽 T 參考圖僅作風格，非 LOGO） */
 export default function ZaiJianFace({ expression, className = '' }: Props) {
+  const stroke = colors.text.primary
+  const fill = colors.bg.elevated
+  const hoodie = colors.bg.muted
+
   return (
     <svg
       viewBox="0 0 100 100"
@@ -15,124 +20,126 @@ export default function ZaiJianFace({ expression, className = '' }: Props) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
+      {/* 帽 T 連帽 */}
+      <path
+        d="M22 52 Q50 18 78 52 L72 58 Q50 32 28 58 Z"
+        fill={hoodie}
+        stroke={stroke}
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M30 58 Q50 48 70 58"
+        stroke={stroke}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        opacity="0.5"
+      />
+
       {/* 身體 */}
-      <ellipse cx="50" cy="58" rx="38" ry="34" fill="#FFFDF9" stroke="#2B2B2B" strokeWidth="2" />
+      <ellipse cx="50" cy="68" rx="34" ry="26" fill={fill} stroke={stroke} strokeWidth="1.8" />
 
-      {/* 手 — 部分表情 */}
-      {(expression === 'proud' || expression === 'cheat') && (
-        <>
-          <ellipse cx="18" cy="62" rx="7" ry="5" fill="#FFFDF9" stroke="#2B2B2B" strokeWidth="1.5" />
-          <ellipse cx="82" cy="62" rx="7" ry="5" fill="#FFFDF9" stroke="#2B2B2B" strokeWidth="1.5" />
-        </>
-      )}
-
-      {/* 表情層 */}
-      <FaceFeatures expression={expression} />
+      <FaceFeatures expression={expression} stroke={stroke} />
     </svg>
   )
 }
 
-function FaceFeatures({ expression }: { expression: ZaiJianExpression }) {
-  const stroke = '#2B2B2B'
+function FaceFeatures({ expression, stroke }: { expression: ZaiJianExpression; stroke: string }) {
   const sw = 2
 
   switch (expression) {
     case 'eye-roll':
       return (
         <>
-          <path d="M36 42 Q40 38 44 42" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <path d="M56 42 Q60 38 64 42" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <line x1="42" y1="58" x2="58" y2="58" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <path d="M36 52 Q40 48 44 52" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <path d="M56 52 Q60 48 64 52" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <line x1="42" y1="68" x2="58" y2="68" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
         </>
       )
     case 'proud':
       return (
         <>
-          <rect x="30" y="40" width="18" height="6" rx="2" fill="#2B2B2B" opacity="0.85" />
-          <rect x="52" y="40" width="18" height="6" rx="2" fill="#2B2B2B" opacity="0.85" />
-          <path d="M42 58 Q50 64 58 58" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <rect x="30" y="50" width="18" height="5" rx="2" fill={stroke} opacity="0.8" />
+          <rect x="52" y="50" width="18" height="5" rx="2" fill={stroke} opacity="0.8" />
+          <path d="M42 68 Q50 74 58 68" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
         </>
       )
     case 'sleepy':
     case 'moon':
       return (
         <>
-          <path d="M36 44 Q40 46 44 44" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <path d="M56 44 Q60 46 64 44" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <line x1="44" y1="60" x2="56" y2="60" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <path d="M36 54 Q40 56 44 54" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <path d="M56 54 Q60 56 64 54" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <line x1="44" y1="70" x2="56" y2="70" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
           {expression === 'moon' && (
-            <text x="68" y="36" fontSize="10" fill={stroke}>z</text>
+            <text x="68" y="46" fontSize="10" fill={stroke}>z</text>
           )}
         </>
       )
     case 'hungry':
       return (
         <>
-          <circle cx="40" cy="44" r="2.5" fill={stroke} />
-          <circle cx="60" cy="44" r="2.5" fill={stroke} />
-          <ellipse cx="50" cy="60" rx="5" ry="4" stroke={stroke} strokeWidth={sw} />
+          <circle cx="40" cy="54" r="2.5" fill={stroke} />
+          <circle cx="60" cy="54" r="2.5" fill={stroke} />
+          <ellipse cx="50" cy="70" rx="5" ry="4" stroke={stroke} strokeWidth={sw} />
         </>
       )
     case 'coffee':
       return (
         <>
-          <circle cx="40" cy="44" r="2" fill={stroke} />
-          <circle cx="60" cy="44" r="2" fill={stroke} />
-          <line x1="43" y1="58" x2="57" y2="58" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <rect x="72" y="48" width="10" height="14" rx="2" stroke={stroke} strokeWidth="1.5" fill="#E8DED1" />
+          <circle cx="40" cy="54" r="2" fill={stroke} />
+          <circle cx="60" cy="54" r="2" fill={stroke} />
+          <line x1="43" y1="68" x2="57" y2="68" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <rect x="72" y="58" width="10" height="12" rx="2" stroke={stroke} strokeWidth="1.5" fill={colors.bg.muted} />
         </>
       )
     case 'workout':
       return (
         <>
-          <circle cx="40" cy="44" r="2.5" fill={stroke} />
-          <circle cx="60" cy="44" r="2.5" fill={stroke} />
-          <path d="M44 58 Q50 54 56 58" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <ellipse cx="50" cy="28" rx="14" ry="4" stroke={stroke} strokeWidth="1.5" fill="#E8DED1" />
+          <circle cx="40" cy="54" r="2.5" fill={stroke} />
+          <circle cx="60" cy="54" r="2.5" fill={stroke} />
+          <path d="M44 68 Q50 64 56 68" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
         </>
       )
     case 'tired':
       return (
         <>
-          <path d="M36 45 L44 43" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <path d="M56 43 L64 45" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <path d="M44 60 Q50 56 56 60" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <circle cx="72" cy="38" r="3" fill="#B8895B" opacity="0.5" />
+          <path d="M36 55 L44 53" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <path d="M56 53 L64 55" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <path d="M44 70 Q50 66 56 70" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
         </>
       )
     case 'plateau':
     case 'suspicious':
       return (
         <>
-          <circle cx="40" cy="44" r="2" fill={stroke} />
-          <circle cx="60" cy="44" r="2" fill={stroke} />
-          <line x1="46" y1="60" x2="54" y2="58" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <circle cx="40" cy="54" r="2" fill={stroke} />
+          <circle cx="60" cy="54" r="2" fill={stroke} />
+          <line x1="46" y1="70" x2="54" y2="68" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
         </>
       )
     case 'cheat':
       return (
         <>
-          <circle cx="40" cy="44" r="2.5" fill={stroke} />
-          <circle cx="60" cy="44" r="2.5" fill={stroke} />
-          <path d="M42 58 Q50 62 58 58" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <circle cx="72" cy="50" r="4" fill="#E8A0A0" opacity="0.6" />
+          <circle cx="40" cy="54" r="2.5" fill={stroke} />
+          <circle cx="60" cy="54" r="2.5" fill={stroke} />
+          <path d="M42 68 Q50 72 58 68" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
         </>
       )
     case 'water':
       return (
         <>
-          <circle cx="40" cy="44" r="2.5" fill={stroke} />
-          <circle cx="60" cy="44" r="2.5" fill={stroke} />
-          <line x1="43" y1="58" x2="57" y2="58" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <path d="M28 50 Q28 42 32 38 Q36 42 36 50 Q36 56 32 58 Q28 56 28 50" fill="#B8895B" opacity="0.5" />
+          <circle cx="40" cy="54" r="2.5" fill={stroke} />
+          <circle cx="60" cy="54" r="2.5" fill={stroke} />
+          <line x1="43" y1="68" x2="57" y2="68" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
         </>
       )
     default:
       return (
         <>
-          <circle cx="40" cy="44" r="2.5" fill={stroke} />
-          <circle cx="60" cy="44" r="2.5" fill={stroke} />
-          <line x1="43" y1="58" x2="57" y2="58" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+          <circle cx="40" cy="54" r="2.5" fill={stroke} />
+          <circle cx="60" cy="54" r="2.5" fill={stroke} />
+          <line x1="43" y1="68" x2="57" y2="68" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
         </>
       )
   }

@@ -4,7 +4,7 @@ import type { CustomEatOutSelection } from './checkin-utils'
 import type { EatOutPreferences, MealSuggestion, SuggestContext, UserMemoryState } from './meal-engine-types'
 import { suggestNextMeal, suggestionToCustomSelection } from './meal-suggest'
 import { nearbyBrands } from './nearby-engine'
-import { eatOutMenu } from './convenience-store-menu'
+import { getDiceMenuSource } from './dice-menu-pool'
 
 export type { MealSuggestion, UserMemoryState, EatOutPreferences }
 export { suggestNextMeal, suggestionToCustomSelection }
@@ -27,11 +27,12 @@ export function currentMealSlot(): MealType {
 }
 
 export function namesFromSeenIds(seenIds: string[]): string[] {
+  const menu = getDiceMenuSource()
   const names = new Set<string>()
   for (const composite of seenIds) {
     for (const part of composite.split('|')) {
       const itemId = part.split(':')[0]
-      const item = eatOutMenu.find(i => i.id === itemId)
+      const item = menu.find(i => i.id === itemId)
       if (item) names.add(item.name)
     }
   }
@@ -46,10 +47,13 @@ export function buildSuggestContext(params: {
   day_index?: number
   exclude_ids?: string[]
   exclude_names?: string[]
+  exclude_stores?: string[]
   rolls_used?: number
   user_lat?: number
   user_lng?: number
   seed?: number
+  adherence?: import('@/lib/engines/adherence-types').AdherenceState | null
+  calorie_bank?: import('@/lib/banks/calorie-bank-types').CalorieBankRow | null
 }): SuggestContext {
   const lat = params.user_lat
   const lng = params.user_lng
@@ -65,9 +69,12 @@ export function rollMealSuggestion(params: {
   day_index?: number
   seen_ids: string[]
   exclude_names?: string[]
+  exclude_stores?: string[]
   rolls_used: number
   user_lat?: number
   user_lng?: number
+  adherence?: import('@/lib/engines/adherence-types').AdherenceState | null
+  calorie_bank?: import('@/lib/banks/calorie-bank-types').CalorieBankRow | null
 }): {
   suggestion: MealSuggestion | null
   rolls_used: number
@@ -85,9 +92,12 @@ export function rollMealSuggestion(params: {
     day_index: params.day_index,
     exclude_ids: params.seen_ids,
     exclude_names: excludeNames,
+    exclude_stores: params.exclude_stores,
     rolls_used: params.rolls_used,
     user_lat: params.user_lat,
     user_lng: params.user_lng,
+    adherence: params.adherence,
+    calorie_bank: params.calorie_bank,
     seed: Date.now() + params.rolls_used * 9973 + mealSeed,
   })
 
@@ -97,7 +107,7 @@ export function rollMealSuggestion(params: {
     const retry = suggestNextMeal(
       buildSuggestContext({
         ...params,
-        exclude_ids: [],
+        exclude_ids: params.seen_ids.slice(-1),
         exclude_names: params.exclude_names ?? [],
         rolls_used: params.rolls_used,
         seed: Date.now() + params.rolls_used * 9973 + mealSeed + 999,
@@ -105,6 +115,20 @@ export function rollMealSuggestion(params: {
     )
     suggestion = retry.suggestion
     pool_exhausted = retry.pool_exhausted
+  }
+
+  if (!suggestion) {
+    const fallback = suggestNextMeal(
+      buildSuggestContext({
+        ...params,
+        exclude_ids: [],
+        exclude_names: [],
+        rolls_used: params.rolls_used + 3,
+        seed: Date.now() + params.rolls_used * 131 + mealSeed + 4242,
+      })
+    )
+    suggestion = fallback.suggestion
+    pool_exhausted = fallback.pool_exhausted
   }
 
   return {

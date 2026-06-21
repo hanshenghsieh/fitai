@@ -1,0 +1,728 @@
+[
+  {
+    "id": "night-market-tw-雞排",
+    "name": "雞排",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "dinner",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market",
+      "night_market"
+    ],
+    "calories": 580,
+    "protein_g": 32,
+    "carbs_g": 38,
+    "fat_g": 32,
+    "price": 65,
+    "photo_url": "",
+    "description": "台灣夜市 · 雞排 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market",
+    "aliases": [
+      "鹽酥雞排"
+    ]
+  },
+  {
+    "id": "night-market-tw-鹽酥雞",
+    "name": "鹽酥雞",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "dinner",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 420,
+    "protein_g": 28,
+    "carbs_g": 18,
+    "fat_g": 26,
+    "price": 60,
+    "photo_url": "",
+    "description": "台灣夜市 · 鹽酥雞 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market",
+    "aliases": [
+      "鹹酥雞"
+    ]
+  },
+  {
+    "id": "night-market-tw-蔥油餅",
+    "name": "蔥油餅",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "dinner",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 380,
+    "protein_g": 8,
+    "carbs_g": 48,
+    "fat_g": 16,
+    "price": 45,
+    "photo_url": "",
+    "description": "台灣夜市 · 蔥油餅 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-地瓜球",
+    "name": "地瓜球",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "dinner",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 280,
+    "protein_g": 2,
+    "carbs_g": 52,
+    "fat_g": 8,
+    "price": 40,
+    "photo_url": "",
+    "description": "台灣夜市 · 地瓜球 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-滷味拼盤",
+    "name": "滷味拼盤",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "dinner",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 320,
+    "protein_g": 22,
+    "carbs_g": 12,
+    "fat_g": 18,
+    "price": 80,
+    "photo_url": "",
+    "description": "台灣夜市 · 滷味拼盤 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-臭豆腐",
+    "name": "臭豆腐",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "dinner",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 280,
+    "protein_g": 14,
+    "carbs_g": 18,
+    "fat_g": 16,
+    "price": 55,
+    "photo_url": "",
+    "description": "台灣夜市 · 臭豆腐 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-蚵仔煎",
+    "name": "蚵仔煎",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "dinner",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 420,
+    "protein_g": 12,
+    "carbs_g": 48,
+    "fat_g": 18,
+    "price": 70,
+    "photo_url": "",
+    "description": "台灣夜市 · 蚵仔煎 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-大腸包小腸",
+    "name": "大腸包小腸",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "dinner",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 480,
+    "protein_g": 16,
+    "carbs_g": 42,
+    "fat_g": 26,
+    "price": 55,
+    "photo_url": "",
+    "description": "台灣夜市 · 大腸包小腸 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-潤餅",
+    "name": "潤餅",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 380,
+    "protein_g": 12,
+    "carbs_g": 52,
+    "fat_g": 12,
+    "price": 45,
+    "photo_url": "",
+    "description": "台灣夜市 · 潤餅 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-飯糰",
+    "name": "飯糰",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "breakfast",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 220,
+    "protein_g": 6,
+    "carbs_g": 38,
+    "fat_g": 4,
+    "price": 30,
+    "photo_url": "",
+    "description": "台灣夜市 · 飯糰 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-蛋餅",
+    "name": "蛋餅",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "breakfast",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 280,
+    "protein_g": 10,
+    "carbs_g": 32,
+    "fat_g": 12,
+    "price": 35,
+    "photo_url": "",
+    "description": "台灣夜市 · 蛋餅 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-鍋燒意麵",
+    "name": "鍋燒意麵",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "dinner",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 420,
+    "protein_g": 14,
+    "carbs_g": 52,
+    "fat_g": 14,
+    "price": 80,
+    "photo_url": "",
+    "description": "台灣夜市 · 鍋燒意麵 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-肉圓",
+    "name": "肉圓",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "dinner",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 320,
+    "protein_g": 8,
+    "carbs_g": 48,
+    "fat_g": 10,
+    "price": 40,
+    "photo_url": "",
+    "description": "台灣夜市 · 肉圓 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-碗粿",
+    "name": "碗粿",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "breakfast",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 280,
+    "protein_g": 6,
+    "carbs_g": 52,
+    "fat_g": 6,
+    "price": 35,
+    "photo_url": "",
+    "description": "台灣夜市 · 碗粿 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-肉羹麵",
+    "name": "肉羹麵",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 480,
+    "protein_g": 18,
+    "carbs_g": 62,
+    "fat_g": 14,
+    "price": 70,
+    "photo_url": "",
+    "description": "台灣夜市 · 肉羹麵 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-海鮮丼",
+    "name": "海鮮丼",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 495,
+    "protein_g": 30,
+    "carbs_g": 67,
+    "fat_g": 10,
+    "price": 270,
+    "photo_url": "",
+    "description": "台灣夜市 · 海鮮丼 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-鍋貼-10顆",
+    "name": "鍋貼（10顆）",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 399,
+    "protein_g": 16,
+    "carbs_g": 44,
+    "fat_g": 14,
+    "price": 67,
+    "photo_url": "",
+    "description": "台灣夜市 · 鍋貼（10顆） · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-水餃-10顆",
+    "name": "水餃（10顆）",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 459,
+    "protein_g": 18,
+    "carbs_g": 53,
+    "fat_g": 16,
+    "price": 91,
+    "photo_url": "",
+    "description": "台灣夜市 · 水餃（10顆） · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-薯條-中",
+    "name": "薯條（中）",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "side",
+    "portionable": false,
+    "tags": [
+      "side",
+      "night_market"
+    ],
+    "calories": 307,
+    "protein_g": 4,
+    "carbs_g": 40,
+    "fat_g": 14,
+    "price": 46,
+    "photo_url": "",
+    "description": "台灣夜市 · 薯條（中） · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-味噌湯",
+    "name": "味噌湯",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "side",
+    "portionable": false,
+    "tags": [
+      "side",
+      "night_market"
+    ],
+    "calories": 40,
+    "protein_g": 3,
+    "carbs_g": 4,
+    "fat_g": 1,
+    "price": 25,
+    "photo_url": "",
+    "description": "台灣夜市 · 味噌湯 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-溫泉蛋",
+    "name": "溫泉蛋",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "side",
+    "portionable": false,
+    "tags": [
+      "side",
+      "night_market"
+    ],
+    "calories": 77,
+    "protein_g": 6,
+    "carbs_g": 1,
+    "fat_g": 5,
+    "price": 15,
+    "photo_url": "",
+    "description": "台灣夜市 · 溫泉蛋 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-滷蛋",
+    "name": "滷蛋",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "side",
+    "portionable": false,
+    "tags": [
+      "side",
+      "night_market"
+    ],
+    "calories": 82,
+    "protein_g": 6,
+    "carbs_g": 2,
+    "fat_g": 5,
+    "price": 10,
+    "photo_url": "",
+    "description": "台灣夜市 · 滷蛋 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-燙青菜",
+    "name": "燙青菜",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "side",
+    "portionable": false,
+    "tags": [
+      "side",
+      "night_market"
+    ],
+    "calories": 47,
+    "protein_g": 3,
+    "carbs_g": 6,
+    "fat_g": 1,
+    "price": 36,
+    "photo_url": "",
+    "description": "台灣夜市 · 燙青菜 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-韓式泡菜",
+    "name": "韓式泡菜",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "side",
+    "portionable": false,
+    "tags": [
+      "side",
+      "night_market"
+    ],
+    "calories": 30,
+    "protein_g": 1,
+    "carbs_g": 6,
+    "fat_g": 0,
+    "price": 20,
+    "photo_url": "",
+    "description": "台灣夜市 · 韓式泡菜 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-白飯-一碗",
+    "name": "白飯（一碗）",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "side",
+    "portionable": false,
+    "tags": [
+      "side",
+      "night_market"
+    ],
+    "calories": 283,
+    "protein_g": 6,
+    "carbs_g": 59,
+    "fat_g": 0,
+    "price": 21,
+    "photo_url": "",
+    "description": "台灣夜市 · 白飯（一碗） · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-煎餃-5顆",
+    "name": "煎餃（5顆）",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "side",
+    "portionable": false,
+    "tags": [
+      "side",
+      "night_market"
+    ],
+    "calories": 220,
+    "protein_g": 8,
+    "carbs_g": 28,
+    "fat_g": 8,
+    "price": 82,
+    "photo_url": "",
+    "description": "台灣夜市 · 煎餃（5顆） · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-蒜香麵包-2片",
+    "name": "蒜香麵包（2片）",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "side",
+    "portionable": false,
+    "tags": [
+      "side",
+      "night_market"
+    ],
+    "calories": 224,
+    "protein_g": 6,
+    "carbs_g": 33,
+    "fat_g": 8,
+    "price": 61,
+    "photo_url": "",
+    "description": "台灣夜市 · 蒜香麵包（2片） · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-凱薩沙拉",
+    "name": "凱薩沙拉",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "side",
+    "portionable": false,
+    "tags": [
+      "side",
+      "night_market"
+    ],
+    "calories": 191,
+    "protein_g": 6,
+    "carbs_g": 11,
+    "fat_g": 14,
+    "price": 83,
+    "photo_url": "",
+    "description": "台灣夜市 · 凱薩沙拉 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-無糖綠茶",
+    "name": "無糖綠茶",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "drink",
+    "portionable": false,
+    "tags": [
+      "drink",
+      "night_market"
+    ],
+    "calories": 1,
+    "protein_g": 0,
+    "carbs_g": 0,
+    "fat_g": 0,
+    "sugar_g": 0,
+    "price": 26,
+    "photo_url": "",
+    "description": "台灣夜市 · 無糖綠茶 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-可樂-中杯",
+    "name": "可樂（中杯）",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "drink",
+    "portionable": false,
+    "tags": [
+      "drink",
+      "night_market"
+    ],
+    "calories": 176,
+    "protein_g": 1,
+    "carbs_g": 0,
+    "fat_g": 46,
+    "sugar_g": 0,
+    "price": 10,
+    "photo_url": "",
+    "description": "台灣夜市 · 可樂（中杯） · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-美式咖啡-中杯",
+    "name": "美式咖啡（中杯）",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "drink",
+    "portionable": false,
+    "tags": [
+      "drink",
+      "night_market"
+    ],
+    "calories": 10,
+    "protein_g": 1,
+    "carbs_g": 1,
+    "fat_g": 0,
+    "sugar_g": 1,
+    "price": 78,
+    "photo_url": "",
+    "description": "台灣夜市 · 美式咖啡（中杯） · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-拿鐵-中杯",
+    "name": "拿鐵（中杯）",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "drink",
+    "portionable": false,
+    "tags": [
+      "drink",
+      "night_market"
+    ],
+    "calories": 184,
+    "protein_g": 8,
+    "carbs_g": 14,
+    "fat_g": 1,
+    "sugar_g": 10,
+    "price": 95,
+    "photo_url": "",
+    "description": "台灣夜市 · 拿鐵（中杯） · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-經典牛肉堡",
+    "name": "經典牛肉堡",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "burger",
+      "night_market"
+    ],
+    "calories": 530,
+    "protein_g": 26,
+    "carbs_g": 43,
+    "fat_g": 28,
+    "price": 92,
+    "photo_url": "",
+    "description": "台灣夜市 · 經典牛肉堡 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-雙層牛肉堡",
+    "name": "雙層牛肉堡",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 580,
+    "protein_g": 32,
+    "carbs_g": 44,
+    "fat_g": 32,
+    "price": 112,
+    "photo_url": "",
+    "description": "台灣夜市 · 雙層牛肉堡 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  },
+  {
+    "id": "night-market-tw-雞腿堡",
+    "name": "雞腿堡",
+    "store": "台灣夜市",
+    "source": "chain",
+    "category": "lunch",
+    "role": "combo",
+    "portionable": false,
+    "tags": [
+      "night_market"
+    ],
+    "calories": 504,
+    "protein_g": 25,
+    "carbs_g": 42,
+    "fat_g": 25,
+    "price": 88,
+    "photo_url": "",
+    "description": "台灣夜市 · 雞腿堡 · 估計營養（待交叉驗證）",
+    "kb_category": "night_market"
+  }
+]

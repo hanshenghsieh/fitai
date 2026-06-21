@@ -118,6 +118,15 @@ export function characterMessageToLine(msg: CharacterMessage): ZaiJianLine {
   }
 }
 
+/** 姿態列單行文案 — TodayPosture 用字串，不可直接渲染 ZaiJianLine */
+export function formatPostureLine(line: ZaiJianLine): string {
+  if (!line.subtext) return line.text
+  const t = line.text.trim()
+  if (!t) return line.subtext
+  const sep = /[。！？…]$/.test(t) ? '' : '。'
+  return `${t}${sep}${line.subtext}`
+}
+
 /** 穩定選句 — 同一天同一 moment 顯示同一句 */
 export function pickZaiJianLine(moment: ZaiJianMoment, salt = ''): ZaiJianLine {
   const category = MOMENT_CATEGORY[moment]

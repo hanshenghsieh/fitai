@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Loader2, Plus, ChevronDown, ChevronUp } from 'lucide-react'
 import { colors, cardStyle } from '@/lib/design-system'
-import { pickZaiJianLine } from '@/lib/copy/zaijian'
+import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import ZaiJian from '@/components/character/ZaiJian'
 
 interface Props {
@@ -49,12 +49,12 @@ export default function MeasurementForm({ lastWeightKg }: Props) {
           duration: 8000,
         })
       } else if (data.regenError) {
-        toast.error('體重記下了，但重算失敗', { description: data.regenError })
+        toast.error(GENTLE_ERROR_MESSAGE, { description: data.regenError })
       } else {
         toast.success('記下了。')
       }
     } catch {
-      toast.error(pickZaiJianLine('error').text)
+      toast.error(GENTLE_ERROR_MESSAGE)
     } finally {
       setLoading(false)
     }

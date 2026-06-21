@@ -1,5 +1,6 @@
-import { format, subDays } from 'date-fns'
+import { format, subDays, parse } from 'date-fns'
 import type { DailyCheckin, DietCheckinItem, WorkoutCheckinItem } from '@/types'
+import { getNutritionDayKey } from '@/lib/timezone'
 
 import type { PortionId } from '@/lib/eat-out-builder'
 import type { FoodDna } from '@/lib/food-memory'
@@ -46,6 +47,8 @@ export interface UserMemoryMeta {
   food_dna?: FoodDna
   /** @deprecated Phase 5 隱形事件引擎取代手動模式 */
   life_event_mode?: 'cheat' | 'travel' | 'family' | 'cny' | 'sick' | 'stress' | 'bad_week' | null
+  /** 家庭共餐：份量建議與 copy 會調整 */
+  eating_context?: 'solo' | 'family'
   /** 使用者宣告今日吃了什麼 */
   food_logs_today?: {
     id: string
@@ -129,8 +132,8 @@ export function calcStreakDays(checkins: CheckinSlice[]): number {
   )
   if (qualifiedDates.size === 0) return 0
 
-  const today = format(new Date(), 'yyyy-MM-dd')
-  const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd')
+  const today = getNutritionDayKey()
+  const yesterday = format(subDays(parse(today, 'yyyy-MM-dd', new Date()), 1), 'yyyy-MM-dd')
 
   let startOffset = 0
   if (!qualifiedDates.has(today)) {

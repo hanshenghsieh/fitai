@@ -53,6 +53,13 @@ export interface MealSuggestion {
   }
   highlight: string
   highlight_key: HighlightKey
+  /** 為什麼這餐？— 價格比較依據（僅在 highlight 涉及預算時填） */
+  highlight_price_meta?: {
+    total_price: number
+    budget_max: number
+    pool_median_price: number
+    saved_vs_median: number
+  }
   stores: string[]
   restaurant_name?: string
   distance_m?: number
@@ -69,11 +76,17 @@ export interface SuggestContext {
   day_index?: number
   exclude_ids?: string[]
   exclude_names?: string[]
+  /** 本輪／近期已骰過的店名 — 強制輪替品牌 */
+  exclude_stores?: string[]
   rolls_used?: number
   nearby_brands?: string[]
   user_lat?: number
   user_lng?: number
   seed?: number
+  /** Phase 7 — 隱形 adherence，調整骰子與目標（使用者不可見） */
+  adherence?: import('@/lib/engines/adherence-types').AdherenceState | null
+  /** Engine v1 — persistent calorie bank */
+  calorie_bank?: import('@/lib/banks/calorie-bank-types').CalorieBankRow | null
 }
 
 export const MEAL_RATIOS = { breakfast: 0.25, lunch: 0.4, dinner: 0.35 } as const

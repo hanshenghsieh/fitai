@@ -18,7 +18,7 @@ import { eatOutMenu } from '@/lib/convenience-store-menu'
 import { linesToDisplayItems } from '@/lib/meal-suggest'
 import { suggestionId } from '@/lib/meal-engine-types'
 import { mealMacroSplit } from '@/lib/goal-calculator'
-import { formatEatOutStoreLine, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
+import { formatEatOutItemMeta, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
 import { useGeolocation } from '@/lib/use-geolocation'
 import { appendSeenForMeal, seenIdsForMeal, rollsForMeal, recordMealRoll } from '@/lib/checkin-utils'
 import { colors, cardStyle } from '@/lib/design-system'
@@ -332,8 +332,7 @@ export default function HomeDecisionHero({
               >
                 <p className="font-semibold text-[15px]" style={{ color: colors.text.primary }}>{item.name}</p>
                 <p className="text-[13px] mt-0.5" style={{ color: colors.text.tertiary }}>
-                  {formatEatOutStoreLine(item)}
-                  {` · ${item.calories} kcal · ${item.protein_g}g 蛋白`}
+                  {formatEatOutItemMeta(item, { protein: true })}
                 </p>
               </div>
             ))}

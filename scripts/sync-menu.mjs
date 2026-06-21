@@ -16,6 +16,19 @@ spawnSync(process.execPath, [path.join(__dirname, 'generate-expanded-menu.mjs')]
 const convenience = JSON.parse(fs.readFileSync(path.join(__dirname, 'final-menu.json'), 'utf8'))
 const chains = JSON.parse(fs.readFileSync(path.join(__dirname, 'restaurant-chains.json'), 'utf8'))
 const expanded = JSON.parse(fs.readFileSync(path.join(__dirname, 'restaurant-expanded.json'), 'utf8'))
+const chainExpansionPath = path.join(__dirname, 'food-kb/seeds/chain-expansion.json')
+const chainExpansion = fs.existsSync(chainExpansionPath)
+  ? JSON.parse(fs.readFileSync(chainExpansionPath, 'utf8'))
+  : []
+
+const generatedDir = path.join(__dirname, 'food-kb/seeds/generated')
+const generatedSeeds = []
+if (fs.existsSync(generatedDir)) {
+  for (const file of fs.readdirSync(generatedDir)) {
+    if (!file.endsWith('.json') || file === 'manifest.json') continue
+    generatedSeeds.push(...JSON.parse(fs.readFileSync(path.join(generatedDir, file), 'utf8')))
+  }
+}
 
 const withSource = convenience.map(item => ({
   ...item,
@@ -27,7 +40,7 @@ const withSource = convenience.map(item => ({
 
 const seen = new Set(withSource.map(i => i.id))
 const merged = [...withSource]
-for (const item of [...chains, ...expanded]) {
+for (const item of [...chains, ...expanded, ...chainExpansion, ...generatedSeeds]) {
   const normalized = {
     role: 'combo',
     portionable: false,
@@ -123,3 +136,4 @@ fs.writeFileSync(
 console.log(`✅ 已同步 ${merged.length} 項外食菜單`)
 console.log(`   早餐 ${byCat.breakfast} · 午餐 ${byCat.lunch} · 晚餐 ${byCat.dinner}`)
 console.log(`   便利店 ${bySource.convenience ?? 0} · 連鎖 ${bySource.chain ?? 0} · 外送 ${bySource.delivery ?? 0}`)
+console.log(`   骰子可用品牌 ${[...new Set(merged.map(i => i.store))].length} 家（自動納入配餐）`)

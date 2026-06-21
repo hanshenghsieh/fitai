@@ -15,9 +15,19 @@ import { buildMealCombination, comboToSaved } from '@/lib/meal-combo-engine'
 import { getAccessStatus } from '@/lib/subscription-access'
 import { applyWeeklyFeedback } from '@/lib/feedback-adjustments'
 import {
+  getLatestWeeklyFeedback,
+  preserveEmbeddedWeeklyFeedback,
+} from '@/lib/weekly-feedback-store'
+import {
   adjustDayNutritionForWorkout,
   estimateWeeklyWorkoutBurn,
 } from '@/lib/workout-nutrition'
+import { getLatestActiveCalorieBank } from '@/lib/banks/calorie-bank-store'
+import {
+  calorieFloorFromGender,
+  isRecoveryActive,
+  recoveryTargetsForDayOffsets,
+} from '@/lib/engines/calorie-bank-engine'
 import type { UserProfile, Goal, WeeklyFeedback } from '@/types'
 
 export async function POST(req: NextRequest) {
@@ -99,13 +109,7 @@ export async function POST(req: NextRequest) {
     const weekStart = startOfWeek(today, { weekStartsOn: 1 })
     const currentWeekStart = format(weekStart, 'yyyy-MM-dd')
     const lastWeekStart = format(startOfWeek(subWeeks(today, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd')
-    const { data: latestFeedback } = await supabase
-      .from('weekly_feedback')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single()
+    const latestFeedback = await getLatestWeeklyFeedback(supabase, userId)
 
     const feedbackForAdjust =
       latestFeedback &&
@@ -212,18 +216,38 @@ export async function POST(req: NextRequest) {
       }
     })
 
+    const activeBank = await getLatestActiveCalorieBank(supabase, userId)
+    const calFloor = calorieFloorFromGender(profile!.gender)
+    if (activeBank && isRecoveryActive(activeBank)) {
+      const recoveryCals = recoveryTargetsForDayOffsets(
+        nutrition.dailyCalories,
+        activeBank.spread_days_remaining,
+        activeBank.daily_adjust_kcal,
+        calFloor,
+        days.length
+      )
+      days.forEach((day, i) => {
+        const targetCal = recoveryCals[i] ?? nutrition.dailyCalories
+        if (targetCal >= day.daily_targets.calories) return
+        const ratio = targetCal / day.daily_targets.calories
+        day.daily_targets.calories = targetCal
+        day.daily_targets.carbs_g = Math.max(0, Math.round(day.daily_targets.carbs_g * ratio))
+        day.meal_summary.target_calories = targetCal
+      })
+    }
+
     const workoutBurn = estimateWeeklyWorkoutBurn(days.map(d => d.workout))
 
     const workoutDays = days.filter(d => d.workout.type !== 'rest').length
 
     const weekStartStr = format(weekStart, 'yyyy-MM-dd')
     const [{ data: existingPlan }, { data: maxPlan }] = await Promise.all([
-      supabase.from('weekly_plans').select('week_number').eq('user_id', userId).eq('week_start', weekStartStr).single(),
+      supabase.from('weekly_plans').select('week_number, plan_data').eq('user_id', userId).eq('week_start', weekStartStr).single(),
       supabase.from('weekly_plans').select('week_number').eq('user_id', userId).order('week_number', { ascending: false }).limit(1).single(),
     ])
     const weekNumber = existingPlan?.week_number ?? ((maxPlan?.week_number ?? 0) + 1)
 
-    const planData = {
+    const planData = preserveEmbeddedWeeklyFeedback(existingPlan?.plan_data, {
       week_number: weekNumber,
       weekly_targets: {
         avg_daily_calories: nutrition.dailyCalories,
@@ -251,7 +275,7 @@ export async function POST(req: NextRequest) {
         (regenReason ? `【已依最新數據重算】${regenReason}\n\n` : '') +
         buildCoachNote(profile!, goal, goalPlan, nutrition, workoutBurn) +
         (coachNoteExtra ? `\n\n${coachNoteExtra}` : ''),
-    }
+    })
 
     const { error: upsertError } = await supabase.from('weekly_plans').upsert(
       {

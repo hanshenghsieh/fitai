@@ -1,5 +1,8 @@
+export const dynamic = 'force-dynamic'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { saveWeeklyFeedback } from '@/lib/weekly-feedback-store'
 import { format, startOfWeek } from 'date-fns'
 
 export async function POST(request: NextRequest) {
@@ -10,17 +13,9 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
 
-  const { data, error } = await supabase
-    .from('weekly_feedback')
-    .upsert({
-      user_id: user.id,
-      week_start: weekStart,
-      ...body,
-    }, { onConflict: 'user_id,week_start' })
-    .select()
-    .single()
+  const { data, error } = await saveWeeklyFeedback(supabase, user.id, weekStart, body)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error }, { status: 500 })
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const cookie = request.headers.get('cookie') || ''

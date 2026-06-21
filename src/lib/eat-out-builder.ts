@@ -1,4 +1,5 @@
 import type { ConvenienceItem, ItemRole } from './convenience-store-menu'
+import { isDrinkStore } from './drink-stores'
 
 export type PortionId = 'full' | 'three_quarter' | 'half'
 
@@ -40,12 +41,9 @@ export function getItemRole(item: ConvenienceItem): ItemRole {
   return item.role ?? 'combo'
 }
 
-const BEVERAGE_STORES = new Set(['CoCo', '50嵐', '清心', '迷客夏', '茶湯會', '春水堂', '可不可', '大苑子'])
+const BEVERAGE_STORES = new Set<string>() // legacy; prefer isDrinkStore()
 
-/** 手搖飲、純茶名（無主食關鍵字） */
 const TEA_DRINK_NAMES = /鐵觀音|烏龍|四季春|青茶|紅茶|綠茶|花茶|普洱|金萱|凍頂|阿里山|高山茶|東方美人/
-
-/** 茶飲店裡的固體餐點關鍵字 */
 const SOLID_AT_TEA_STORE = /麵|飯|便當|滷|茶葉蛋|豆干|米|雞|牛|豬|排|套餐|點心|蘿蔔糕|抄手|水餃|燻雞/
 
 /** 手搖飲、茶飲（含誤標為 combo 的品項） */
@@ -57,7 +55,7 @@ export function isBeverage(item: ConvenienceItem): boolean {
   if (/響炮|珍奶|珍珠奶茶|奶茶|檸檬|百香|鮮奶|微糖|半糖|波霸|鮮柚|多多/.test(n)) {
     return !isFullMealName(n)
   }
-  if (BEVERAGE_STORES.has(item.store)) {
+  if (isDrinkStore(item.store) || BEVERAGE_STORES.has(item.store)) {
     if (SOLID_AT_TEA_STORE.test(n) || isFullMealName(n)) return false
     if (item.protein_g < 12 && item.calories < 500) return true
   }
@@ -66,6 +64,18 @@ export function isBeverage(item: ConvenienceItem): boolean {
     return true
   }
   return false
+}
+
+/** 湯品（一餐最多一份） */
+export function isSoupLike(name: string): boolean {
+  if (/火鍋|湯包|湯圓|湯種/.test(name)) return false
+  return /湯|羹|味噌/.test(name)
+}
+
+/** 合併糖度/份量變體（椰汁雞湯無糖 vs 半糖 → 同一品項） */
+export function normalizeDishKey(name: string): string {
+  const base = name.split(/[·・]/)[0] ?? name
+  return base.replace(/[（(][^)）]+[）)]/g, '').replace(/\s+/g, '').trim()
 }
 
 /** 非飲料的實體食物 */
@@ -81,7 +91,7 @@ export function isSolidFood(item: ConvenienceItem): boolean {
 /** 名稱是否為完整主食（飯、便當、麵等） */
 export function isFullMealName(name: string): boolean {
   if (/茶葉蛋|滷蛋|糖心蛋|溫泉蛋|水煮蛋/.test(name)) return false
-  return /飯|便當|麵|丼|燴飯|定食|拌飯|炒飯|潛艇堡|堡|三明治/.test(name)
+  return /飯|便當|麵|丼|燴飯|定食|拌飯|炒飯|潛艇堡|堡|三明治|壽司|握壽司|餐盒|沙拉碗|鍋|腸粉|刈包|拉麵|牛肉麵|丼飯|鐵板|套餐|拼盤|定食/.test(name)
 }
 
 /** 小份蛋白質配菜（茶葉蛋、雞胸、沙拉等） */
@@ -105,7 +115,7 @@ export function isStarchMain(item: ConvenienceItem): boolean {
   if (role === 'carb' || role === 'main') return true
   if (isFullMealName(item.name)) return true
   if (role === 'combo') {
-    return item.calories >= 180 || isFullMealName(item.name)
+    return item.calories >= 140 || isFullMealName(item.name)
   }
   if (item.source === 'convenience' && item.calories >= 220) return true
   return item.calories >= 280
@@ -285,4 +295,21 @@ export function formatEatOutStoreLine(item: Pick<ConvenienceItem, 'store' | 'sou
     return `${item.store}（${via}）`
   }
   return item.store
+}
+
+/** 骰子／外食品項副標：品牌 · 熱量（可選蛋白） */
+export function formatEatOutItemMeta(
+  item: Pick<ConvenienceItem, 'store' | 'source' | 'description' | 'calories' | 'protein_g'>,
+  opts?: { protein?: boolean }
+): string {
+  const bits = [formatEatOutStoreLine(item), `${item.calories} kcal`]
+  if (opts?.protein) bits.push(`${Math.round(item.protein_g)}g 蛋白`)
+  return bits.join(' · ')
+}
+
+/** 食物紀錄／骰子確認：品牌 · 菜名 */
+export function formatEatOutDiceLabel(
+  item: Pick<ConvenienceItem, 'name' | 'store' | 'source' | 'description'>
+): string {
+  return `${formatEatOutStoreLine(item)} · ${item.name}`
 }

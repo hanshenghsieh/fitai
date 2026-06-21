@@ -2,6 +2,9 @@
 
 const TZ = 'Asia/Taipei'
 
+/** 凌晨此時刻前仍歸屬「前一日」飲食紀錄（配合睡前／夜班） */
+export const NUTRITION_DAY_ROLLOVER_HOUR = 5
+
 export function getTaipeiHour(date = new Date()): number {
   const h = new Intl.DateTimeFormat('en-US', {
     hour: 'numeric',
@@ -13,6 +16,19 @@ export function getTaipeiHour(date = new Date()): number {
 
 export function getTaipeiDateKey(date = new Date()): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(date)
+}
+
+/** 飲食紀錄用的「今天」— 00:00–04:59 仍算昨天 */
+export function getNutritionDayKey(date = new Date()): string {
+  if (getTaipeiHour(date) < NUTRITION_DAY_ROLLOVER_HOUR) {
+    const prev = new Date(date.getTime() - 24 * 60 * 60 * 1000)
+    return getTaipeiDateKey(prev)
+  }
+  return getTaipeiDateKey(date)
+}
+
+export function nutritionDayResetLabel(): string {
+  return `紀錄日於凌晨 ${NUTRITION_DAY_ROLLOVER_HOUR}:00（台北）換新`
 }
 
 /** 例：6月19日 星期五 */

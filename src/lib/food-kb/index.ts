@@ -1,0 +1,7 @@
+export * from './brand-registry'
+export * from './types'
+export * from './normalize'
+export * from './dedupe'
+export * from './confidence'
+export * from './graph'
+export * from './strict-validate'

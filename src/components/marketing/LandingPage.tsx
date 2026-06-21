@@ -26,7 +26,7 @@ export default function LandingPage() {
             className="flex items-center justify-center gap-2 py-4 rounded-2xl text-[17px] font-semibold"
             style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
           >
-            免費試用 7 天
+            免費試用 14 天
             <ArrowRight className="h-5 w-5" />
           </Link>
           <Link href="/login" className="text-center text-[13px] py-2" style={{ color: colors.text.tertiary }}>

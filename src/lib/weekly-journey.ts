@@ -1,43 +1,48 @@
-/** 本週旅程 — 情緒標籤（非 KPI） */
+/** 本週旅程 — 日記語氣（非 KPI、非儀表板） */
 
 import { addDays, format } from 'date-fns'
+import { zhTW } from 'date-fns/locale'
 
 export type DayJourneyStatus = 'upcoming' | 'today' | 'done' | 'missed' | 'rest' | 'weekend'
 
 export interface DayJourneyNode {
   dayIndex: number
   label: string
-  mood: string
+  dateLabel: string
+  journal: string
+  workoutHint: string
   status: DayJourneyStatus
 }
 
 const WEEKDAY_MOODS = [
-  '開局。不用完美。',
+  '新的一週。不用完美開局。',
   '還在。這就夠了。',
-  '中場。撐一下。',
+  '中場。走到哪算哪。',
   '快週末了。',
   '今天可以。',
-  '吃好一點。',
-  '準備下週。',
+  '吃好一點。人生不是只有雞胸。',
+  '準備下週。不用報復性節食。',
 ]
 
 const DAY_NAMES = ['週一', '週二', '週三', '週四', '週五', '週六', '週日']
 
-export function statusLabel(status: DayJourneyStatus): string {
-  switch (status) {
-    case 'upcoming':
-      return '還沒到'
-    case 'today':
-      return '今天'
-    case 'done':
-      return '有記錄'
-    case 'missed':
-      return '跳過了'
-    case 'rest':
-      return '休息'
-    case 'weekend':
-      return '週末'
-  }
+function workoutHint(type: string, typeZh: string): string {
+  if (type === 'rest') return '休息'
+  return typeZh || '有運動'
+}
+
+function journalForDay(params: {
+  dayIndex: number
+  status: DayJourneyStatus
+  isToday: boolean
+}): string {
+  const { dayIndex, status, isToday } = params
+  if (isToday) return WEEKDAY_MOODS[dayIndex]!
+  if (status === 'upcoming' || status === 'weekend') return '還沒寫到這一天。'
+  if (status === 'done') return '有留下一點痕跡。'
+  if (status === 'rest') return '排定休息。'
+  if (status === 'missed') return '那天先略過。'
+  return WEEKDAY_MOODS[dayIndex]!
 }
 
 export function buildWeekJourney(params: {
@@ -45,12 +50,14 @@ export function buildWeekJourney(params: {
   checkinMap: Record<string, { diet_items?: { completed: boolean }[]; workout_items?: { completed: boolean }[] } | null>
   weekStart: string
   workoutTypes: ('rest' | string)[]
-  dayCalories?: number[]
+  workoutLabels: string[]
 }): DayJourneyNode[] {
-  const { todayDayIndex, checkinMap, weekStart, workoutTypes, dayCalories } = params
+  const { todayDayIndex, checkinMap, weekStart, workoutTypes, workoutLabels } = params
 
   return DAY_NAMES.map((label, dayIndex) => {
-    const dateStr = format(addDays(new Date(weekStart), dayIndex), 'yyyy-MM-dd')
+    const date = addDays(new Date(weekStart), dayIndex)
+    const dateStr = format(date, 'yyyy-MM-dd')
+    const dateLabel = format(date, 'M月d日 EEEE', { locale: zhTW })
     const checkin = checkinMap[dateStr]
     const isRest = workoutTypes[dayIndex] === 'rest'
     const isToday = dayIndex === todayDayIndex
@@ -63,55 +70,36 @@ export function buildWeekJourney(params: {
       if (checkin) {
         const dietDone = checkin.diet_items?.some(i => i.completed) ?? false
         const workDone = checkin.workout_items?.some(i => i.completed) ?? false
-        status = dietDone || workDone ? 'done' : 'missed'
+        status = dietDone || workDone ? 'done' : isRest ? 'rest' : 'missed'
       } else if (isRest) status = 'rest'
       else status = 'missed'
     } else if (isWeekend) status = 'weekend'
 
-    let mood = dayCalories?.[dayIndex]
-      ? `${dayCalories[dayIndex]} kcal · ${workoutTypes[dayIndex] === 'rest' ? '休息' : '有運動'}`
-      : WEEKDAY_MOODS[dayIndex]!
-    if (dayIndex === 5) mood = '吃好一點。人生不是只有雞胸。'
-    if (dayIndex === 6) mood = '準備下週。不用報復性節食。'
+    const hint = workoutHint(workoutTypes[dayIndex] ?? 'rest', workoutLabels[dayIndex] ?? '')
 
-    return { dayIndex, label, mood, status }
+    return {
+      dayIndex,
+      label,
+      dateLabel,
+      journal: journalForDay({ dayIndex, status, isToday }),
+      workoutHint: hint,
+      status,
+    }
   })
 }
 
-export function formatWeeklyGoals(planData: {
-  goal_snapshot?: { weekly_fat_loss_g?: number; daily_deficit?: number; fat_to_lose_kg?: number }
-  weekly_targets: {
-    workout_days: number
-    avg_daily_calories: number
-    avg_daily_protein_g: number
-    weekly_exercise_burn_kcal?: number
-  }
-}): { icon: string; text: string }[] {
-  const cal = planData.weekly_targets.avg_daily_calories
-  const pro = planData.weekly_targets.avg_daily_protein_g
-  const deficit = planData.goal_snapshot?.daily_deficit
-  const fatG = planData.goal_snapshot?.weekly_fat_loss_g
+export function buildWeekPosture(todayDayIndex: number, journey: DayJourneyNode[]): string {
+  const today = journey[todayDayIndex]
+  if (!today) return '這週，照你能做到的走。'
 
-  const lines: { icon: string; text: string }[] = [
-    { icon: '🔥', text: `每日 ${cal} kcal · 蛋白 ${pro}g` },
-  ]
-  if (deficit != null && deficit > 0) {
-    lines.push({ icon: '📉', text: `熱量缺口　每日約 ${deficit} kcal` })
-  }
-  if (fatG != null && fatG > 0) {
-    lines.push({ icon: '🎯', text: `體重方向　每週約 -${(fatG / 1000).toFixed(1)} kg` })
-  }
-  lines.push(
-    { icon: '🏃', text: `運動　本週 ${planData.weekly_targets.workout_days} 次` },
-  )
-  if (planData.weekly_targets.weekly_exercise_burn_kcal) {
-    lines.push({
-      icon: '⚡',
-      text: `運動消耗　約 ${planData.weekly_targets.weekly_exercise_burn_kcal} kcal（已納入赤字）`,
-    })
-  }
-  lines.push({ icon: '💧', text: `喝水　每天照目標喝` })
-  return lines
+  const past = journey.filter(n => n.dayIndex < todayDayIndex)
+  const touched = past.filter(n => n.status === 'done' || n.status === 'rest').length
+
+  if (todayDayIndex === 0) return '新的一週。你知道起點在哪。'
+  if (todayDayIndex >= 5) return '週末了。這週到這裡就好。'
+  if (touched >= Math.max(1, past.length - 1)) return `${today.label}。這週還在節奏裡。`
+  if (touched === 0) return `${today.label}。從今天寫起來。`
+  return `${today.label}。走到哪，算到哪。`
 }
 
 export function simplifyWorkout(workout: {
@@ -121,24 +109,26 @@ export function simplifyWorkout(workout: {
   main: { exercise_name_zh: string }[]
 }): { title: string; subtitle: string; duration: string } {
   if (workout.type === 'rest') {
-    return { title: '今天先活著', subtitle: '其他明天再說。', duration: '' }
+    return { title: '今天先休息', subtitle: '身體也需要寫進日記。', duration: '' }
   }
   const mainName = workout.main[0]?.exercise_name_zh
-  const title = mainName ? `動一下：${mainName}` : '動一下'
+  const title = mainName ? `${mainName}` : workout.type_zh
   return {
     title,
-    subtitle: '做完就好。不用很猛。',
+    subtitle: workout.type_zh,
     duration: `${workout.estimated_duration_mins} 分鐘`,
   }
 }
 
-export function shouldShowWeekReward(params: {
+/** @deprecated Phase 10 — no gamified rewards on Week */
+export function shouldShowWeekReward(_params: {
   todayDayIndex: number
   completionRate: number
 }): boolean {
-  return params.todayDayIndex >= 6 && params.completionRate >= 0.5
+  return false
 }
 
+/** @deprecated Phase 10 — no completion scores on Week */
 export function weekCompletionRate(
   checkinMap: Record<string, { diet_items?: { completed: boolean }[]; workout_items?: { completed: boolean }[] } | null>,
   weekStart: string,

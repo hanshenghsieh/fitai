@@ -1,8 +1,8 @@
 'use client'
 
-import Image from 'next/image'
 import { colors } from '@/lib/design-system'
 import type { ZaiJianExpression, ZaiJianLine } from '@/lib/copy/zaijian'
+import ZaiJianFace from '@/components/character/ZaiJianFace'
 
 export type ZaiJianSize = 'xs' | 'sm' | 'md' | 'lg' | 'hero'
 
@@ -39,17 +39,10 @@ export default function ZaiJian({
 
   const face = showFace ? (
     <div
-      className={`flex-shrink-0 overflow-hidden rounded-full ${breathe ? 'mi-breathe-ring' : ''}`}
+      className={`flex-shrink-0 ${breathe ? 'mi-breathe-ring' : ''}`}
       style={{ width: px, height: px }}
     >
-      <Image
-        src="/zaijian-hoodie.png"
-        alt=""
-        width={px}
-        height={px}
-        className="w-full h-full object-cover object-top"
-        aria-hidden
-      />
+      <ZaiJianFace expression={expression} className="w-full h-full" />
     </div>
   ) : null
 

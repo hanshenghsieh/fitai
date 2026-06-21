@@ -31,24 +31,32 @@ interface Props {
   plans: WeekStats[]
   goal: Goal | null
   goalSnapshot?: GoalSnapshot | null
+  /** 試用結束預覽：只顯示近期趨勢，隱藏深度分析 */
+  previewMode?: boolean
 }
 
-export default function ProgressCharts({ measurements, plans, goal, goalSnapshot }: Props) {
-  const weightData = measurements
+export default function ProgressCharts({ measurements, plans, goal, goalSnapshot, previewMode }: Props) {
+  const visibleMeasurements = previewMode
+    ? measurements.slice(-14)
+    : measurements
+
+  const weightData = visibleMeasurements
     .filter(m => m.weight_kg !== null)
     .map(m => ({ date: format(new Date(m.measured_at), 'M/d'), weight: m.weight_kg }))
 
-  const latestWeight = measurements[measurements.length - 1]?.weight_kg ?? null
-  const fatBank = buildFatBank(goalSnapshot, goal, latestWeight)
+  const latestWeight = visibleMeasurements[visibleMeasurements.length - 1]?.weight_kg ?? null
+  const fatBank = previewMode ? null : buildFatBank(goalSnapshot, goal, latestWeight)
 
-  const isPlateau = detectWeightPlateau(measurements)
-  const plateauStory = buildPlateauStory({
-    measurements,
-    mealAdherence: plans[plans.length - 1]?.previous_completion_rate,
-    workoutAdherence: plans[plans.length - 1]?.previous_workout_rate,
-  })
+  const isPlateau = previewMode ? false : detectWeightPlateau(measurements)
+  const plateauStory = previewMode
+    ? null
+    : buildPlateauStory({
+        measurements,
+        mealAdherence: plans[plans.length - 1]?.previous_completion_rate,
+        workoutAdherence: plans[plans.length - 1]?.previous_workout_rate,
+      })
 
-  if (measurements.length === 0 && plans.length === 0) {
+  if (visibleMeasurements.length === 0 && plans.length === 0) {
     return (
       <div className="p-6 rounded-2xl" style={cardStyle}>
         <ZaiJian
@@ -128,7 +136,7 @@ export default function ProgressCharts({ measurements, plans, goal, goalSnapshot
         </div>
       )}
 
-      {measurements.length > 0 && (
+      {!previewMode && measurements.length > 0 && (
         <div className="rounded-2xl overflow-hidden" style={cardStyle}>
           <div className="px-4 py-3 border-b" style={{ borderColor: colors.border.subtle }}>
             <h3 className="text-[15px] font-semibold" style={{ color: colors.text.primary }}>最近記錄</h3>

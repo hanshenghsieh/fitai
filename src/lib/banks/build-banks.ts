@@ -1,5 +1,8 @@
-import type { DayPlan } from '@/types'
+import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import type { FoodLogEntry, UserBanks } from './types'
+import type { AdherenceState } from '@/lib/engines/adherence-types'
+import { effectiveDailyTargetFromBank } from '@/lib/engines/calorie-bank-engine'
+import type { DayPlan } from '@/types'
 
 interface GoalSnap {
   daily_deficit?: number
@@ -13,7 +16,9 @@ export function buildUserBanks(
   goalSnapshot: GoalSnap | null | undefined,
   foodLogs: FoodLogEntry[],
   workoutCompleted: number,
-  workoutTotal: number
+  workoutTotal: number,
+  adherence?: AdherenceState | null,
+  calorieBank?: CalorieBankRow | null
 ): UserBanks {
   const todayTargetKcal = todayPlan.daily_targets.calories
   const dailyPace =
@@ -26,12 +31,18 @@ export function buildUserBanks(
 
   const weeklyTarget = todayPlan.workout?.type === 'rest' ? 0 : Math.max(3, workoutTotal > 0 ? 5 : 3)
 
+  const spreadAdjust = adherence?.spread.dailyAdjustKcal ?? 0
+  const internalTarget =
+    calorieBank?.internal_target_kcal ??
+    effectiveDailyTargetFromBank(todayTargetKcal, calorieBank) ??
+    todayTargetKcal + spreadAdjust
+
   return {
     calorie: {
       dailyPaceKcal: dailyPace,
       todayTargetKcal,
       todayLoggedKcal,
-      runningBalanceKcal: todayTargetKcal - todayLoggedKcal,
+      runningBalanceKcal: internalTarget - todayLoggedKcal,
       totalBudgetKcal: goalSnapshot?.total_deficit_kcal ?? dailyPace * 90,
       daysRemaining: (goalSnapshot?.weeks_remaining ?? 12) * 7,
     },

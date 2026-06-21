@@ -1,0 +1,1382 @@
+{
+  "generated_at": "2026-06-20T06:10:42.336Z",
+  "stats": {
+    "total_items": 2159,
+    "total_clusters": 2159,
+    "total_brands": 316,
+    "total_observations": 3118,
+    "by_source_type": {},
+    "by_brand_type": {
+      "convenience": 4,
+      "fast_food": 5,
+      "coffee": 6,
+      "other": 280,
+      "chain_restaurant": 8,
+      "bubble_tea": 11,
+      "buffet": 2
+    },
+    "avg_confidence": 0.559,
+    "low_confidence_count": 858,
+    "missing_nutrition_count": 9
+  },
+  "gaps": [
+    {
+      "gap_type": "missing_brand",
+      "brand_slug": "fitbox",
+      "description": "尚未收錄品牌：FitBox",
+      "priority": 9
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "50嵐",
+      "description": "缺少熱量：50嵐 無糖烏龍（L）",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "coca-cola",
+      "description": "缺少熱量：Coca-Cola 可口可乐无糖",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "oreo",
+      "description": "缺少熱量：Oreo Oreo Dutch Cocoa Wafer",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "i-mei",
+      "description": "缺少熱量：I-MEI Imei Egg Roll - Original Flavour",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "unknown",
+      "description": "缺少熱量：supermarket 4511413404133",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "三叔公",
+      "description": "缺少熱量：三叔公 Nougat Biscuit",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "organic-shop",
+      "description": "缺少熱量：Organic Shop Organic Jumbo Oat Flakes",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "airwaves",
+      "description": "缺少熱量：Airwaves Airwaves",
+      "priority": 7
+    },
+    {
+      "gap_type": "missing_nutrition",
+      "brand_slug": "7-11",
+      "description": "缺少熱量：7-11 無糖綠茶（600ml）",
+      "priority": 7
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "7-11",
+      "description": "信心偏低 (0.325)：7-11 四起司香草烤雞握便當",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "7-11",
+      "description": "信心偏低 (0.485)：7-11 御飯糰-梅子紫蘇",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "7-11",
+      "description": "信心偏低 (0.3)：7-11 原賞三明治-雞肉沙拉",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "7-11",
+      "description": "信心偏低 (0.1)：7-11 7-11茶葉蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "全家",
+      "description": "信心偏低 (0.15)：全家 四起司香草烤雞握便當",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "全家",
+      "description": "信心偏低 (0.23)：全家 御飯糰-梅子紫蘇",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "全家",
+      "description": "信心偏低 (0.1)：全家 7-11茶葉蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麥當勞",
+      "description": "信心偏低 (0.25)：麥當勞 咔啦豬肉滿福堡加蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麥當勞",
+      "description": "信心偏低 (0.25)：麥當勞 麥香魚早餐套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "八方雲集",
+      "description": "信心偏低 (0.1)：八方雲集 鍋貼套餐（10顆+酸辣湯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "肯德基",
+      "description": "信心偏低 (0.2)：肯德基 咔啦脆雞捲餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "弘爺漢堡",
+      "description": "信心偏低 (0.11)：弘爺漢堡 燒肉蛋餅套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麥當勞",
+      "description": "信心偏低 (0.22)：麥當勞 大麥克",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麥當勞",
+      "description": "信心偏低 (0.34)：麥當勞 雙層牛肉吉士堡",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麥當勞",
+      "description": "信心偏低 (0.3)：麥當勞 就醬好雞腿堡",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麥當勞",
+      "description": "信心偏低 (0.25)：麥當勞 麥香雞套餐（中薯+飲）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "肯德基",
+      "description": "信心偏低 (0.375)：肯德基 咔啦脆雞腿堡套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "摩斯漢堡",
+      "description": "信心偏低 (0.25)：摩斯漢堡 摩斯漢堡套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "摩斯漢堡",
+      "description": "信心偏低 (0.275)：摩斯漢堡 摩斯雞腿堡",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "subway",
+      "description": "信心偏低 (0.362)：Subway 火雞胸潛艇堡（6吋）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "梁社漢",
+      "description": "信心偏低 (0.35)：梁社漢 舒肥雞胸健康餐盒",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "吉野家",
+      "description": "信心偏低 (0.337)：吉野家 牛丼（中）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "瓦城",
+      "description": "信心偏低 (0.275)：瓦城 綠咖哩雞套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "瓦城",
+      "description": "信心偏低 (0.275)：瓦城 打拋豬肉片套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "健人餐廚",
+      "description": "信心偏低 (0.279)：健人餐廚 炙烤雞腿餐盒",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麥當勞",
+      "description": "信心偏低 (0.25)：麥當勞 勁辣雞腿堡套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "三商巧福",
+      "description": "信心偏低 (0.475)：三商巧福 原味牛肉麵",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "三商巧福",
+      "description": "信心偏低 (0.4)：三商巧福 排骨飯",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "三商巧福",
+      "description": "信心偏低 (0.45)：三商巧福 雞腿飯",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "鬍鬚張",
+      "description": "信心偏低 (0.45)：鬍鬚張 排骨飯",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "鬍鬚張",
+      "description": "信心偏低 (0.3)：鬍鬚張 雞腿飯",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "東池飯包",
+      "description": "信心偏低 (0.21)：東池飯包 招牌飯包",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麥味登",
+      "description": "信心偏低 (0.121)：麥味登 燒肉蛋餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "早安美芝城",
+      "description": "信心偏低 (0.17)：早安美芝城 燻雞蛋餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "拉亞漢堡",
+      "description": "信心偏低 (0.1)：拉亞漢堡 燒肉蛋餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "清心福全",
+      "description": "信心偏低 (0.1)：清心福全 鮮奶茶（M）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "星巴克",
+      "description": "信心偏低 (0.33)：星巴克 拿鐵（中）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "星巴克",
+      "description": "信心偏低 (0.13)：星巴克 美式咖啡（中）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "路易莎咖啡",
+      "description": "信心偏低 (0.1)：路易莎 經典拿鐵（中）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "cama咖啡",
+      "description": "信心偏低 (0.1)：cama 小農拿鐵（中）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "勝博殿",
+      "description": "信心偏低 (0.3)：勝博殿 腰內豬排定食",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "爭鮮迴轉壽司",
+      "description": "信心偏低 (0.317)：爭鮮迴轉壽司 鮭魚握壽司（2貫）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "壽司郎",
+      "description": "信心偏低 (0.1)：壽司郎 鮭魚握壽司",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "石二鍋",
+      "description": "信心偏低 (0.45)：石二鍋 個人鍋（瘦肉）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "夏慕尼",
+      "description": "信心偏低 (0.35)：夏慕尼 香蒜牛排套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "夏慕尼",
+      "description": "信心偏低 (0.35)：夏慕尼 菲力牛排套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "自助餐組件",
+      "description": "信心偏低 (0.35)：自助餐組件 地瓜（一條）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "台鐵便當",
+      "description": "信心偏低 (0.4)：台鐵便當 排骨便當",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "肯德基",
+      "description": "信心偏低 (0.15)：肯德基 上校雞塊（6塊）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "摩斯漢堡",
+      "description": "信心偏低 (0.4)：摩斯漢堡 辣味雞腿堡",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "sukiya",
+      "description": "信心偏低 (0.4)：SUKIYA 牛丼（小）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "健人餐廚",
+      "description": "信心偏低 (0.4)：健人餐廚 雞胸沙拉碗",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "少點鹹",
+      "description": "信心偏低 (0.35)：少點鹹 低GI鮭魚餐盒",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "subway",
+      "description": "信心偏低 (0.3)：Subway 雞胸沙拉碗",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "瓦城",
+      "description": "信心偏低 (0.15)：瓦城 月亮蝦餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "瓦城",
+      "description": "信心偏低 (0.25)：瓦城 青木瓜沙拉",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "瓦城",
+      "description": "信心偏低 (0.15)：瓦城 椰汁雞湯",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "饗食天堂",
+      "description": "信心偏低 (0.35)：饗食天堂 自助餐盤（估算）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "頂呱呱",
+      "description": "信心偏低 (0.1)：頂呱呱 雞塊套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "頂呱呱",
+      "description": "信心偏低 (0.3)：頂呱呱 雞腿堡",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "拿坡里",
+      "description": "信心偏低 (0.25)：拿坡里 卡拉雞腿堡",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "必勝客",
+      "description": "信心偏低 (0.1)：必勝客 個人比薩（夏威夷）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "必勝客",
+      "description": "信心偏低 (0.35)：必勝客 義大利麵",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "必勝客",
+      "description": "信心偏低 (0.1)：必勝客 烤雞翅（6支）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "必勝客",
+      "description": "信心偏低 (0.25)：必勝客 沙拉",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "達美樂",
+      "description": "信心偏低 (0.1)：達美樂 雞塊",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "肯德基",
+      "description": "信心偏低 (0.1)：肯德基 蛋塔套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "costco",
+      "description": "信心偏低 (0.2)：Costco 牛肉捲",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "亞尼克",
+      "description": "信心偏低 (0.1)：亞尼克 生乳捲",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "亞尼克",
+      "description": "信心偏低 (0.1)：亞尼克 蛋糕",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "陳根找茶",
+      "description": "信心偏低 (0.25)：陳根找茶 無糖茶（L）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "迷客夏",
+      "description": "信心偏低 (0.1)：迷客夏 無糖鮮奶茶",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "迷客夏",
+      "description": "信心偏低 (0.1)：迷客夏 紅茶拿鐵",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "迷客夏",
+      "description": "信心偏低 (0.3)：迷客夏 綠茶",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "茶湯會",
+      "description": "信心偏低 (0.1)：茶湯會 無糖茶",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "茶湯會",
+      "description": "信心偏低 (0.1)：茶湯會 烏龍",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "鮮茶道",
+      "description": "信心偏低 (0.25)：鮮茶道 無糖茶",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "老賴紅茶",
+      "description": "信心偏低 (0.25)：老賴紅茶 紅茶",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "非常泰",
+      "description": "信心偏低 (0.15)：非常泰 綠咖哩雞",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "非常泰",
+      "description": "信心偏低 (0.15)：非常泰 打拋豬",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "非常泰",
+      "description": "信心偏低 (0.1)：非常泰 酸辣湯",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "非常泰",
+      "description": "信心偏低 (0.2)：非常泰 河粉",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "非常泰",
+      "description": "信心偏低 (0.1)：非常泰 春捲",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "7-11",
+      "description": "信心偏低 (0.35)：7-11 鮮蝦蛋沙拉",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "7-11",
+      "description": "信心偏低 (0.35)：7-11 厚切豬排飯",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "7-11",
+      "description": "信心偏低 (0.35)：7-11 關東煮綜合套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "全家",
+      "description": "信心偏低 (0.35)：全家 厚切豬排飯",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "萊爾富",
+      "description": "信心偏低 (0.35)：萊爾富 茶葉蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "萊爾富",
+      "description": "信心偏低 (0.35)：萊爾富 厚切豬排飯",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "萊爾富",
+      "description": "信心偏低 (0.4)：萊爾富 義大利麵餐盒",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "萊爾富",
+      "description": "信心偏低 (0.4)：萊爾富 關東煮綜合套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "ok超商",
+      "description": "信心偏低 (0.35)：OK超商 御飯糰（鮭魚）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "ok超商",
+      "description": "信心偏低 (0.35)：OK超商 茶葉蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "ok超商",
+      "description": "信心偏低 (0.35)：OK超商 厚切豬排飯",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "ok超商",
+      "description": "信心偏低 (0.35)：OK超商 義大利麵餐盒",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麥味登",
+      "description": "信心偏低 (0.35)：麥味登 豬肉滿福堡加蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "q-burger",
+      "description": "信心偏低 (0.35)：Q Burger 原味蛋餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "q-burger",
+      "description": "信心偏低 (0.35)：Q Burger 燒肉總匯蛋餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "q-burger",
+      "description": "信心偏低 (0.35)：Q Burger 豬肉滿福堡加蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "弘爺漢堡",
+      "description": "信心偏低 (0.25)：弘爺漢堡 鐵板麵套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "拉亞漢堡",
+      "description": "信心偏低 (0.35)：拉亞漢堡 豬肉滿福堡加蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "早安美芝城",
+      "description": "信心偏低 (0.35)：早安美芝城 豬肉滿福堡加蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "晨間廚房",
+      "description": "信心偏低 (0.1)：晨間廚房 原味蛋餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "美而美",
+      "description": "信心偏低 (0.1)：美而美 原味蛋餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "美而美",
+      "description": "信心偏低 (0.25)：美而美 鐵板麵套餐",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "美而美",
+      "description": "信心偏低 (0.35)：美而美 豬肉滿福堡加蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "呷尚寶",
+      "description": "信心偏低 (0.1)：呷尚寶 原味蛋餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "呷尚寶",
+      "description": "信心偏低 (0.35)：呷尚寶 豬肉滿福堡加蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "早安山丘",
+      "description": "信心偏低 (0.1)：早安山丘 原味蛋餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "早安山丘",
+      "description": "信心偏低 (0.35)：早安山丘 豬肉滿福堡加蛋",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "巨林美而美",
+      "description": "信心偏低 (0.1)：巨林美而美 原味蛋餅",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "星巴克",
+      "description": "信心偏低 (0.25)：星巴克 焦糖瑪奇朵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "星巴克",
+      "description": "信心偏低 (0.35)：星巴克 藍莓瑪芬",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "路易莎咖啡",
+      "description": "信心偏低 (0.35)：路易莎 焦糖瑪奇朵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "路易莎咖啡",
+      "description": "信心偏低 (0.35)：路易莎 雞肉沙拉三明治",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "路易莎咖啡",
+      "description": "信心偏低 (0.35)：路易莎 藍莓瑪芬",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "85度c",
+      "description": "信心偏低 (0.35)：85度C 美式咖啡（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "85度c",
+      "description": "信心偏低 (0.1)：85度C 拿鐵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "85度c",
+      "description": "信心偏低 (0.35)：85度C 焦糖瑪奇朵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "85度c",
+      "description": "信心偏低 (0.35)：85度C 雞肉沙拉三明治",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "85度c",
+      "description": "信心偏低 (0.35)：85度C 藍莓瑪芬",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "cama咖啡",
+      "description": "信心偏低 (0.45)：cama 美式咖啡（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "cama咖啡",
+      "description": "信心偏低 (0.35)：cama 焦糖瑪奇朵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "cama咖啡",
+      "description": "信心偏低 (0.35)：cama 雞肉沙拉三明治",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "cama咖啡",
+      "description": "信心偏低 (0.35)：cama 藍莓瑪芬",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "伯朗咖啡",
+      "description": "信心偏低 (0.35)：伯朗咖啡 美式咖啡（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "伯朗咖啡",
+      "description": "信心偏低 (0.1)：伯朗咖啡 拿鐵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "伯朗咖啡",
+      "description": "信心偏低 (0.35)：伯朗咖啡 焦糖瑪奇朵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "伯朗咖啡",
+      "description": "信心偏低 (0.35)：伯朗咖啡 藍莓瑪芬",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "成真咖啡",
+      "description": "信心偏低 (0.35)：成真咖啡 美式咖啡（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "成真咖啡",
+      "description": "信心偏低 (0.1)：成真咖啡 拿鐵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "成真咖啡",
+      "description": "信心偏低 (0.1)：成真咖啡 焦糖瑪奇朵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "成真咖啡",
+      "description": "信心偏低 (0.35)：成真咖啡 藍莓瑪芬",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "黑沃咖啡",
+      "description": "信心偏低 (0.45)：黑沃咖啡 美式咖啡（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "黑沃咖啡",
+      "description": "信心偏低 (0.1)：黑沃咖啡 拿鐵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "黑沃咖啡",
+      "description": "信心偏低 (0.35)：黑沃咖啡 焦糖瑪奇朵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "黑沃咖啡",
+      "description": "信心偏低 (0.35)：黑沃咖啡 雞肉沙拉三明治",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "黑沃咖啡",
+      "description": "信心偏低 (0.35)：黑沃咖啡 藍莓瑪芬",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "丹堤咖啡",
+      "description": "信心偏低 (0.35)：丹堤咖啡 美式咖啡（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "丹堤咖啡",
+      "description": "信心偏低 (0.1)：丹堤咖啡 拿鐵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "丹堤咖啡",
+      "description": "信心偏低 (0.35)：丹堤咖啡 焦糖瑪奇朵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "丹堤咖啡",
+      "description": "信心偏低 (0.35)：丹堤咖啡 藍莓瑪芬",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "多那之",
+      "description": "信心偏低 (0.35)：多那之 美式咖啡（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "多那之",
+      "description": "信心偏低 (0.1)：多那之 拿鐵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "多那之",
+      "description": "信心偏低 (0.35)：多那之 焦糖瑪奇朵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "多那之",
+      "description": "信心偏低 (0.4)：多那之 雞肉沙拉三明治",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "多那之",
+      "description": "信心偏低 (0.35)：多那之 藍莓瑪芬",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "cafe-n",
+      "description": "信心偏低 (0.45)：CAFE!N 美式咖啡（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "cafe-n",
+      "description": "信心偏低 (0.1)：CAFE!N 拿鐵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "cafe-n",
+      "description": "信心偏低 (0.35)：CAFE!N 焦糖瑪奇朵（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "五十嵐",
+      "description": "信心偏低 (0.1)：五十嵐 珍珠奶茶（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "五十嵐",
+      "description": "信心偏低 (0.1)：五十嵐 四季春茶（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "五十嵐",
+      "description": "信心偏低 (0.167)：五十嵐 烏龍拿鐵（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "五十嵐",
+      "description": "信心偏低 (0.35)：五十嵐 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "清心福全",
+      "description": "信心偏低 (0.35)：清心福全 烏龍拿鐵（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "清心福全",
+      "description": "信心偏低 (0.35)：清心福全 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "coco都可",
+      "description": "信心偏低 (0.3)：CoCo都可 珍珠奶茶（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "coco都可",
+      "description": "信心偏低 (0.35)：CoCo都可 四季春茶（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "coco都可",
+      "description": "信心偏低 (0.35)：CoCo都可 烏龍拿鐵（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "coco都可",
+      "description": "信心偏低 (0.35)：CoCo都可 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "coco都可",
+      "description": "信心偏低 (0.25)：CoCo都可 鮮奶茶（中杯·微糖）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "可不可",
+      "description": "信心偏低 (0.1)：可不可 珍珠奶茶（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "可不可",
+      "description": "信心偏低 (0.35)：可不可 四季春茶（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "可不可",
+      "description": "信心偏低 (0.1)：可不可 烏龍拿鐵（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "可不可",
+      "description": "信心偏低 (0.35)：可不可 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麻古茶坊",
+      "description": "信心偏低 (0.1)：麻古茶坊 珍珠奶茶（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麻古茶坊",
+      "description": "信心偏低 (0.15)：麻古茶坊 四季春茶（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麻古茶坊",
+      "description": "信心偏低 (0.35)：麻古茶坊 烏龍拿鐵（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "麻古茶坊",
+      "description": "信心偏低 (0.35)：麻古茶坊 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "迷客夏",
+      "description": "信心偏低 (0.35)：迷客夏 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "大苑子",
+      "description": "信心偏低 (0.1)：大苑子 珍珠奶茶（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "大苑子",
+      "description": "信心偏低 (0.45)：大苑子 四季春茶（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "大苑子",
+      "description": "信心偏低 (0.35)：大苑子 烏龍拿鐵（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "大苑子",
+      "description": "信心偏低 (0.35)：大苑子 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "茶湯會",
+      "description": "信心偏低 (0.35)：茶湯會 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "烏弄",
+      "description": "信心偏低 (0.1)：烏弄 珍珠奶茶（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "烏弄",
+      "description": "信心偏低 (0.45)：烏弄 四季春茶（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "烏弄",
+      "description": "信心偏低 (0.2)：烏弄 烏龍拿鐵（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "烏弄",
+      "description": "信心偏低 (0.35)：烏弄 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "得正",
+      "description": "信心偏低 (0.1)：得正 珍珠奶茶（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "得正",
+      "description": "信心偏低 (0.35)：得正 四季春茶（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "得正",
+      "description": "信心偏低 (0.15)：得正 烏龍拿鐵（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "得正",
+      "description": "信心偏低 (0.35)：得正 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "一沐日",
+      "description": "信心偏低 (0.1)：一沐日 珍珠奶茶（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "一沐日",
+      "description": "信心偏低 (0.35)：一沐日 四季春茶（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "一沐日",
+      "description": "信心偏低 (0.35)：一沐日 烏龍拿鐵（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "一沐日",
+      "description": "信心偏低 (0.35)：一沐日 百香雙響炮（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "龜記",
+      "description": "信心偏低 (0.1)：龜記 珍珠奶茶（大杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "龜記",
+      "description": "信心偏低 (0.45)：龜記 四季春茶（中杯）",
+      "priority": 6
+    },
+    {
+      "gap_type": "low_confidence",
+      "brand_slug": "龜記",
+      "description": "信心偏低 (0.35)：龜記 烏龍拿鐵（大杯）",
+      "priority": 6
+    }
+  ],
+  "top_brands_by_items": [
+    {
+      "slug": "7-11",
+      "name_zh": "7-11",
+      "count": 277
+    },
+    {
+      "slug": "五十嵐",
+      "name_zh": "五十嵐",
+      "count": 30
+    },
+    {
+      "slug": "全家",
+      "name_zh": "全家",
+      "count": 26
+    },
+    {
+      "slug": "自助餐組件",
+      "name_zh": "自助餐組件",
+      "count": 24
+    },
+    {
+      "slug": "subway",
+      "name_zh": "Subway",
+      "count": 22
+    },
+    {
+      "slug": "麥當勞",
+      "name_zh": "麥當勞",
+      "count": 18
+    },
+    {
+      "slug": "三商巧福",
+      "name_zh": "三商巧福",
+      "count": 16
+    },
+    {
+      "slug": "鬍鬚張",
+      "name_zh": "鬍鬚張",
+      "count": 15
+    },
+    {
+      "slug": "清心福全",
+      "name_zh": "清心福全",
+      "count": 15
+    },
+    {
+      "slug": "路易莎咖啡",
+      "name_zh": "路易莎咖啡",
+      "count": 15
+    },
+    {
+      "slug": "fitbox",
+      "name_zh": "FITBOX",
+      "count": 15
+    },
+    {
+      "slug": "摩斯漢堡",
+      "name_zh": "摩斯漢堡",
+      "count": 14
+    },
+    {
+      "slug": "肌肉海灘",
+      "name_zh": "肌肉海灘",
+      "count": 14
+    },
+    {
+      "slug": "拿坡里",
+      "name_zh": "拿坡里",
+      "count": 14
+    },
+    {
+      "slug": "台灣夜市",
+      "name_zh": "台灣夜市",
+      "count": 14
+    },
+    {
+      "slug": "健人餐廚",
+      "name_zh": "健人餐廚",
+      "count": 13
+    },
+    {
+      "slug": "爭鮮迴轉壽司",
+      "name_zh": "爭鮮迴轉壽司",
+      "count": 13
+    },
+    {
+      "slug": "壽司郎",
+      "name_zh": "壽司郎",
+      "count": 13
+    },
+    {
+      "slug": "星巴克",
+      "name_zh": "星巴克",
+      "count": 12
+    },
+    {
+      "slug": "肯德基",
+      "name_zh": "肯德基",
+      "count": 12
+    },
+    {
+      "slug": "85度c",
+      "name_zh": "85度C",
+      "count": 12
+    },
+    {
+      "slug": "點點心",
+      "name_zh": "點點心",
+      "count": 12
+    },
+    {
+      "slug": "coco都可",
+      "name_zh": "CoCo都可",
+      "count": 12
+    },
+    {
+      "slug": "蛋白盒子",
+      "name_zh": "蛋白盒子",
+      "count": 11
+    },
+    {
+      "slug": "隨主飡",
+      "name_zh": "隨主飡",
+      "count": 11
+    },
+    {
+      "slug": "楽坡bonbox",
+      "name_zh": "楽坡Bonbox",
+      "count": 11
+    },
+    {
+      "slug": "達美樂",
+      "name_zh": "達美樂",
+      "count": 11
+    },
+    {
+      "slug": "costco",
+      "name_zh": "Costco",
+      "count": 11
+    },
+    {
+      "slug": "森度餐廚",
+      "name_zh": "森度餐廚",
+      "count": 10
+    },
+    {
+      "slug": "能量小姐",
+      "name_zh": "能量小姐",
+      "count": 10
+    }
+  ],
+  "missing_brands": [
+    "路易莎",
+    "cama",
+    "FitBox"
+  ],
+  "stale_items": []
+}
