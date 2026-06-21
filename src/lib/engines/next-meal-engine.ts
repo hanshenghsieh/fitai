@@ -47,8 +47,9 @@ export interface TodayMealState {
 }
 
 export const OVER_TARGET_COPY = {
+  banner: '今天營養量攝取已經很足夠了，不需要更多攝取',
   lines: [
-    '今天已經很足夠了。',
+    '今天營養量攝取已經很足夠了，不需要更多攝取',
     '不用急著補救。',
     '喝點水，好好休息。',
     '接下來幾天交給我。',

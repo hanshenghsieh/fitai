@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Heart, ClipboardList, Loader2 } from 'lucide-react'
+import { ClipboardList, Loader2, RefreshCw } from 'lucide-react'
 import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu } from '@/lib/food-search'
 import { estimateFreeTextMeal } from '@/lib/food-estimate'
@@ -21,8 +21,6 @@ import {
   computeTodayMealState,
   OVER_TARGET_COPY,
 } from '@/lib/engines/next-meal-engine'
-import { pickCompanionLine, companionCategoryForHour } from '@/lib/copy/companion-picker'
-import type { CompanionLine } from '@/lib/copy/companion-lines'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import { getFoodMemoryGreeting, getFoodPrediction } from '@/lib/engines/food-prediction'
 import type { FoodLogEntry } from '@/lib/banks/types'
@@ -43,7 +41,8 @@ import {
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { storesInText } from '@/lib/dice-store-names'
 import { linesToDisplayItems } from '@/lib/meal-suggest'
-import { formatEatOutDiceLabel } from '@/lib/eat-out-builder'
+import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
+import { eatOutMenu, type ConvenienceItem } from '@/lib/convenience-store-menu'
 import DiceMealPreview from '@/components/dashboard/DiceMealPreview'
 import TodayFoodMore from '@/components/dashboard/today/TodayFoodMore'
 import {
@@ -73,6 +72,52 @@ function allItemNamesFromLogs(logs: FoodLogEntry[]): string[] {
   return [...new Set(logs.flatMap(l => l.name.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean)))]
 }
 
+function logToDisplayItems(log: FoodLogEntry): ConvenienceItem[] {
+  const names = log.name.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean)
+  if (!names.length) return []
+  const store = log.store ?? '已記錄'
+  if (names.length === 1) {
+    return [
+      {
+        id: `${log.id}-0`,
+        name: names[0]!,
+        store,
+        source: 'convenience',
+        category: 'lunch',
+        role: 'main',
+        portionable: false,
+        tags: [],
+        calories: log.calories,
+        protein_g: log.protein_g,
+        carbs_g: log.carbs_g ?? 0,
+        fat_g: log.fat_g ?? 0,
+        price: 0,
+        photo_url: '',
+        description: '',
+      },
+    ]
+  }
+  const perCal = Math.round(log.calories / names.length)
+  const perPro = Math.round(log.protein_g / names.length)
+  return names.map((name, i) => ({
+    id: `${log.id}-${i}`,
+    name,
+    store,
+    source: 'convenience' as const,
+    category: 'lunch' as const,
+    role: 'main' as const,
+    portionable: false,
+    tags: [],
+    calories: perCal,
+    protein_g: perPro,
+    carbs_g: 0,
+    fat_g: 0,
+    price: 0,
+    photo_url: '',
+    description: '',
+  }))
+}
+
 function diceSessionKey(mealType: MealType): string {
   return `dice-session-${getNutritionDayKey(new Date())}-${mealType}`
 }
@@ -96,6 +141,13 @@ function saveDiceSession(mealType: MealType, stores: string[], ids: string[]) {
   } catch {
     /* quota / private mode */
   }
+}
+
+function mealTypeForFoodSlot(slot: FoodSlot, schedule: WorkSchedule): MealType {
+  if (slot === 'meal1') return 'breakfast'
+  if (slot === 'meal2') return 'lunch'
+  if (slot === 'meal3') return 'dinner'
+  return currentMealSlotForSchedule(schedule) as MealType
 }
 
 interface Props {
@@ -275,11 +327,18 @@ export default function TodayOS({
   onPostureLine,
   onDiceApply,
 }: Props) {
-  const mealSlotLegacy = currentMealSlotForSchedule(userMemory.work_schedule ?? 'standard') as MealType
   const coords = useGeolocation(userMemory.eat_out_prefs?.work_location)
   const memory = memoryFromCheckinMeta({ user_memory: userMemory })
 
   const foodLogs = userMemory.food_logs_today ?? []
+
+  const [activeSlot, setActiveSlot] = useState<FoodSlot>(() =>
+    defaultFoodSlot(getTaipeiHour(), mealHoursFromLogs(recentFoodLogs))
+  )
+  const mealSlotLegacy = useMemo(
+    () => mealTypeForFoodSlot(activeSlot, userMemory.work_schedule ?? 'standard'),
+    [activeSlot, userMemory.work_schedule]
+  )
   const adherenceState = useMemo(
     () =>
       buildAdherenceContext(
@@ -331,18 +390,13 @@ export default function TodayOS({
     adherenceState.events,
   ])
 
-  const [companionLine, setCompanionLine] = useState<CompanionLine | null>(null)
-  const [companionRecentIds, setCompanionRecentIds] = useState<string[]>([])
-
-  const [activeSlot, setActiveSlot] = useState<FoodSlot>(() =>
-    defaultFoodSlot(getTaipeiHour(), mealHoursFromLogs(recentFoodLogs))
-  )
   const [moreOpen, setMoreOpen] = useState(false)
   const [query, setQuery] = useState('')
   const foodLogsRef = useRef(foodLogs)
   foodLogsRef.current = foodLogs
   const [rolling, setRolling] = useState(false)
-  const [dicePreview, setDicePreview] = useState<MealSuggestion | null>(null)
+  const [dicePreviewByMeal, setDicePreviewByMeal] = useState<Partial<Record<MealType, MealSuggestion>>>({})
+  const dicePreview = dicePreviewByMeal[mealSlotLegacy] ?? null
   const [localDiceRolls, setLocalDiceRolls] = useState(0)
   const [seenDiceStores, setSeenDiceStores] = useState<string[]>([])
   const [seenDiceIds, setSeenDiceIds] = useState<string[]>([])
@@ -371,6 +425,32 @@ export default function TodayOS({
   )
 
   const lastSlotLog = slotLogs.length > 0 ? slotLogs[slotLogs.length - 1]!.log : null
+
+  const slotLoggedItems = useMemo(
+    () => (lastSlotLog ? logToDisplayItems(lastSlotLog) : []),
+    [lastSlotLog]
+  )
+
+  const slotContentFlags = useMemo(() => {
+    const flags: Partial<Record<FoodSlot, boolean>> = {}
+    const schedule = userMemory.work_schedule ?? 'standard'
+    for (const s of FOOD_SLOTS) {
+      if (s.id === 'other') continue
+      const mt = mealTypeForFoodSlot(s.id, schedule)
+      flags[s.id] =
+        (customEatOut[mt]?.length ?? 0) > 0 ||
+        foodLogs.some(l => (l.slot ?? 'meal2') === s.id)
+    }
+    return flags
+  }, [customEatOut, foodLogs, userMemory.work_schedule])
+
+  const slotSelectedItems = useMemo(() => {
+    const custom = customEatOut[mealSlotLegacy]
+    if (!custom?.length) return []
+    return selectedToDisplayItems(deserializeCustomCombo(custom, eatOutMenu))
+  }, [customEatOut, mealSlotLegacy])
+
+  const slotMealSuggest = mealSuggest[mealSlotLegacy]
 
   useEffect(() => {
     if (frequentList.length === 0) {
@@ -581,19 +661,8 @@ export default function TodayOS({
     [patchLog, userMemory.food_dna, foodDna, mealTargets.calories, mealTargets.protein]
   )
 
-  const pickCompanion = useCallback(() => {
-    const cat =
-      companionCategoryForHour(getTaipeiHour()) ??
-      (dayState.overTargetProtection || dayState.recoveryActive ? 'recovery' : 'comfort')
-    const line = pickCompanionLine(companionRecentIds, cat, String(Date.now()))
-    setCompanionRecentIds(prev => [...prev, line.id].slice(-50))
-    setCompanionLine(line)
-    setDicePreview(null)
-  }, [companionRecentIds, dayState.overTargetProtection, dayState.recoveryActive])
-
   const rollDice = useCallback(() => {
     if (!dayState.allowDiceAndSuggest) return
-    setCompanionLine(null)
     setRolling(true)
     void preloadDiceMenuBulk().then(() => {
       // 預覽骰子只排除「上一個預覽」，不套用今日已確認的 seen_ids（避免選項過少）
@@ -650,7 +719,7 @@ export default function TodayOS({
         setSeenDiceStores(nextStores)
         setSeenDiceIds(nextIds)
         saveDiceSession(mealSlotLegacy, nextStores, nextIds)
-        setDicePreview(result.suggestion)
+        setDicePreviewByMeal(prev => ({ ...prev, [mealSlotLegacy]: result.suggestion! }))
       }, 350)
     })
   }, [mealSlotLegacy, dicePreview, foodLogs, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, seenDiceStores, seenDiceIds, dailyRolls, adherenceState, calorieBank, dayState])
@@ -687,34 +756,47 @@ export default function TodayOS({
       userMemory: nextMemory,
       logEntry,
     })
-    setDicePreview(null)
-    if (dayState.allowDiceAndSuggest) {
-      setTimeout(() => rollDice(), 100)
-    }
-  }, [dicePreview, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, updatePostureLine, onDiceApply, rollDice, dayState.allowDiceAndSuggest])
+    setDicePreviewByMeal(prev => {
+      const next = { ...prev }
+      delete next[mealSlotLegacy]
+      return next
+    })
+  }, [dicePreview, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, updatePostureLine, onDiceApply])
 
   const previewItems = dicePreview ? linesToDisplayItems(dicePreview.lines) : []
+  const displayItems =
+    previewItems.length > 0
+      ? previewItems
+      : slotSelectedItems.length > 0
+        ? slotSelectedItems
+        : slotLoggedItems
+  const showingConfirmedSelection = !dicePreview && slotSelectedItems.length > 0
+  const showingLoggedOnly =
+    !dicePreview && slotSelectedItems.length === 0 && slotLoggedItems.length > 0
+  const highlightKey =
+    dicePreview?.highlight_key ?? slotMealSuggest?.current_highlight_key ?? 'balanced'
 
   useEffect(() => {
     if (heroBooted.current) return
     heroBooted.current = true
-    if (dayState.overTargetProtection) {
-      setCompanionLine({
-        id: 'over-target-static',
-        text: OVER_TARGET_COPY.lines[0],
-        category: 'recovery',
-      })
-      return
-    }
+    if (dayState.overTargetProtection) return
+    if (customEatOut[mealSlotLegacy]?.length) return
+    if (dicePreviewByMeal[mealSlotLegacy]) return
     void preloadDiceMenuBulk().then(() => rollDice())
-  }, [rollDice, dayState.overTargetProtection])
+  }, [rollDice, dayState.overTargetProtection, mealSlotLegacy, customEatOut])
 
   useEffect(() => {
     if (dayState.overTargetProtection) {
-      setDicePreview(null)
+      setDicePreviewByMeal({})
       setRolling(false)
+      return
     }
-  }, [dayState.overTargetProtection])
+    const mt = mealTypeForFoodSlot(activeSlot, userMemory.work_schedule ?? 'standard')
+    if (dicePreviewByMeal[mt]) return
+    if (customEatOut[mt]?.length) return
+    void preloadDiceMenuBulk().then(() => rollDice())
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-roll when switching meal tab
+  }, [activeSlot, userMemory.work_schedule, dayState.overTargetProtection])
 
   const formatLogTime = (loggedAt: string) => {
     try {
@@ -738,12 +820,13 @@ export default function TodayOS({
         <div className="flex gap-2 overflow-x-auto pb-0.5 -mx-1 px-1">
           {FOOD_SLOTS.filter(s => s.id !== 'other').map(s => {
             const active = activeSlot === s.id
+            const hasContent = slotContentFlags[s.id]
             return (
               <button
                 key={s.id}
                 type="button"
                 onClick={() => setActiveSlot(s.id)}
-                className="flex-shrink-0 px-4 py-2 rounded-full text-[13px]"
+                className="flex-shrink-0 px-4 py-2 rounded-full text-[13px] flex items-center gap-1.5"
                 style={{
                   backgroundColor: active ? TODAY.pillActiveBg : TODAY.pillBg,
                   color: active ? TODAY.pillActiveText : TODAY.text,
@@ -751,47 +834,58 @@ export default function TodayOS({
                 }}
               >
                 {s.label}
+                {hasContent && (
+                  <span
+                    className="w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{
+                      backgroundColor: active ? TODAY.pillActiveText : TODAY.mocha,
+                      opacity: active ? 0.85 : 0.55,
+                    }}
+                  />
+                )}
               </button>
             )
           })}
         </div>
 
-        {rolling && !dicePreview && !companionLine ? (
+        {dayState.overTargetProtection && (
+          <p
+            className="text-[13px] text-center leading-relaxed px-1 -mt-1"
+            style={{ color: TODAY.textSecondary, fontWeight: 400 }}
+          >
+            {OVER_TARGET_COPY.banner}
+          </p>
+        )}
+
+        {rolling && !dicePreview && displayItems.length === 0 ? (
           <div className="py-14 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             想一下…
           </div>
-        ) : companionLine ? (
-          <div className="py-10 px-2 space-y-3 text-center">
-            <p className="text-[17px] leading-relaxed" style={{ color: TODAY.text, fontWeight: 500 }}>
-              {companionLine.text}
-            </p>
-            {dayState.overTargetProtection && (
-              <div className="space-y-1.5 text-[14px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-                {OVER_TARGET_COPY.lines.slice(1).map(line => (
-                  <p key={line}>{line}</p>
-                ))}
-              </div>
+        ) : displayItems.length > 0 ? (
+          <>
+            {(showingConfirmedSelection || showingLoggedOnly) && (
+              <p className="text-[12px] px-0.5" style={{ color: TODAY.mocha, fontWeight: 500 }}>
+                {showingConfirmedSelection ? '這餐已選' : '這餐已記錄'}
+              </p>
             )}
-          </div>
-        ) : dicePreview ? (
-          <DiceMealPreview
-            items={previewItems}
-            mealType={mealSlotLegacy}
-            schedule={userMemory.work_schedule ?? 'standard'}
-            lifeEvent={inferredTrustEvent}
-            prefersCook={profile?.cooking_time_mins != null && profile.cooking_time_mins >= 20}
-            highlightKey={dicePreview.highlight_key}
-            highlightPriceMeta={dicePreview.highlight_price_meta}
-          />
-        ) : dayState.overTargetProtection ? (
-          <div className="py-10 px-2 space-y-2 text-center text-[14px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            {OVER_TARGET_COPY.lines.map(line => (
-              <p key={line}>{line}</p>
-            ))}
-          </div>
+            <DiceMealPreview
+              items={displayItems}
+              mealType={mealSlotLegacy}
+              schedule={userMemory.work_schedule ?? 'standard'}
+              lifeEvent={inferredTrustEvent}
+              prefersCook={profile?.cooking_time_mins != null && profile.cooking_time_mins >= 20}
+              highlightKey={highlightKey}
+              highlightPriceMeta={dicePreview?.highlight_price_meta}
+            />
+            {showingConfirmedSelection && slotMealSuggest?.current_highlight && (
+              <p className="text-[13px] px-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+                {slotMealSuggest.current_highlight}
+              </p>
+            )}
+          </>
         ) : (
           <div className="py-10 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            點下方陪陪我，或從更多記錄
+            點下方換一個，或從更多記錄
           </div>
         )}
 
@@ -804,20 +898,20 @@ export default function TodayOS({
               className="w-full h-16 rounded-[24px] text-[18px] disabled:opacity-40"
               style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
             >
-              吃了
+              就決定是它了
             </button>
           )}
 
           <div className="flex gap-3">
             <button
               type="button"
-              disabled={rolling}
-              onClick={pickCompanion}
-              className="flex-1 h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2"
+              disabled={rolling || !dayState.allowDiceAndSuggest}
+              onClick={rollDice}
+              className="flex-1 h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2 disabled:opacity-40"
               style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
             >
-              <Heart className="h-[16px] w-[16px]" strokeWidth={TODAY.iconStroke} />
-              陪陪我
+              <RefreshCw className={`h-[16px] w-[16px] ${rolling ? 'animate-spin' : ''}`} strokeWidth={TODAY.iconStroke} />
+              換一個
             </button>
             <button
               type="button"
