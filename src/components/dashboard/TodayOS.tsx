@@ -1,7 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { RefreshCw, ClipboardList, Loader2 } from 'lucide-react'
+import { Heart, ClipboardList, Loader2 } from 'lucide-react'
+import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu } from '@/lib/food-search'
 import { estimateFreeTextMeal } from '@/lib/food-estimate'
 import {
@@ -15,6 +16,13 @@ import { formatPostureLine } from '@/lib/copy/zaijian'
 import { getCorrectionMessage } from '@/lib/engines/correction-engine'
 import { buildAdherenceState, adherenceToTrustEvent } from '@/lib/engines/adherence-engine'
 import { mergeBankIntoAdherence } from '@/lib/engines/calorie-bank-engine'
+import {
+  avgDailyKcalFromLogs,
+  computeTodayMealState,
+  OVER_TARGET_COPY,
+} from '@/lib/engines/next-meal-engine'
+import { pickCompanionLine, companionCategoryForHour } from '@/lib/copy/companion-picker'
+import type { CompanionLine } from '@/lib/copy/companion-lines'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import { getFoodMemoryGreeting, getFoodPrediction } from '@/lib/engines/food-prediction'
 import type { FoodLogEntry } from '@/lib/banks/types'
@@ -290,6 +298,42 @@ export default function TodayOS({
   )
   const inferredTrustEvent = useMemo(() => adherenceToTrustEvent(adherenceState), [adherenceState])
 
+  const dayState = useMemo(() => {
+    const todayStr = getNutritionDayKey()
+    const dayKeys7 = Array.from({ length: 7 }, (_, i) =>
+      format(subDays(parseISO(todayStr), i), 'yyyy-MM-dd')
+    )
+    const allLogs = [...recentFoodLogs, ...foodLogs]
+    const maintenance =
+      (goalSnapshot as { tdee?: number } | undefined)?.tdee ??
+      todayPlan.daily_targets.calories + (goalSnapshot?.daily_deficit ?? 0)
+    return computeTodayMealState({
+      todayFoodLogs: foodLogs,
+      normalTargetKcal: todayPlan.daily_targets.calories,
+      internalTargetKcal: calorieBank?.internal_target_kcal,
+      proteinTargetG: todayPlan.daily_targets.protein_g,
+      calorieBank,
+      mealSlot: mealSlotLegacy,
+      hourOfDay: getTaipeiHour(),
+      maintenanceKcal: maintenance,
+      avg7DayKcal: avgDailyKcalFromLogs(allLogs, dayKeys7),
+      weightPlateauDays: adherenceState.events.includes('plateau') ? 15 : 0,
+      adherencePct: foodLogs.length > 0 ? Math.min(100, 80 + foodLogs.length * 3) : 70,
+      sleepDebt: adherenceState.events.includes('sleep_debt'),
+    })
+  }, [
+    foodLogs,
+    recentFoodLogs,
+    todayPlan.daily_targets,
+    calorieBank,
+    mealSlotLegacy,
+    goalSnapshot,
+    adherenceState.events,
+  ])
+
+  const [companionLine, setCompanionLine] = useState<CompanionLine | null>(null)
+  const [companionRecentIds, setCompanionRecentIds] = useState<string[]>([])
+
   const [activeSlot, setActiveSlot] = useState<FoodSlot>(() =>
     defaultFoodSlot(getTaipeiHour(), mealHoursFromLogs(recentFoodLogs))
   )
@@ -371,10 +415,7 @@ export default function TodayOS({
   }, [foodLogs, userMemory, updatePostureLine])
 
   const mealTargets = useMemo(() => {
-    const dailyCalories =
-      calorieBank?.internal_target_kcal && calorieBank.internal_target_kcal > 0
-        ? calorieBank.internal_target_kcal
-        : todayPlan.daily_targets.calories
+    const dailyCalories = dayState.todayTarget
     const split = mealMacroSplit(
       {
         dailyCalories,
@@ -385,7 +426,7 @@ export default function TodayOS({
       mealSlotLegacy
     )
     return { calories: split.calories, protein: split.protein }
-  }, [todayPlan.daily_targets, mealSlotLegacy, calorieBank?.internal_target_kcal])
+  }, [todayPlan.daily_targets, mealSlotLegacy, dayState.todayTarget])
 
   const results = useMemo(() => searchFoodMenu(query, 6), [query])
 
@@ -540,7 +581,19 @@ export default function TodayOS({
     [patchLog, userMemory.food_dna, foodDna, mealTargets.calories, mealTargets.protein]
   )
 
+  const pickCompanion = useCallback(() => {
+    const cat =
+      companionCategoryForHour(getTaipeiHour()) ??
+      (dayState.overTargetProtection || dayState.recoveryActive ? 'recovery' : 'comfort')
+    const line = pickCompanionLine(companionRecentIds, cat, String(Date.now()))
+    setCompanionRecentIds(prev => [...prev, line.id].slice(-50))
+    setCompanionLine(line)
+    setDicePreview(null)
+  }, [companionRecentIds, dayState.overTargetProtection, dayState.recoveryActive])
+
   const rollDice = useCallback(() => {
+    if (!dayState.allowDiceAndSuggest) return
+    setCompanionLine(null)
     setRolling(true)
     void preloadDiceMenuBulk().then(() => {
       // 預覽骰子只排除「上一個預覽」，不套用今日已確認的 seen_ids（避免選項過少）
@@ -578,6 +631,7 @@ export default function TodayOS({
         user_lng: coords?.lng,
         adherence: adherenceState,
         calorie_bank: calorieBank,
+        day_state: dayState,
       })
 
       setTimeout(() => {
@@ -599,7 +653,7 @@ export default function TodayOS({
         setDicePreview(result.suggestion)
       }, 350)
     })
-  }, [mealSlotLegacy, dicePreview, foodLogs, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, seenDiceStores, seenDiceIds, dailyRolls, adherenceState, calorieBank])
+  }, [mealSlotLegacy, dicePreview, foodLogs, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, seenDiceStores, seenDiceIds, dailyRolls, adherenceState, calorieBank, dayState])
 
   const confirmDice = useCallback(() => {
     if (!dicePreview) return
@@ -634,16 +688,33 @@ export default function TodayOS({
       logEntry,
     })
     setDicePreview(null)
-    setTimeout(() => rollDice(), 100)
-  }, [dicePreview, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, updatePostureLine, onDiceApply, rollDice])
+    if (dayState.allowDiceAndSuggest) {
+      setTimeout(() => rollDice(), 100)
+    }
+  }, [dicePreview, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, updatePostureLine, onDiceApply, rollDice, dayState.allowDiceAndSuggest])
 
   const previewItems = dicePreview ? linesToDisplayItems(dicePreview.lines) : []
 
   useEffect(() => {
     if (heroBooted.current) return
     heroBooted.current = true
+    if (dayState.overTargetProtection) {
+      setCompanionLine({
+        id: 'over-target-static',
+        text: OVER_TARGET_COPY.lines[0],
+        category: 'recovery',
+      })
+      return
+    }
     void preloadDiceMenuBulk().then(() => rollDice())
-  }, [rollDice])
+  }, [rollDice, dayState.overTargetProtection])
+
+  useEffect(() => {
+    if (dayState.overTargetProtection) {
+      setDicePreview(null)
+      setRolling(false)
+    }
+  }, [dayState.overTargetProtection])
 
   const formatLogTime = (loggedAt: string) => {
     try {
@@ -685,9 +756,22 @@ export default function TodayOS({
           })}
         </div>
 
-        {rolling && !dicePreview ? (
+        {rolling && !dicePreview && !companionLine ? (
           <div className="py-14 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             想一下…
+          </div>
+        ) : companionLine ? (
+          <div className="py-10 px-2 space-y-3 text-center">
+            <p className="text-[17px] leading-relaxed" style={{ color: TODAY.text, fontWeight: 500 }}>
+              {companionLine.text}
+            </p>
+            {dayState.overTargetProtection && (
+              <div className="space-y-1.5 text-[14px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+                {OVER_TARGET_COPY.lines.slice(1).map(line => (
+                  <p key={line}>{line}</p>
+                ))}
+              </div>
+            )}
           </div>
         ) : dicePreview ? (
           <DiceMealPreview
@@ -699,33 +783,41 @@ export default function TodayOS({
             highlightKey={dicePreview.highlight_key}
             highlightPriceMeta={dicePreview.highlight_price_meta}
           />
+        ) : dayState.overTargetProtection ? (
+          <div className="py-10 px-2 space-y-2 text-center text-[14px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+            {OVER_TARGET_COPY.lines.map(line => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
         ) : (
           <div className="py-10 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            點下方換一個，或從更多記錄
+            點下方陪陪我，或從更多記錄
           </div>
         )}
 
         <div className="space-y-3 pt-1">
-          <button
-            type="button"
-            disabled={!dicePreview || rolling}
-            onClick={confirmDice}
-            className="w-full h-16 rounded-[24px] text-[18px] disabled:opacity-40"
-            style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
-          >
-            吃了
-          </button>
+          {dicePreview && dayState.allowDiceAndSuggest && (
+            <button
+              type="button"
+              disabled={rolling}
+              onClick={confirmDice}
+              className="w-full h-16 rounded-[24px] text-[18px] disabled:opacity-40"
+              style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
+            >
+              吃了
+            </button>
+          )}
 
           <div className="flex gap-3">
             <button
               type="button"
               disabled={rolling}
-              onClick={rollDice}
+              onClick={pickCompanion}
               className="flex-1 h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2"
               style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
             >
-              <RefreshCw className={`h-[16px] w-[16px] ${rolling ? 'animate-spin' : ''}`} strokeWidth={TODAY.iconStroke} />
-              換一個
+              <Heart className="h-[16px] w-[16px]" strokeWidth={TODAY.iconStroke} />
+              陪陪我
             </button>
             <button
               type="button"

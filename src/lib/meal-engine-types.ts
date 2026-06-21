@@ -87,6 +87,8 @@ export interface SuggestContext {
   adherence?: import('@/lib/engines/adherence-types').AdherenceState | null
   /** Engine v1 — persistent calorie bank */
   calorie_bank?: import('@/lib/banks/calorie-bank-types').CalorieBankRow | null
+  /** Engine v2 — continuous today state */
+  day_state?: import('@/lib/engines/next-meal-engine').TodayMealState | null
 }
 
 export const MEAL_RATIOS = { breakfast: 0.25, lunch: 0.4, dinner: 0.35 } as const

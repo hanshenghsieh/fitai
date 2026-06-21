@@ -54,6 +54,7 @@ export function buildSuggestContext(params: {
   seed?: number
   adherence?: import('@/lib/engines/adherence-types').AdherenceState | null
   calorie_bank?: import('@/lib/banks/calorie-bank-types').CalorieBankRow | null
+  day_state?: import('@/lib/engines/next-meal-engine').TodayMealState | null
 }): SuggestContext {
   const lat = params.user_lat
   const lng = params.user_lng
@@ -75,6 +76,7 @@ export function rollMealSuggestion(params: {
   user_lng?: number
   adherence?: import('@/lib/engines/adherence-types').AdherenceState | null
   calorie_bank?: import('@/lib/banks/calorie-bank-types').CalorieBankRow | null
+  day_state?: import('@/lib/engines/next-meal-engine').TodayMealState | null
 }): {
   suggestion: MealSuggestion | null
   rolls_used: number
@@ -98,6 +100,7 @@ export function rollMealSuggestion(params: {
     user_lng: params.user_lng,
     adherence: params.adherence,
     calorie_bank: params.calorie_bank,
+    day_state: params.day_state,
     seed: Date.now() + params.rolls_used * 9973 + mealSeed,
   })
 

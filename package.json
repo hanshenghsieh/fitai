@@ -25,7 +25,7 @@
     "food-images:setup": "npx tsx scripts/setup-food-images.ts",
     "food-images:reset": "npx tsx scripts/setup-food-images.ts -- --force",
     "market-loop": "npx tsx scripts/market-loop/run.ts",
-    "test": "node --import tsx --test src/lib/engines/calorie-bank-engine.test.ts",
+    "test": "node --import tsx --test src/lib/engines/calorie-bank-engine.test.ts src/lib/engines/next-meal-engine.test.ts",
     "migrate:calorie-bank": "node scripts/apply-calorie-bank-migration.mjs"
   },
   "dependencies": {

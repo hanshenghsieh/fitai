@@ -3,8 +3,8 @@ import { applyPortion, type PortionId, isSolidFood, isBeverage } from './eat-out
 import { getFilteredMenu, preferredBrandBoost } from './eat-out-filters'
 import { getDiceMainPool, isDiceSideCandidate, isDiceDrinkCandidate, getDiceMenuPool } from './dice-menu-pool'
 import { effectiveMealCalTarget, enjoyableDiceBonus } from './engines/adherence-engine'
-import { recoveryFoodScoreAdjust } from './engines/calorie-bank-engine'
-import { isRecoveryActive } from './engines/calorie-bank-engine'
+import { recoveryFoodScoreAdjust, isRecoveryActive } from './engines/calorie-bank-engine'
+import { scoreMealCandidate } from './engines/next-meal-engine'
 import { isValidMealLines } from './meal-combo-validity'
 import { nearestPlaceForBrand } from './nearby-engine'
 import type { ConvenienceItem } from './convenience-store-menu'
@@ -199,6 +199,29 @@ function scoreCandidate(
   return score
 }
 
+function scoreCandidateV2(
+  totals: ReturnType<typeof linesToTotals>,
+  itemNames: string[],
+  dayState: NonNullable<SuggestContext['day_state']>,
+  memory: SuggestContext['memory'],
+  store: string,
+  rollsUsed = 0,
+  excludeStores?: string[]
+): number {
+  let score = scoreMealCandidate({
+    itemNames,
+    calories: totals.calories,
+    proteinG: totals.protein_g,
+    state: dayState,
+    historyBoost: preferredBrandBoost(store, memory) < 0 ? 1 : 0,
+    userPrefBoost: (memory?.favorite_brands?.includes(store) ? 1 : 0),
+    recoveryActive: dayState.recoveryActive,
+  })
+  if (rollsUsed > 0) score += 12
+  if (excludeStores?.includes(store)) score += 400
+  return score
+}
+
 type ScoredSuggestion = MealSuggestion & { score: number }
 
 function stratifiedStorePick(
@@ -370,20 +393,31 @@ function isExcludedByName(lines: MealLine[], excludeNames?: string[]): boolean {
 }
 
 export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSuggestion[] {
-  const baseTargets = mealTargetsFromDaily(
-    {
-      ...ctx.daily_targets,
-      calories:
-        ctx.calorie_bank?.internal_target_kcal && ctx.calorie_bank.internal_target_kcal > 0
-          ? ctx.calorie_bank.internal_target_kcal
-          : ctx.daily_targets.calories,
-    },
-    ctx.meal_type
-  )
+  if (ctx.day_state?.overTargetProtection) return []
+
+  const dayState = ctx.day_state
+  const dailyCalBase =
+    ctx.calorie_bank?.internal_target_kcal && ctx.calorie_bank.internal_target_kcal > 0
+      ? ctx.calorie_bank.internal_target_kcal
+      : ctx.daily_targets.calories
+
+  const baseTargets = dayState
+    ? {
+        calories: dayState.effectiveMealCalTarget,
+        protein_g: dayState.effectiveMealProteinTarget,
+        carbs_g: ctx.daily_targets.carbs_g,
+        fat_g: ctx.daily_targets.fat_g,
+      }
+    : mealTargetsFromDaily(
+        { ...ctx.daily_targets, calories: dailyCalBase },
+        ctx.meal_type
+      )
   const targets = ctx.adherence
     ? {
         ...baseTargets,
-        calories: effectiveMealCalTarget(baseTargets.calories, ctx.adherence),
+        calories: dayState
+          ? dayState.effectiveMealCalTarget
+          : effectiveMealCalTarget(baseTargets.calories, ctx.adherence),
         protein_g: Math.round(baseTargets.protein_g * ctx.adherence.dice.proteinBoost),
       }
     : baseTargets
@@ -584,6 +618,10 @@ export function suggestNextMeal(
   ctx: SuggestContext,
   prev?: MealSuggestion | null
 ): { suggestion: MealSuggestion | null; pool_exhausted: boolean } {
+  if (ctx.day_state?.overTargetProtection) {
+    return { suggestion: null, pool_exhausted: true }
+  }
+
   const reroll = ctx.rolls_used ?? 0
   let candidates = generateCandidates(ctx, false)
   if (candidates.length < 40) {
@@ -652,23 +690,33 @@ export function suggestNextMeal(
 
   const scored = candidates.map(c => ({
     ...c,
-    score: scoreCandidate(
-      c.totals,
-      targets,
-      c.totals.price,
-      budgetMax,
-      c.stores[0] ?? '',
-      ctx.memory,
-      c.distance_m,
-      ctx.nearby_brands,
-      primaryItemNames(c.lines),
-      ctx.exclude_names,
-      c.lines.length,
-      ctx.exclude_stores,
-      reroll,
-      ctx.adherence,
-      ctx.calorie_bank
-    ),
+    score: ctx.day_state
+      ? scoreCandidateV2(
+          c.totals,
+          primaryItemNames(c.lines),
+          ctx.day_state,
+          ctx.memory,
+          c.stores[0] ?? '',
+          reroll,
+          ctx.exclude_stores
+        )
+      : scoreCandidate(
+          c.totals,
+          targets,
+          c.totals.price,
+          budgetMax,
+          c.stores[0] ?? '',
+          ctx.memory,
+          c.distance_m,
+          ctx.nearby_brands,
+          primaryItemNames(c.lines),
+          ctx.exclude_names,
+          c.lines.length,
+          ctx.exclude_stores,
+          reroll,
+          ctx.adherence,
+          ctx.calorie_bank
+        ),
   }))
 
   const seed =
