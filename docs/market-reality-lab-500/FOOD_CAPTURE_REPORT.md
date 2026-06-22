@@ -1,7 +1,7 @@
 # Food Capture Flow — iter7 上線報告
 
 **日期：** 2026-06-19  
-**Production：** https://fitai-taupe-sigma.vercel.app  
+**Production：** https://betterbit.app  
 **MR500：** iter7（+ `has_photo_food_capture`）
 
 ---

@@ -3,11 +3,13 @@ import Link from 'next/link'
 import LegalPageLayout, { LegalSection } from '@/components/legal/LegalPageLayout'
 import { SUPPORT_EMAIL } from '@/lib/support'
 import { colors } from '@/lib/design-system'
+import { createPageMetadata } from '@/lib/site-metadata'
 
-export const metadata: Metadata = {
-  title: '支援 · 再健一點',
+export const metadata: Metadata = createPageMetadata({
+  title: '支援',
   description: 'BetterBit 客服與常見問題。',
-}
+  path: '/support',
+})
 
 export default function SupportPage() {
   return (

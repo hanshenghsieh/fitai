@@ -2,7 +2,7 @@
 
 **建立日期：** 2026-06-18  
 **檢查基準 commit：** `4dbc201` — Fix meal log sync, menu plausibility, and today UX improvements.  
-**Production：** https://fitai-taupe-sigma.vercel.app  
+**Production：** https://betterbit.app  
 **GitHub：** https://github.com/hanshenghsieh/fitai
 
 ---

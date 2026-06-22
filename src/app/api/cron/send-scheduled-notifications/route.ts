@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { format, startOfWeek } from 'date-fns'
+import { absoluteUrl } from '@/lib/app-url'
 
 // 定時通知時間配置 (24小時制)
 const NOTIFICATION_SCHEDULE = {
@@ -56,7 +57,7 @@ async function sendScheduledNotifications() {
           || plan?.meals?.[0]?.items?.[0]?.name_zh
           || '查看計畫'
 
-        await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-notifications`, {
+        await fetch(absoluteUrl('/api/send-notifications'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -85,7 +86,7 @@ async function sendScheduledNotifications() {
           || plan?.meals?.[1]?.items?.[0]?.name_zh
           || '查看計畫'
 
-        await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-notifications`, {
+        await fetch(absoluteUrl('/api/send-notifications'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -114,7 +115,7 @@ async function sendScheduledNotifications() {
           || plan?.meals?.[2]?.items?.[0]?.name_zh
           || '查看計畫'
 
-        await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-notifications`, {
+        await fetch(absoluteUrl('/api/send-notifications'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -141,7 +142,7 @@ async function sendScheduledNotifications() {
         const plan = await getActivePlanForToday(supabase, user_id)
         const workoutType = plan?.workout?.type_zh || '查看計畫'
 
-        await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-notifications`, {
+        await fetch(absoluteUrl('/api/send-notifications'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -184,7 +185,7 @@ async function sendScheduledNotifications() {
         const qualified = total > 0 && dietDone >= diet.length && workoutDone >= workout.length
 
         if (!qualified) {
-          await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-notifications`, {
+          await fetch(absoluteUrl('/api/send-notifications'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

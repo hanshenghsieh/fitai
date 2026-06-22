@@ -1,5 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli'
 
+import { PRODUCTION_APP_URL } from './src/lib/app-url'
+
 /**
  * BetterBit iOS shell — loads production Next.js (Vercel).
  * No static export; full SSR/API preserved on server.
@@ -10,7 +12,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 const serverUrl =
   process.env.CAP_SERVER_URL?.trim() ||
   process.env.NEXT_PUBLIC_APP_URL?.trim() ||
-  'https://fitai-taupe-sigma.vercel.app'
+  PRODUCTION_APP_URL
 
 const config: CapacitorConfig = {
   appId: 'app.fitai.betterbit',
@@ -21,8 +23,8 @@ const config: CapacitorConfig = {
     cleartext: serverUrl.startsWith('http://'),
     androidScheme: 'https',
     allowNavigation: [
-      'fitai-taupe-sigma.vercel.app',
-      '*.vercel.app',
+      'betterbit.app',
+      '*.betterbit.app',
       'checkout.stripe.com',
       '*.stripe.com',
     ],

@@ -21,7 +21,7 @@ for (const line of envContent.split('\n')) {
 const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL
 const SERVICE_KEY = env.SUPABASE_SERVICE_ROLE_KEY
 const ANON_KEY = env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-const BASE = env.QA_BASE_URL || 'https://fitai-taupe-sigma.vercel.app'
+const BASE = env.QA_BASE_URL || 'https://betterbit.app'
 const CRON_SECRET = env.CRON_SECRET
 const PASSWORD = 'BetterBit2026!'
 

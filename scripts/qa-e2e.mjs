@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer'
 
-const BASE = process.env.QA_BASE_URL || 'https://fitai-taupe-sigma.vercel.app'
+const BASE = process.env.QA_BASE_URL || 'https://betterbit.app'
 const EMAIL = '123@gmail.com'
 const PASS = '00000000'
 

@@ -48,7 +48,7 @@ npx vercel --prod
 ```
 
 在 Vercel Dashboard → Settings → Environment Variables 加入所有金鑰。
-`NEXT_PUBLIC_APP_URL` 改為你的 Vercel 網址。
+`NEXT_PUBLIC_APP_URL` 改為 `https://betterbit.app`。
 
 ## 架構說明
 

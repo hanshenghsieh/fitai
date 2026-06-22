@@ -1,7 +1,7 @@
 # BetterBit QA 報告 — Production Ship
 
 **日期：** 2026-06-19  
-**環境：** `https://fitai-taupe-sigma.vercel.app`  
+**環境：** `https://betterbit.app`  
 **帳號：** `123@gmail.com` / `00000000`  
 **Commits：** `601e526` → `a9ef970`
 
@@ -68,7 +68,7 @@
 - [ ] Vercel 設定 `NEXT_PUBLIC_STRIPE_PRICE_ID`（真實 Price）
 - [ ] `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`
 - [ ] `CRON_SECRET` + Vercel cron 啟用
-- [ ] `NEXT_PUBLIC_APP_URL=https://fitai-taupe-sigma.vercel.app`
+- [ ] `NEXT_PUBLIC_APP_URL=https://betterbit.app`
 
 ---
 

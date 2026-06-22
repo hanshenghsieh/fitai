@@ -1,5 +1,7 @@
 /** 計畫自動重算 — 體重/體脂變化觸發閉環 */
 
+import { getAppUrl } from '@/lib/app-url'
+
 export const WEIGHT_REGEN_THRESHOLD_KG = 0.5
 export const BODY_FAT_REGEN_THRESHOLD_PCT = 1.0
 
@@ -53,7 +55,7 @@ export async function triggerPlanRegeneration(
   userId: string,
   reason: string
 ): Promise<{ ok: boolean; data?: unknown; error?: string }> {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const appUrl = getAppUrl()
   const secret = process.env.CRON_SECRET
   if (!secret) {
     return { ok: false, error: 'CRON_SECRET not configured' }

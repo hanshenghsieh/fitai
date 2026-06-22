@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getFirebaseMessaging } from '@/lib/firebase-admin'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
+import { absoluteUrl } from '@/lib/app-url'
 
 interface PushNotification {
   title: string
@@ -79,7 +80,7 @@ async function sendNotificationToUser(
       notification: { title: content.title, body: content.body },
       webpush: {
         fcmOptions: {
-          link: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?notification=${type}`,
+          link: absoluteUrl(`/dashboard?notification=${type}`),
         },
         notification: {
           title: content.title,

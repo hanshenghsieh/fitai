@@ -3,7 +3,7 @@
 **版本：** Capacitor 8 · iOS 原生殼  
 **Bundle ID：** `app.fitai.betterbit`  
 **App 名稱：** 再健一點  
-**Production URL：** https://fitai-taupe-sigma.vercel.app
+**Production URL：** https://betterbit.app
 
 ---
 
@@ -20,7 +20,7 @@ BetterBit **保留 Next.js 全端架構**（Vercel SSR + API Routes）。iOS App
                ▼
 ┌─────────────────────────────────┐
 │  Next.js on Vercel               │
-│  fitai-taupe-sigma.vercel.app    │
+│  betterbit.app    │
 │  (dashboard / API / Supabase)    │
 └─────────────────────────────────┘
 ```
@@ -186,9 +186,9 @@ npm run cap:open:ios
 
 | 項目 | URL |
 |------|-----|
-| Privacy Policy | https://fitai-taupe-sigma.vercel.app/privacy |
-| Terms | https://fitai-taupe-sigma.vercel.app/terms |
-| Support | https://fitai-taupe-sigma.vercel.app/support |
+| Privacy Policy | https://betterbit.app/privacy |
+| Terms | https://betterbit.app/terms |
+| Support | https://betterbit.app/support |
 
 ---
 

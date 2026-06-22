@@ -1,6 +1,6 @@
 # 再健一點 App Status Report
 
-**Production URL:** https://fitai-taupe-sigma.vercel.app  
+**Production URL:** https://betterbit.app  
 **Last Updated:** 2026-06-18  
 **Brand:** 再健一點（原 FitAI 已全面更名）
 
@@ -60,11 +60,11 @@ npm run sync-menu
 npm run build
 
 # 4. 部署至 Vercel
-# 生產網址：https://fitai-taupe-sigma.vercel.app
+# 生產網址：https://betterbit.app
 npx vercel deploy --prod
 
 # 5. Vercel 環境變數（Settings → Environment Variables）
-#    NEXT_PUBLIC_APP_URL=https://fitai-taupe-sigma.vercel.app
+#    NEXT_PUBLIC_APP_URL=https://betterbit.app
 #    + .env.local 內其餘所有變數
 #    CRON_SECRET、STRIPE_*、FIREBASE_ADMIN_SDK 等
 ```

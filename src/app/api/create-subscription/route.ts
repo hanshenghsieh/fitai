@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createCustomerIfNotExists, createCheckoutSession } from '@/lib/stripe'
 import { getStripePriceId } from '@/lib/stripe-config'
+import { getAppUrl } from '@/lib/app-url'
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '訂閱尚未開放，請稍後再試' }, { status: 503 })
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const appUrl = getAppUrl()
 
     const customerId = await createCustomerIfNotExists(
       user.id,

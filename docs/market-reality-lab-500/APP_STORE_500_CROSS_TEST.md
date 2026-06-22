@@ -2,7 +2,7 @@
 
 **日期：** 2026-06-19  
 **產品模型：** MR500 **iter7**（iter6 + **拍照優先食物紀錄**）  
-**Production：** https://fitai-taupe-sigma.vercel.app
+**Production：** https://betterbit.app
 
 ## 本輪上線
 

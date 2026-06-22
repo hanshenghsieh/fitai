@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import LegalPageLayout, { LegalSection } from '@/components/legal/LegalPageLayout'
 import { SUPPORT_EMAIL } from '@/lib/support'
+import { createPageMetadata } from '@/lib/site-metadata'
 
-export const metadata: Metadata = {
-  title: '隱私權政策 · 再健一點',
+export const metadata: Metadata = createPageMetadata({
+  title: '隱私權政策',
   description: 'BetterBit 如何收集、使用與保護你的個人資料。',
-}
+  path: '/privacy',
+})
 
 export default function PrivacyPage() {
   return (

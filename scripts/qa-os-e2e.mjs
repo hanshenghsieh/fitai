@@ -12,7 +12,7 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const accountsFile = join(__dirname, 'test-accounts.json')
 
-const BASE = process.env.QA_BASE_URL || 'https://fitai-taupe-sigma.vercel.app'
+const BASE = process.env.QA_BASE_URL || 'https://betterbit.app'
 const PASSWORD = process.env.QA_TEST_PASSWORD || 'BetterBit2026!'
 
 let accounts = []

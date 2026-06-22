@@ -3,6 +3,8 @@ import { Inter, Noto_Sans_TC } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
 import { colors } from '@/lib/design-system'
+import { getAppUrl } from '@/lib/app-url'
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from '@/lib/site-metadata'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -17,11 +19,38 @@ const notoSansTC = Noto_Sans_TC({
   display: 'swap',
 })
 
+const appUrl = getAppUrl()
+
 export const metadata: Metadata = {
-  title: '再健一點',
-  description: '安靜陪伴你的健康節奏。你不用完美，照常過就好。',
+  metadataBase: new URL(appUrl),
+  title: {
+    default: SITE_NAME,
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   manifest: '/manifest.json',
-  appleWebApp: { capable: true, statusBarStyle: 'default', title: '再健一點' },
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'zh_TW',
+    url: appUrl,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_TAGLINE,
+  },
+  twitter: {
+    card: 'summary',
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: SITE_NAME },
   icons: {
     icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
     apple: [{ url: '/icon.svg', type: 'image/svg+xml' }],

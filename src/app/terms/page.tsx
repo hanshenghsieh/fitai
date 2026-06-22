@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import LegalPageLayout, { LegalSection } from '@/components/legal/LegalPageLayout'
 import { SUPPORT_EMAIL } from '@/lib/support'
+import { createPageMetadata } from '@/lib/site-metadata'
 
-export const metadata: Metadata = {
-  title: '服務條款 · 再健一點',
+export const metadata: Metadata = createPageMetadata({
+  title: '服務條款',
   description: 'BetterBit 服務條款與使用規範。',
-}
+  path: '/terms',
+})
 
 export default function TermsPage() {
   return (
