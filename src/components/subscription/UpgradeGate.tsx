@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Lock } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 
 interface Props {
   access: AccessStatus
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export default function UpgradeGate({ access, feature, children, preview }: Props) {
-  if (access.hasFullAccess) return <>{children}</>
+  if (isAppStoreSafeMode() || access.hasFullAccess) return <>{children}</>
 
   if (preview) {
     return (

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import SettingsSection from '@/components/settings/SettingsSection'
 import SettingsRow from '@/components/settings/SettingsRow'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 
 interface Props {
   access: AccessStatus
@@ -21,11 +22,19 @@ export default function SettingsPremiumTeaser({ access }: Props) {
       .catch(() => {})
   }, [])
 
+  const safeMode = isAppStoreSafeMode()
+
   return (
-    <SettingsSection title="會員" description="邀請，不是付費牆。">
+    <SettingsSection title="會員" description={safeMode ? '即將開放。' : '邀請，不是付費牆。'}>
       <SettingsRow
-        label={isSubscribed ? '會員進行中' : 'BetterBit 會員'}
-        detail={isSubscribed ? '計畫會持續跟上你' : '這段路，想繼續一起走？'}
+        label={safeMode ? 'BetterBit Premium' : isSubscribed ? '會員進行中' : 'BetterBit 會員'}
+        detail={
+          safeMode
+            ? '即將開放。先看看我們在準備什麼。'
+            : isSubscribed
+              ? '計畫會持續跟上你'
+              : '這段路，想繼續一起走？'
+        }
         onClick={() => router.push('/settings/premium')}
         last
       />

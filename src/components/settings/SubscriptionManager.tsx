@@ -8,6 +8,7 @@ import { colors, cardStyle } from '@/lib/design-system'
 import { getStripePriceId, SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
 import ZaiJian from '@/components/character/ZaiJian'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 
 export default function SubscriptionManager() {
   const searchParams = useSearchParams()
@@ -104,6 +105,7 @@ export default function SubscriptionManager() {
   }
 
   if (loading) {
+    if (isAppStoreSafeMode()) return null
     return (
       <div className="rounded-2xl p-6 text-center" style={cardStyle}>
         <Loader2 className="h-5 w-5 animate-spin mx-auto" style={{ color: colors.accent.action }} />
@@ -113,6 +115,8 @@ export default function SubscriptionManager() {
 
   const isSubscribed = subscription?.status === 'active'
   const isCanceling = subscription?.cancel_at_period_end
+
+  if (isAppStoreSafeMode()) return null
 
   return (
     <div className="rounded-2xl p-5 space-y-4" style={cardStyle}>

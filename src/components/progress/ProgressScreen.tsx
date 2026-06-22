@@ -18,6 +18,7 @@ import ProgressAdaptation from '@/components/progress/ProgressAdaptation'
 import ProgressHistory from '@/components/progress/ProgressHistory'
 import ProgressPlateauNote from '@/components/progress/ProgressPlateauNote'
 import ProgressUpgradeHint from '@/components/progress/ProgressUpgradeHint'
+import { withSafeModeAccess } from '@/lib/app-store-safe-mode'
 import type { BodyMeasurement, Goal } from '@/types'
 
 interface GoalSnapshot {
@@ -44,9 +45,11 @@ export default function ProgressScreen({
   latestWeight,
   plateau,
 }: Props) {
-  const visibleMeasurements = access.hasFullAccess
+  const effectiveAccess = withSafeModeAccess(access)
+
+  const visibleMeasurements = effectiveAccess.hasFullAccess
     ? measurements
-    : access.trialExpired
+    : effectiveAccess.trialExpired
       ? measurements.slice(-14)
       : measurements
 
@@ -54,24 +57,24 @@ export default function ProgressScreen({
   const tone = useMemo(() => trendTone(visibleMeasurements), [visibleMeasurements])
   const chartPoints = useMemo(
     () =>
-      weightChartPoints(visibleMeasurements, access.hasFullAccess ? 21 : 14).map(p => ({
+      weightChartPoints(visibleMeasurements, effectiveAccess.hasFullAccess ? 21 : 14).map(p => ({
         label: p.label,
         weight: p.weight,
       })),
-    [visibleMeasurements, access.hasFullAccess]
+    [visibleMeasurements, effectiveAccess.hasFullAccess]
   )
 
   const fatBank = useMemo(() => {
-    if (!access.hasFullAccess) return null
+    if (!effectiveAccess.hasFullAccess) return null
     return fatBankSummary({
       startWeight: goal?.start_weight_kg,
       targetWeight: goal?.target_weight_kg ?? goalSnapshot?.target_weight,
       latestWeight,
     })
-  }, [access.hasFullAccess, goal, goalSnapshot, latestWeight])
+  }, [effectiveAccess.hasFullAccess, goal, goalSnapshot, latestWeight])
 
-  const showFullHistory = access.hasFullAccess || (access.trialExpired && measurements.length > 0)
-  const hasEarnedPreview = access.trialExpired && measurements.length > 0
+  const showFullHistory = effectiveAccess.hasFullAccess || (effectiveAccess.trialExpired && measurements.length > 0)
+  const hasEarnedPreview = effectiveAccess.trialExpired && measurements.length > 0
 
   const content = (
     <div className="space-y-5 pb-8">
@@ -86,10 +89,10 @@ export default function ProgressScreen({
     </div>
   )
 
-  if (access.hasFullAccess) return content
+  if (effectiveAccess.hasFullAccess) return content
 
   return (
-    <ProgressUpgradeHint access={access} hasEarnedPreview={hasEarnedPreview}>
+    <ProgressUpgradeHint access={effectiveAccess} hasEarnedPreview={hasEarnedPreview}>
       {hasEarnedPreview ? content : (
         <>
           <ProgressHeader posture={posture} />

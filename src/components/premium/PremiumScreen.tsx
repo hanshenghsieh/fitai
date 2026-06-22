@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { ChevronLeft, Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 import { getStripePriceId } from '@/lib/stripe-config'
 import {
   PREMIUM_STORY,
@@ -14,12 +15,61 @@ import {
   premiumPriceLine,
   premiumTrialWhisper,
 } from '@/lib/premium-narrative'
+import LegalLinksRow from '@/components/legal/LegalLinksRow'
 
 interface Props {
   access: AccessStatus
 }
 
+function PremiumSafeModeScreen() {
+  return (
+    <div className="min-h-screen pb-16" style={{ backgroundColor: colors.bg.canvas }}>
+      <div className="px-5 pt-12 pb-6">
+        <Link
+          href="/settings"
+          className="inline-flex items-center gap-1 text-[14px] mb-6"
+          style={{ color: colors.text.tertiary }}
+        >
+          <ChevronLeft className="h-4 w-4" />
+          設定
+        </Link>
+
+        <h1 className="text-[22px] font-medium tracking-tight" style={{ color: colors.text.primary }}>
+          BetterBit Premium
+        </h1>
+        <p className="text-[15px] mt-3 leading-relaxed" style={{ color: colors.text.secondary }}>
+          BetterBit Premium 即將開放。
+        </p>
+      </div>
+
+      <div className="px-5 space-y-8">
+        <div className="space-y-4">
+          {PREMIUM_STORY.map(line => (
+            <p key={line} className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
+              {line}
+            </p>
+          ))}
+        </div>
+
+        <LegalLinksRow className="pt-2" />
+
+        <Link href="/dashboard" className="block text-[14px]" style={{ color: colors.text.tertiary }}>
+          先回去 Today
+        </Link>
+      </div>
+    </div>
+  )
+}
+
 export default function PremiumScreen({ access }: Props) {
+  if (isAppStoreSafeMode()) {
+    return <PremiumSafeModeScreen />
+  }
+
+  return <PremiumStripeScreen access={access} />
+}
+
+function PremiumStripeScreen({ access }: Props) {
   const searchParams = useSearchParams()
   const [subscription, setSubscription] = useState<{
     status: string
@@ -132,6 +182,7 @@ export default function PremiumScreen({ access }: Props) {
             >
               {portalLoading ? '開啟中…' : '管理帳單'}
             </button>
+            <LegalLinksRow />
           </div>
         ) : (
           <div className="space-y-6">
@@ -157,6 +208,7 @@ export default function PremiumScreen({ access }: Props) {
               >
                 {subscribing ? '前往付款…' : stripeReady ? '繼續一起走走' : '會員準備中'}
               </button>
+              <LegalLinksRow />
               <Link href="/dashboard" className="block text-[14px]" style={{ color: colors.text.tertiary }}>
                 先回去 Today
               </Link>

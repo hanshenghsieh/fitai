@@ -7,6 +7,7 @@ import { Check, Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
 import { getStripePriceId, SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 import SettingsSection from './SettingsSection'
 
 interface Props {
@@ -85,6 +86,8 @@ export default function SettingsSubscriptionSection({ access }: Props) {
   }
 
   const isSubscribed = subscription?.status === 'active'
+
+  if (isAppStoreSafeMode()) return null
 
   return (
     <SettingsSection title="會員" description="不是付費牆，是持續照顧。">

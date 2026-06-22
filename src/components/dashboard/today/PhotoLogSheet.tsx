@@ -216,6 +216,9 @@ function ReviewStep({
       </div>
 
       <div className="shrink-0 px-5 pt-2 pb-5 space-y-2">
+        <p className="text-[11px] text-center leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400, opacity: 0.8 }}>
+          熱量與蛋白質為估算值，僅供參考。
+        </p>
         <button
           type="button"
           disabled={draft.loading || saving || !draft.name.trim()}

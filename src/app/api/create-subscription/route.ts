@@ -3,8 +3,13 @@ import { createClient } from '@/lib/supabase/server'
 import { createCustomerIfNotExists, createCheckoutSession } from '@/lib/stripe'
 import { getStripePriceId } from '@/lib/stripe-config'
 import { getAppUrl } from '@/lib/app-url'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 
 export async function POST(req: NextRequest) {
+  if (isAppStoreSafeMode()) {
+    return NextResponse.json({ error: '訂閱即將開放' }, { status: 503 })
+  }
+
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

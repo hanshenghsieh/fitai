@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 
 interface Props {
   access: AccessStatus
@@ -11,7 +12,7 @@ interface Props {
 }
 
 export default function ProgressUpgradeHint({ access, children, hasEarnedPreview }: Props) {
-  if (access.hasFullAccess) return <>{children}</>
+  if (isAppStoreSafeMode() || access.hasFullAccess) return <>{children}</>
 
   if (hasEarnedPreview) {
     return (

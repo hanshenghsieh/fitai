@@ -3,13 +3,14 @@
 import Link from 'next/link'
 import { colors } from '@/lib/design-system'
 import { TRIAL_DAYS, type AccessStatus } from '@/lib/subscription-access'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 
 interface Props {
   access: AccessStatus
 }
 
 export default function TrialBanner({ access }: Props) {
-  if (access.isSubscribed) return null
+  if (isAppStoreSafeMode() || access.isSubscribed) return null
 
   if (access.isTrial) {
     return (

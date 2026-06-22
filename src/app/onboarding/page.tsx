@@ -55,6 +55,7 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [data, setData] = useState<FormData>(initialData)
   const [loading, setLoading] = useState(false)
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
   const router = useRouter()
   const set = (key: keyof FormData, val: unknown) => setData(prev => ({ ...prev, [key]: val }))
 
@@ -173,7 +174,15 @@ export default function OnboardingPage() {
 
         {step === 1 && <StepStart data={data} set={set} />}
         {step === 2 && <StepLifestyle data={data} set={set} />}
-        {step === 3 && <StepFinish data={data} set={set} planPreview={planPreview} />}
+        {step === 3 && (
+          <StepFinish
+            data={data}
+            set={set}
+            planPreview={planPreview}
+            disclaimerAccepted={disclaimerAccepted}
+            onDisclaimerAccepted={setDisclaimerAccepted}
+          />
+        )}
 
         <div className="flex gap-3">
           {step > 1 && (
@@ -200,7 +209,7 @@ export default function OnboardingPage() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || !disclaimerAccepted}
               className="flex-1 py-3 rounded-xl text-[15px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40"
               style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
             >
@@ -312,10 +321,14 @@ function StepFinish({
   data,
   set,
   planPreview,
+  disclaimerAccepted,
+  onDisclaimerAccepted,
 }: {
   data: FormData
   set: (k: keyof FormData, v: unknown) => void
   planPreview: ReturnType<typeof calculateGoalPlan> | null
+  disclaimerAccepted: boolean
+  onDisclaimerAccepted: (accepted: boolean) => void
 }) {
   const injuries = [
     { val: 'knee', label: '膝蓋' }, { val: 'back', label: '腰' },
@@ -404,6 +417,25 @@ function StepFinish({
         <li>· 進首頁就有第一餐建議（mini-win）</li>
         <li>· 不喜歡可換同熱量組合</li>
       </ul>
+
+      <label
+        className="flex items-start gap-3 rounded-2xl p-4 cursor-pointer"
+        style={{ backgroundColor: colors.bg.muted }}
+      >
+        <input
+          type="checkbox"
+          checked={disclaimerAccepted}
+          onChange={e => onDisclaimerAccepted(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--accent)]"
+          style={{ accentColor: colors.accent.action }}
+        />
+        <span className="text-[13px] leading-relaxed" style={{ color: colors.text.secondary }}>
+          BetterBit 提供健康與飲食輔助建議，不能取代醫師、營養師或其他專業醫療建議。食物辨識與熱量估算僅供參考。
+          <span className="block mt-2 font-medium" style={{ color: colors.text.primary }}>
+            我了解
+          </span>
+        </span>
+      </label>
     </div>
   )
 }

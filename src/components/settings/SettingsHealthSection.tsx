@@ -9,6 +9,7 @@ import {
   getHealthSyncPreference,
   setHealthSyncPreference,
 } from '@/lib/health-sync'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 import SettingsSection from './SettingsSection'
 
 export default function SettingsHealthSection() {
@@ -33,6 +34,8 @@ export default function SettingsHealthSection() {
       setSyncing(false)
     }
   }
+
+  if (isAppStoreSafeMode()) return null
 
   return (
     <SettingsSection title="健康資料" description="被動、安靜、自動。">

@@ -10,6 +10,7 @@ import {
   setHealthSyncPreference,
 } from '@/lib/health-sync'
 import { toast } from 'sonner'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 
 export default function HealthSyncCard() {
   const [enabled, setEnabled] = useState(false)
@@ -43,6 +44,8 @@ export default function HealthSyncCard() {
       setSyncing(false)
     }
   }
+
+  if (isAppStoreSafeMode()) return null
 
   return (
     <div className="rounded-2xl p-4 space-y-3" style={cardStyle}>

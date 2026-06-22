@@ -13,6 +13,7 @@ import {
 } from '@/lib/goal-calculator'
 import { buildMealCombination, comboToSaved } from '@/lib/meal-combo-engine'
 import { getAccessStatus } from '@/lib/subscription-access'
+import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 import { applyWeeklyFeedback } from '@/lib/feedback-adjustments'
 import {
   getLatestWeeklyFeedback,
@@ -98,7 +99,7 @@ export async function POST(req: NextRequest) {
       .single()
 
     const access = getAccessStatus(profile.created_at, subscription)
-    if (!access.hasFullAccess) {
+    if (!isAppStoreSafeMode() && !access.hasFullAccess) {
       return NextResponse.json(
         { error: '試用期已結束，請訂閱以繼續生成計畫', code: 'SUBSCRIPTION_REQUIRED' },
         { status: 403 }
