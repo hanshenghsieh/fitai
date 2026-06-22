@@ -52,10 +52,15 @@ export default function LandingPage() {
         ))}
       </section>
 
-      <section className="px-6 pb-16 text-center">
+      <section className="px-6 pb-16 text-center space-y-4">
         <p className="text-[12px] leading-relaxed" style={{ color: colors.text.tertiary }}>
           再健只是介面。背後是完整的營養與運動計算。
         </p>
+        <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[12px]">
+          <Link href="/privacy" style={{ color: colors.text.tertiary }}>隱私權政策</Link>
+          <Link href="/terms" style={{ color: colors.text.tertiary }}>服務條款</Link>
+          <Link href="/support" style={{ color: colors.text.tertiary }}>支援</Link>
+        </nav>
       </section>
     </div>
   )

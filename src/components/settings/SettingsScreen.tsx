@@ -23,6 +23,7 @@ import SettingsNotificationsSection from './SettingsNotificationsSection'
 import SettingsPrivacySection from './SettingsPrivacySection'
 import SettingsSupportSection from './SettingsSupportSection'
 import SettingsAboutSection from './SettingsAboutSection'
+import SettingsDeleteAccountSection from './SettingsDeleteAccountSection'
 
 interface Props {
   profile: UserProfile | null
@@ -127,6 +128,7 @@ export default function SettingsScreen({ profile, email, access }: Props) {
       <SettingsPrivacySection />
       <SettingsSupportSection />
       <SettingsAboutSection />
+      <SettingsDeleteAccountSection />
     </div>
   )
 }
