@@ -62,6 +62,7 @@ import { mealMacroSplit } from '@/lib/goal-calculator'
 import { currentMealSlotForSchedule, type WorkSchedule } from '@/lib/human-mode'
 import { TODAY } from '@/lib/today-design'
 import { toast } from 'sonner'
+import { isNearDailyTarget, nearTargetRollMessage } from '@/lib/light-snack-suggest'
 
 interface GoalSnapshot {
   daily_deficit?: number
@@ -795,7 +796,12 @@ export default function TodayOS({
 
         setLocalDiceRolls(n => n + 1)
         if (!result.suggestion) {
-          toast.message('暫時想不到別的')
+          const ds = dayStateRef.current
+          if (isNearDailyTarget(ds) || ds.skipMealRecommendation) {
+            toast.message(nearTargetRollMessage(ds.remainingCalories))
+          } else {
+            toast.message('暫時想不到別的')
+          }
           return
         }
         const store = result.suggestion.stores[0]

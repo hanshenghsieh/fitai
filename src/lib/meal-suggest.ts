@@ -5,6 +5,7 @@ import { getDiceMainPool, isDiceSideCandidate, isDiceDrinkCandidate, getDiceMenu
 import { effectiveMealCalTarget, enjoyableDiceBonus } from './engines/adherence-engine'
 import { recoveryFoodScoreAdjust, isRecoveryActive } from './engines/calorie-bank-engine'
 import { scoreMealCandidate } from './engines/next-meal-engine'
+import { suggestLightSnack } from './light-snack-suggest'
 import { isValidMealLines } from './meal-combo-validity'
 import { nearestPlaceForBrand } from './nearby-engine'
 import type { ConvenienceItem } from './convenience-store-menu'
@@ -825,6 +826,12 @@ function suggestNextMealFromPool(
     pool = mergeCandidateLists(pool, extra)
     sessionDicePools.set(key, pool)
     available = filterCandidatesForRoll(pool, ctx)
+  }
+
+  if (!available.length) {
+    const light = suggestLightSnack(ctx)
+    if (light) return finalizeSuggestionPick(ctx, [light], prev)
+    return { suggestion: null, pool_exhausted: true }
   }
 
   return finalizeSuggestionPick(ctx, available, prev)

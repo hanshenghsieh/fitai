@@ -3,6 +3,7 @@ import type { UserProfile } from '@/types'
 import type { CustomEatOutSelection } from './checkin-utils'
 import type { EatOutPreferences, MealSuggestion, SuggestContext, UserMemoryState } from './meal-engine-types'
 import { suggestNextMeal, suggestionToCustomSelection } from './meal-suggest'
+import { suggestLightSnack } from './light-snack-suggest'
 import { nearbyBrands } from './nearby-engine'
 import { getDiceMenuSource, lookupDiceMenuItem } from './dice-menu-pool'
 
@@ -120,6 +121,19 @@ export function rollMealSuggestion(params: {
     )
     suggestion = fallback.suggestion
     pool_exhausted = fallback.pool_exhausted
+  }
+
+  if (!suggestion && params.day_state && !params.day_state.overTargetProtection) {
+    const lightCtx = buildSuggestContext({
+      ...params,
+      exclude_ids: params.seen_ids.slice(-4),
+      exclude_names: (params.exclude_names ?? []).slice(-4),
+      exclude_stores: params.exclude_stores?.slice(-4),
+      rolls_used: params.rolls_used,
+      seed: Date.now() + params.rolls_used * 53 + mealSeed + 2048,
+      fast_dice: true,
+    })
+    suggestion = suggestLightSnack(lightCtx)
   }
 
   return {
