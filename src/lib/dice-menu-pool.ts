@@ -28,6 +28,8 @@ export function lookupDiceMenuItem(id: string): ConvenienceItem | undefined {
   return getMenuIdIndex(getDiceMenuSource()).get(id)
 }
 
+const DICE_POOL_CACHE_VERSION = 3
+
 function dicePoolCacheKey(
   mealType: MealType,
   profile?: UserProfile | null,
@@ -36,6 +38,7 @@ function dicePoolCacheKey(
   const p = profile
   const prefs = memory?.eat_out_prefs
   return [
+    DICE_POOL_CACHE_VERSION,
     mealType,
     p?.is_vegetarian ? 1 : 0,
     p?.is_vegan ? 1 : 0,

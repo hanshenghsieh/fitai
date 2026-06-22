@@ -38,6 +38,7 @@ interface Props {
   onSelectFrequent: (id: string) => void
   onCommitFrequent: (frequentId?: string) => void
   onPhotoCapture: (file: File) => void
+  onCreateFreeText?: (name: string) => void
 }
 
 function FrequentRow({ food, onClick, compact }: { food: FrequentFood; onClick: () => void; compact?: boolean }) {
@@ -206,6 +207,7 @@ export default function TodayFoodMore({
   onSelectFrequent: _onSelectFrequent,
   onCommitFrequent,
   onPhotoCapture,
+  onCreateFreeText,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [showAllFrequent, setShowAllFrequent] = useState(false)
@@ -358,13 +360,28 @@ export default function TodayFoodMore({
                 沒找到想吃的？
               </p>
               <p className="text-[13px] mt-2 leading-relaxed" style={{ color: DS.textSecondary, fontWeight: 400 }}>
-                拍張照片，剩下交給 BetterBit。
+                可以直接建立紀錄，或拍張照片讓 BetterBit 幫你估。
               </p>
+              {onCreateFreeText && (
+                <button
+                  type="button"
+                  onClick={() => onCreateFreeText(query.trim())}
+                  className="mt-5 w-full max-w-xs mx-auto flex items-center justify-center h-12 px-8 rounded-full text-[14px]"
+                  style={{ backgroundColor: DS.mocha, color: '#FFFFFF', fontWeight: 500 }}
+                >
+                  用「{query.trim()}」建立紀錄
+                </button>
+              )}
               <button
                 type="button"
                 onClick={openPhotoMode}
-                className="mt-5 inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-[14px]"
-                style={{ backgroundColor: DS.mocha, color: '#FFFFFF', fontWeight: 500 }}
+                className={`inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-[14px] ${onCreateFreeText ? 'mt-3' : 'mt-5'}`}
+                style={{
+                  backgroundColor: onCreateFreeText ? '#FFFFFF' : DS.mocha,
+                  color: onCreateFreeText ? DS.mocha : '#FFFFFF',
+                  fontWeight: 500,
+                  border: onCreateFreeText ? `1.5px solid ${DS.mocha}` : undefined,
+                }}
               >
                 <Camera className="h-4 w-4" strokeWidth={ICON_STROKE} />
                 拍照

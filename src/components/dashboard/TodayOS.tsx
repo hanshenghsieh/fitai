@@ -981,6 +981,21 @@ export default function TodayOS({
     },
     [commitLog]
   )
+  const handleCreateFreeText = useCallback(
+    (name: string) => {
+      const trimmed = name.trim()
+      if (!trimmed) return
+      const est = estimateFreeTextMeal(trimmed, mealTargets.calories, mealTargets.protein)
+      commitLog({
+        id: est.id,
+        name: est.name,
+        calories: est.calories,
+        protein_g: est.protein_g,
+        source: 'search',
+      })
+    },
+    [commitLog, mealTargets.calories, mealTargets.protein]
+  )
   const handleCommitFrequent = useCallback(
     (frequentId?: string) => {
       const f = frequentList.find(x => x.id === (frequentId ?? selectedFrequentId))
@@ -1208,6 +1223,7 @@ export default function TodayOS({
         onSelectFrequent={setSelectedFrequentId}
         onCommitFrequent={handleCommitFrequent}
         onPhotoCapture={handleMorePhotoCapture}
+        onCreateFreeText={handleCreateFreeText}
       />
 
       <PhotoLogSheet
