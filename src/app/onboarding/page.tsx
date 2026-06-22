@@ -321,9 +321,48 @@ function StepFinish({
     { val: 'knee', label: '膝蓋' }, { val: 'back', label: '腰' },
     { val: 'shoulder', label: '肩' }, { val: 'wrist', label: '手腕' },
   ]
+  const equipmentOptions = [
+    { val: 'none', label: '無器材（在家徒手）' },
+    { val: 'jump_rope', label: '跳繩' },
+    { val: 'dumbbells', label: '啞鈴' },
+    { val: 'resistance_bands', label: '彈力帶' },
+    { val: 'pull_up_bar', label: '引體向上架' },
+    { val: 'gym', label: '健身房' },
+  ]
+
+  const toggleEquipment = (val: string) => {
+    if (val === 'none') {
+      set('equipment', ['none'])
+      return
+    }
+    const next = toggle(
+      data.equipment.filter(e => e !== 'none'),
+      val
+    )
+    set('equipment', next.length ? next : ['none'])
+  }
+
   return (
     <div className="space-y-4">
       <OnboardingCard title="最後確認" desc="有傷的話跟我說，動作會避開。">
+        <div>
+          <Label className="text-[13px]">你手邊有哪些器材？</Label>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {equipmentOptions.map(({ val, label }) => (
+              <OnboardingChip
+                key={val}
+                active={data.equipment.includes(val)}
+                onClick={() => toggleEquipment(val)}
+                className="px-3 py-2"
+              >
+                {label}
+              </OnboardingChip>
+            ))}
+          </div>
+          <p className="text-[11px] mt-2 leading-relaxed" style={{ color: colors.text.tertiary }}>
+            沒有器材也沒問題，會優先安排慢跑、快走、徒手訓練。
+          </p>
+        </div>
         <div>
           <Label className="text-[13px]">哪裡不舒服（選填）</Label>
           <div className="flex flex-wrap gap-2 mt-2">

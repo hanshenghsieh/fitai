@@ -12,11 +12,29 @@ const DISH_FAMILY_RULES: { pattern: RegExp; allowedKb: Set<string> }[] = [
   { pattern: /溫泉蛋|味噌|泡菜|溫野菜|茶碗蒸|丼飯/, allowedKb: new Set(['japanese', 'hotpot', 'bento']) },
   { pattern: /握壽司|壽司拼盤|軍艦|刺身|生魚片|壽司郎/, allowedKb: new Set(['japanese']) },
   { pattern: /潛艇堡/, allowedKb: new Set(['fastfood']) },
+  { pattern: /(?:經典|雙層)?牛肉堡|雞腿堡|咔啦脆雞堡|脆雞堡|麥香雞/, allowedKb: new Set(['fastfood', 'breakfast']) },
+  { pattern: /雞塊（\d+塊）|^蛋塔/, allowedKb: new Set(['fastfood']) },
+  { pattern: /(?:豚骨|味噌|醬油|鹽味|沾)拉麵|拉麵（/, allowedKb: new Set(['noodles', 'japanese']) },
+  { pattern: /^(?:牛|親子|海鮮|燒肉|滑)丼|丼（中）/, allowedKb: new Set(['japanese']) },
+  { pattern: /石鍋拌飯/, allowedKb: new Set(['korean']) },
   { pattern: /麻辣鍋|石頭火鍋|涮涮鍋|個人鍋/, allowedKb: new Set(['hotpot', 'japanese']) },
   { pattern: /瑪格麗特|夏威夷披薩|披薩（/, allowedKb: new Set(['fastfood']) },
   { pattern: /蛋餅|蘿蔔糕/, allowedKb: new Set(['breakfast', 'fastfood']) },
   { pattern: /牛肉麵|排骨飯|滷肉飯|麻醬麵/, allowedKb: new Set(['noodles', 'bento', 'chinese', 'nightmarket', 'convenience', 'supermarket']) },
+  { pattern: /咖哩(?:豬排|雞)飯/, allowedKb: new Set(['japanese', 'fastfood']) },
+  { pattern: /烤雞沙拉碗/, allowedKb: new Set(['fastfood', 'healthy']) },
 ]
+
+/** 日式炸豬排專賣 — 不賣漢堡、拉麵、丼飯等 bulk 模板 */
+const TONKATSU_BRANDS = new Set(['福勝亭', '勝博殿', '杏子豬排'])
+
+function isTonkatsuPlausibleName(name: string): boolean {
+  return (
+    /豬排|猪排|定食|炸蝦|腰內|里肌|海老|唐揚|味噌|高麗菜|溫野菜|茶碗蒸|咖哩/.test(name) ||
+    CAFETERIA_SIDE.test(name) ||
+    /沙拉|飲|茶|咖啡|可樂|豆漿|果汁|牛奶|拿鐵|無糖|泡菜|燙/.test(name)
+  )
+}
 
 const VEG_OK_KB = new Set(['convenience', 'bento', 'japanese', 'healthy', 'hotpot', 'supermarket', 'nightmarket', 'chinese'])
 
@@ -51,7 +69,9 @@ export function isPlausibleBrandItem(item: ConvenienceItem): boolean {
 
   const name = item.name
 
-  if (rejectsCafeteriaArchetype(name, kb)) return false
+  if (TONKATSU_BRANDS.has(item.store) && !isTonkatsuPlausibleName(name)) return false
+
+  if (rejectsCafeteriaArchetype(name, kb) && !TONKATSU_BRANDS.has(item.store)) return false
 
   if (kb === 'fastfood' && CAFETERIA_SIDE.test(name)) return false
 

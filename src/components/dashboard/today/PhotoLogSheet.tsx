@@ -29,7 +29,14 @@ interface Props {
 }
 
 function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void; onClose: () => void }) {
-  const fileRef = useRef<HTMLInputElement>(null)
+  const cameraRef = useRef<HTMLInputElement>(null)
+  const galleryRef = useRef<HTMLInputElement>(null)
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0]
+    if (f) onPickFile(f)
+    e.target.value = ''
+  }
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
@@ -47,23 +54,28 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
           <X className="h-5 w-5" strokeWidth={ICON_STROKE} style={{ color: TODAY.textSecondary }} />
         </button>
       </div>
-      <div className="flex-1 px-5 flex flex-col items-center justify-center min-h-[240px]">
+      <div className="flex-1 px-5 flex flex-col items-center justify-center gap-6 min-h-[240px] pb-4">
         <input
-          ref={fileRef}
+          ref={cameraRef}
           type="file"
           accept="image/*"
           capture="environment"
           className="hidden"
-          onChange={e => {
-            const f = e.target.files?.[0]
-            if (f) onPickFile(f)
-            e.target.value = ''
-          }}
+          onChange={handleFile}
         />
+        <input
+          ref={galleryRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFile}
+        />
+
         <button
           type="button"
-          onClick={() => fileRef.current?.click()}
-          className="flex flex-col items-center gap-3 active:opacity-85"
+          onClick={() => cameraRef.current?.click()}
+          className="w-full max-w-xs flex flex-col items-center gap-3 py-6 rounded-[28px] active:opacity-85"
+          style={{ backgroundColor: TODAY.surface }}
         >
           <span
             className="flex items-center justify-center rounded-full"
@@ -76,9 +88,23 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
               拍今天吃的
             </span>
             <span className="block text-[13px] mt-1" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-              或從相簿選一張
+              開啟相機拍照
             </span>
           </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => galleryRef.current?.click()}
+          className="w-full max-w-xs h-14 rounded-[22px] text-[15px] active:opacity-90"
+          style={{
+            backgroundColor: TODAY.card,
+            color: TODAY.mocha,
+            fontWeight: 500,
+            border: `1.5px solid ${TODAY.mocha}`,
+          }}
+        >
+          從相簿選擇
         </button>
       </div>
     </div>

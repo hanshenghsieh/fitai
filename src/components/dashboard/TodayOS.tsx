@@ -29,7 +29,16 @@ import {
   learnFromLog,
   type FoodDna,
 } from '@/lib/food-memory'
-import { FOOD_SLOTS, defaultFoodSlot, slotLabel, mealHoursFromLogs, type FoodSlot } from '@/lib/food-slots'
+import {
+  FOOD_SLOTS,
+  defaultFoodSlot,
+  slotLabel,
+  mealHoursFromLogs,
+  logMatchesFoodSlot,
+  normalizeFoodLogSlot,
+  customEatOutMealTypeForSlot,
+  type FoodSlot,
+} from '@/lib/food-slots'
 import { getTaipeiHour, nutritionDayResetLabel, getNutritionDayKey } from '@/lib/timezone'
 import {
   rollMealSuggestion,
@@ -37,11 +46,11 @@ import {
   memoryFromCheckinMeta,
   type MealSuggestion,
 } from '@/lib/meal-engine'
-import { preloadDiceMenuBulk, isDiceMenuBulkReady } from '@/lib/dice-menu-pool'
+import { preloadDiceMenuBulk, isDiceMenuBulkReady, getDiceMenuSource } from '@/lib/dice-menu-pool'
 import { storesInText } from '@/lib/dice-store-names'
 import { linesToDisplayItems } from '@/lib/meal-suggest'
 import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
-import { eatOutMenu, type ConvenienceItem } from '@/lib/convenience-store-menu'
+import type { ConvenienceItem } from '@/lib/convenience-store-menu'
 import DiceMealPreview from '@/components/dashboard/DiceMealPreview'
 import TodayFoodMore from '@/components/dashboard/today/TodayFoodMore'
 import PhotoLogSheet, { type PhotoLogDraft } from '@/components/dashboard/today/PhotoLogSheet'
@@ -169,6 +178,7 @@ interface Props {
   workoutTotal: number
   calorieBank?: CalorieBankRow | null
   onLogFood: (logs: FoodLogEntry[], userMemory: UserMemoryMeta) => void
+  onClearMealSelection?: (mealType: MealType) => void
   onPostureLine?: (line: string) => void
   onDiceApply: (payload: {
     mealType: MealType
@@ -352,6 +362,7 @@ export default function TodayOS({
   workoutTotal,
   calorieBank = null,
   onLogFood,
+  onClearMealSelection,
   onPostureLine,
   onDiceApply,
 }: Props) {
@@ -424,7 +435,7 @@ export default function TodayOS({
   const rollingRef = useRef(false)
   const confirmingRef = useRef(false)
   const loggingRef = useRef(false)
-  const initialRollDone = useRef(false)
+  const autoRollKeyRef = useRef('')
   const lastPostureLineRef = useRef('')
   const photoPreviewUrlRef = useRef<string | null>(null)
   const [dicePreviewByMeal, setDicePreviewByMeal] = useState<Partial<Record<MealType, MealSuggestion>>>({})
@@ -448,7 +459,7 @@ export default function TodayOS({
     () =>
       foodLogs
         .map((log, index) => ({ log, index }))
-        .filter(({ log }) => (log.slot ?? 'meal2') === activeSlot),
+        .filter(({ log }) => logMatchesFoodSlot(log, activeSlot)),
     [foodLogs, activeSlot]
   )
 
@@ -466,22 +477,23 @@ export default function TodayOS({
 
   const slotContentFlags = useMemo(() => {
     const flags: Partial<Record<FoodSlot, boolean>> = {}
-    const schedule = userMemory.work_schedule ?? 'standard'
     for (const s of FOOD_SLOTS) {
       if (s.id === 'other') continue
-      const mt = mealTypeForFoodSlot(s.id, schedule)
+      const customMealType = customEatOutMealTypeForSlot(s.id)
       flags[s.id] =
-        (customEatOut[mt]?.length ?? 0) > 0 ||
-        foodLogs.some(l => (l.slot ?? 'meal2') === s.id)
+        foodLogs.some(l => logMatchesFoodSlot(l, s.id)) ||
+        (customMealType != null && (customEatOut[customMealType]?.length ?? 0) > 0)
     }
     return flags
-  }, [customEatOut, foodLogs, userMemory.work_schedule])
+  }, [customEatOut, foodLogs])
 
   const slotSelectedItems = useMemo(() => {
-    const custom = customEatOut[mealSlotLegacy]
+    const customMealType = customEatOutMealTypeForSlot(activeSlot)
+    if (!customMealType) return []
+    const custom = customEatOut[customMealType]
     if (!custom?.length) return []
-    return selectedToDisplayItems(deserializeCustomCombo(custom, eatOutMenu))
-  }, [customEatOut, mealSlotLegacy])
+    return selectedToDisplayItems(deserializeCustomCombo(custom, getDiceMenuSource()))
+  }, [customEatOut, activeSlot])
 
   const slotMealSuggest = mealSuggest[mealSlotLegacy]
 
@@ -619,11 +631,29 @@ export default function TodayOS({
 
   const removeLogById = useCallback(
     (logId: string) => {
+      const removed = foodLogs.find(l => l.id === logId)
       const prevLogs = foodLogs
       const prevMemory = userMemory
       const nextLogs = foodLogs.filter(l => l.id !== logId)
       const nextMemory = { ...userMemory, food_logs_today: nextLogs }
       onLogFood(nextLogs, nextMemory)
+      if (removed) {
+        const mt = customEatOutMealTypeForSlot(normalizeFoodLogSlot(removed))
+        if (mt) onClearMealSelection?.(mt)
+        const slot = normalizeFoodLogSlot(removed)
+        const legacy =
+          slot === 'meal1' ? 'breakfast' : slot === 'meal2' ? 'lunch' : slot === 'meal3' ? 'dinner' : null
+        if (legacy) {
+          saveDiceSession(legacy, [], [])
+          setDicePreviewByMeal(prev => {
+            if (!prev[legacy]) return prev
+            const next = { ...prev }
+            delete next[legacy]
+            return next
+          })
+        }
+      }
+      autoRollKeyRef.current = ''
       schedulePostureLine(nextLogs, nextMemory)
       toast('已移除這筆紀錄', {
         duration: 5000,
@@ -636,7 +666,7 @@ export default function TodayOS({
         },
       })
     },
-    [foodLogs, userMemory, schedulePostureLine, onLogFood]
+    [foodLogs, userMemory, schedulePostureLine, onLogFood, onClearMealSelection]
   )
 
   const requestDeleteLog = useCallback((logId: string) => {
@@ -798,6 +828,9 @@ export default function TodayOS({
 
   const rollDice = useCallback(() => {
     if (!dayStateRef.current.allowDiceAndSuggest || rollingRef.current) return
+    if (customEatOut[mealSlotLegacy]?.length) {
+      onClearMealSelection?.(mealSlotLegacy)
+    }
     rollingRef.current = true
     setRolling(true)
 
@@ -877,7 +910,7 @@ export default function TodayOS({
     } else {
       void preloadDiceMenuBulk().finally(scheduleRoll)
     }
-  }, [mealSlotLegacy, dicePreviewByMeal, foodLogs, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, dailyRolls, adherenceState, calorieBank])
+  }, [mealSlotLegacy, dicePreviewByMeal, foodLogs, customEatOut, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, dailyRolls, adherenceState, calorieBank, onClearMealSelection])
 
   const confirmDice = useCallback(() => {
     if (!dicePreview || confirmingRef.current) return
@@ -921,26 +954,44 @@ export default function TodayOS({
   }, [dicePreview, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, schedulePostureLine, onDiceApply])
 
   const previewItems = dicePreview ? linesToDisplayItems(dicePreview.lines) : []
+  const hasSlotLogs = slotLogs.length > 0
   const displayItems =
     previewItems.length > 0
       ? previewItems
-      : slotSelectedItems.length > 0
-        ? slotSelectedItems
-        : slotLoggedItems
-  const showingConfirmedSelection = !dicePreview && slotSelectedItems.length > 0
+      : hasSlotLogs && slotLoggedItems.length > 0
+        ? slotLoggedItems
+        : slotSelectedItems.length > 0
+          ? slotSelectedItems
+          : []
+  const showingConfirmedSelection = !dicePreview && slotSelectedItems.length > 0 && !hasSlotLogs
   const showingLoggedOnly =
     !dicePreview && slotSelectedItems.length === 0 && slotLoggedItems.length > 0
   const highlightKey =
     dicePreview?.highlight_key ?? slotMealSuggest?.current_highlight_key ?? 'balanced'
 
   useEffect(() => {
-    if (initialRollDone.current) return
-    initialRollDone.current = true
     if (dayState.overTargetProtection) return
     if (customEatOut[mealSlotLegacy]?.length) return
     if (dicePreviewByMeal[mealSlotLegacy]) return
+    if (slotLogs.length > 0) return
+    const key = `${mealSlotLegacy}:empty`
+    if (autoRollKeyRef.current === key) return
+    autoRollKeyRef.current = key
     rollDice()
-  }, [rollDice, dayState.overTargetProtection, mealSlotLegacy, customEatOut, dicePreviewByMeal])
+  }, [
+    rollDice,
+    dayState.overTargetProtection,
+    mealSlotLegacy,
+    customEatOut,
+    dicePreviewByMeal,
+    slotLogs.length,
+  ])
+
+  useEffect(() => {
+    if (slotLogs.length > 0 || customEatOut[mealSlotLegacy]?.length) {
+      autoRollKeyRef.current = ''
+    }
+  }, [slotLogs.length, customEatOut, mealSlotLegacy])
 
   useEffect(() => {
     if (dayState.overTargetProtection) {
@@ -1002,13 +1053,6 @@ export default function TodayOS({
       if (f) commitLog(frequentToLogEntry(f, activeSlot))
     },
     [frequentList, selectedFrequentId, activeSlot, commitLog]
-  )
-  const handleMorePhotoCapture = useCallback(
-    (file: File) => {
-      setMoreOpen(false)
-      handlePhotoPick(file)
-    },
-    [handlePhotoPick]
   )
   const repeatLastLog = useCallback(() => {
     if (!lastSlotLog || repeating) return
@@ -1222,7 +1266,6 @@ export default function TodayOS({
         selectedFrequentId={selectedFrequentId}
         onSelectFrequent={setSelectedFrequentId}
         onCommitFrequent={handleCommitFrequent}
-        onPhotoCapture={handleMorePhotoCapture}
         onCreateFreeText={handleCreateFreeText}
       />
 

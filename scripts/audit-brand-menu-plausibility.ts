@@ -16,11 +16,17 @@ const FASTFOOD_JUNK = /雞塊（\d+塊）|^蛋塔|^凱薩沙拉|上校雞塊|麥
 const DISH_FAMILY_CHECKS: { label: string; pattern: RegExp; badKb: Set<string> }[] = [
   { label: '煎餃/鍋貼', pattern: /煎餃|鍋貼|水餃|餃子|小籠包/, badKb: new Set(['fastfood', 'coffee', 'bubbletea', 'desserts', 'bbq', 'thai', 'korean', 'american', 'healthy', 'hotpot']) },
   { label: '壽司', pattern: /握壽司|壽司拼盤|軍艦|刺身|生魚片/, badKb: new Set(['fastfood', 'coffee', 'bubbletea', 'noodles', 'bento', 'thai', 'korean', 'american', 'healthy', 'hotpot', 'bbq']) },
+  { label: '漢堡', pattern: /(?:經典|雙層)?牛肉堡|雞腿堡|咔啦脆雞堡|脆雞堡|麥香雞/, badKb: new Set(['japanese', 'noodles', 'bento', 'coffee', 'bubbletea', 'hotpot', 'bbq', 'thai', 'korean', 'american', 'healthy', 'desserts', 'convenience', 'supermarket']) },
+  { label: '拉麵', pattern: /(?:豚骨|味噌|醬油|鹽味|沾)拉麵|拉麵（/, badKb: new Set(['fastfood', 'coffee', 'bubbletea', 'bento', 'hotpot', 'bbq', 'thai', 'korean', 'american', 'healthy', 'desserts', 'convenience', 'supermarket']) },
+  { label: '丼飯', pattern: /^(?:牛|親子|海鮮|燒肉|滑)丼|丼（中）/, badKb: new Set(['fastfood', 'coffee', 'bubbletea', 'bento', 'noodles', 'hotpot', 'bbq', 'thai', 'korean', 'american', 'healthy', 'desserts', 'convenience', 'supermarket']) },
+  { label: '石鍋拌飯', pattern: /石鍋拌飯/, badKb: new Set(['fastfood', 'coffee', 'bubbletea', 'japanese', 'noodles', 'bento', 'hotpot', 'bbq', 'thai', 'american', 'healthy', 'desserts', 'convenience', 'supermarket']) },
   { label: '潛艇堡', pattern: /潛艇堡/, badKb: new Set(['japanese', 'noodles', 'bento', 'coffee', 'bubbletea', 'hotpot', 'bbq', 'thai', 'korean', 'healthy', 'desserts']) },
   { label: '披薩', pattern: /瑪格麗特|夏威夷披薩|披薩（/, badKb: new Set(['japanese', 'noodles', 'bento', 'coffee', 'bubbletea', 'hotpot', 'bbq', 'thai', 'korean', 'healthy', 'desserts']) },
   { label: '麻辣鍋', pattern: /麻辣鍋|石頭火鍋|涮涮鍋|個人鍋/, badKb: new Set(['fastfood', 'coffee', 'bubbletea', 'desserts', 'bbq', 'thai', 'korean', 'american', 'healthy', 'noodles']) },
   { label: '蛋餅', pattern: /蛋餅|蘿蔔糕/, badKb: new Set(['japanese', 'hotpot', 'bbq', 'thai', 'korean', 'american', 'healthy', 'desserts', 'noodles']) },
+  { label: '雞塊/蛋塔', pattern: /雞塊（\d+塊）|^蛋塔/, badKb: new Set(['japanese', 'noodles', 'bento', 'coffee', 'bubbletea', 'hotpot', 'bbq', 'thai', 'korean', 'american', 'healthy', 'desserts', 'convenience', 'supermarket', 'breakfast']) },
 ]
+const TONKATSU_BRANDS = new Set(['福勝亭', '勝博殿', '杏子豬排'])
 const FLAVOR_SUFFIX = /\s*·\s*(微辣|少油|少鹽|加蛋|加菜)$/
 const SOLID_MEAL = /飯|麵|堡|排|鍋|便當|套餐|沙拉碗|丼|壽司|披薩|炸雞/
 
@@ -51,8 +57,8 @@ async function main() {
     const inPool = pool.filter(i => i.store === store)
     const mains = getDiceMainPool('lunch').filter(i => i.store === store)
 
-    // 1. 自助餐配菜仍在池中
-    if (!['bento', 'chinese', 'convenience', 'supermarket'].includes(cat)) {
+    // 1. 自助餐配菜仍在池中（便當/中餐/豬排定食店除外）
+    if (!['bento', 'chinese', 'convenience', 'supermarket'].includes(cat) && !TONKATSU_BRANDS.has(store)) {
       const cafeteriaInPool = inPool.filter(i => CAFETERIA.test(i.name))
       if (cafeteriaInPool.length) {
         issues.push({
@@ -89,6 +95,21 @@ async function main() {
           kb: cat,
           kind: `dish_family_${check.label}`,
           samples: bad.slice(0, 4).map(i => i.name),
+        })
+      }
+    }
+
+    // 3b. 豬排專賣店 — 被擋的模板菜仍漏進池
+    if (TONKATSU_BRANDS.has(store)) {
+      const blocked = raw.filter(i => !isPlausibleBrandItem(i))
+      const leaking = blocked.filter(i => inPool.some(p => p.id === i.id))
+      if (leaking.length) {
+        issues.push({
+          severity: 'error',
+          brand: store,
+          kb: cat,
+          kind: 'tonkatsu_pollution',
+          samples: leaking.slice(0, 4).map(i => i.name),
         })
       }
     }

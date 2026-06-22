@@ -28,7 +28,7 @@ export function lookupDiceMenuItem(id: string): ConvenienceItem | undefined {
   return getMenuIdIndex(getDiceMenuSource()).get(id)
 }
 
-const DICE_POOL_CACHE_VERSION = 3
+const DICE_POOL_CACHE_VERSION = 4
 
 function dicePoolCacheKey(
   mealType: MealType,

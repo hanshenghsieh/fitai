@@ -26,6 +26,7 @@ import type { FoodLogEntry } from '@/lib/banks/types'
 import type { FoodDna } from '@/lib/food-memory'
 import { isRecoveryActive } from '@/lib/engines/calorie-bank-engine'
 import { sumLoggedCalories, sumLoggedProtein, computeTodayMealState } from '@/lib/engines/next-meal-engine'
+import { foodLogsNeedSync, reconcileFoodLogsToday } from '@/lib/food-log-reconcile'
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
 import { TODAY } from '@/lib/today-design'
@@ -108,6 +109,16 @@ export default function BetterBitHome({
   const cooldown = todayPlan.workout?.cooldown ?? []
   const workoutDone = workoutItems.filter(w => w.completed).length
   const foodLogs = userMemory.food_logs_today ?? []
+  const displayFoodLogs = useMemo(
+    () => reconcileFoodLogsToday(foodLogs),
+    [foodLogs]
+  )
+  const reconcileSyncRef = useRef<string | null>(null)
+
+  const displayUserMemory = useMemo(
+    () => ({ ...userMemory, food_logs_today: displayFoodLogs }),
+    [userMemory, displayFoodLogs]
+  )
   const [postureLine, setPostureLine] = useState('最近忙嗎？回來就好。今天照常。')
   const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(initialCalorieBank)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -118,6 +129,16 @@ export default function BetterBitHome({
     mealSuggest?: Partial<Record<MealType, MealSuggestState>>
     customEatOut?: Partial<Record<MealType, CustomEatOutSelection[]>>
   }>({})
+  const userMemoryRef = useRef(userMemory)
+  const customEatOutRef = useRef(customEatOut)
+  const dailyRollsRef = useRef(dailyRolls)
+  const mealSuggestRef = useRef(mealSuggest)
+  const workoutItemsRef = useRef(workoutItems)
+  userMemoryRef.current = userMemory
+  customEatOutRef.current = customEatOut
+  dailyRollsRef.current = dailyRolls
+  mealSuggestRef.current = mealSuggest
+  workoutItemsRef.current = workoutItems
 
   useEffect(() => {
     void preloadDiceMenuBulk()
@@ -130,13 +151,13 @@ export default function BetterBitHome({
   }, [])
 
   const intakeSummary = useMemo(() => {
-    const caloriesLogged = sumLoggedCalories(foodLogs)
-    const proteinLogged = sumLoggedProtein(foodLogs)
+    const caloriesLogged = sumLoggedCalories(displayFoodLogs)
+    const proteinLogged = sumLoggedProtein(displayFoodLogs)
     const normalTarget = todayPlan.daily_targets.calories
     const proteinTarget = todayPlan.daily_targets.protein_g
     const recoveryActive = isRecoveryActive(calorieBank ?? { recovery_balance_kcal: 0, spread_days_remaining: 0 })
     const dayState = computeTodayMealState({
-      todayFoodLogs: foodLogs,
+      todayFoodLogs: displayFoodLogs,
       normalTargetKcal: normalTarget,
       internalTargetKcal: calorieBank?.internal_target_kcal,
       proteinTargetG: proteinTarget,
@@ -150,7 +171,7 @@ export default function BetterBitHome({
       overTarget: dayState.overTargetProtection,
       recoveryActive,
     }
-  }, [foodLogs, todayPlan.daily_targets, calorieBank])
+  }, [displayFoodLogs, todayPlan.daily_targets, calorieBank])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -167,13 +188,13 @@ export default function BetterBitHome({
     persistPatchRef.current = {}
     const state = {
       dietItems: checkin?.diet_items ?? [],
-      workoutItems: patch.workoutItems ?? workoutItems,
+      workoutItems: patch.workoutItems ?? workoutItemsRef.current,
       waterMl: checkin?.water_ml ?? 0,
       mealModes,
-      customEatOut: patch.customEatOut ?? customEatOut,
-      dailyRolls: patch.dailyRolls ?? dailyRolls,
-      mealSuggest: patch.mealSuggest ?? mealSuggest,
-      userMemory: patch.userMemory ?? userMemory,
+      customEatOut: patch.customEatOut ?? customEatOutRef.current,
+      dailyRolls: patch.dailyRolls ?? dailyRollsRef.current,
+      mealSuggest: patch.mealSuggest ?? mealSuggestRef.current,
+      userMemory: patch.userMemory ?? userMemoryRef.current,
     }
     try {
       const res = await fetch('/api/checkin', {
@@ -187,7 +208,7 @@ export default function BetterBitHome({
     } catch {
       toast.error(GENTLE_ERROR_MESSAGE)
     }
-  }, [checkin, workoutItems, mealModes, customEatOut, dailyRolls, mealSuggest, userMemory, weeklyPlanId])
+  }, [checkin, mealModes, weeklyPlanId])
 
   const persist = useCallback(
     (patch: {
@@ -208,8 +229,34 @@ export default function BetterBitHome({
   )
 
   const handleLogFood = useCallback((logs: FoodLogEntry[], nextMemory: UserMemoryMeta) => {
+    userMemoryRef.current = nextMemory
     startTransition(() => setUserMemory(nextMemory))
     persist({ userMemory: nextMemory })
+  }, [persist])
+
+  useEffect(() => {
+    const fingerprint = displayFoodLogs.map(l => `${l.id}:${l.slot}`).join('|')
+    if (reconcileSyncRef.current === fingerprint) return
+    if (!foodLogsNeedSync(foodLogs, displayFoodLogs)) {
+      reconcileSyncRef.current = fingerprint
+      return
+    }
+    reconcileSyncRef.current = fingerprint
+    handleLogFood(displayFoodLogs, { ...userMemory, food_logs_today: displayFoodLogs })
+  }, [displayFoodLogs, foodLogs, userMemory, handleLogFood])
+
+  const handleClearMealSelection = useCallback((mealType: MealType) => {
+    const nextCustom = { ...customEatOutRef.current }
+    delete nextCustom[mealType]
+    const nextSuggest = { ...mealSuggestRef.current }
+    delete nextSuggest[mealType]
+    customEatOutRef.current = nextCustom
+    mealSuggestRef.current = nextSuggest
+    startTransition(() => {
+      setCustomEatOut(nextCustom)
+      setMealSuggest(nextSuggest)
+    })
+    persist({ customEatOut: nextCustom, mealSuggest: nextSuggest })
   }, [persist])
 
   const handleDiceApply = useCallback((payload: {
@@ -219,30 +266,37 @@ export default function BetterBitHome({
     mealSuggest: Partial<Record<MealType, MealSuggestState>>
     userMemory: UserMemoryMeta
   }) => {
-    const nextCustom = { ...customEatOut, [payload.mealType]: payload.selection }
+    userMemoryRef.current = payload.userMemory
+    dailyRollsRef.current = payload.dailyRolls
+    mealSuggestRef.current = payload.mealSuggest
+    setCustomEatOut(prev => {
+      const nextCustom = { ...prev, [payload.mealType]: payload.selection }
+      customEatOutRef.current = nextCustom
+      persist({
+        customEatOut: nextCustom,
+        dailyRolls: payload.dailyRolls,
+        mealSuggest: payload.mealSuggest,
+        userMemory: payload.userMemory,
+      })
+      return nextCustom
+    })
     startTransition(() => {
-      setCustomEatOut(nextCustom)
       setDailyRolls(payload.dailyRolls)
       setMealSuggest(payload.mealSuggest)
       setUserMemory(payload.userMemory)
     })
-    persist({
-      customEatOut: nextCustom,
-      dailyRolls: payload.dailyRolls,
-      mealSuggest: payload.mealSuggest,
-      userMemory: payload.userMemory,
-    })
-  }, [customEatOut, persist])
+  }, [persist])
 
   const toggleExercise = useCallback((exerciseId: string) => {
     startTransition(() => {
       const updated = workoutItems.map(w =>
         w.exercise_id === exerciseId ? { ...w, completed: !w.completed } : w
       )
+      workoutItemsRef.current = updated
       setWorkoutItems(updated)
       persist({ workoutItems: updated })
     })
-  }, [workoutItems, persist])
+  }, [persist])
 
   const isRestDay = exercises.length === 0
 
@@ -262,7 +316,7 @@ export default function BetterBitHome({
         todayPlan={todayPlan}
         profile={profile}
         goalSnapshot={goalSnapshot}
-        userMemory={userMemory}
+        userMemory={displayUserMemory}
         foodDna={userMemory.food_dna ?? foodDna}
         dayOfWeek={dayOfWeek}
         recentMissedDays={recentMissedDays}
@@ -275,6 +329,7 @@ export default function BetterBitHome({
         workoutTotal={workoutItems.length}
         calorieBank={calorieBank}
         onLogFood={handleLogFood}
+        onClearMealSelection={handleClearMealSelection}
         onPostureLine={setPostureLine}
         onDiceApply={handleDiceApply}
       />

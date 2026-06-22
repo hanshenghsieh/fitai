@@ -128,17 +128,45 @@ const STRENGTH_EXERCISES_PER_SESSION = 4
 const WARMUP_MINS = 5
 const COOLDOWN_MINS = 5
 
-function userHasEquipment(userEquipment: string[], required: EquipTag[]): boolean {
-  if (required.includes('none') && required.length === 1) return true
-  if (userEquipment.includes('none') || userEquipment.length === 0) {
-    return required.every(r => r === 'none')
+/** 正規化 onboarding / DB 的器材欄位 */
+export function normalizeUserEquipment(raw: string[] | null | undefined): EquipTag[] {
+  if (!raw?.length) return ['none']
+
+  const mapped = new Set<EquipTag>()
+  for (const item of raw) {
+    const s = String(item).toLowerCase()
+    if (s === 'none' || /無器材|徒手|沒有/.test(item)) {
+      mapped.add('none')
+      continue
+    }
+    if (/啞鈴|dumbbell/.test(s)) mapped.add('dumbbells')
+    if (/槓鈴|barbell/.test(s)) mapped.add('barbell')
+    if (/彈力|band/.test(s)) mapped.add('resistance_bands')
+    if (/跳繩|jump.?rope/.test(s)) mapped.add('jump_rope')
+    if (/引體|pull.?up/.test(s)) mapped.add('pull_up_bar')
+    if (/健身|gym|器械|飛輪|划船機|滑步機/.test(s)) mapped.add('gym')
   }
-  return required.some(r => r === 'none' || userEquipment.includes(r))
+
+  const tags = [...mapped]
+  if (!tags.length || (tags.length === 1 && tags[0] === 'none')) return ['none']
+  return tags.filter(t => t !== 'none')
+}
+
+function isBodyweightOnly(userEquipment: EquipTag[]): boolean {
+  return userEquipment.length === 1 && userEquipment[0] === 'none'
+}
+
+function userHasEquipment(userEquipment: EquipTag[], required: EquipTag[]): boolean {
+  if (required.every(r => r === 'none')) return true
+  if (isBodyweightOnly(userEquipment)) {
+    return required.includes('none')
+  }
+  return required.some(r => userEquipment.includes(r))
 }
 
 function filterExercises(
   split: 'upper' | 'lower',
-  userEquipment: string[],
+  userEquipment: EquipTag[],
   injuries: { knee: boolean; back: boolean; shoulder: boolean; wrist: boolean }
 ): ExerciseTemplate[] {
   return EXERCISE_POOL.filter(ex => {
@@ -152,9 +180,14 @@ function filterExercises(
   })
 }
 
-function sortPoolByEquipment(pool: ExerciseTemplate[], userEquipment: string[]): ExerciseTemplate[] {
-  const hasReal = userEquipment.some(e => e !== 'none')
-  if (!hasReal) return pool
+function sortPoolByEquipment(pool: ExerciseTemplate[], userEquipment: EquipTag[]): ExerciseTemplate[] {
+  if (isBodyweightOnly(userEquipment)) {
+    return [...pool].sort((a, b) => {
+      const aBody = a.equipment.includes('none') ? 0 : 1
+      const bBody = b.equipment.includes('none') ? 0 : 1
+      return aBody - bBody
+    })
+  }
   return [...pool].sort((a, b) => {
     const aBody = a.equipment.every(e => e === 'none') ? 1 : 0
     const bBody = b.equipment.every(e => e === 'none') ? 1 : 0
@@ -166,11 +199,12 @@ function pickSessionExercises(
   pool: ExerciseTemplate[],
   sessionIndex: number,
   count: number,
-  userEquipment: string[]
+  userEquipment: EquipTag[]
 ): ExerciseTemplate[] {
   let sorted = sortPoolByEquipment(pool, userEquipment)
-  const hasReal = userEquipment.some(e => e !== 'none')
-  if (hasReal) {
+  if (isBodyweightOnly(userEquipment)) {
+    sorted = sorted.filter(ex => ex.equipment.includes('none'))
+  } else if (!isBodyweightOnly(userEquipment)) {
     const withEquip = sorted.filter(ex => !ex.equipment.every(e => e === 'none'))
     if (withEquip.length >= count) sorted = withEquip
   }
@@ -215,31 +249,56 @@ function toWorkoutSet(
   }
 }
 
-// 有氧選項
-const cardioExercises = [
+// 有氧選項 — equipment 標記所需器材
+const cardioExercises: {
+  id: string
+  name: string
+  name_zh: string
+  duration: number
+  intensity: string
+  lowImpact: boolean
+  equipment: EquipTag[]
+  homePriority?: number
+}[] = [
   {
     id: 'running',
     name: 'Running',
-    name_zh: '跑步',
+    name_zh: '慢跑',
     duration: 1800,
     intensity: '中等 (130-150 BPM)',
     lowImpact: false,
+    equipment: ['none'],
+    homePriority: 1,
   },
   {
-    id: 'cycling',
-    name: 'Cycling',
-    name_zh: '騎車',
-    duration: 1800,
-    intensity: '中等 (100-120 RPM)',
+    id: 'brisk-walk',
+    name: 'Brisk Walk',
+    name_zh: '快走',
+    duration: 2100,
+    intensity: '輕度-中等',
     lowImpact: true,
+    equipment: ['none'],
+    homePriority: 0,
   },
   {
-    id: 'rowing',
-    name: 'Rowing',
-    name_zh: '划船',
-    duration: 1800,
-    intensity: '中等 (24-28 strokes/min)',
-    lowImpact: true,
+    id: 'high-knees',
+    name: 'High Knees',
+    name_zh: '原地高抬腿',
+    duration: 1200,
+    intensity: '中等',
+    lowImpact: false,
+    equipment: ['none'],
+    homePriority: 2,
+  },
+  {
+    id: 'jumping-jacks',
+    name: 'Jumping Jacks',
+    name_zh: '開合跳',
+    duration: 900,
+    intensity: '中等-高',
+    lowImpact: false,
+    equipment: ['none'],
+    homePriority: 3,
   },
   {
     id: 'jump-rope',
@@ -248,6 +307,26 @@ const cardioExercises = [
     duration: 1200,
     intensity: '中等-高強度 (140-160 BPM)',
     lowImpact: false,
+    equipment: ['jump_rope'],
+    homePriority: 4,
+  },
+  {
+    id: 'cycling',
+    name: 'Cycling',
+    name_zh: '騎車',
+    duration: 1800,
+    intensity: '中等 (100-120 RPM)',
+    lowImpact: true,
+    equipment: ['gym'],
+  },
+  {
+    id: 'rowing',
+    name: 'Rowing',
+    name_zh: '划船機',
+    duration: 1800,
+    intensity: '中等 (24-28 strokes/min)',
+    lowImpact: true,
+    equipment: ['gym'],
   },
   {
     id: 'swimming',
@@ -256,8 +335,28 @@ const cardioExercises = [
     duration: 1800,
     intensity: '中等',
     lowImpact: true,
+    equipment: ['gym'],
   },
 ]
+
+function pickCardioExercise(
+  userEquipment: EquipTag[],
+  hasKneeInjury: boolean,
+  dayIndex: number,
+  volumeMult: number
+) {
+  let pool = cardioExercises.filter(c => userHasEquipment(userEquipment, c.equipment))
+  if (hasKneeInjury) pool = pool.filter(c => c.lowImpact)
+  if (!pool.length) {
+    pool = cardioExercises.filter(c => c.equipment.includes('none'))
+  }
+  if (isBodyweightOnly(userEquipment)) {
+    pool = [...pool].sort((a, b) => (a.homePriority ?? 9) - (b.homePriority ?? 9))
+  }
+  const cardio = pool[dayIndex % pool.length]!
+  const cardioDuration = Math.round(cardio.duration * volumeMult)
+  return { cardio, cardioDuration }
+}
 
 export function generateWorkoutPlan(
   dayIndex: number,
@@ -286,14 +385,7 @@ export function generateWorkoutPlan(
     wrist: hasWristInjury,
   }
 
-  const hasGym = equipment.some(e =>
-    ['健身房', 'gym', '器械'].some(k => String(e).toLowerCase().includes(k))
-  )
-  const userEquipment = equipment.includes('none') || equipment.length === 0
-    ? ['none']
-    : hasGym
-      ? [...equipment, 'gym', 'dumbbells', 'barbell']
-      : equipment
+  const userEquipment = normalizeUserEquipment(equipment)
   const levelMult =
     fitnessLevel === 'advanced' ? 1.15 : fitnessLevel === 'beginner' ? 0.85 : 1
   const modMult = workoutModifier === 'easier' ? 0.85 : workoutModifier === 'harder' ? 1.1 : 1
@@ -405,22 +497,12 @@ export function generateWorkoutPlan(
   }
 
   if (isCardioDay) {
-    let availableCardio = hasKneeInjury
-      ? cardioExercises.filter(c => c.lowImpact)
-      : [...cardioExercises]
-
-    if (userEquipment.includes('jump_rope')) {
-      availableCardio = availableCardio.sort((a, b) =>
-        a.id === 'jump-rope' ? -1 : b.id === 'jump-rope' ? 1 : 0
-      )
-    }
-    if (userEquipment.includes('none') && userEquipment.length === 1) {
-      availableCardio = availableCardio.filter(c => ['running', 'jump-rope'].includes(c.id))
-    }
-
-    const cardioIndex = dayIndex % availableCardio.length
-    const cardio = availableCardio[cardioIndex]
-    const cardioDuration = Math.round(cardio.duration * volumeMult)
+    const { cardio, cardioDuration } = pickCardioExercise(
+      userEquipment,
+      hasKneeInjury,
+      dayIndex,
+      volumeMult
+    )
 
     return {
       type: 'cardio',

@@ -104,7 +104,7 @@ export const BRAND_REGISTRY: BrandEntry[] = [
   { slug: 'zhengzhong', name_zh: '正忠排骨飯', category: 'bento', kb_category: 'bento', priority: 7 },
   { slug: 'chishang', name_zh: '池上木片便當', category: 'bento', kb_category: 'bento', priority: 7 },
   { slug: 'dongchi', name_zh: '東池飯包', category: 'bento', kb_category: 'bento', priority: 7 },
-  { slug: 'fukusho', name_zh: '福勝亭', category: 'bento', kb_category: 'bento', priority: 7 },
+  { slug: 'fukusho', name_zh: '福勝亭', category: 'chain_restaurant', kb_category: 'japanese', priority: 7 },
 
   // ── hot pot ──
   { slug: 'shierguo', name_zh: '石二鍋', category: 'hot_pot', kb_category: 'hotpot', priority: 9 },
