@@ -13,6 +13,39 @@ export { DRINK_STORE_NAMES, isDrinkStore } from './drink-stores'
 
 let diceMenuSource: ConvenienceItem[] | null = null
 let bulkLoadPromise: Promise<ConvenienceItem[]> | null = null
+let menuIdIndex: Map<string, ConvenienceItem> | null = null
+let menuIdIndexLen = 0
+const dicePoolCache = new Map<string, ConvenienceItem[]>()
+
+function getMenuIdIndex(menu: ConvenienceItem[]): Map<string, ConvenienceItem> {
+  if (menuIdIndex && menuIdIndexLen === menu.length) return menuIdIndex
+  menuIdIndex = new Map(menu.map(i => [i.id, i]))
+  menuIdIndexLen = menu.length
+  return menuIdIndex
+}
+
+export function lookupDiceMenuItem(id: string): ConvenienceItem | undefined {
+  return getMenuIdIndex(getDiceMenuSource()).get(id)
+}
+
+function dicePoolCacheKey(
+  mealType: MealType,
+  profile?: UserProfile | null,
+  memory?: UserMemoryState
+): string {
+  const p = profile
+  const prefs = memory?.eat_out_prefs
+  return [
+    mealType,
+    p?.is_vegetarian ? 1 : 0,
+    p?.is_vegan ? 1 : 0,
+    p?.is_halal ? 1 : 0,
+    prefs?.breakfast_max_price ?? '',
+    prefs?.lunch_max_price ?? '',
+    prefs?.dinner_max_price ?? '',
+    (prefs?.avoided_brands ?? []).join(','),
+  ].join('|')
+}
 
 function mergeDiceMenus(bulk: ConvenienceItem[]): ConvenienceItem[] {
   const seen = new Set(eatOutMenu.map(i => i.id))
@@ -88,10 +121,15 @@ export function getDiceMenuPool(
   profile?: UserProfile | null,
   memory?: UserMemoryState
 ): ConvenienceItem[] {
-  return getFilteredMenu(mealType, profile, memory, {
+  const key = dicePoolCacheKey(mealType, profile, memory)
+  const hit = dicePoolCache.get(key)
+  if (hit) return hit
+  const pool = getFilteredMenu(mealType, profile, memory, {
     includeBeverages: true,
     source: getDiceMenuSource(),
   })
+  dicePoolCache.set(key, pool)
+  return pool
 }
 
 export function isDiceSingleItem(item: ConvenienceItem, mealType: MealType): boolean {

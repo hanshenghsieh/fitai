@@ -4,7 +4,7 @@ import type { CustomEatOutSelection } from './checkin-utils'
 import type { EatOutPreferences, MealSuggestion, SuggestContext, UserMemoryState } from './meal-engine-types'
 import { suggestNextMeal, suggestionToCustomSelection } from './meal-suggest'
 import { nearbyBrands } from './nearby-engine'
-import { getDiceMenuSource } from './dice-menu-pool'
+import { getDiceMenuSource, lookupDiceMenuItem } from './dice-menu-pool'
 
 export type { MealSuggestion, UserMemoryState, EatOutPreferences }
 export { suggestNextMeal, suggestionToCustomSelection }
@@ -27,12 +27,11 @@ export function currentMealSlot(): MealType {
 }
 
 export function namesFromSeenIds(seenIds: string[]): string[] {
-  const menu = getDiceMenuSource()
   const names = new Set<string>()
   for (const composite of seenIds) {
     for (const part of composite.split('|')) {
       const itemId = part.split(':')[0]
-      const item = menu.find(i => i.id === itemId)
+      const item = lookupDiceMenuItem(itemId)
       if (item) names.add(item.name)
     }
   }
@@ -102,32 +101,21 @@ export function rollMealSuggestion(params: {
     calorie_bank: params.calorie_bank,
     day_state: params.day_state,
     seed: Date.now() + params.rolls_used * 9973 + mealSeed,
+    fast_dice: true,
   })
 
   let { suggestion, pool_exhausted } = suggestNextMeal(ctx)
-
-  if (!suggestion && params.seen_ids.length > 0) {
-    const retry = suggestNextMeal(
-      buildSuggestContext({
-        ...params,
-        exclude_ids: params.seen_ids.slice(-1),
-        exclude_names: params.exclude_names ?? [],
-        rolls_used: params.rolls_used,
-        seed: Date.now() + params.rolls_used * 9973 + mealSeed + 999,
-      })
-    )
-    suggestion = retry.suggestion
-    pool_exhausted = retry.pool_exhausted
-  }
 
   if (!suggestion) {
     const fallback = suggestNextMeal(
       buildSuggestContext({
         ...params,
-        exclude_ids: [],
-        exclude_names: [],
-        rolls_used: params.rolls_used + 3,
+        exclude_ids: params.seen_ids.slice(-6),
+        exclude_names: (params.exclude_names ?? []).slice(-8),
+        exclude_stores: [],
+        rolls_used: params.rolls_used + 1,
         seed: Date.now() + params.rolls_used * 131 + mealSeed + 4242,
+        fast_dice: true,
       })
     )
     suggestion = fallback.suggestion

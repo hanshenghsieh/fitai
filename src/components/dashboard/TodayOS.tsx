@@ -37,7 +37,7 @@ import {
   memoryFromCheckinMeta,
   type MealSuggestion,
 } from '@/lib/meal-engine'
-import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
+import { preloadDiceMenuBulk, isDiceMenuBulkReady } from '@/lib/dice-menu-pool'
 import { storesInText } from '@/lib/dice-store-names'
 import { linesToDisplayItems } from '@/lib/meal-suggest'
 import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
@@ -756,59 +756,73 @@ export default function TodayOS({
     const session = loadDiceSession(slot)
     const preview = dicePreviewByMeal[slot] ?? null
 
-    void preloadDiceMenuBulk().then(() => {
-      const excludeIds = [...new Set([
-        ...seenIdsForMeal(dailyRolls, slot),
-        ...(dailyRolls.seen_suggestion_ids ?? []),
-        ...session.ids,
-        preview?.id,
-      ].filter(Boolean))]
-      const previewNames = preview ? linesToDisplayItems(preview.lines).map(i => i.name) : []
-      const excludeNames = [...new Set([...allItemNamesFromLogs(foodLogs), ...previewNames])]
-      const loggedStores = foodLogs.flatMap(l => [
-        l.store,
-        ...storesInText(l.name),
-      ].filter(Boolean)) as string[]
-      const excludeStores = [...new Set([
-        ...session.stores,
-        preview?.stores[0],
-        ...loggedStores,
-      ].filter(Boolean))]
+    const runRoll = () => {
+      try {
+        const excludeIds = [...new Set([
+          ...seenIdsForMeal(dailyRolls, slot),
+          ...(dailyRolls.seen_suggestion_ids ?? []),
+          ...session.ids,
+          preview?.id,
+        ].filter(Boolean))]
+        const previewNames = preview ? linesToDisplayItems(preview.lines).map(i => i.name) : []
+        const excludeNames = [...new Set([...allItemNamesFromLogs(foodLogs), ...previewNames])]
+        const loggedStores = foodLogs.flatMap(l => [
+          l.store,
+          ...storesInText(l.name),
+        ].filter(Boolean)) as string[]
+        const excludeStores = [...new Set([
+          ...session.stores,
+          preview?.stores[0],
+          ...loggedStores,
+        ].filter(Boolean))]
 
-      const result = rollMealSuggestion({
-        meal_type: slot,
-        daily_targets: todayPlan.daily_targets,
-        profile,
-        memory,
-        day_index: dayIndex,
-        seen_ids: excludeIds,
-        exclude_names: excludeNames,
-        exclude_stores: excludeStores,
-        rolls_used: localDiceRolls,
-        user_lat: coords?.lat,
-        user_lng: coords?.lng,
-        adherence: adherenceState,
-        calorie_bank: calorieBank,
-        day_state: dayStateRef.current,
-      })
+        const result = rollMealSuggestion({
+          meal_type: slot,
+          daily_targets: todayPlan.daily_targets,
+          profile,
+          memory,
+          day_index: dayIndex,
+          seen_ids: excludeIds,
+          exclude_names: excludeNames,
+          exclude_stores: excludeStores,
+          rolls_used: localDiceRolls,
+          user_lat: coords?.lat,
+          user_lng: coords?.lng,
+          adherence: adherenceState,
+          calorie_bank: calorieBank,
+          day_state: dayStateRef.current,
+        })
 
-      rollingRef.current = false
-      setRolling(false)
-      setLocalDiceRolls(n => n + 1)
-      if (!result.suggestion) {
-        toast.message('暫時想不到別的')
-        return
+        setLocalDiceRolls(n => n + 1)
+        if (!result.suggestion) {
+          toast.message('暫時想不到別的')
+          return
+        }
+        const store = result.suggestion.stores[0]
+        const id = result.suggestion.id
+        const nextStores = store ? [...new Set([...session.stores, store])].slice(-20) : session.stores
+        const nextIds = [...new Set([...session.ids, id])].slice(-40)
+        saveDiceSession(slot, nextStores, nextIds)
+        setDicePreviewByMeal(prev => ({ ...prev, [slot]: result.suggestion! }))
+      } finally {
+        rollingRef.current = false
+        setRolling(false)
       }
-      const store = result.suggestion.stores[0]
-      const id = result.suggestion.id
-      const nextStores = store ? [...new Set([...session.stores, store])].slice(-20) : session.stores
-      const nextIds = [...new Set([...session.ids, id])].slice(-40)
-      saveDiceSession(slot, nextStores, nextIds)
-      setDicePreviewByMeal(prev => ({ ...prev, [slot]: result.suggestion! }))
-    }).catch(() => {
-      rollingRef.current = false
-      setRolling(false)
-    })
+    }
+
+    const scheduleRoll = () => {
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(() => runRoll(), { timeout: 80 })
+      } else {
+        requestAnimationFrame(() => runRoll())
+      }
+    }
+
+    if (isDiceMenuBulkReady()) {
+      scheduleRoll()
+    } else {
+      void preloadDiceMenuBulk().finally(scheduleRoll)
+    }
   }, [mealSlotLegacy, dicePreviewByMeal, foodLogs, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, dailyRolls, adherenceState, calorieBank])
 
   const confirmDice = useCallback(() => {

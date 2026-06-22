@@ -89,6 +89,8 @@ export interface SuggestContext {
   calorie_bank?: import('@/lib/banks/calorie-bank-types').CalorieBankRow | null
   /** Engine v2 — continuous today state */
   day_state?: import('@/lib/engines/next-meal-engine').TodayMealState | null
+  /** UI dice roll — use cached pool + lighter candidate generation */
+  fast_dice?: boolean
 }
 
 export const MEAL_RATIOS = { breakfast: 0.25, lunch: 0.4, dinner: 0.35 } as const
