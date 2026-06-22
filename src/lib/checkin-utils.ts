@@ -232,6 +232,15 @@ export function userMemoryFromCheckin(checkin: DailyCheckin | null): UserMemoryM
   return parseCheckinMeta(checkin).user_memory ?? {}
 }
 
+/** Strip heavy base64 photos before PATCH — keep them in client state only. */
+export function userMemoryForPersist(memory: UserMemoryMeta | undefined): UserMemoryMeta | undefined {
+  if (!memory?.food_logs_today?.length) return memory
+  return {
+    ...memory,
+    food_logs_today: memory.food_logs_today.map(({ photo_data_url: _photo, ...log }) => log),
+  }
+}
+
 export function buildCheckinPayload(
   state: {
     dietItems: DietCheckinItem[]
@@ -250,7 +259,7 @@ export function buildCheckinPayload(
     custom_eat_out: state.customEatOut,
     daily_rolls: state.dailyRolls,
     meal_suggest: state.mealSuggest,
-    user_memory: state.userMemory,
+    user_memory: userMemoryForPersist(state.userMemory),
   })
   return {
     weekly_plan_id: weeklyPlanId,

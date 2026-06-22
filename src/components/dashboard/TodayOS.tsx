@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ClipboardList, Loader2, RefreshCw } from 'lucide-react'
+import { ClipboardList, Loader2, RefreshCw, Camera, Trash2 } from 'lucide-react'
 import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu } from '@/lib/food-search'
 import { estimateFreeTextMeal } from '@/lib/food-estimate'
@@ -19,7 +19,6 @@ import { mergeBankIntoAdherence } from '@/lib/engines/calorie-bank-engine'
 import {
   avgDailyKcalFromLogs,
   computeTodayMealState,
-  OVER_TARGET_COPY,
 } from '@/lib/engines/next-meal-engine'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import { getFoodMemoryGreeting, getFoodPrediction } from '@/lib/engines/food-prediction'
@@ -45,6 +44,7 @@ import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems }
 import { eatOutMenu, type ConvenienceItem } from '@/lib/convenience-store-menu'
 import DiceMealPreview from '@/components/dashboard/DiceMealPreview'
 import TodayFoodMore from '@/components/dashboard/today/TodayFoodMore'
+import PhotoLogSheet, { type PhotoLogDraft } from '@/components/dashboard/today/PhotoLogSheet'
 import {
   appendSeenForMeal,
   recordMealRoll,
@@ -56,11 +56,12 @@ import {
   type CustomEatOutSelection,
 } from '@/lib/checkin-utils'
 import { useGeolocation } from '@/lib/use-geolocation'
-import { TODAY } from '@/lib/today-design'
+import type { DayPlan, UserProfile } from '@/types'
 import FoodPhotoThumb from '@/components/dashboard/today/FoodPhotoThumb'
 import { mealMacroSplit } from '@/lib/goal-calculator'
 import { currentMealSlotForSchedule, type WorkSchedule } from '@/lib/human-mode'
-import type { DayPlan, UserProfile } from '@/types'
+import { TODAY } from '@/lib/today-design'
+import { toast } from 'sonner'
 
 interface GoalSnapshot {
   daily_deficit?: number
@@ -222,9 +223,11 @@ function buildAdherenceContext(
 function CapturedLogRow({
   log,
   onNameSubmit,
+  onDelete,
 }: {
   log: FoodLogEntry
   onNameSubmit: (name: string) => void
+  onDelete?: () => void
 }) {
   const [nameDraft, setNameDraft] = useState('')
 
@@ -234,9 +237,21 @@ function CapturedLogRow({
         <FoodPhotoThumb photo_url={log.photo_data_url} userUploadedPhoto={log.photo_data_url} size={80} radius={20} />
       )}
       <div className="flex-1 min-w-0 space-y-1.5">
-        <p className="text-[17px] leading-snug" style={{ color: TODAY.text, fontWeight: 500 }}>
-          {log.name}
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-[17px] leading-snug flex-1 min-w-0" style={{ color: TODAY.text, fontWeight: 500 }}>
+            {log.name}
+          </p>
+          {onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="p-1.5 -mr-1 shrink-0 rounded-full active:opacity-70"
+              aria-label="移除紀錄"
+            >
+              <Trash2 className="h-4 w-4" strokeWidth={TODAY.iconStroke} style={{ color: TODAY.textSecondary }} />
+            </button>
+          )}
+        </div>
 
         {log.learning && (
           <p className="text-[14px] flex items-center gap-1.5" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
@@ -292,12 +307,24 @@ function CapturedLogRow({
   )
 }
 
-function LogTextRow({ log }: { log: FoodLogEntry }) {
+function LogTextRow({ log, onDelete }: { log: FoodLogEntry; onDelete?: () => void }) {
   return (
     <div className="space-y-1.5 w-full">
-      <p className="text-[17px] leading-snug" style={{ color: TODAY.text, fontWeight: 500 }}>
-        {log.name}
-      </p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-[17px] leading-snug flex-1 min-w-0" style={{ color: TODAY.text, fontWeight: 500 }}>
+          {log.name}
+        </p>
+        {onDelete && (
+          <button
+            type="button"
+            onClick={onDelete}
+            className="p-1.5 -mr-1 shrink-0 rounded-full active:opacity-70"
+            aria-label="移除紀錄"
+          >
+            <Trash2 className="h-4 w-4" strokeWidth={TODAY.iconStroke} style={{ color: TODAY.textSecondary }} />
+          </button>
+        )}
+      </div>
       {log.calories > 0 && (
         <p className="text-[15px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
           {log.calories} kcal · 蛋白質 {Math.round(log.protein_g)}g
@@ -390,23 +417,24 @@ export default function TodayOS({
     adherenceState.events,
   ])
 
-  const [moreOpen, setMoreOpen] = useState(false)
-  const [query, setQuery] = useState('')
-  const foodLogsRef = useRef(foodLogs)
-  foodLogsRef.current = foodLogs
   const [rolling, setRolling] = useState(false)
+  const [confirming, setConfirming] = useState(false)
+  const rollingRef = useRef(false)
+  const initialRollDone = useRef(false)
+  const lastPostureLineRef = useRef('')
   const [dicePreviewByMeal, setDicePreviewByMeal] = useState<Partial<Record<MealType, MealSuggestion>>>({})
   const dicePreview = dicePreviewByMeal[mealSlotLegacy] ?? null
   const [localDiceRolls, setLocalDiceRolls] = useState(0)
-  const [seenDiceStores, setSeenDiceStores] = useState<string[]>([])
-  const [seenDiceIds, setSeenDiceIds] = useState<string[]>([])
-  const heroBooted = useRef(false)
-
-  useEffect(() => {
-    const session = loadDiceSession(mealSlotLegacy)
-    if (session.stores.length) setSeenDiceStores(session.stores)
-    if (session.ids.length) setSeenDiceIds(session.ids)
-  }, [mealSlotLegacy])
+  const [moreOpen, setMoreOpen] = useState(false)
+  const [photoOpen, setPhotoOpen] = useState(false)
+  const [photoDraft, setPhotoDraft] = useState<PhotoLogDraft | null>(null)
+  const [photoSaving, setPhotoSaving] = useState(false)
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const foodLogsRef = useRef(foodLogs)
+  foodLogsRef.current = foodLogs
+  const dayStateRef = useRef(dayState)
+  dayStateRef.current = dayState
 
   const frequentList = useMemo(() => displayFrequent(foodDna), [foodDna])
   const [selectedFrequentId, setSelectedFrequentId] = useState('')
@@ -469,23 +497,29 @@ export default function TodayOS({
 
   const updatePostureLine = useCallback(
     (logs: FoodLogEntry[], memory: UserMemoryMeta, lastDelta = 0) => {
+      let line: string
       if (logs.length === 0) {
-        onPostureLine?.(formatPostureLine(prediction ?? getFoodMemoryGreeting()))
-        return
+        line = formatPostureLine(prediction ?? getFoodMemoryGreeting())
+      } else {
+        line = formatPostureLine(
+          buildAdherenceContext(
+            logs,
+            memory,
+            todayPlan,
+            goalSnapshot,
+            workoutDone,
+            workoutTotal,
+            recentMissedDays,
+            recentFoodLogs,
+            lastDelta,
+            calorieBank
+          ).line
+        )
       }
-      const { line } = buildAdherenceContext(
-        logs,
-        memory,
-        todayPlan,
-        goalSnapshot,
-        workoutDone,
-        workoutTotal,
-        recentMissedDays,
-        recentFoodLogs,
-        lastDelta,
-        calorieBank
-      )
-      onPostureLine?.(formatPostureLine(line))
+      if (line !== lastPostureLineRef.current) {
+        lastPostureLineRef.current = line
+        onPostureLine?.(line)
+      }
     },
     [prediction, todayPlan, goalSnapshot, workoutDone, workoutTotal, recentMissedDays, recentFoodLogs, onPostureLine, calorieBank]
   )
@@ -550,84 +584,136 @@ export default function TodayOS({
     [foodLogs, userMemory, foodDna, activeSlot, mealTargets.calories, updatePostureLine, onLogFood]
   )
 
-  const removeLog = useCallback(
-    (index: number) => {
-      const nextLogs = foodLogs.filter((_, i) => i !== index)
+  const removeLogById = useCallback(
+    (logId: string) => {
+      const prevLogs = foodLogs
+      const prevMemory = userMemory
+      const nextLogs = foodLogs.filter(l => l.id !== logId)
       const nextMemory = { ...userMemory, food_logs_today: nextLogs }
       updatePostureLine(nextLogs, nextMemory)
       onLogFood(nextLogs, nextMemory)
+      toast('已移除這筆紀錄', {
+        duration: 5000,
+        action: {
+          label: '復原',
+          onClick: () => {
+            updatePostureLine(prevLogs, prevMemory)
+            onLogFood(prevLogs, prevMemory)
+          },
+        },
+      })
     },
     [foodLogs, userMemory, updatePostureLine, onLogFood]
   )
 
-  const handlePhotoCapture = useCallback(
-    async (file: File) => {
-      const dataUrl = await fileToDataUrl(file)
-      const logId = `photo-${Date.now()}`
-      commitLog({
-        id: logId,
-        name: '未知食物',
+  const requestDeleteLog = useCallback((logId: string) => {
+    setDeleteConfirmId(logId)
+  }, [])
+
+  const confirmDeleteLog = useCallback(() => {
+    if (!deleteConfirmId) return
+    removeLogById(deleteConfirmId)
+    setDeleteConfirmId(null)
+  }, [deleteConfirmId, removeLogById])
+
+  const parsePhotoDraft = useCallback(
+    async (file: File, previewUrl: string) => {
+      setPhotoDraft({
+        file,
+        previewUrl,
+        name: '',
         calories: 0,
         protein_g: 0,
-        source: 'photo',
-        photo_data_url: dataUrl,
-        learning: true,
-        capture_status: 'learning',
+        loading: true,
       })
-
-      void (async () => {
-        try {
-          const parsed = await parseFoodPhotoFile(file)
-          const dna = userMemory.food_dna ?? foodDna
-          const verified = lookupVerifiedFood(parsed.name, dna)
-
-          if (verified) {
-            patchLog(logId, {
-              name: verified.name,
-              store: verified.store,
-              calories: verified.calories,
-              protein_g: verified.protein_g,
-              carbs_g: verified.carbs_g,
-              fat_g: verified.fat_g,
-              learning: false,
-              community_verified: true,
-              capture_status: 'resolved',
-            })
-            return
-          }
-
-          if (isLowConfidence(parsed.confidence_pct)) {
-            patchLog(logId, {
-              learning: false,
-              needs_name: true,
-              capture_status: 'needs_name',
-              ai_confidence_pct: parsed.confidence_pct,
-            })
-            return
-          }
-
-          patchLog(logId, {
-            name: parsed.name,
-            calories: parsed.calories,
-            protein_g: parsed.protein_g,
-            carbs_g: parsed.carbs_g,
-            fat_g: parsed.fat_g,
-            confidence: parsed.confidence,
-            learning: false,
-            capture_status: 'resolved',
-            ai_confidence_pct: parsed.confidence_pct,
-          })
-        } catch {
-          patchLog(logId, {
-            learning: false,
-            needs_name: true,
-            capture_status: 'needs_name',
-          })
+      try {
+        const parsed = await parseFoodPhotoFile(file)
+        const dna = userMemory.food_dna ?? foodDna
+        const verified = lookupVerifiedFood(parsed.name, dna)
+        if (verified) {
+          setPhotoDraft(prev =>
+            prev
+              ? {
+                  ...prev,
+                  name: verified.name,
+                  calories: verified.calories,
+                  protein_g: verified.protein_g,
+                  loading: false,
+                }
+              : prev
+          )
+          return
         }
-      })()
+        if (isLowConfidence(parsed.confidence_pct)) {
+          setPhotoDraft(prev =>
+            prev
+              ? {
+                  ...prev,
+                  name: parsed.name || '',
+                  calories: parsed.calories || 0,
+                  protein_g: parsed.protein_g || 0,
+                  loading: false,
+                }
+              : prev
+          )
+          return
+        }
+        setPhotoDraft(prev =>
+          prev
+            ? {
+                ...prev,
+                name: parsed.name,
+                calories: parsed.calories,
+                protein_g: parsed.protein_g,
+                loading: false,
+              }
+            : prev
+        )
+      } catch {
+        setPhotoDraft(prev =>
+          prev ? { ...prev, name: '', calories: 0, protein_g: 0, loading: false } : prev
+        )
+      }
     },
-    [commitLog, patchLog, userMemory.food_dna, foodDna]
+    [userMemory.food_dna, foodDna]
   )
+
+  const handlePhotoPick = useCallback(
+    (file: File) => {
+      if (photoPreviewUrlRef.current) URL.revokeObjectURL(photoPreviewUrlRef.current)
+      const previewUrl = URL.createObjectURL(file)
+      photoPreviewUrlRef.current = previewUrl
+      setPhotoOpen(true)
+      void parsePhotoDraft(file, previewUrl)
+    },
+    [parsePhotoDraft]
+  )
+
+  const closePhotoSheet = useCallback(() => {
+    setPhotoOpen(false)
+    setPhotoDraft(null)
+    setPhotoSaving(false)
+    if (photoPreviewUrlRef.current) {
+      URL.revokeObjectURL(photoPreviewUrlRef.current)
+      photoPreviewUrlRef.current = null
+    }
+  }, [])
+
+  const savePhotoDraft = useCallback(async () => {
+    if (!photoDraft || photoSaving) return
+    setPhotoSaving(true)
+    const dataUrl = await fileToDataUrl(photoDraft.file)
+    commitLog({
+      id: `photo-${Date.now()}`,
+      name: photoDraft.name.trim() || '未知食物',
+      calories: photoDraft.calories,
+      protein_g: photoDraft.protein_g,
+      source: 'photo',
+      photo_data_url: dataUrl,
+      capture_status: 'resolved',
+    })
+    closePhotoSheet()
+  }, [photoDraft, photoSaving, commitLog, closePhotoSheet])
 
   const handleCaptureName = useCallback(
     (logId: string, name: string) => {
@@ -662,32 +748,35 @@ export default function TodayOS({
   )
 
   const rollDice = useCallback(() => {
-    if (!dayState.allowDiceAndSuggest) return
+    if (!dayStateRef.current.allowDiceAndSuggest || rollingRef.current) return
+    rollingRef.current = true
     setRolling(true)
+
+    const slot = mealSlotLegacy
+    const session = loadDiceSession(slot)
+    const preview = dicePreviewByMeal[slot] ?? null
+
     void preloadDiceMenuBulk().then(() => {
-      // 預覽骰子只排除「上一個預覽」，不套用今日已確認的 seen_ids（避免選項過少）
       const excludeIds = [...new Set([
-        ...seenIdsForMeal(dailyRolls, mealSlotLegacy),
+        ...seenIdsForMeal(dailyRolls, slot),
         ...(dailyRolls.seen_suggestion_ids ?? []),
-        ...seenDiceIds,
-        dicePreview?.id,
+        ...session.ids,
+        preview?.id,
       ].filter(Boolean))]
-      const previewNames = dicePreview
-        ? linesToDisplayItems(dicePreview.lines).map(i => i.name)
-        : []
+      const previewNames = preview ? linesToDisplayItems(preview.lines).map(i => i.name) : []
       const excludeNames = [...new Set([...allItemNamesFromLogs(foodLogs), ...previewNames])]
       const loggedStores = foodLogs.flatMap(l => [
         l.store,
         ...storesInText(l.name),
       ].filter(Boolean)) as string[]
       const excludeStores = [...new Set([
-        ...seenDiceStores,
-        dicePreview?.stores[0],
+        ...session.stores,
+        preview?.stores[0],
         ...loggedStores,
       ].filter(Boolean))]
 
       const result = rollMealSuggestion({
-        meal_type: mealSlotLegacy,
+        meal_type: slot,
         daily_targets: todayPlan.daily_targets,
         profile,
         memory,
@@ -700,32 +789,31 @@ export default function TodayOS({
         user_lng: coords?.lng,
         adherence: adherenceState,
         calorie_bank: calorieBank,
-        day_state: dayState,
+        day_state: dayStateRef.current,
       })
 
-      setTimeout(() => {
-        setRolling(false)
-        setLocalDiceRolls(n => n + 1)
-        if (!result.suggestion) {
-          toast.message('暫時想不到別的')
-          return
-        }
-        const store = result.suggestion.stores[0]
-        const id = result.suggestion.id
-        const nextStores = store
-          ? [...new Set([...seenDiceStores, store])].slice(-20)
-          : seenDiceStores
-        const nextIds = [...new Set([...seenDiceIds, id])].slice(-40)
-        setSeenDiceStores(nextStores)
-        setSeenDiceIds(nextIds)
-        saveDiceSession(mealSlotLegacy, nextStores, nextIds)
-        setDicePreviewByMeal(prev => ({ ...prev, [mealSlotLegacy]: result.suggestion! }))
-      }, 350)
+      rollingRef.current = false
+      setRolling(false)
+      setLocalDiceRolls(n => n + 1)
+      if (!result.suggestion) {
+        toast.message('暫時想不到別的')
+        return
+      }
+      const store = result.suggestion.stores[0]
+      const id = result.suggestion.id
+      const nextStores = store ? [...new Set([...session.stores, store])].slice(-20) : session.stores
+      const nextIds = [...new Set([...session.ids, id])].slice(-40)
+      saveDiceSession(slot, nextStores, nextIds)
+      setDicePreviewByMeal(prev => ({ ...prev, [slot]: result.suggestion! }))
+    }).catch(() => {
+      rollingRef.current = false
+      setRolling(false)
     })
-  }, [mealSlotLegacy, dicePreview, foodLogs, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, seenDiceStores, seenDiceIds, dailyRolls, adherenceState, calorieBank, dayState])
+  }, [mealSlotLegacy, dicePreviewByMeal, foodLogs, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, dailyRolls, adherenceState, calorieBank])
 
   const confirmDice = useCallback(() => {
-    if (!dicePreview) return
+    if (!dicePreview || confirming) return
+    setConfirming(true)
     const items = linesToDisplayItems(dicePreview.lines)
     const logEntry: FoodLogEntry = {
       id: `dice-${dicePreview.id}`,
@@ -761,7 +849,8 @@ export default function TodayOS({
       delete next[mealSlotLegacy]
       return next
     })
-  }, [dicePreview, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, updatePostureLine, onDiceApply])
+    setConfirming(false)
+  }, [dicePreview, confirming, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, updatePostureLine, onDiceApply])
 
   const previewItems = dicePreview ? linesToDisplayItems(dicePreview.lines) : []
   const displayItems =
@@ -777,26 +866,21 @@ export default function TodayOS({
     dicePreview?.highlight_key ?? slotMealSuggest?.current_highlight_key ?? 'balanced'
 
   useEffect(() => {
-    if (heroBooted.current) return
-    heroBooted.current = true
+    if (initialRollDone.current) return
+    initialRollDone.current = true
     if (dayState.overTargetProtection) return
     if (customEatOut[mealSlotLegacy]?.length) return
     if (dicePreviewByMeal[mealSlotLegacy]) return
-    void preloadDiceMenuBulk().then(() => rollDice())
-  }, [rollDice, dayState.overTargetProtection, mealSlotLegacy, customEatOut])
+    rollDice()
+  }, [rollDice, dayState.overTargetProtection, mealSlotLegacy, customEatOut, dicePreviewByMeal])
 
   useEffect(() => {
     if (dayState.overTargetProtection) {
       setDicePreviewByMeal({})
       setRolling(false)
-      return
+      rollingRef.current = false
     }
-    const mt = mealTypeForFoodSlot(activeSlot, userMemory.work_schedule ?? 'standard')
-    if (dicePreviewByMeal[mt]) return
-    if (customEatOut[mt]?.length) return
-    void preloadDiceMenuBulk().then(() => rollDice())
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-roll when switching meal tab
-  }, [activeSlot, userMemory.work_schedule, dayState.overTargetProtection])
+  }, [dayState.overTargetProtection])
 
   const formatLogTime = (loggedAt: string) => {
     try {
@@ -848,15 +932,6 @@ export default function TodayOS({
           })}
         </div>
 
-        {dayState.overTargetProtection && (
-          <p
-            className="text-[13px] text-center leading-relaxed px-1 -mt-1"
-            style={{ color: TODAY.textSecondary, fontWeight: 400 }}
-          >
-            {OVER_TARGET_COPY.banner}
-          </p>
-        )}
-
         {rolling && !dicePreview && displayItems.length === 0 ? (
           <div className="py-14 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             想一下…
@@ -893,12 +968,12 @@ export default function TodayOS({
           {dicePreview && dayState.allowDiceAndSuggest && (
             <button
               type="button"
-              disabled={rolling}
+              disabled={rolling || confirming}
               onClick={confirmDice}
               className="w-full h-16 rounded-[24px] text-[18px] disabled:opacity-40"
               style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
             >
-              就決定是它了
+              {confirming ? '記錄中…' : '就決定是它了'}
             </button>
           )}
 
@@ -911,7 +986,7 @@ export default function TodayOS({
               style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
             >
               <RefreshCw className={`h-[16px] w-[16px] ${rolling ? 'animate-spin' : ''}`} strokeWidth={TODAY.iconStroke} />
-              換一個
+              {rolling ? '想一下…' : '換一個'}
             </button>
             <button
               type="button"
@@ -923,6 +998,16 @@ export default function TodayOS({
               更多記錄
             </button>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setPhotoOpen(true)}
+            className="w-full h-12 rounded-[20px] text-[14px] flex items-center justify-center gap-2 active:opacity-90"
+            style={{ backgroundColor: TODAY.surface, color: TODAY.mocha, fontWeight: 500 }}
+          >
+            <Camera className="h-[16px] w-[16px]" strokeWidth={TODAY.iconStroke} />
+            拍今天吃的
+          </button>
         </div>
       </div>
 
@@ -976,9 +1061,10 @@ export default function TodayOS({
                     <CapturedLogRow
                       log={log}
                       onNameSubmit={name => handleCaptureName(log.id, name)}
+                      onDelete={() => requestDeleteLog(log.id)}
                     />
                   ) : (
-                    <LogTextRow log={log} />
+                    <LogTextRow log={log} onDelete={() => requestDeleteLog(log.id)} />
                   )}
                 </li>
               ))}
@@ -1019,8 +1105,63 @@ export default function TodayOS({
           const f = frequentList.find(x => x.id === (frequentId ?? selectedFrequentId))
           if (f) commitLog(frequentToLogEntry(f, activeSlot))
         }}
-        onPhotoCapture={handlePhotoCapture}
+        onPhotoCapture={file => {
+          setMoreOpen(false)
+          handlePhotoPick(file)
+        }}
       />
+
+      <PhotoLogSheet
+        open={photoOpen}
+        draft={photoDraft}
+        onClose={closePhotoSheet}
+        onPickFile={handlePhotoPick}
+        onDraftChange={patch => setPhotoDraft(prev => (prev ? { ...prev, ...patch } : prev))}
+        onSave={() => void savePhotoDraft()}
+        onBackToCapture={() => setPhotoDraft(null)}
+        saving={photoSaving}
+      />
+
+      {deleteConfirmId && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center px-5 pb-8"
+          style={{ backgroundColor: 'rgba(47, 36, 29, 0.22)', backdropFilter: 'blur(4px)' }}
+          onClick={() => setDeleteConfirmId(null)}
+        >
+          <div
+            className="w-full max-w-md p-6 space-y-5"
+            style={{
+              backgroundColor: TODAY.card,
+              borderRadius: TODAY.radiusCard,
+              boxShadow: TODAY.cardShadow,
+              fontFamily: TODAY.font,
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <p className="text-[16px] leading-relaxed" style={{ color: TODAY.text, fontWeight: 500 }}>
+              要移除這筆紀錄嗎？
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmId(null)}
+                className="flex-1 h-12 rounded-[20px] text-[14px]"
+                style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
+              >
+                先留著
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteLog}
+                className="flex-1 h-12 rounded-[20px] text-[14px]"
+                style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
+              >
+                移除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

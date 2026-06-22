@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useCallback, useEffect } from 'react'
+import { useState, useTransition, useCallback, useEffect, useRef, useMemo } from 'react'
 import { CheckCircle2, Circle, ChevronDown, ChevronUp, Play } from 'lucide-react'
 import {
   buildCheckinPayload,
@@ -19,10 +19,15 @@ import {
 import { toast } from 'sonner'
 import TodayHeader from '@/components/dashboard/today/TodayHeader'
 import TodayPosture from '@/components/dashboard/today/TodayPosture'
+import TodayIntakeBar from '@/components/dashboard/today/TodayIntakeBar'
 import TodayOS from '@/components/dashboard/TodayOS'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { FoodDna } from '@/lib/food-memory'
+import { isRecoveryActive } from '@/lib/engines/calorie-bank-engine'
+import { sumLoggedCalories, sumLoggedProtein, computeTodayMealState } from '@/lib/engines/next-meal-engine'
+import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
+import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
 import { TODAY } from '@/lib/today-design'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import { zaijian } from '@/lib/copy/zaijian'
@@ -105,6 +110,47 @@ export default function BetterBitHome({
   const foodLogs = userMemory.food_logs_today ?? []
   const [postureLine, setPostureLine] = useState('最近忙嗎？回來就好。今天照常。')
   const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(initialCalorieBank)
+  const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const persistPatchRef = useRef<{
+    workoutItems?: WorkoutCheckinItem[]
+    userMemory?: UserMemoryMeta
+    dailyRolls?: DailyRollState
+    mealSuggest?: Partial<Record<MealType, MealSuggestState>>
+    customEatOut?: Partial<Record<MealType, CustomEatOutSelection[]>>
+  }>({})
+
+  useEffect(() => {
+    void preloadDiceMenuBulk()
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
+    }
+  }, [])
+
+  const intakeSummary = useMemo(() => {
+    const caloriesLogged = sumLoggedCalories(foodLogs)
+    const proteinLogged = sumLoggedProtein(foodLogs)
+    const normalTarget = todayPlan.daily_targets.calories
+    const proteinTarget = todayPlan.daily_targets.protein_g
+    const recoveryActive = isRecoveryActive(calorieBank ?? { recovery_balance_kcal: 0, spread_days_remaining: 0 })
+    const dayState = computeTodayMealState({
+      todayFoodLogs: foodLogs,
+      normalTargetKcal: normalTarget,
+      internalTargetKcal: calorieBank?.internal_target_kcal,
+      proteinTargetG: proteinTarget,
+      calorieBank,
+    })
+    return {
+      caloriesLogged,
+      proteinLogged,
+      caloriesTarget: dayState.todayTarget,
+      proteinTarget,
+      overTarget: dayState.overTargetProtection,
+      recoveryActive,
+    }
+  }, [foodLogs, todayPlan.daily_targets, calorieBank])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -116,57 +162,75 @@ export default function BetterBitHome({
 
   const mealModes = mealModesFromCheckin(checkin)
 
+  const flushPersist = useCallback(async () => {
+    const patch = persistPatchRef.current
+    persistPatchRef.current = {}
+    const state = {
+      dietItems: checkin?.diet_items ?? [],
+      workoutItems: patch.workoutItems ?? workoutItems,
+      waterMl: checkin?.water_ml ?? 0,
+      mealModes,
+      customEatOut: patch.customEatOut ?? customEatOut,
+      dailyRolls: patch.dailyRolls ?? dailyRolls,
+      mealSuggest: patch.mealSuggest ?? mealSuggest,
+      userMemory: patch.userMemory ?? userMemory,
+    }
+    try {
+      const res = await fetch('/api/checkin', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId)),
+      })
+      if (!res.ok) throw new Error()
+      const json = (await res.json()) as { calorie_bank?: CalorieBankRow | null }
+      if (json.calorie_bank) setCalorieBank(json.calorie_bank)
+    } catch {
+      toast.error(GENTLE_ERROR_MESSAGE)
+    }
+  }, [checkin, workoutItems, mealModes, customEatOut, dailyRolls, mealSuggest, userMemory, weeklyPlanId])
+
   const persist = useCallback(
-    async (patch: { workoutItems?: WorkoutCheckinItem[]; userMemory?: UserMemoryMeta; dailyRolls?: DailyRollState; mealSuggest?: Partial<Record<MealType, MealSuggestState>>; customEatOut?: Partial<Record<MealType, CustomEatOutSelection[]>> }) => {
-      const state = {
-        dietItems: checkin?.diet_items ?? [],
-        workoutItems: patch.workoutItems ?? workoutItems,
-        waterMl: checkin?.water_ml ?? 0,
-        mealModes,
-        customEatOut: patch.customEatOut ?? customEatOut,
-        dailyRolls: patch.dailyRolls ?? dailyRolls,
-        mealSuggest: patch.mealSuggest ?? mealSuggest,
-        userMemory: patch.userMemory ?? userMemory,
-      }
-      try {
-        const res = await fetch('/api/checkin', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId)),
-        })
-        if (!res.ok) throw new Error()
-        const json = (await res.json()) as { calorie_bank?: CalorieBankRow | null }
-        if (json.calorie_bank) setCalorieBank(json.calorie_bank)
-      } catch {
-        toast.error(GENTLE_ERROR_MESSAGE)
-      }
+    (patch: {
+      workoutItems?: WorkoutCheckinItem[]
+      userMemory?: UserMemoryMeta
+      dailyRolls?: DailyRollState
+      mealSuggest?: Partial<Record<MealType, MealSuggestState>>
+      customEatOut?: Partial<Record<MealType, CustomEatOutSelection[]>>
+    }) => {
+      persistPatchRef.current = { ...persistPatchRef.current, ...patch }
+      if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
+      persistTimerRef.current = setTimeout(() => {
+        persistTimerRef.current = null
+        void flushPersist()
+      }, 400)
     },
-    [checkin, workoutItems, mealModes, customEatOut, dailyRolls, mealSuggest, userMemory, weeklyPlanId]
+    [flushPersist]
   )
 
-  const handleLogFood = (logs: FoodLogEntry[], nextMemory: UserMemoryMeta) => {
+  const handleLogFood = useCallback((logs: FoodLogEntry[], nextMemory: UserMemoryMeta) => {
     setUserMemory(nextMemory)
     persist({ userMemory: nextMemory })
-  }
+  }, [persist])
 
-  const handleDiceApply = (payload: {
+  const handleDiceApply = useCallback((payload: {
     mealType: MealType
     selection: CustomEatOutSelection[]
     dailyRolls: DailyRollState
     mealSuggest: Partial<Record<MealType, MealSuggestState>>
     userMemory: UserMemoryMeta
   }) => {
-    setCustomEatOut({ ...customEatOut, [payload.mealType]: payload.selection })
+    const nextCustom = { ...customEatOut, [payload.mealType]: payload.selection }
+    setCustomEatOut(nextCustom)
     setDailyRolls(payload.dailyRolls)
     setMealSuggest(payload.mealSuggest)
     setUserMemory(payload.userMemory)
     persist({
-      customEatOut: { ...customEatOut, [payload.mealType]: payload.selection },
+      customEatOut: nextCustom,
       dailyRolls: payload.dailyRolls,
       mealSuggest: payload.mealSuggest,
       userMemory: payload.userMemory,
     })
-  }
+  }, [customEatOut, persist])
 
   const toggleExercise = (exerciseId: string) => {
     startTransition(() => {
@@ -184,6 +248,13 @@ export default function BetterBitHome({
     <>
       <TodayHeader trialDaysLeft={trialDaysLeft} />
       <TodayPosture line={postureLine} />
+      <TodayIntakeBar
+        caloriesLogged={intakeSummary.caloriesLogged}
+        caloriesTarget={intakeSummary.caloriesTarget}
+        proteinLogged={intakeSummary.proteinLogged}
+        proteinTarget={intakeSummary.proteinTarget}
+        overTarget={intakeSummary.overTarget}
+      />
 
       <TodayOS
         todayPlan={todayPlan}
@@ -299,17 +370,27 @@ export default function BetterBitHome({
                               )}
                             </div>
                           </div>
-                          {planEx?.youtube_id && (
-                            <a
-                              href={`https://www.youtube.com/watch?v=${planEx.youtube_id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 ml-8 px-3 py-1.5 text-[11px] rounded-full"
-                              style={{ backgroundColor: TODAY.pillBg, color: TODAY.mocha, fontWeight: 500 }}
-                            >
-                              <Play className="h-3 w-3" strokeWidth={TODAY.iconStroke} /> 動作教學
-                            </a>
-                          )}
+                          {(() => {
+                            const verified = getVerifiedExerciseVideo(ex.exercise_id)
+                            if (verified?.video_url) {
+                              return (
+                                <a
+                                  href={verified.video_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 ml-8 px-3 py-1.5 text-[11px] rounded-full"
+                                  style={{ backgroundColor: TODAY.pillBg, color: TODAY.mocha, fontWeight: 500 }}
+                                >
+                                  <Play className="h-3 w-3" strokeWidth={TODAY.iconStroke} /> 動作教學
+                                </a>
+                              )
+                            }
+                            return (
+                              <p className="ml-8 text-[11px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+                                {exerciseVideoPlaceholder(ex.exercise_name)}
+                              </p>
+                            )
+                          })()}
                         </div>
                       )
                     })}
