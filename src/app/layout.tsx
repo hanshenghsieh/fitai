@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Noto_Sans_TC } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
+import CapacitorShell from '@/components/capacitor/CapacitorShell'
+import OfflineShell from '@/components/capacitor/OfflineShell'
 import { colors } from '@/lib/design-system'
 import { getAppUrl } from '@/lib/app-url'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from '@/lib/site-metadata'
@@ -75,6 +77,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
       >
         {children}
+        <CapacitorShell />
+        <OfflineShell />
         <Toaster theme="light" richColors={false} position="top-center" />
       </body>
     </html>

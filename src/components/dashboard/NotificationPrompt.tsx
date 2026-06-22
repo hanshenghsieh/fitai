@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { initializeFirebase, requestNotificationPermission, listenForPushMessages } from '@/lib/firebase'
+import { isWebPushSupported } from '@/lib/capacitor-native'
 import { colors } from '@/lib/design-system'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
@@ -19,7 +20,9 @@ export default function NotificationPrompt() {
   const line = pickZaiJianLine('notify_prompt')
 
   useEffect(() => {
-    const supported = typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator
+    if (!isWebPushSupported()) return
+
+    const supported = true
     setIsSupported(supported)
 
     if (supported) {

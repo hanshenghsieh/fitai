@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { ArrowLeft, Camera, Loader2, X } from 'lucide-react'
 import { TODAY } from '@/lib/today-design'
+import { isNativeIOS } from '@/lib/capacitor-native'
+import { captureFoodPhotoFromCamera, pickFoodPhotoFromGallery } from '@/lib/native-camera'
 
 const ICON_STROKE = TODAY.iconStroke
 
@@ -31,11 +33,41 @@ interface Props {
 function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void; onClose: () => void }) {
   const cameraRef = useRef<HTMLInputElement>(null)
   const galleryRef = useRef<HTMLInputElement>(null)
+  const [picking, setPicking] = useState(false)
+  const useNativeCamera = isNativeIOS()
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]
     if (f) onPickFile(f)
     e.target.value = ''
+  }
+
+  async function openCamera() {
+    if (useNativeCamera) {
+      setPicking(true)
+      try {
+        const file = await captureFoodPhotoFromCamera()
+        if (file) onPickFile(file)
+      } finally {
+        setPicking(false)
+      }
+      return
+    }
+    cameraRef.current?.click()
+  }
+
+  async function openGallery() {
+    if (useNativeCamera) {
+      setPicking(true)
+      try {
+        const file = await pickFoodPhotoFromGallery()
+        if (file) onPickFile(file)
+      } finally {
+        setPicking(false)
+      }
+      return
+    }
+    galleryRef.current?.click()
   }
 
   return (
@@ -55,25 +87,30 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
         </button>
       </div>
       <div className="flex-1 px-5 flex flex-col items-center justify-center gap-6 min-h-[240px] pb-4">
-        <input
-          ref={cameraRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="hidden"
-          onChange={handleFile}
-        />
-        <input
-          ref={galleryRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFile}
-        />
+        {!useNativeCamera && (
+          <>
+            <input
+              ref={cameraRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={handleFile}
+            />
+            <input
+              ref={galleryRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFile}
+            />
+          </>
+        )}
 
         <button
           type="button"
-          onClick={() => cameraRef.current?.click()}
+          disabled={picking}
+          onClick={() => void openCamera()}
           className="w-full max-w-xs flex flex-col items-center gap-3 py-6 rounded-[28px] active:opacity-85"
           style={{ backgroundColor: TODAY.surface }}
         >
@@ -88,14 +125,15 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
               拍今天吃的
             </span>
             <span className="block text-[13px] mt-1" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-              開啟相機拍照
+              {picking ? '開啟中…' : '開啟相機拍照'}
             </span>
           </span>
         </button>
 
         <button
           type="button"
-          onClick={() => galleryRef.current?.click()}
+          disabled={picking}
+          onClick={() => void openGallery()}
           className="w-full max-w-xs h-14 rounded-[22px] text-[15px] active:opacity-90"
           style={{
             backgroundColor: TODAY.card,

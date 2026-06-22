@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { colors } from '@/lib/design-system'
 import { initializeFirebase, requestNotificationPermission, listenForPushMessages } from '@/lib/firebase'
+import { isWebPushSupported } from '@/lib/capacitor-native'
 import SettingsSection from './SettingsSection'
 
 export default function SettingsNotificationsSection() {
@@ -13,8 +14,9 @@ export default function SettingsNotificationsSection() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const ok = typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator
-    setSupported(ok)
+    if (!isWebPushSupported()) return
+
+    setSupported(true)
     if (ok && Notification.permission === 'granted') {
       setEnabled(true)
       listenForPushMessages()

@@ -35,6 +35,7 @@
     "@anthropic-ai/sdk": "^0.104.2",
     "@base-ui/react": "^1.5.0",
     "@capacitor/app": "^8.1.0",
+    "@capacitor/camera": "^8.2.0",
     "@capacitor/cli": "^8.4.1",
     "@capacitor/core": "^8.4.1",
     "@capacitor/ios": "^8.4.1",

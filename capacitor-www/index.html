@@ -14,17 +14,43 @@
       }
       .shell {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         height: 100%;
         text-align: center;
-        padding: 24px;
+        padding: 32px 24px;
+        box-sizing: border-box;
+      }
+      h1 {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0 0 12px;
+      }
+      p {
+        font-size: 15px;
+        line-height: 1.5;
+        margin: 0;
+        color: #6B6560;
+        max-width: 280px;
+      }
+      button {
+        margin-top: 32px;
+        padding: 12px 32px;
+        border: none;
+        border-radius: 20px;
+        background: #5C4A3A;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 500;
       }
     </style>
   </head>
   <body>
     <div class="shell">
-      <p>再健一點</p>
+      <h1>目前離線</h1>
+      <p>再健一點需要網路才能載入。請確認連線後再試。</p>
+      <button type="button" onclick="window.location.reload()">重試</button>
     </div>
   </body>
 </html>
