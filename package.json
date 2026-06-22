@@ -26,11 +26,20 @@
     "food-images:reset": "npx tsx scripts/setup-food-images.ts -- --force",
     "market-loop": "npx tsx scripts/market-loop/run.ts",
     "test": "node --import tsx --test src/lib/engines/calorie-bank-engine.test.ts src/lib/engines/next-meal-engine.test.ts",
-    "migrate:calorie-bank": "node scripts/apply-calorie-bank-migration.mjs"
+    "migrate:calorie-bank": "node scripts/apply-calorie-bank-migration.mjs",
+    "cap:sync": "npx cap sync ios",
+    "cap:open:ios": "npx cap open ios",
+    "cap:ios": "npx cap sync ios && npx cap open ios"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",
     "@base-ui/react": "^1.5.0",
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/ios": "^8.4.1",
+    "@capacitor/splash-screen": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.2",
     "@hookform/resolvers": "^5.4.0",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
