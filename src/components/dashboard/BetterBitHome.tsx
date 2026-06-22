@@ -202,13 +202,13 @@ export default function BetterBitHome({
       persistTimerRef.current = setTimeout(() => {
         persistTimerRef.current = null
         void flushPersist()
-      }, 400)
+      }, 300)
     },
     [flushPersist]
   )
 
   const handleLogFood = useCallback((logs: FoodLogEntry[], nextMemory: UserMemoryMeta) => {
-    setUserMemory(nextMemory)
+    startTransition(() => setUserMemory(nextMemory))
     persist({ userMemory: nextMemory })
   }, [persist])
 
@@ -220,10 +220,12 @@ export default function BetterBitHome({
     userMemory: UserMemoryMeta
   }) => {
     const nextCustom = { ...customEatOut, [payload.mealType]: payload.selection }
-    setCustomEatOut(nextCustom)
-    setDailyRolls(payload.dailyRolls)
-    setMealSuggest(payload.mealSuggest)
-    setUserMemory(payload.userMemory)
+    startTransition(() => {
+      setCustomEatOut(nextCustom)
+      setDailyRolls(payload.dailyRolls)
+      setMealSuggest(payload.mealSuggest)
+      setUserMemory(payload.userMemory)
+    })
     persist({
       customEatOut: nextCustom,
       dailyRolls: payload.dailyRolls,
@@ -232,7 +234,7 @@ export default function BetterBitHome({
     })
   }, [customEatOut, persist])
 
-  const toggleExercise = (exerciseId: string) => {
+  const toggleExercise = useCallback((exerciseId: string) => {
     startTransition(() => {
       const updated = workoutItems.map(w =>
         w.exercise_id === exerciseId ? { ...w, completed: !w.completed } : w
@@ -240,7 +242,7 @@ export default function BetterBitHome({
       setWorkoutItems(updated)
       persist({ workoutItems: updated })
     })
-  }
+  }, [workoutItems, persist])
 
   const isRestDay = exercises.length === 0
 

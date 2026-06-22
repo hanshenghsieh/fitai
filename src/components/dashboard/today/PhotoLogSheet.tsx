@@ -10,6 +10,7 @@ const ICON_STROKE = TODAY.iconStroke
 export interface PhotoLogDraft {
   file: File
   previewUrl: string
+  dataUrl?: string
   name: string
   calories: number
   protein_g: number

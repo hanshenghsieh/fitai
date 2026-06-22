@@ -9,7 +9,7 @@ import {
   fileToDataUrl,
   isLowConfidence,
   lookupVerifiedFood,
-  parseFoodPhotoFile,
+  parseFoodPhotoDataUrl,
 } from '@/lib/food-capture'
 import { buildUserBanks } from '@/lib/banks/build-banks'
 import { formatPostureLine } from '@/lib/copy/zaijian'
@@ -420,9 +420,13 @@ export default function TodayOS({
 
   const [rolling, setRolling] = useState(false)
   const [confirming, setConfirming] = useState(false)
+  const [repeating, setRepeating] = useState(false)
   const rollingRef = useRef(false)
+  const confirmingRef = useRef(false)
+  const loggingRef = useRef(false)
   const initialRollDone = useRef(false)
   const lastPostureLineRef = useRef('')
+  const photoPreviewUrlRef = useRef<string | null>(null)
   const [dicePreviewByMeal, setDicePreviewByMeal] = useState<Partial<Record<MealType, MealSuggestion>>>({})
   const dicePreview = dicePreviewByMeal[mealSlotLegacy] ?? null
   const [localDiceRolls, setLocalDiceRolls] = useState(0)
@@ -525,6 +529,25 @@ export default function TodayOS({
     [prediction, todayPlan, goalSnapshot, workoutDone, workoutTotal, recentMissedDays, recentFoodLogs, onPostureLine, calorieBank]
   )
 
+  const schedulePostureLine = useCallback(
+    (logs: FoodLogEntry[], memory: UserMemoryMeta, lastDelta = 0) => {
+      const run = () => updatePostureLine(logs, memory, lastDelta)
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(run, { timeout: 120 })
+      } else {
+        queueMicrotask(run)
+      }
+    },
+    [updatePostureLine]
+  )
+
+  useEffect(() => {
+    if (!dicePreview) {
+      confirmingRef.current = false
+      setConfirming(false)
+    }
+  }, [dicePreview])
+
   useEffect(() => {
     updatePostureLine(foodLogs, userMemory)
   }, [foodLogs, userMemory, updatePostureLine])
@@ -547,6 +570,8 @@ export default function TodayOS({
 
   const patchLog = useCallback(
     (logId: string, patch: Partial<FoodLogEntry>) => {
+      if (loggingRef.current) return
+      loggingRef.current = true
       const current = foodLogsRef.current
       const prev = current.find(l => l.id === logId)
       const nextLogs = current.map(l => (l.id === logId ? { ...l, ...patch } : l))
@@ -557,14 +582,19 @@ export default function TodayOS({
       }
       const nextMemory = { ...userMemory, food_logs_today: nextLogs, food_dna: nextDna }
       const delta = updated && prev ? updated.calories - prev.calories : 0
-      if (delta !== 0) updatePostureLine(nextLogs, nextMemory, delta)
       onLogFood(nextLogs, nextMemory)
+      if (delta !== 0) schedulePostureLine(nextLogs, nextMemory, delta)
+      queueMicrotask(() => {
+        loggingRef.current = false
+      })
     },
-    [userMemory, foodDna, onLogFood, updatePostureLine]
+    [userMemory, foodDna, onLogFood, schedulePostureLine]
   )
 
   const commitLog = useCallback(
     (entry: Omit<FoodLogEntry, 'logged_at' | 'user_declared'>) => {
+      if (loggingRef.current) return
+      loggingRef.current = true
       const full: FoodLogEntry = {
         ...entry,
         slot: entry.slot ?? activeSlot,
@@ -576,13 +606,15 @@ export default function TodayOS({
         ? (userMemory.food_dna ?? foodDna)
         : learnFromLog(userMemory.food_dna ?? foodDna, full)
       const nextMemory = { ...userMemory, food_logs_today: nextLogs, food_dna: nextDna }
-      const delta = full.calories - mealTargets.calories
-      updatePostureLine(nextLogs, nextMemory, delta)
       setQuery('')
       setMoreOpen(false)
       onLogFood(nextLogs, nextMemory)
+      schedulePostureLine(nextLogs, nextMemory, full.calories - mealTargets.calories)
+      queueMicrotask(() => {
+        loggingRef.current = false
+      })
     },
-    [foodLogs, userMemory, foodDna, activeSlot, mealTargets.calories, updatePostureLine, onLogFood]
+    [foodLogs, userMemory, foodDna, activeSlot, mealTargets.calories, schedulePostureLine, onLogFood]
   )
 
   const removeLogById = useCallback(
@@ -591,20 +623,20 @@ export default function TodayOS({
       const prevMemory = userMemory
       const nextLogs = foodLogs.filter(l => l.id !== logId)
       const nextMemory = { ...userMemory, food_logs_today: nextLogs }
-      updatePostureLine(nextLogs, nextMemory)
       onLogFood(nextLogs, nextMemory)
+      schedulePostureLine(nextLogs, nextMemory)
       toast('已移除這筆紀錄', {
         duration: 5000,
         action: {
           label: '復原',
           onClick: () => {
-            updatePostureLine(prevLogs, prevMemory)
             onLogFood(prevLogs, prevMemory)
+            schedulePostureLine(prevLogs, prevMemory)
           },
         },
       })
     },
-    [foodLogs, userMemory, updatePostureLine, onLogFood]
+    [foodLogs, userMemory, schedulePostureLine, onLogFood]
   )
 
   const requestDeleteLog = useCallback((logId: string) => {
@@ -618,17 +650,18 @@ export default function TodayOS({
   }, [deleteConfirmId, removeLogById])
 
   const parsePhotoDraft = useCallback(
-    async (file: File, previewUrl: string) => {
+    async (file: File, previewUrl: string, dataUrl: string) => {
       setPhotoDraft({
         file,
         previewUrl,
+        dataUrl,
         name: '',
         calories: 0,
         protein_g: 0,
         loading: true,
       })
       try {
-        const parsed = await parseFoodPhotoFile(file)
+        const parsed = await parseFoodPhotoDataUrl(dataUrl, file.type || 'image/jpeg')
         const dna = userMemory.food_dna ?? foodDna
         const verified = lookupVerifiedFood(parsed.name, dna)
         if (verified) {
@@ -685,7 +718,7 @@ export default function TodayOS({
       const previewUrl = URL.createObjectURL(file)
       photoPreviewUrlRef.current = previewUrl
       setPhotoOpen(true)
-      void parsePhotoDraft(file, previewUrl)
+      void fileToDataUrl(file).then(dataUrl => parsePhotoDraft(file, previewUrl, dataUrl))
     },
     [parsePhotoDraft]
   )
@@ -700,10 +733,25 @@ export default function TodayOS({
     }
   }, [])
 
-  const savePhotoDraft = useCallback(async () => {
-    if (!photoDraft || photoSaving) return
+  const savePhotoDraft = useCallback(() => {
+    if (!photoDraft || photoSaving || photoDraft.loading) return
     setPhotoSaving(true)
-    const dataUrl = await fileToDataUrl(photoDraft.file)
+    const dataUrl = photoDraft.dataUrl
+    if (!dataUrl) {
+      void fileToDataUrl(photoDraft.file).then(url => {
+        commitLog({
+          id: `photo-${Date.now()}`,
+          name: photoDraft.name.trim() || '未知食物',
+          calories: photoDraft.calories,
+          protein_g: photoDraft.protein_g,
+          source: 'photo',
+          photo_data_url: url,
+          capture_status: 'resolved',
+        })
+        closePhotoSheet()
+      })
+      return
+    }
     commitLog({
       id: `photo-${Date.now()}`,
       name: photoDraft.name.trim() || '未知食物',
@@ -832,7 +880,8 @@ export default function TodayOS({
   }, [mealSlotLegacy, dicePreviewByMeal, foodLogs, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, dailyRolls, adherenceState, calorieBank])
 
   const confirmDice = useCallback(() => {
-    if (!dicePreview || confirming) return
+    if (!dicePreview || confirmingRef.current) return
+    confirmingRef.current = true
     setConfirming(true)
     const items = linesToDisplayItems(dicePreview.lines)
     const logEntry: FoodLogEntry = {
@@ -849,7 +898,6 @@ export default function TodayOS({
     const nextLogs = [...foodLogs, logEntry]
     const nextDna = learnFromLog(userMemory.food_dna ?? foodDna, logEntry)
     const nextMemory = { ...userMemory, food_logs_today: nextLogs, food_dna: nextDna }
-    updatePostureLine(nextLogs, nextMemory, logEntry.calories - mealTargets.calories)
     onDiceApply({
       mealType: mealSlotLegacy,
       selection: suggestionToSelections(dicePreview),
@@ -869,8 +917,8 @@ export default function TodayOS({
       delete next[mealSlotLegacy]
       return next
     })
-    setConfirming(false)
-  }, [dicePreview, confirming, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, updatePostureLine, onDiceApply])
+    schedulePostureLine(nextLogs, nextMemory, logEntry.calories - mealTargets.calories)
+  }, [dicePreview, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, schedulePostureLine, onDiceApply])
 
   const previewItems = dicePreview ? linesToDisplayItems(dicePreview.lines) : []
   const displayItems =
@@ -910,6 +958,64 @@ export default function TodayOS({
       return ''
     }
   }
+
+  const openMore = useCallback(() => setMoreOpen(true), [])
+  const closeMore = useCallback(() => setMoreOpen(false), [])
+  const openPhoto = useCallback(() => setPhotoOpen(true), [])
+  const handleDraftChange = useCallback(
+    (patch: Partial<Pick<PhotoLogDraft, 'name' | 'calories' | 'protein_g'>>) => {
+      setPhotoDraft(prev => (prev ? { ...prev, ...patch } : prev))
+    },
+    []
+  )
+  const handlePickSearch = useCallback(
+    (item: { id: string; name: string; store?: string; calories: number; protein_g: number }) => {
+      commitLog({
+        id: item.id,
+        name: item.name,
+        store: item.store,
+        calories: item.calories,
+        protein_g: item.protein_g,
+        source: 'search',
+      })
+    },
+    [commitLog]
+  )
+  const handleCommitFrequent = useCallback(
+    (frequentId?: string) => {
+      const f = frequentList.find(x => x.id === (frequentId ?? selectedFrequentId))
+      if (f) commitLog(frequentToLogEntry(f, activeSlot))
+    },
+    [frequentList, selectedFrequentId, activeSlot, commitLog]
+  )
+  const handleMorePhotoCapture = useCallback(
+    (file: File) => {
+      setMoreOpen(false)
+      handlePhotoPick(file)
+    },
+    [handlePhotoPick]
+  )
+  const repeatLastLog = useCallback(() => {
+    if (!lastSlotLog || repeating) return
+    setRepeating(true)
+    commitLog({
+      id: `repeat-${Date.now()}`,
+      name: lastSlotLog.name,
+      store: lastSlotLog.store,
+      calories: lastSlotLog.calories,
+      protein_g: lastSlotLog.protein_g,
+      carbs_g: lastSlotLog.carbs_g,
+      fat_g: lastSlotLog.fat_g,
+      confidence: lastSlotLog.confidence,
+      slot: activeSlot,
+      source: 'frequent',
+    })
+    queueMicrotask(() => setRepeating(false))
+  }, [lastSlotLog, repeating, commitLog, activeSlot])
+
+  useEffect(() => {
+    void preloadDiceMenuBulk()
+  }, [])
 
   return (
     <div className="px-5 pb-6 space-y-8 max-w-[640px] mx-auto" style={{ fontFamily: TODAY.font }}>
@@ -1010,7 +1116,7 @@ export default function TodayOS({
             </button>
             <button
               type="button"
-              onClick={() => setMoreOpen(true)}
+              onClick={openMore}
               className="flex-[1.12] h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2"
               style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
             >
@@ -1021,7 +1127,7 @@ export default function TodayOS({
 
           <button
             type="button"
-            onClick={() => setPhotoOpen(true)}
+            onClick={openPhoto}
             className="w-full h-12 rounded-[20px] text-[14px] flex items-center justify-center gap-2 active:opacity-90"
             style={{ backgroundColor: TODAY.surface, color: TODAY.mocha, fontWeight: 500 }}
           >
@@ -1053,21 +1159,9 @@ export default function TodayOS({
             {lastSlotLog && (
               <button
                 type="button"
-                onClick={() => {
-                  commitLog({
-                    id: `repeat-${Date.now()}`,
-                    name: lastSlotLog.name,
-                    store: lastSlotLog.store,
-                    calories: lastSlotLog.calories,
-                    protein_g: lastSlotLog.protein_g,
-                    carbs_g: lastSlotLog.carbs_g,
-                    fat_g: lastSlotLog.fat_g,
-                    confidence: lastSlotLog.confidence,
-                    slot: activeSlot,
-                    source: 'frequent',
-                  })
-                }}
-                className="h-11 px-5 rounded-full text-[13px]"
+                disabled={repeating}
+                onClick={repeatLastLog}
+                className="h-11 px-5 rounded-full text-[13px] disabled:opacity-40"
                 style={{ backgroundColor: TODAY.pillBg, color: TODAY.mocha, fontWeight: 500 }}
               >
                 再記一次…
@@ -1103,32 +1197,17 @@ export default function TodayOS({
 
       <TodayFoodMore
         open={moreOpen}
-        onClose={() => setMoreOpen(false)}
+        onClose={closeMore}
         activeSlot={activeSlot}
         query={query}
         onQueryChange={setQuery}
         searchResults={results}
-        onPickSearch={item =>
-          commitLog({
-            id: item.id,
-            name: item.name,
-            store: item.store,
-            calories: item.calories,
-            protein_g: item.protein_g,
-            source: 'search',
-          })
-        }
+        onPickSearch={handlePickSearch}
         frequentList={frequentList}
         selectedFrequentId={selectedFrequentId}
         onSelectFrequent={setSelectedFrequentId}
-        onCommitFrequent={(frequentId) => {
-          const f = frequentList.find(x => x.id === (frequentId ?? selectedFrequentId))
-          if (f) commitLog(frequentToLogEntry(f, activeSlot))
-        }}
-        onPhotoCapture={file => {
-          setMoreOpen(false)
-          handlePhotoPick(file)
-        }}
+        onCommitFrequent={handleCommitFrequent}
+        onPhotoCapture={handleMorePhotoCapture}
       />
 
       <PhotoLogSheet
@@ -1136,8 +1215,8 @@ export default function TodayOS({
         draft={photoDraft}
         onClose={closePhotoSheet}
         onPickFile={handlePhotoPick}
-        onDraftChange={patch => setPhotoDraft(prev => (prev ? { ...prev, ...patch } : prev))}
-        onSave={() => void savePhotoDraft()}
+        onDraftChange={handleDraftChange}
+        onSave={savePhotoDraft}
         onBackToCapture={() => setPhotoDraft(null)}
         saving={photoSaving}
       />

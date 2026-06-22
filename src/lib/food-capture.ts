@@ -29,13 +29,15 @@ export interface PhotoParseResult {
   confidence_pct: number
 }
 
-export async function parseFoodPhotoFile(file: File): Promise<PhotoParseResult> {
-  const dataUrl = await fileToDataUrl(file)
+export async function parseFoodPhotoDataUrl(
+  dataUrl: string,
+  mimeType = 'image/jpeg'
+): Promise<PhotoParseResult> {
   const base64 = dataUrl.split(',')[1] ?? ''
   const res = await fetch('/api/food-photo', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ imageBase64: base64, mimeType: file.type || 'image/jpeg' }),
+    body: JSON.stringify({ imageBase64: base64, mimeType }),
   })
   const json = await res.json()
   if (!res.ok) throw new Error(json.error || '辨識失敗')
@@ -81,6 +83,11 @@ export async function parseFoodPhotoFile(file: File): Promise<PhotoParseResult> 
     confidence: worst,
     confidence_pct: confidenceToPct(worst),
   }
+}
+
+export async function parseFoodPhotoFile(file: File): Promise<PhotoParseResult> {
+  const dataUrl = await fileToDataUrl(file)
+  return parseFoodPhotoDataUrl(dataUrl, file.type || 'image/jpeg')
 }
 
 /** Second+ encounter — use community averages from Food DNA */
