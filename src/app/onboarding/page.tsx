@@ -158,7 +158,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen p-4 pt-8 pb-12" style={{ backgroundColor: colors.bg.canvas }}>
+    <div className="auth-page-shell p-4 pt-8 pb-12" style={{ backgroundColor: colors.bg.canvas }}>
       <div className="w-full max-w-xl mx-auto space-y-6">
         <ZaiJian size="lg" line={pickZaiJianLine(`onboarding_${Math.min(step, 4)}` as 'onboarding_1')} layout="bubble" />
         <div className="flex justify-between text-[13px]" style={{ color: colors.text.tertiary }}>

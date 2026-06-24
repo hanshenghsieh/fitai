@@ -6,6 +6,8 @@ import { ArrowLeft, Camera, Loader2, X } from 'lucide-react'
 import { TODAY } from '@/lib/today-design'
 import { isNativeIOS } from '@/lib/capacitor-native'
 import { captureFoodPhotoFromCamera, pickFoodPhotoFromGallery } from '@/lib/native-camera'
+import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
+import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
 
 const ICON_STROKE = TODAY.iconStroke
 
@@ -17,14 +19,17 @@ export interface PhotoLogDraft {
   calories: number
   protein_g: number
   loading: boolean
+  accuracy?: PhotoAccuracyState
 }
 
 interface Props {
   open: boolean
   draft: PhotoLogDraft | null
+  accuracyEnabled?: boolean
   onClose: () => void
   onPickFile: (file: File) => void
   onDraftChange: (patch: Partial<Pick<PhotoLogDraft, 'name' | 'calories' | 'protein_g'>>) => void
+  onAccuracyChange?: (patch: Partial<UserConfirmationAnswers>) => void
   onSave: () => void
   saving?: boolean
   onBackToCapture?: () => void
@@ -149,21 +154,135 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
   )
 }
 
+function AccuracyConfirmSection({
+  accuracy,
+  onAccuracyChange,
+}: {
+  accuracy: PhotoAccuracyState
+  onAccuracyChange: NonNullable<Props['onAccuracyChange']>
+}) {
+  const selectedId = accuracy.answers.selected_candidate_id ?? accuracy.candidates[0]?.id
+  const questions = accuracy.draft.confirmation_questions.slice(0, 2)
+  const confirmed = accuracy.answers.user_confirmed === true
+  const ready = accuracy.final.ready_for_food_log
+
+  const answerFor = (qid: ConfirmationQuestion['id']) => accuracy.answers[qid]
+
+  return (
+    <div
+      className="space-y-4 p-4"
+      style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}
+    >
+      <div className="space-y-1">
+        <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
+          我想先確認一下
+        </p>
+        <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+          這餐看起來像下面哪一個？幫我選最接近的。
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {accuracy.candidates.map(c => {
+          const active = c.id === selectedId
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => onAccuracyChange({ selected_candidate_id: c.id, user_confirmed: false })}
+              className="px-4 py-2.5 text-[14px] active:opacity-85"
+              style={{
+                borderRadius: 20,
+                backgroundColor: active ? TODAY.pillActiveBg : TODAY.card,
+                color: active ? TODAY.pillActiveText : TODAY.text,
+                fontWeight: active ? 600 : 500,
+                border: active ? 'none' : `1.5px solid ${TODAY.pillBg}`,
+              }}
+            >
+              {c.display_name}
+            </button>
+          )
+        })}
+      </div>
+
+      {questions.map(q => (
+        <div key={q.id} className="space-y-2">
+          <p className="text-[13px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>
+            {q.prompt}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {q.options.map(opt => {
+              const active = answerFor(q.id) === opt.id
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => onAccuracyChange({ [q.id]: opt.id, user_confirmed: false })}
+                  className="px-3.5 py-2 text-[13px] active:opacity-85"
+                  style={{
+                    borderRadius: 18,
+                    backgroundColor: active ? TODAY.pillBg : TODAY.card,
+                    color: TODAY.text,
+                    fontWeight: active ? 600 : 500,
+                    border: `1.5px solid ${active ? TODAY.mocha : 'rgba(142, 131, 120, 0.18)'}`,
+                  }}
+                >
+                  {opt.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      ))}
+
+      {!confirmed && (
+        <button
+          type="button"
+          onClick={() => onAccuracyChange({ user_confirmed: true })}
+          className="w-full h-12 text-[15px] active:opacity-90"
+          style={{
+            borderRadius: 22,
+            backgroundColor: TODAY.pillBg,
+            color: TODAY.mocha,
+            fontWeight: 600,
+          }}
+        >
+          確認後我再幫你記錄
+        </button>
+      )}
+
+      {confirmed && ready && (
+        <p className="text-[13px] text-center leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+          好，我記下來了。熱量與蛋白質是依你選的份量估算。
+        </p>
+      )}
+    </div>
+  )
+}
+
 function ReviewStep({
   draft,
+  accuracyEnabled,
   onBack,
   onClose,
   onDraftChange,
+  onAccuracyChange,
   onSave,
   saving,
 }: {
   draft: PhotoLogDraft
+  accuracyEnabled?: boolean
   onBack: () => void
   onClose: () => void
   onDraftChange: Props['onDraftChange']
+  onAccuracyChange?: Props['onAccuracyChange']
   onSave: () => void
   saving?: boolean
 }) {
+  const accuracyMode = accuracyEnabled && !!draft.accuracy
+  const readyForLog = !accuracyMode || draft.accuracy!.final.ready_for_food_log
+  const showMacros = !accuracyMode || draft.accuracy!.answers.user_confirmed === true
+
   const [calText, setCalText] = useState(String(draft.calories || ''))
   const [proText, setProText] = useState(String(draft.protein_g || ''))
 
@@ -189,7 +308,7 @@ function ReviewStep({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-4 space-y-5 min-h-0">
+      <div className="ios-bottom-sheet__scroll flex-1 overflow-y-auto overscroll-contain px-5 pb-4 space-y-5 min-h-0">
         <div
           className="relative w-full overflow-hidden"
           style={{ height: 200, borderRadius: 28, backgroundColor: TODAY.surface }}
@@ -202,69 +321,92 @@ function ReviewStep({
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
             正在辨識…
           </p>
+        ) : accuracyMode && draft.accuracy && onAccuracyChange ? (
+          <AccuracyConfirmSection accuracy={draft.accuracy} onAccuracyChange={onAccuracyChange} />
         ) : (
           <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             辨識不準也沒關係，你可以改一下。
           </p>
         )}
 
-        <label className="block space-y-1.5">
-          <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>食物名稱</span>
-          <input
-            type="text"
-            value={draft.name}
-            onChange={e => onDraftChange({ name: e.target.value })}
-            placeholder="例如：雞腿便當"
-            className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent"
-            style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
-          />
-        </label>
+        {!accuracyMode && (
+          <label className="block space-y-1.5">
+            <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>食物名稱</span>
+            <input
+              type="text"
+              value={draft.name}
+              onChange={e => onDraftChange({ name: e.target.value })}
+              placeholder="例如：雞腿便當"
+              className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent"
+              style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
+            />
+          </label>
+        )}
 
-        <label className="block space-y-1.5">
-          <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>熱量（kcal）</span>
-          <input
-            type="number"
-            inputMode="numeric"
-            value={calText}
-            onChange={e => {
-              setCalText(e.target.value)
-              const n = parseInt(e.target.value, 10)
-              onDraftChange({ calories: Number.isFinite(n) ? n : 0 })
-            }}
-            className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent tabular-nums"
-            style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
-          />
-        </label>
+        {showMacros && (
+          <>
+            {accuracyMode && (
+              <label className="block space-y-1.5">
+                <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>食物名稱</span>
+                <input
+                  type="text"
+                  value={draft.name}
+                  onChange={e => onDraftChange({ name: e.target.value })}
+                  className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent"
+                  style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
+                />
+              </label>
+            )}
 
-        <label className="block space-y-1.5">
-          <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>蛋白質（g）</span>
-          <input
-            type="number"
-            inputMode="numeric"
-            value={proText}
-            onChange={e => {
-              setProText(e.target.value)
-              const n = parseInt(e.target.value, 10)
-              onDraftChange({ protein_g: Number.isFinite(n) ? n : 0 })
-            }}
-            className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent tabular-nums"
-            style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
-          />
-        </label>
+            <label className="block space-y-1.5">
+              <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>熱量（kcal）</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={calText}
+                onChange={e => {
+                  setCalText(e.target.value)
+                  const n = parseInt(e.target.value, 10)
+                  onDraftChange({ calories: Number.isFinite(n) ? n : 0 })
+                }}
+                readOnly={accuracyMode}
+                className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent tabular-nums"
+                style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
+              />
+            </label>
+
+            <label className="block space-y-1.5">
+              <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>蛋白質（g）</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={proText}
+                onChange={e => {
+                  setProText(e.target.value)
+                  const n = parseInt(e.target.value, 10)
+                  onDraftChange({ protein_g: Number.isFinite(n) ? n : 0 })
+                }}
+                readOnly={accuracyMode}
+                className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent tabular-nums"
+                style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
+              />
+            </label>
+          </>
+        )}
       </div>
 
-      <div className="shrink-0 px-5 pt-2 pb-5 space-y-2">
+      <div className="ios-bottom-sheet__footer shrink-0 px-5 pt-2 pb-3 space-y-2">
         <p className="text-[11px] text-center leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400, opacity: 0.8 }}>
           熱量與蛋白質為估算值，僅供參考。
         </p>
         <button
           type="button"
-          disabled={draft.loading || saving || !draft.name.trim()}
+          disabled={draft.loading || saving || !draft.name.trim() || !readyForLog}
           onClick={onSave}
           className="w-full h-14 rounded-[22px] text-[16px] disabled:opacity-40"
           style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
         >
-          {saving ? '加入中…' : '加入今天'}
+          {saving ? '加入中…' : accuracyMode && !readyForLog ? '請先確認這餐' : '加入今天'}
         </button>
       </div>
     </div>
@@ -274,9 +416,11 @@ function ReviewStep({
 export default function PhotoLogSheet({
   open,
   draft,
+  accuracyEnabled,
   onClose,
   onPickFile,
   onDraftChange,
+  onAccuracyChange,
   onSave,
   saving,
   onBackToCapture,
@@ -302,22 +446,23 @@ export default function PhotoLogSheet({
       onClick={onClose}
     >
       <div
-        className="max-w-lg mx-auto w-full flex flex-col overflow-hidden"
+        className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
           fontFamily: TODAY.font,
           backgroundColor: TODAY.card,
           borderRadius: '28px 28px 0 0',
           boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.08)',
-          maxHeight: 'min(85vh, 640px)',
         }}
         onClick={e => e.stopPropagation()}
       >
         {draft ? (
           <ReviewStep
             draft={draft}
+            accuracyEnabled={accuracyEnabled}
             onBack={onBackToCapture ?? onClose}
             onClose={onClose}
             onDraftChange={onDraftChange}
+            onAccuracyChange={onAccuracyChange}
             onSave={onSave}
             saving={saving}
           />

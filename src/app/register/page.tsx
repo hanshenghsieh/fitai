@@ -50,7 +50,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: colors.bg.canvas }}>
+    <div className="auth-page-shell flex items-center justify-center p-4" style={{ backgroundColor: colors.bg.canvas }}>
       <div className="w-full max-w-md space-y-6">
         <ZaiJian size="lg" line={pickZaiJianLine('onboarding_1')} layout="bubble" />
         <form

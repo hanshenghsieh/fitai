@@ -11,6 +11,14 @@ import {
   lookupVerifiedFood,
   parseFoodPhotoDataUrl,
 } from '@/lib/food-capture'
+import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
+import {
+  buildPhotoLogCommitFromAccuracy,
+  createPhotoAccuracyState,
+  photoAccuracyReadyForLog,
+  updatePhotoAccuracyState,
+} from '@/lib/nutrition/photo-log-accuracy'
+import type { UserConfirmationAnswers } from '@/lib/nutrition/types'
 import { buildUserBanks } from '@/lib/banks/build-banks'
 import { formatPostureLine } from '@/lib/copy/zaijian'
 import { getCorrectionMessage } from '@/lib/engines/correction-engine'
@@ -692,6 +700,20 @@ export default function TodayOS({
       })
       try {
         const parsed = await parseFoodPhotoDataUrl(dataUrl, file.type || 'image/jpeg')
+        if (isNutritionAccuracyV1()) {
+          const accuracy = createPhotoAccuracyState(parsed.name || '', { store: storesInText(parsed.name)?.[0] })
+          setPhotoDraft({
+            file,
+            previewUrl,
+            dataUrl,
+            name: accuracy.draft.candidate.display_name,
+            calories: accuracy.final.ready_for_food_log ? accuracy.final.calories : 0,
+            protein_g: accuracy.final.ready_for_food_log ? accuracy.final.protein_g : 0,
+            loading: false,
+            accuracy,
+          })
+          return
+        }
         const dna = userMemory.food_dna ?? foodDna
         const verified = lookupVerifiedFood(parsed.name, dna)
         if (verified) {
@@ -763,8 +785,51 @@ export default function TodayOS({
     }
   }, [])
 
+  const handleAccuracyChange = useCallback((patch: Partial<UserConfirmationAnswers>) => {
+    setPhotoDraft(prev => {
+      if (!prev?.accuracy) return prev
+      const accuracy = updatePhotoAccuracyState(prev.accuracy, patch)
+      return {
+        ...prev,
+        name: accuracy.draft.candidate.display_name,
+        calories: accuracy.final.ready_for_food_log ? accuracy.final.calories : 0,
+        protein_g: accuracy.final.ready_for_food_log ? accuracy.final.protein_g : 0,
+        accuracy,
+      }
+    })
+  }, [])
+
   const savePhotoDraft = useCallback(() => {
     if (!photoDraft || photoSaving || photoDraft.loading) return
+    if (isNutritionAccuracyV1() && photoDraft.accuracy) {
+      if (!photoAccuracyReadyForLog(photoDraft.accuracy)) return
+      setPhotoSaving(true)
+      const logId = `photo-${Date.now()}`
+      const finish = (url: string) => {
+        const { payload, meta } = buildPhotoLogCommitFromAccuracy(photoDraft.accuracy!, {
+          id: logId,
+          photo_data_url: url,
+        })
+        if (!payload) {
+          setPhotoSaving(false)
+          return
+        }
+        commitLog({
+          ...payload,
+          photo_data_url: url,
+          capture_status: 'resolved',
+          nutrition_accuracy_meta: meta ?? undefined,
+        })
+        closePhotoSheet()
+      }
+      const dataUrl = photoDraft.dataUrl
+      if (!dataUrl) {
+        void fileToDataUrl(photoDraft.file).then(finish)
+        return
+      }
+      finish(dataUrl)
+      return
+    }
     setPhotoSaving(true)
     const dataUrl = photoDraft.dataUrl
     if (!dataUrl) {
@@ -1272,9 +1337,11 @@ export default function TodayOS({
       <PhotoLogSheet
         open={photoOpen}
         draft={photoDraft}
+        accuracyEnabled={isNutritionAccuracyV1()}
         onClose={closePhotoSheet}
         onPickFile={handlePhotoPick}
         onDraftChange={handleDraftChange}
+        onAccuracyChange={handleAccuracyChange}
         onSave={savePhotoDraft}
         onBackToCapture={() => setPhotoDraft(null)}
         saving={photoSaving}

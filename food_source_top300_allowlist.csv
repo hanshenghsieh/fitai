@@ -1,0 +1,301 @@
+rank,canonical_name,source_type,seed_priority,needs_cross_validation,confidence_level,menu_clusters,search_aliases,quarantine_exempt
+1,7-11,convenience_store,P0,false,A,"飲料|飯糰|三明治|便當|熟食","7-ELEVEN|統一超商|seven eleven",true
+2,全家,convenience_store,P0,false,A,"飲料|飯糰|三明治|便當|熟食","FamilyMart|familymart",true
+3,萊爾富,convenience_store,P0,false,A,"飲料|飯糰|三明治|便當|熟食","Hi-Life|hilife",true
+4,OK超商,convenience_store,P0,false,A,"飲料|飯糰|三明治|便當|熟食","OK mart|OK Mart|okmart",true
+5,全聯,supermarket,P0,false,A,"熟食|沙拉|便當|烘焙|飲料","全聯福利中心|PX Mart|pxmart",true
+6,家樂福,supermarket,P0,false,A,"熟食|沙拉|便當|烘焙|飲料","Carrefour|carrefour",true
+7,Costco,supermarket,P0,false,A,"熟食|沙拉|便當|烘焙|飲料","好市多|好市多熟食",true
+8,愛買,supermarket,P0,false,A,"熟食|沙拉|便當|烘焙|飲料",,true
+9,大潤發,supermarket,P0,false,A,"熟食|沙拉|便當|烘焙|飲料",,true
+10,美廉社,convenience_store,P0,false,A,"飲料|飯糰|三明治|便當|熟食",Simple Mart,true
+11,麥當勞,chain_restaurant,P0,false,A,"漢堡|薯條|早餐|雞塊|飲料","McDonald's|Mcdonalds|McDonald",true
+12,肯德基,chain_restaurant,P0,false,A,"炸雞|漢堡|蛋塔|套餐|飲料","KFC|kfc",true
+13,漢堡王,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","Burger King|必艾客",true
+14,摩斯漢堡,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","MOS|MOS Burger",true
+15,Subway,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","SUBWAY|Subway美式潛艇堡",true
+16,丹丹漢堡,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",丹丹漢堡七賢店,true
+17,頂呱呱,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+18,拿坡里,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+19,必勝客,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+20,達美樂,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+21,八方雲集,chain_restaurant,P0,false,A,"鍋貼|水餃|酸辣湯|麵食|飲料",,true
+22,四海遊龍,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+23,三商巧福,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+24,鬍鬚張,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+25,吉野家,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+26,SUKIYA,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","Sukiya|すき家",true
+27,大戶屋,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+28,YAYOI彌生軒,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","彌生軒|YAYOI",true
+29,SUKIYA,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","すき家|Sukiya",true
+30,丸龜製麵,chain_restaurant,P0,false,A,"烏龍麵|天婦羅|釜玉|副食|飲料",,true
+31,藏壽司,chain_restaurant,P0,false,A,"迴轉壽司|握壽司|副食|甜點|飲料",,true
+32,壽司郎,chain_restaurant,P0,false,A,"迴轉壽司|握壽司|副食|甜點|飲料",,true
+33,爭鮮迴轉壽司,chain_restaurant,P0,false,A,"迴轉壽司|握壽司|副食|甜點|飲料","爭鮮|爭鮮PLUS|爭鮮plus",true
+34,合點壽司,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+35,金子半之助,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+36,乾杯,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+37,老乾杯,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+38,燒肉同話,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+39,胡同燒肉,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+40,茶六燒肉堂,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","茶六公益店|茶六",true
+41,築間,chain_restaurant,P0,false,A,"火鍋|肉盤|菜盤|副食|飲料",,true
+42,石二鍋,chain_restaurant,P0,false,A,"火鍋|肉盤|菜盤|副食|飲料",,true
+43,12MINI,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+44,這一鍋,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+45,肉多多,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+46,馬辣,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+47,辛殿麻辣鍋,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+48,鼎王,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+49,無老鍋,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+50,老四川,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+51,王品牛排,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+52,西堤牛排,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",西堤,true
+53,陶板屋,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+54,夏慕尼,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+55,原燒,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+56,藝奇,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+57,聚北海道鍋物,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+58,品田牧場,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+59,青花驕,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+60,尬鍋,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+61,瓦城,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+62,非常泰,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+63,1010湘,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+64,時時香,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+65,開飯川食堂,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+66,饗泰多,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+67,大心,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+68,金色三麥,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+69,TGI Fridays,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",TGI FRIDAYS,true
+70,Chili's,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",Chilis,true
+71,星巴克,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點","Starbucks|starbucks",true
+72,路易莎,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點","路易莎咖啡|Louisa",true
+73,cama,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點","cama café|cama咖啡",true
+74,伯朗咖啡,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",伯朗,true
+75,怡客咖啡,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",,true
+76,丹堤咖啡,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",,true
+77,85度C,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",,true
+78,Mister Donut,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+79,Krispy Kreme,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+80,Dunkin',chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",Dunkin,true
+81,五十嵐,drink_shop,P0,false,A,"珍珠奶茶|烏龍茶|青茶|鮮奶茶|果茶",50嵐,true
+82,清心福全,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",清心,true
+83,CoCo都可,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品","CoCo|coco",true
+84,可不可,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品","可不可熟成紅茶|可不可熟成紅茶台北南陽店",true
+85,迷客夏,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+86,一芳水果茶,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",一芳,true
+87,萬波,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",萬波島嶼紅茶,true
+88,龜記,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+89,麻古茶坊,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+90,珍煮丹,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",珍煮丹黑糖飲品,true
+91,春水堂,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",春水堂創始店,true
+92,翰林茶館,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+93,COMEBUY,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+94,茶湯會,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",TEA TOP,true
+95,再睡五分鐘,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品","再睡5分鐘|滴妹再睡5分鐘",true
+96,得正,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+97,大苑子,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+98,老賴茶棧,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",老賴紅茶,true
+99,五桐號,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+100,烏弄,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+101,鼎泰豐,chain_restaurant,P0,false,A,"小籠包|炒飯|麵點|小菜|飲料",,true
+102,欣葉,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","欣葉台菜|欣葉小聚|欣葉日本料理",true
+103,欣葉,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","欣葉小聚|欣葉台菜|欣葉日本料理",true
+104,度小月,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",度小月擔仔麵,true
+105,阿霞飯店,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+106,金峰魯肉飯,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+107,黃記魯肉飯,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+108,今大魯肉飯,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+109,矮仔財滷肉飯,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+110,天天利美食坊,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+111,阜杭豆漿,street_food,P0,false,A,"蛋餅|漢堡|三明治|飲料|套餐",,true
+112,永和豆漿,street_food,P0,false,A,"蛋餅|漢堡|三明治|飲料|套餐",,true
+113,世界豆漿大王,street_food,P0,false,A,"蛋餅|漢堡|三明治|飲料|套餐",,true
+114,美而美,street_food,P0,false,A,"蛋餅|漢堡|三明治|飲料|套餐",,true
+115,弘爺漢堡,street_food,P0,false,A,"蛋餅|漢堡|三明治|飲料|套餐",,true
+116,拉亞漢堡,street_food,P0,false,A,"蛋餅|漢堡|三明治|飲料|套餐",,true
+117,Q Burger,street_food,P0,false,A,"蛋餅|漢堡|三明治|飲料|套餐",,true
+118,麥味登,street_food,P0,false,A,"蛋餅|漢堡|三明治|飲料|套餐",,true
+119,早安美芝城,street_food,P0,false,A,"蛋餅|漢堡|三明治|飲料|套餐",,true
+120,晨間廚房,street_food,P0,false,A,"蛋餅|漢堡|三明治|飲料|套餐",,true
+121,梁社漢排骨,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",梁社漢,true
+122,悟饕池上便當,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","悟饕池上飯包|悟饕飯包|悟饕",true
+123,正忠排骨飯,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",正忠排骨飯高雄總店,true
+124,福隆便當,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+125,台鐵便當,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+126,池上木片便當,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+127,金仙滷肉飯,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",金仙魯肉飯,true
+128,鬍鬚張便當,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+129,悟饕池上便當,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","悟饕飯包|悟饕池上飯包|悟饕",true
+130,佳味鮮便當,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+131,大埔鐵板燒,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+132,紅花鐵板燒,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+133,夏慕尼,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",夏慕尼鐵板燒,true
+134,龐德羅莎,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+135,貴族世家,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+136,孫東寶,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+137,我家牛排,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+138,牛角日本燒肉,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+139,安安燒肉,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+140,燒肉眾,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+141,添好運,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+142,點點心,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+143,檀島香港茶餐廳,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+144,金獅樓,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+145,京星港式飲茶,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+146,了凡油雞飯,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+147,香港發財燒臘,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+148,香港九記海鮮,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+149,茗香園冰室,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+150,波記茶餐廳,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+151,大阪王將,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+152,京都勝牛,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+153,勝博殿,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+154,銀座杏子日式豬排,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+155,福勝亭,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+156,靜岡勝政,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+157,樂麵屋,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+158,一風堂,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+159,屯京拉麵,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+160,花月嵐,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+161,山頭火,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+162,一蘭拉麵,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+163,Nagi凪拉麵,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+164,麵屋武藏,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+165,鷹流拉麵,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+166,鬼金棒,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+167,博多一幸舍,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+168,拉麵公子,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+169,麵屋壹之穴,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+170,麵屋一燈,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+171,bb.q CHICKEN,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+172,起家雞,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+173,NENE CHICKEN,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+174,韓姜熙,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+175,涓豆腐,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+176,豆腐村,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+177,八色烤肉,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+178,姜虎東白丁,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+179,小韓坊,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+180,韓虎嘯,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+181,雙月食品社,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",雙月食品社濟南店,true
+182,林東芳牛肉麵,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+183,永康牛肉麵,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+184,劉山東牛肉麵,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+185,老山東牛肉家常麵店,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+186,建宏牛肉麵,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+187,史記正宗牛肉麵,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+188,牛店精燉牛肉麵,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+189,老王記牛肉麵,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+190,張家清真黃牛肉麵館,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+191,阿宗麵線,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+192,陳記腸蚵專業麵線,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+193,油庫口麵線,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+194,賴阿婆芋圓,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+195,東區粉圓,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+196,三兄妹雪花冰,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+197,冰讚,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+198,龍都冰菓專業家,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+199,陳三鼎黑糖青蛙鮮奶,drink_shop,P0,false,A,"手搖飲|奶茶|果茶|鮮奶茶|冰品",,true
+200,施家鮮肉湯圓,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+201,士林夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+202,饒河夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+203,寧夏夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+204,臨江街夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+205,南機場夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+206,樂華夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+207,輔大花園夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+208,逢甲夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+209,一中街商圈,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+210,旱溪夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+211,花園夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+212,武聖夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+213,六合夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+214,瑞豐夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+215,羅東夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+216,東大門夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+217,基隆廟口夜市,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+218,城隍廟小吃,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+219,淡水老街,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+220,九份老街,night_market,P0,false,B,"小吃|鹽酥雞|滷味|飲料|甜點",,true
+221,新光三越美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+222,遠東SOGO美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+223,微風廣場美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+224,台北101美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+225,誠品生活美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+226,遠百美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+227,板橋大遠百美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+228,Global Mall 環球購物中心美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+229,LaLaport美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+230,南紡購物中心美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+231,夢時代美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+232,漢神巨蛋美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+233,台茂購物中心美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+234,大江購物中心美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+235,美麗華美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+236,京站美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+237,CITYLINK美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+238,Mitsui Outlet Park美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+239,ATT 4 FUN美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+240,統一時代百貨美食街,mall_food_court,P0,false,A,"套餐|定食|輕食|飲料|甜點",,true
+241,IKEA,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","IKEA餐廳|宜家",true
+242,MUJI Café,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",,true
+243,TSUTAYA BOOKSTORE Café,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",,true
+244,N.Y. Bagels Café,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",,true
+245,貳樓,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點","Second Floor貳樓|貳樓餐廳",true
+246,樂子,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",,true
+247,Sarabeth’s,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",,true
+248,樂子,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",The Diner樂子,true
+249,Belle Époque,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",,true
+250,Woolloomooloo,cafe,P0,false,A,"咖啡|輕食|貝果|三明治|甜點",Woolloomooloo信義店,true
+251,開丼,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+252,金子咖哩,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+253,魔法咖哩,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+254,咖哩匠,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+255,CoCo壹番屋,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","Coco壱番屋|咖哩",true
+256,甘泉魚麵,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+257,老先覺,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+258,大呼過癮,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+259,錢都,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+260,小蒙牛,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+261,養鍋,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+262,涮乃葉,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+263,饗食天堂,chain_restaurant,P0,false,A,"自助餐|海鮮|熟食|甜點|飲料",,true
+264,饗饗,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+265,旭集,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+266,漢來海港,chain_restaurant,P0,false,A,"自助餐|海鮮|熟食|甜點|飲料",,true
+267,果然匯,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+268,島語,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+269,欣葉,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","欣葉日本料理|欣葉台菜|欣葉小聚",true
+270,千葉火鍋,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+271,Subway,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料","Subway美式潛艇堡|SUBWAY",true
+272,SaladStop!,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+273,Miacucina,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+274,Miss Green,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+275,BaganHood,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+276,Herban Kitchen & Bar,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+277,Ooh Cha Cha,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+278,Plants,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+279,Naked Deli,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+280,FitBox,delivery_only,P0,false,B,"舒肥雞胸|健康餐盒|沙拉|低卡主食","FITBOX|fitbox",true
+281,享健康,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",享健康餐盒,true
+282,健身工廠,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",健身工廠健康餐,true
+283,森度餐廚,delivery_only,P0,false,B,"舒肥雞胸餐盒|低卡主食|沙拉|蛋白質餐",森度餐廚（Uber Eats）,true
+284,福勝亭便當,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+285,健康橘子工坊,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+286,Light House,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",Light House健康餐,true
+287,Miss Energy,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",能量小姐,true
+288,有肌勵,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+289,初飯,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+290,貝果貝果之東西廚房,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+291,三明治先生,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+292,卡路里,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",卡路里健康餐盒,true
+293,Muscle Food,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+294,野人舒食,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+295,良食煮意,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",,true
+296,蔬方,delivery_only,P0,false,B,"健康餐盒|沙拉|舒肥雞胸|低卡主食|蛋白質餐",蔬坊,true
+297,好丘,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+298,碳佐麻里,chain_restaurant,P0,false,A,"套餐|定食|主食|小菜|飲料",,true
+299,阿城鵝肉,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true
+300,富霸王豬腳,local_restaurant,P0,false,B,"招牌主食|小菜|湯品|飲料",,true

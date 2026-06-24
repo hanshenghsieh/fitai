@@ -8,7 +8,6 @@ import type { AccessStatus } from '@/lib/subscription-access'
 import type { WorkSchedule } from '@/lib/human-mode'
 import { parseGeneratePlanError } from '@/lib/api-errors'
 import {
-  userMemoryFromCheckin,
   parseCheckinMeta,
   buildCheckinPayload,
   initDietItems,
@@ -29,25 +28,27 @@ interface Props {
   profile: UserProfile | null
   email: string
   access: AccessStatus
+  initialWorkSchedule?: WorkSchedule
+  initialEatingContext?: 'solo' | 'family'
 }
 
-export default function SettingsScreen({ profile, email, access }: Props) {
-  const [workSchedule, setWorkSchedule] = useState<WorkSchedule>('standard')
-  const [eatingContext, setEatingContext] = useState<'solo' | 'family'>('solo')
+export default function SettingsScreen({
+  profile,
+  email,
+  access,
+  initialWorkSchedule = 'standard',
+  initialEatingContext = 'solo',
+}: Props) {
+  const [workSchedule, setWorkSchedule] = useState<WorkSchedule>(initialWorkSchedule)
+  const [eatingContext, setEatingContext] = useState<'solo' | 'family'>(initialEatingContext)
   const [scheduleSaving, setScheduleSaving] = useState(false)
   const [regenLoading, setRegenLoading] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
-    fetch('/api/checkin')
-      .then(r => r.json())
-      .then(data => {
-        const mem = userMemoryFromCheckin(data.checkin ?? null)
-        if (mem.work_schedule) setWorkSchedule(mem.work_schedule)
-        if (mem.eating_context) setEatingContext(mem.eating_context)
-      })
-      .catch(() => {})
-  }, [])
+    setWorkSchedule(initialWorkSchedule)
+    setEatingContext(initialEatingContext)
+  }, [initialWorkSchedule, initialEatingContext])
 
   const patchMemory = useCallback(
     async (patch: { work_schedule?: WorkSchedule; eating_context?: 'solo' | 'family' }) => {

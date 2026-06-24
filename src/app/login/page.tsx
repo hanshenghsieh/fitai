@@ -42,7 +42,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: colors.bg.canvas }}>
+    <div className="auth-page-shell flex items-center justify-center p-4" style={{ backgroundColor: colors.bg.canvas }}>
       <div className="w-full max-w-md space-y-6">
         <ZaiJian size="lg" line={{ text: '回來了。', expression: 'normal', subtext: '今天吃什麼？' }} layout="bubble" />
         <form

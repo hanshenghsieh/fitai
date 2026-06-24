@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://betterbit.app/schemas/food-dna-seed-item.json",
+  "title": "FoodDNASeedItem",
+  "description": "BetterBit 600 餐廳建庫 — 單一品項種子規格",
+  "type": "object",
+  "required": [
+    "restaurant_id",
+    "canonical_restaurant_name",
+    "menu_item_name",
+    "canonical_food_name",
+    "category",
+    "kcal",
+    "protein_g",
+    "carbs_g",
+    "fat_g",
+    "portion_size",
+    "portion_unit",
+    "nutrition_source_type",
+    "accuracy_level",
+    "requires_confirmation",
+    "quarantine_exempt"
+  ],
+  "properties": {
+    "restaurant_id": { "type": "string", "description": "穩定 slug，如 mcdonalds-tw" },
+    "canonical_restaurant_name": { "type": "string" },
+    "aliases": { "type": "array", "items": { "type": "string" } },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "convenience_store", "supermarket", "warehouse_club", "fast_food", "drink_shop",
+        "cafe", "bento_shop", "breakfast_shop", "hot_pot", "bbq", "japanese", "korean",
+        "noodle_shop", "braised_snack", "fried_chicken", "night_market", "mall_food_court",
+        "healthy_meal_box", "local_snack", "independent_restaurant"
+      ]
+    },
+    "location_context": { "type": "string", "description": "百貨美食街等場域，非餐廳名" },
+    "menu_item_name": { "type": "string", "description": "菜單原始品名" },
+    "canonical_food_name": { "type": "string" },
+    "category": { "type": "string" },
+    "kcal": { "type": "number", "minimum": 0 },
+    "protein_g": { "type": "number", "minimum": 0 },
+    "carbs_g": { "type": "number", "minimum": 0 },
+    "fat_g": { "type": "number", "minimum": 0 },
+    "fiber_g": { "type": "number", "minimum": 0 },
+    "sodium_mg": { "type": "number", "minimum": 0 },
+    "portion_size": { "type": "number", "minimum": 0 },
+    "portion_unit": { "type": "string" },
+    "diet_score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "satiety_score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "protein_density": { "type": "number", "description": "g protein per 100 kcal" },
+    "calorie_density": { "type": "number", "description": "kcal per portion unit" },
+    "portion_risk": { "enum": ["low", "medium", "high"] },
+    "sauce_risk": { "enum": ["low", "medium", "high"] },
+    "fried_risk": { "enum": ["low", "medium", "high"] },
+    "sugar_risk": { "enum": ["low", "medium", "high"] },
+    "nutrition_source_type": {
+      "enum": ["official", "barcode", "verified_brand_menu", "betterbit_template", "user_confirmed_estimate", "ai_photo_only"]
+    },
+    "accuracy_level": { "enum": ["A", "B", "C", "D"] },
+    "requires_confirmation": { "type": "boolean" },
+    "high_risk_tags": { "type": "array", "items": { "type": "string" } },
+    "add_on_options": { "type": "array", "items": { "type": "string" } },
+    "substitution_options": { "type": "array", "items": { "type": "string" } },
+    "verification_sources": { "type": "array", "items": { "type": "string" } },
+    "last_verified_at": { "type": "string", "format": "date-time" },
+    "needs_manual_review": { "type": "boolean" },
+    "seed_priority": { "enum": ["P0", "P1", "P2"] },
+    "quarantine_exempt": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}

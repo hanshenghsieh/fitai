@@ -5,6 +5,7 @@ import { Search, X, PenLine } from 'lucide-react'
 import type { FrequentFood } from '@/lib/food-memory'
 import { primaryFoodLabel } from '@/lib/food-photography'
 import type { FoodSlot } from '@/lib/food-slots'
+import { isNativeIOS } from '@/lib/capacitor-native'
 
 const DS = {
   text: '#2F241D',
@@ -16,7 +17,6 @@ const DS = {
 
 const ICON_STROKE = 1.8
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
-const SHEET_MAX = 'min(58vh, 520px)'
 
 interface Props {
   open: boolean
@@ -81,10 +81,14 @@ export default function TodayFoodMore({
       return
     }
     document.body.style.overflow = 'hidden'
-    const t = window.setTimeout(() => inputRef.current?.focus(), 120)
+    // Auto-focus triggers iOS keyboard zoom on <16px inputs; skip on native shell.
+    let t: number | undefined
+    if (!isNativeIOS()) {
+      t = window.setTimeout(() => inputRef.current?.focus(), 120)
+    }
     return () => {
       document.body.style.overflow = ''
-      window.clearTimeout(t)
+      if (t !== undefined) window.clearTimeout(t)
     }
   }, [open])
 
@@ -115,13 +119,12 @@ export default function TodayFoodMore({
       onClick={onClose}
     >
       <div
-        className="max-w-lg mx-auto w-full flex flex-col overflow-hidden"
+        className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
           fontFamily: font,
           backgroundColor: DS.sheet,
           borderRadius: '28px 28px 0 0',
           boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.08)',
-          maxHeight: SHEET_MAX,
         }}
         onClick={e => e.stopPropagation()}
       >
@@ -157,17 +160,13 @@ export default function TodayFoodMore({
                 }
               }}
               placeholder="例如：鐵板燒、雞腿便當…"
-              className="flex-1 bg-transparent text-[14px] outline-none min-w-0"
+              className="flex-1 bg-transparent text-base outline-none min-w-0"
               style={{ color: DS.text, fontWeight: 400 }}
             />
           </div>
         </div>
 
-        <div
-          ref={scrollRef}
-          className="flex-1 overflow-y-auto overscroll-contain px-5 pb-4 min-h-0"
-          style={{ WebkitOverflowScrolling: 'touch' }}
-        >
+        <div ref={scrollRef} className="ios-bottom-sheet__scroll px-5 pb-2">
           {hasSearch && searchResults.length > 0 && (
             <div className="mb-5 space-y-5">
               {searchResults.map(item => (
@@ -245,7 +244,10 @@ export default function TodayFoodMore({
         </div>
 
         {onCreateFreeText && (
-          <div className="shrink-0 px-5 pb-4 pt-2 border-t" style={{ borderColor: 'rgba(142, 131, 120, 0.12)' }}>
+          <div
+            className="ios-bottom-sheet__footer px-5 pt-2 pb-3 border-t"
+            style={{ borderColor: 'rgba(142, 131, 120, 0.12)' }}
+          >
             <button
               type="button"
               disabled={!trimmed}
@@ -260,7 +262,7 @@ export default function TodayFoodMore({
         )}
 
         <p
-          className="shrink-0 text-center text-[11px] py-3 px-5"
+          className="ios-bottom-sheet__footer shrink-0 text-center text-[11px] py-2 px-5"
           style={{ color: DS.textSecondary, fontWeight: 400 }}
         >
           每一餐，都是照顧自己的練習

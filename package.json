@@ -25,11 +25,12 @@
     "food-images:setup": "npx tsx scripts/setup-food-images.ts",
     "food-images:reset": "npx tsx scripts/setup-food-images.ts -- --force",
     "market-loop": "npx tsx scripts/market-loop/run.ts",
-    "test": "node --import tsx --test src/lib/engines/calorie-bank-engine.test.ts src/lib/engines/next-meal-engine.test.ts",
+    "test": "node --import tsx --test src/lib/engines/calorie-bank-engine.test.ts src/lib/engines/next-meal-engine.test.ts src/lib/betterbit-food-score.test.ts src/lib/nutrition/accuracy-engine.test.ts src/lib/nutrition/photo-log-accuracy.test.ts",
     "migrate:calorie-bank": "node scripts/apply-calorie-bank-migration.mjs",
     "cap:sync": "npx cap sync ios",
     "cap:open:ios": "npx cap open ios",
-    "cap:ios": "npx cap sync ios && npx cap open ios"
+    "cap:ios": "npx cap sync ios && npx cap open ios",
+    "testflight:3a-prep": "node scripts/testflight-build-3a-prep.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",

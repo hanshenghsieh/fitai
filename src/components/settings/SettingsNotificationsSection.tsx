@@ -16,6 +16,7 @@ export default function SettingsNotificationsSection() {
   useEffect(() => {
     if (!isWebPushSupported()) return
 
+    const ok = initializeFirebase()
     setSupported(true)
     if (ok && Notification.permission === 'granted') {
       setEnabled(true)

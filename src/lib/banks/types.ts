@@ -53,4 +53,12 @@ export interface FoodLogEntry {
   imageCategory?: import('@/lib/food-image-system').ImageCategory
   capture_status?: 'learning' | 'resolved' | 'needs_name'
   ai_confidence_pct?: number
+  /** Nutrition Accuracy v1 metadata (client check-in JSON only) */
+  nutrition_accuracy_meta?: {
+    accuracy_level: 'A' | 'B' | 'C' | 'D'
+    source_type: string
+    user_confirmed: boolean
+    portion_adjustments: Record<string, unknown>
+    candidate_label: string
+  }
 }

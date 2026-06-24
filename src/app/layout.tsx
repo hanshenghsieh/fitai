@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Noto_Sans_TC } from 'next/font/google'
 import './globals.css'
+import '@/styles/capacitor-ios-shell.css'
 import { Toaster } from '@/components/ui/sonner'
 import CapacitorShell from '@/components/capacitor/CapacitorShell'
 import OfflineShell from '@/components/capacitor/OfflineShell'
@@ -63,6 +64,9 @@ export const viewport: Viewport = {
   themeColor: '#F4F2EE',
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

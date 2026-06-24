@@ -24,6 +24,7 @@ export default function TodayHeader({ trialDaysLeft }: Props) {
         {trialDaysLeft != null && trialDaysLeft > 0 && trialDaysLeft <= 14 && (
           <Link
             href="/settings"
+            prefetch
             className="text-[13px] mt-1.5 block leading-relaxed"
             style={{ color: TODAY.textSecondary, fontWeight: 400 }}
           >
@@ -33,6 +34,7 @@ export default function TodayHeader({ trialDaysLeft }: Props) {
       </div>
       <Link
         href="/settings"
+        prefetch
         className="p-2 rounded-full shrink-0 mt-0.5"
         style={{ color: TODAY.textSecondary }}
         aria-label="設定"
