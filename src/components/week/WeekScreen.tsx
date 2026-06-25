@@ -2,7 +2,6 @@
 
 import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
-import BBIcon from '@/components/icons/BBIcon'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { WeekSummary } from '@/lib/analytics/week-summary'
 import { useReveal } from '@/components/motion/useReveal'
@@ -72,23 +71,13 @@ export default function WeekScreen({ summary, error }: Props) {
 
   return (
     <div className="px-5 pt-4 pb-8 space-y-5 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
-      <header className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-[34px] leading-tight" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-            本週
-          </h1>
-          <p className="text-[15px] mt-1 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-            你的每一步，都讓改變更靠近。
-          </p>
-        </div>
-        <button
-          type="button"
-          aria-label="本週日曆"
-          className="p-2 rounded-full mt-1"
-          style={{ color: BB_V2.text.secondary }}
-        >
-          <BBIcon name="calendar" size={20} tone="muted" />
-        </button>
+      <header>
+        <h1 className="text-[34px] leading-tight" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+          本週
+        </h1>
+        <p className="text-[15px] mt-1 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+          你的每一步，都讓改變更靠近。
+        </p>
       </header>
 
       {summary.weekScore && (

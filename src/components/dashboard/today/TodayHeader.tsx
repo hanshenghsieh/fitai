@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { Settings } from 'lucide-react'
 import { TODAY } from '@/lib/today-design'
 
 interface Props {
@@ -11,7 +10,7 @@ interface Props {
 export default function TodayHeader({ trialDaysLeft }: Props) {
   return (
     <header
-      className="px-5 pt-11 pb-1 flex items-start justify-between gap-3 max-w-[640px] mx-auto"
+      className="px-5 pt-11 pb-1 max-w-[640px] mx-auto"
       style={{ fontFamily: TODAY.font }}
     >
       <div>
@@ -32,15 +31,6 @@ export default function TodayHeader({ trialDaysLeft }: Props) {
           </Link>
         )}
       </div>
-      <Link
-        href="/settings"
-        prefetch
-        className="p-2 rounded-full shrink-0 mt-0.5"
-        style={{ color: TODAY.textSecondary }}
-        aria-label="設定"
-      >
-        <Settings className="h-[18px] w-[18px]" strokeWidth={TODAY.iconStroke} />
-      </Link>
     </header>
   )
 }
