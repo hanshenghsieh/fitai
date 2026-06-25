@@ -5,6 +5,7 @@ import { ClipboardList, Loader2, RefreshCw, Camera } from 'lucide-react'
 import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu } from '@/lib/food-search'
 import { estimateFreeTextMeal } from '@/lib/food-estimate'
+import { enrichFoodLog, sumItemMacros } from '@/lib/food-log-macros'
 import {
   fileToDataUrl,
   isLowConfidence,
@@ -484,12 +485,12 @@ export default function TodayOS({
     (entry: Omit<FoodLogEntry, 'logged_at' | 'user_declared'>) => {
       if (loggingRef.current) return
       loggingRef.current = true
-      const full: FoodLogEntry = {
+      const full: FoodLogEntry = enrichFoodLog({
         ...entry,
         slot: entry.slot ?? activeSlot,
         logged_at: new Date().toISOString(),
         user_declared: true,
-      }
+      })
       const nextLogs = [...foodLogs, full]
       const nextDna = full.learning
         ? (userMemory.food_dna ?? foodDna)
@@ -823,12 +824,15 @@ export default function TodayOS({
     confirmingRef.current = true
     setConfirming(true)
     const items = linesToDisplayItems(dicePreview.lines)
+    const totals = sumItemMacros(items)
     const logEntry: FoodLogEntry = {
       id: `dice-${dicePreview.id}`,
       name: items.map(i => formatEatOutDiceLabel(i)).join(' + '),
       store: dicePreview.stores[0] ?? (items.length === 1 ? items[0]?.store : undefined),
-      calories: items.reduce((s, i) => s + (i.calories ?? 0), 0),
-      protein_g: items.reduce((s, i) => s + (i.protein_g ?? 0), 0),
+      calories: totals.calories,
+      protein_g: totals.protein_g,
+      carbs_g: totals.carbs_g,
+      fat_g: totals.fat_g,
       slot: activeSlot,
       logged_at: new Date().toISOString(),
       user_declared: true,
@@ -917,13 +921,15 @@ export default function TodayOS({
     []
   )
   const handlePickSearch = useCallback(
-    (item: { id: string; name: string; store?: string; calories: number; protein_g: number }) => {
+    (item: { id: string; name: string; store?: string; calories: number; protein_g: number; carbs_g?: number; fat_g?: number }) => {
       commitLog({
         id: item.id,
         name: item.name,
         store: item.store,
         calories: item.calories,
         protein_g: item.protein_g,
+        carbs_g: item.carbs_g,
+        fat_g: item.fat_g,
         source: 'search',
       })
     },

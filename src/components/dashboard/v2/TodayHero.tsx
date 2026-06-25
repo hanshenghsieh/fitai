@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
+import { sumLoggedCarbs, sumLoggedFat } from '@/lib/food-log-macros'
 import CalorieRing from './CalorieRing'
 import MacroBars from './MacroBars'
 import MealLogCard from './MealLogCard'
@@ -13,13 +14,11 @@ interface Props {
   caloriesTarget: number
   proteinLogged: number
   proteinTarget: number
+  carbsTarget: number
+  fatTarget: number
   overTarget?: boolean
   foodLogs?: FoodLogEntry[]
   onDeleteLog?: (id: string) => void
-}
-
-function sumMacro(logs: FoodLogEntry[], key: 'carbs_g' | 'fat_g'): number {
-  return logs.reduce((acc, l) => acc + (l[key] ?? 0), 0)
 }
 
 export default function TodayHero({
@@ -27,22 +26,14 @@ export default function TodayHero({
   caloriesTarget,
   proteinLogged,
   proteinTarget,
+  carbsTarget,
+  fatTarget,
   overTarget = false,
   foodLogs = [],
   onDeleteLog,
 }: Props) {
-  const carbsLogged = sumMacro(foodLogs, 'carbs_g')
-  const fatLogged = sumMacro(foodLogs, 'fat_g')
-  const carbsTarget = useMemo(() => {
-    const fromLogs = carbsLogged
-    if (fromLogs > 0) return Math.max(fromLogs, Math.round((caloriesTarget * 0.45) / 4))
-    return Math.round((caloriesTarget * 0.45) / 4)
-  }, [carbsLogged, caloriesTarget])
-  const fatTarget = useMemo(() => {
-    const fromLogs = fatLogged
-    if (fromLogs > 0) return Math.max(fromLogs, Math.round((caloriesTarget * 0.3) / 9))
-    return Math.round((caloriesTarget * 0.3) / 9)
-  }, [fatLogged, caloriesTarget])
+  const carbsLogged = sumLoggedCarbs(foodLogs)
+  const fatLogged = sumLoggedFat(foodLogs)
 
   const sortedLogs = useMemo(
     () => [...foodLogs].sort((a, b) => b.logged_at.localeCompare(a.logged_at)),
@@ -57,9 +48,9 @@ export default function TodayHero({
           <MacroBars
             proteinLogged={proteinLogged}
             proteinTarget={proteinTarget}
-            carbsLogged={carbsLogged || Math.round(proteinLogged * 0.5)}
+            carbsLogged={carbsLogged}
             carbsTarget={carbsTarget}
-            fatLogged={fatLogged || Math.round(caloriesLogged * 0.08)}
+            fatLogged={fatLogged}
             fatTarget={fatTarget}
           />
         </div>

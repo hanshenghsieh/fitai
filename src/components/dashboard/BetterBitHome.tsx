@@ -317,6 +317,8 @@ export default function BetterBitHome({
         caloriesTarget={intakeSummary.caloriesTarget}
         proteinLogged={intakeSummary.proteinLogged}
         proteinTarget={intakeSummary.proteinTarget}
+        carbsTarget={todayPlan.daily_targets.carbs_g}
+        fatTarget={todayPlan.daily_targets.fat_g}
         overTarget={intakeSummary.overTarget}
         foodLogs={displayFoodLogs}
         onDeleteLog={handleDeleteLog}
