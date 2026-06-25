@@ -13,7 +13,7 @@ export default function CapacitorShell() {
     const removeIOSShell = installCapacitorIOSShell()
 
     void StatusBar.setStyle({ style: Style.Dark }).catch(() => {})
-    void StatusBar.setBackgroundColor({ color: '#F4F2EE' }).catch(() => {})
+    void StatusBar.setBackgroundColor({ color: '#FFF9F2' }).catch(() => {})
 
     let removeBackListener: (() => void) | undefined
 

@@ -1,6 +1,6 @@
 import { isNativeIOS } from '@/lib/capacitor-native'
 
-const CANVAS = '#F4F2EE'
+const CANVAS = '#FFF9F2'
 const VIEWPORT_CONTENT =
   'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'
 

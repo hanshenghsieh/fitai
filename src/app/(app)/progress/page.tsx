@@ -1,54 +1,110 @@
 export const dynamic = 'force-dynamic'
 
 import { createClient } from '@/lib/supabase/server'
-import { format, subWeeks } from 'date-fns'
-import { colors } from '@/lib/design-system'
-import ProgressScreen from '@/components/progress/ProgressScreen'
-import { buildPlateauStory } from '@/lib/plateau-story'
-import { getAccessStatus } from '@/lib/subscription-access'
+import { format, startOfWeek, subDays } from 'date-fns'
+import { BB_V2 } from '@/lib/betterbit-v2'
+import AnalyticsScreen from '@/components/analytics/AnalyticsScreen'
+import type { WeeklyPlanData } from '@/types'
+import type { AnalysisDayPlanHint } from '@/lib/analytics/analysis-summary'
 
 export default async function ProgressPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const eightWeeksAgo = format(subWeeks(new Date(), 8), 'yyyy-MM-dd')
+  const now = new Date()
+  const ninetyDaysAgo = format(subDays(now, 90), 'yyyy-MM-dd')
+  const weekStart = format(startOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd')
 
-  const [{ data: profile }, { data: subscription }, { data: measurements }, { data: goal }, { data: weeklyPlan }] = await Promise.all([
-    supabase.from('user_profiles').select('created_at, weight_kg').eq('id', user.id).single(),
-    supabase.from('subscriptions').select('status').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).single(),
-    supabase.from('body_measurements').select('*').eq('user_id', user.id)
-      .gte('measured_at', eightWeeksAgo).order('measured_at', { ascending: true }),
-    supabase.from('goals').select('*').eq('user_id', user.id).eq('is_active', true).order('created_at', { ascending: false }).limit(1),
-    supabase.from('weekly_plans').select('plan_data, previous_completion_rate, previous_workout_rate').eq('user_id', user.id).order('week_start', { ascending: false }).limit(1),
+  const [
+    { data: profile },
+    { data: measurements },
+    { data: goal },
+    { data: checkins },
+    { data: weeklyPlans },
+  ] = await Promise.all([
+    supabase.from('user_profiles').select('weight_kg').eq('id', user.id).single(),
+    supabase
+      .from('body_measurements')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('measured_at', ninetyDaysAgo)
+      .order('measured_at', { ascending: true }),
+    supabase
+      .from('goals')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(1),
+    supabase
+      .from('daily_checkins')
+      .select('checkin_date, notes, water_ml, workout_items')
+      .eq('user_id', user.id)
+      .gte('checkin_date', ninetyDaysAgo)
+      .order('checkin_date', { ascending: true }),
+    supabase
+      .from('weekly_plans')
+      .select('plan_data, week_start')
+      .eq('user_id', user.id)
+      .gte('week_start', ninetyDaysAgo)
+      .order('week_start', { ascending: false }),
   ])
 
-  const latestWeeklyPlan = weeklyPlan?.[0] ?? null
-  const goalSnapshot = (latestWeeklyPlan?.plan_data as { goal_snapshot?: Record<string, unknown> } | null)?.goal_snapshot ?? null
-  const access = getAccessStatus(profile?.created_at ?? new Date().toISOString(), subscription)
   const activeGoal = goal?.[0] ?? null
   const latestWeight = measurements?.[measurements.length - 1]?.weight_kg ?? profile?.weight_kg ?? null
 
-  const plateau = buildPlateauStory({
-    measurements: measurements ?? [],
-    mealAdherence: latestWeeklyPlan?.previous_completion_rate ?? null,
-    workoutAdherence: latestWeeklyPlan?.previous_workout_rate ?? null,
-  })
+  const dayPlansByDate: Record<string, AnalysisDayPlanHint> = {}
+  let latestTargets = { calories: 1800, protein_g: 120, water_ml: 2000 }
+  let plannedWorkoutTitle: string | undefined
+
+  for (const row of weeklyPlans ?? []) {
+    const plan = row.plan_data as WeeklyPlanData | null
+    if (!plan?.days) continue
+    for (const day of plan.days) {
+      dayPlansByDate[day.date] = {
+        calories_burned_est: day.workout?.calories_burned_est,
+        daily_targets: day.daily_targets,
+      }
+    }
+  }
+
+  const currentWeekPlan = (weeklyPlans ?? []).find(p => p.week_start === weekStart)
+  const currentPlanData = currentWeekPlan?.plan_data as WeeklyPlanData | null
+  const todayStr = format(now, 'yyyy-MM-dd')
+  const todayPlan = currentPlanData?.days?.find(d => d.date === todayStr) ?? currentPlanData?.days?.[0]
+  if (todayPlan?.daily_targets) {
+    latestTargets = {
+      calories: todayPlan.daily_targets.calories,
+      protein_g: todayPlan.daily_targets.protein_g,
+      water_ml: todayPlan.daily_targets.water_ml,
+    }
+  } else if (currentPlanData?.weekly_targets) {
+    latestTargets = {
+      calories: currentPlanData.weekly_targets.avg_daily_calories,
+      protein_g: currentPlanData.weekly_targets.avg_daily_protein_g,
+      water_ml: 2000,
+    }
+  }
+
+  if (todayPlan?.workout?.type_zh) {
+    plannedWorkoutTitle = todayPlan.workout.type_zh
+  }
 
   return (
-    <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: colors.bg.canvas }}>
-      <ProgressScreen
+    <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: BB_V2.bg.canvas }}>
+      <AnalyticsScreen
         measurements={measurements ?? []}
-        goal={activeGoal}
-        goalSnapshot={goalSnapshot as {
-          fat_to_lose_kg?: number
-          weekly_fat_loss_g?: number
-          weeks_remaining?: number
-          target_weight?: number | null
-        } | null}
-        access={access}
-        latestWeight={latestWeight}
-        plateau={plateau}
+        checkins={checkins ?? []}
+        targets={{
+          calories: latestTargets.calories,
+          protein_g: latestTargets.protein_g,
+          water_ml: latestTargets.water_ml,
+          target_weight_kg: activeGoal?.target_weight_kg ?? currentPlanData?.goal_snapshot?.target_weight ?? null,
+        }}
+        dayPlansByDate={dayPlansByDate}
+        currentWeightKg={latestWeight}
+        plannedWorkoutTitle={plannedWorkoutTitle}
       />
     </div>
   )

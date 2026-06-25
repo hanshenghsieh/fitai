@@ -11,6 +11,7 @@ import {
 } from '@/lib/progress-narrative'
 import ProgressHeader from '@/components/progress/ProgressHeader'
 import ProgressTrendChart from '@/components/progress/ProgressTrendChart'
+import ProgressNutrientDonut from '@/components/progress/ProgressNutrientDonut'
 import ProgressWeightLog from '@/components/progress/ProgressWeightLog'
 import ProgressFatBank from '@/components/progress/ProgressFatBank'
 import ProgressExplainer from '@/components/progress/ProgressExplainer'
@@ -79,7 +80,8 @@ export default function ProgressScreen({
   const content = (
     <div className="space-y-5 pb-8">
       <ProgressHeader posture={posture} />
-      <ProgressTrendChart points={chartPoints} tone={tone} />
+      <ProgressTrendChart points={chartPoints} />
+      <ProgressNutrientDonut proteinG={42} carbsG={180} fatG={55} />
       <ProgressWeightLog lastWeightKg={latestWeight} />
       {plateau && <ProgressPlateauNote text={plateau.text} subtext={plateau.subtext} />}
       {fatBank && <ProgressFatBank progressPct={fatBank.progressPct} line={fatBank.line} />}

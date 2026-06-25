@@ -3,28 +3,28 @@
 
 export const colors = {
   bg: {
-    canvas: '#F4F2EE',
-    elevated: '#FCFBF9',
-    muted: '#EAE7E1',
+    canvas: '#FFF9F2',
+    elevated: '#FFFFFF',
+    muted: '#FFF4E8',
   },
 
   text: {
-    primary: '#3A3835',
-    secondary: '#6D6A65',
-    tertiary: '#9A9690',
+    primary: '#1C1C1E',
+    secondary: '#6E6E73',
+    tertiary: '#8E8E93',
   },
 
   accent: {
-    action: '#7A756D',
-    actionHover: '#6A655E',
-    actionSoft: 'rgba(122, 117, 109, 0.08)',
-    sage: '#7D8B7A',
-    sageSoft: 'rgba(125, 139, 122, 0.1)',
+    action: '#D89A52',
+    actionHover: '#C88A42',
+    actionSoft: 'rgba(216, 154, 82, 0.12)',
+    sage: '#76B69A',
+    sageSoft: 'rgba(118, 182, 154, 0.12)',
   },
 
   border: {
-    subtle: '#E3E0DA',
-    focus: '#7A756D',
+    subtle: 'rgba(0,0,0,0.05)',
+    focus: '#D89A52',
   },
 
   state: {
@@ -58,8 +58,8 @@ export const borderRadius = {
   sm: 8,
   md: 12,
   lg: 16,
-  xl: 18,
-  card: 18,
+  xl: 20,
+  card: 28,
   full: 9999,
 } as const
 
@@ -79,18 +79,18 @@ export const motion = {
   easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
 } as const
 
-/** Card — restrained radius, border not shadow */
+/** Card — v2: white, 28px, soft shadow */
 export const cardStyle = {
   backgroundColor: colors.bg.elevated,
-  border: `1px solid ${colors.border.subtle}`,
   borderRadius: borderRadius.card,
+  boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
 } as const
 
 export const buttonPrimary = {
   backgroundColor: colors.accent.action,
-  color: colors.bg.elevated,
-  borderRadius: borderRadius.lg,
-  fontWeight: 500,
+  color: '#FFFFFF',
+  borderRadius: 22,
+  fontWeight: 600,
 } as const
 
 export const buttonGhost = {

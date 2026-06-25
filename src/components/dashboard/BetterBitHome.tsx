@@ -19,7 +19,7 @@ import {
 import { toast } from 'sonner'
 import TodayHeader from '@/components/dashboard/today/TodayHeader'
 import TodayPosture from '@/components/dashboard/today/TodayPosture'
-import TodayIntakeBar from '@/components/dashboard/today/TodayIntakeBar'
+import TodayHero from '@/components/dashboard/v2/TodayHero'
 import TodayOS from '@/components/dashboard/TodayOS'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import type { FoodLogEntry } from '@/lib/banks/types'
@@ -30,6 +30,7 @@ import { foodLogsNeedSync, reconcileFoodLogsToday } from '@/lib/food-log-reconci
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
 import { TODAY } from '@/lib/today-design'
+import BBCard from '@/components/ui/BBCard'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import { zaijian } from '@/lib/copy/zaijian'
 import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile } from '@/types'
@@ -299,55 +300,69 @@ export default function BetterBitHome({
   }, [persist])
 
   const isRestDay = exercises.length === 0
+  const deleteLogRef = useRef<(id: string) => void>(() => {})
+  const handleDeleteLog = useCallback((id: string) => {
+    deleteLogRef.current(id)
+  }, [])
+  const registerDeleteLog = useCallback((handler: (id: string) => void) => {
+    deleteLogRef.current = handler
+  }, [])
 
   return (
     <>
       <TodayHeader trialDaysLeft={trialDaysLeft} />
       <TodayPosture line={postureLine} />
-      <TodayIntakeBar
+      <TodayHero
         caloriesLogged={intakeSummary.caloriesLogged}
         caloriesTarget={intakeSummary.caloriesTarget}
         proteinLogged={intakeSummary.proteinLogged}
         proteinTarget={intakeSummary.proteinTarget}
         overTarget={intakeSummary.overTarget}
+        foodLogs={displayFoodLogs}
+        onDeleteLog={handleDeleteLog}
       />
 
-      <TodayOS
-        todayPlan={todayPlan}
-        profile={profile}
-        goalSnapshot={goalSnapshot}
-        userMemory={displayUserMemory}
-        foodDna={userMemory.food_dna ?? foodDna}
-        dayOfWeek={dayOfWeek}
-        recentMissedDays={recentMissedDays}
-        recentFoodLogs={recentFoodLogs}
-        dailyRolls={dailyRolls}
-        mealSuggest={mealSuggest}
-        customEatOut={customEatOut}
-        dayIndex={dayIndex}
-        workoutDone={workoutDone}
-        workoutTotal={workoutItems.length}
-        calorieBank={calorieBank}
-        onLogFood={handleLogFood}
-        onClearMealSelection={handleClearMealSelection}
-        onPostureLine={setPostureLine}
-        onDiceApply={handleDiceApply}
-      />
+      <div className="px-5 pb-32 max-w-[640px] mx-auto space-y-6" style={{ fontFamily: TODAY.font }}>
+        <TodayOS
+          todayPlan={todayPlan}
+          profile={profile}
+          goalSnapshot={goalSnapshot}
+          userMemory={displayUserMemory}
+          foodDna={userMemory.food_dna ?? foodDna}
+          dayOfWeek={dayOfWeek}
+          recentMissedDays={recentMissedDays}
+          recentFoodLogs={recentFoodLogs}
+          dailyRolls={dailyRolls}
+          mealSuggest={mealSuggest}
+          customEatOut={customEatOut}
+          dayIndex={dayIndex}
+          workoutDone={workoutDone}
+          workoutTotal={workoutItems.length}
+          calorieBank={calorieBank}
+          onLogFood={handleLogFood}
+          onClearMealSelection={handleClearMealSelection}
+          onPostureLine={setPostureLine}
+          onDiceApply={handleDiceApply}
+          registerDeleteLog={registerDeleteLog}
+        />
 
-      <div className="px-5 pb-32 max-w-[640px] mx-auto space-y-4" style={{ fontFamily: TODAY.font }}>
         {isPending && (
           <p className="text-center text-[11px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>{zaijian.saving}</p>
         )}
 
-        {todayPlan.workout && !isRestDay && (
-          <div
-            className="overflow-hidden"
-            style={{
-              backgroundColor: TODAY.card,
-              borderRadius: TODAY.radiusCard,
-              boxShadow: TODAY.cardShadow,
-            }}
-          >
+        {todayPlan.workout && isRestDay ? (
+          <BBCard padding="20px 24px">
+            <p className="text-[16px]" style={{ color: TODAY.text, fontWeight: 500 }}>
+              {todayPlan.workout.type_zh || '今日休息'}
+            </p>
+            <p className="text-[13px] mt-1.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+              今天不安排主訓練，好好恢復。想動的話可以輕度伸展。
+            </p>
+          </BBCard>
+        ) : null}
+
+        {todayPlan.workout && !isRestDay ? (
+          <BBCard className="overflow-hidden" padding={0}>
             <button
               type="button"
               className="w-full p-6 flex items-start justify-between gap-4 text-left"
@@ -469,8 +484,8 @@ export default function BetterBitHome({
                 )}
               </div>
             )}
-          </div>
-        )}
+          </BBCard>
+        ) : null}
       </div>
     </>
   )

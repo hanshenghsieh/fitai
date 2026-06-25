@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { ArrowLeft, Camera, Loader2, X } from 'lucide-react'
 import { TODAY } from '@/lib/today-design'
+import { BB_V2 } from '@/lib/betterbit-v2'
+import BBCard from '@/components/ui/BBCard'
 import { isNativeIOS } from '@/lib/capacitor-native'
 import { captureFoodPhotoFromCamera, pickFoodPhotoFromGallery } from '@/lib/native-camera'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
@@ -151,6 +153,31 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
         </button>
       </div>
     </div>
+  )
+}
+
+function guessFoodTags(name: string): string[] {
+  const parts = name.split(/[+＋、,，]/).map(s => s.trim()).filter(Boolean)
+  if (parts.length > 1) return parts.slice(0, 4)
+  if (name) return [name]
+  return []
+}
+
+function FoodTag({ label, style }: { label: string; style?: React.CSSProperties }) {
+  return (
+    <span
+      className="px-3 py-1.5 text-[12px] backdrop-blur-md"
+      style={{
+        borderRadius: BB_V2.radius.pill,
+        backgroundColor: 'rgba(255,255,255,0.88)',
+        color: BB_V2.text.primary,
+        fontWeight: 600,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+        ...style,
+      }}
+    >
+      {label}
+    </span>
   )
 }
 
@@ -311,9 +338,23 @@ function ReviewStep({
       <div className="ios-bottom-sheet__scroll flex-1 overflow-y-auto overscroll-contain px-5 pb-4 space-y-5 min-h-0">
         <div
           className="relative w-full overflow-hidden"
-          style={{ height: 200, borderRadius: 28, backgroundColor: TODAY.surface }}
+          style={{ height: 360, borderRadius: BB_V2.radius.sheet, backgroundColor: BB_V2.bg.pill }}
         >
           <Image src={draft.previewUrl} alt="" fill unoptimized className="object-cover" sizes="100vw" />
+          {!draft.loading && draft.name && !accuracyMode && (
+            <div className="absolute inset-0 p-4 flex flex-wrap content-start gap-2 pointer-events-none">
+              {guessFoodTags(draft.name).map((tag, i) => (
+                <FoodTag
+                  key={tag}
+                  label={tag}
+                  style={{
+                    marginTop: i === 0 ? '12%' : undefined,
+                    marginLeft: i === 1 ? '45%' : i === 2 ? '8%' : undefined,
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {draft.loading ? (
@@ -329,69 +370,97 @@ function ReviewStep({
           </p>
         )}
 
-        {!accuracyMode && (
-          <label className="block space-y-1.5">
-            <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>食物名稱</span>
-            <input
-              type="text"
-              value={draft.name}
-              onChange={e => onDraftChange({ name: e.target.value })}
-              placeholder="例如：雞腿便當"
-              className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent"
-              style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
-            />
-          </label>
-        )}
-
         {showMacros && (
-          <>
-            {accuracyMode && (
-              <label className="block space-y-1.5">
-                <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>食物名稱</span>
-                <input
-                  type="text"
-                  value={draft.name}
-                  onChange={e => onDraftChange({ name: e.target.value })}
-                  className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent"
-                  style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
-                />
-              </label>
+          <BBCard padding={20}>
+            <p className="text-[18px] mb-1" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+              {draft.name || '這餐'}
+            </p>
+            <p className="text-[32px] tabular-nums mb-4" style={{ color: BB_V2.accent.orange, fontWeight: 700 }}>
+              {draft.calories || '—'}
+              <span className="text-[16px] ml-1" style={{ fontWeight: 600 }}>kcal</span>
+            </p>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { label: '蛋白質', value: draft.protein_g, unit: 'g', color: BB_V2.macro.protein },
+                { label: '碳水', value: Math.round((draft.calories || 0) * 0.4 / 4), unit: 'g', color: BB_V2.macro.carbs },
+                { label: '脂肪', value: Math.round((draft.calories || 0) * 0.25 / 9), unit: 'g', color: BB_V2.macro.fat },
+              ].map(row => (
+                <div
+                  key={row.label}
+                  className="text-center py-3"
+                  style={{ borderRadius: 16, backgroundColor: BB_V2.bg.canvas }}
+                >
+                  <p className="text-[11px] mb-1" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>{row.label}</p>
+                  <p className="text-[18px] tabular-nums" style={{ color: row.color, fontWeight: 700 }}>
+                    {row.value || '—'}
+                    <span className="text-[11px] font-medium">{row.unit}</span>
+                  </p>
+                </div>
+              ))}
+            </div>
+            {!accuracyMode && (
+              <div className="mt-4 space-y-3 pt-4" style={{ borderTop: `1px solid ${BB_V2.divider}` }}>
+                <label className="block space-y-1">
+                  <span className="text-[12px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>食物名稱</span>
+                  <input
+                    type="text"
+                    value={draft.name}
+                    onChange={e => onDraftChange({ name: e.target.value })}
+                    placeholder="例如：雞腿便當"
+                    className="w-full px-4 py-3 text-[16px] outline-none"
+                    style={{
+                      color: BB_V2.text.primary,
+                      fontWeight: 500,
+                      borderRadius: BB_V2.radius.input,
+                      backgroundColor: BB_V2.bg.canvas,
+                    }}
+                  />
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="block space-y-1">
+                    <span className="text-[12px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>熱量 kcal</span>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      value={calText}
+                      onChange={e => {
+                        setCalText(e.target.value)
+                        const n = parseInt(e.target.value, 10)
+                        onDraftChange({ calories: Number.isFinite(n) ? n : 0 })
+                      }}
+                      className="w-full px-4 py-3 text-[16px] outline-none tabular-nums"
+                      style={{
+                        color: BB_V2.text.primary,
+                        fontWeight: 600,
+                        borderRadius: BB_V2.radius.input,
+                        backgroundColor: BB_V2.bg.canvas,
+                      }}
+                    />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[12px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>蛋白質 g</span>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      value={proText}
+                      onChange={e => {
+                        setProText(e.target.value)
+                        const n = parseInt(e.target.value, 10)
+                        onDraftChange({ protein_g: Number.isFinite(n) ? n : 0 })
+                      }}
+                      className="w-full px-4 py-3 text-[16px] outline-none tabular-nums"
+                      style={{
+                        color: BB_V2.text.primary,
+                        fontWeight: 600,
+                        borderRadius: BB_V2.radius.input,
+                        backgroundColor: BB_V2.bg.canvas,
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
             )}
-
-            <label className="block space-y-1.5">
-              <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>熱量（kcal）</span>
-              <input
-                type="number"
-                inputMode="numeric"
-                value={calText}
-                onChange={e => {
-                  setCalText(e.target.value)
-                  const n = parseInt(e.target.value, 10)
-                  onDraftChange({ calories: Number.isFinite(n) ? n : 0 })
-                }}
-                readOnly={accuracyMode}
-                className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent tabular-nums"
-                style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
-              />
-            </label>
-
-            <label className="block space-y-1.5">
-              <span className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>蛋白質（g）</span>
-              <input
-                type="number"
-                inputMode="numeric"
-                value={proText}
-                onChange={e => {
-                  setProText(e.target.value)
-                  const n = parseInt(e.target.value, 10)
-                  onDraftChange({ protein_g: Number.isFinite(n) ? n : 0 })
-                }}
-                readOnly={accuracyMode}
-                className="w-full px-0 py-2 text-[16px] border-b outline-none bg-transparent tabular-nums"
-                style={{ color: TODAY.text, fontWeight: 500, borderColor: 'rgba(142, 131, 120, 0.2)' }}
-              />
-            </label>
-          </>
+          </BBCard>
         )}
       </div>
 
@@ -403,8 +472,14 @@ function ReviewStep({
           type="button"
           disabled={draft.loading || saving || !draft.name.trim() || !readyForLog}
           onClick={onSave}
-          className="w-full h-14 rounded-[22px] text-[16px] disabled:opacity-40"
-          style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
+          className="w-full text-[17px] disabled:opacity-40 active:scale-[0.99] transition-transform"
+          style={{
+            height: 60,
+            borderRadius: BB_V2.radius.button,
+            backgroundColor: BB_V2.accent.orange,
+            color: '#FFFFFF',
+            fontWeight: 600,
+          }}
         >
           {saving ? '加入中…' : accuracyMode && !readyForLog ? '請先確認這餐' : '加入今天'}
         </button>
@@ -448,10 +523,10 @@ export default function PhotoLogSheet({
       <div
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
-          fontFamily: TODAY.font,
-          backgroundColor: TODAY.card,
-          borderRadius: '28px 28px 0 0',
-          boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.08)',
+          fontFamily: BB_V2.font,
+          backgroundColor: BB_V2.bg.card,
+          borderRadius: `${BB_V2.radius.sheet}px ${BB_V2.radius.sheet}px 0 0`,
+          boxShadow: BB_V2.shadow.card,
         }}
         onClick={e => e.stopPropagation()}
       >

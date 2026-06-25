@@ -2,7 +2,7 @@
 
 import { useState, useOptimistic, useTransition, useEffect } from 'react'
 import { toast } from 'sonner'
-import { CheckCircle2, Circle, Play, ChevronDown, ChevronUp, Droplets, Flame, Dumbbell, Store } from 'lucide-react'
+import { CheckCircle2, Circle, Play, ChevronDown, ChevronUp, Droplets, Flame, Dumbbell, Store, Utensils, Bed } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
 import { getConvenienceItems, type ConvenienceItem } from '@/lib/convenience-store-menu'
 import type { DayPlan, DailyCheckin, DietCheckinItem, WorkoutCheckinItem } from '@/types'
@@ -118,7 +118,7 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
     startTransition(async () => {
       setIsCompleted(true)
       await saveCheckin({ is_completed: true })
-      toast.success('🎉 今天達標了！繼續加油！')
+      toast.success('今天達標了！繼續加油！')
     })
   }
 
@@ -186,9 +186,9 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
         <p className="text-xs font-medium text-gray-500 mb-2">今天吃法</p>
         <div className="flex gap-2">
           {[
-            { val: 'cook', label: '🍳 自己煮' },
-            { val: 'eat-out', label: '🍱 外食' },
-            { val: 'mixed', label: '🔄 混合' },
+            { val: 'cook', label: '自己煮' },
+            { val: 'eat-out', label: '外食' },
+            { val: 'mixed', label: '混合' },
           ].map(({ val, label }) => (
             <button
               key={val}
@@ -281,8 +281,8 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
                             {(item as any).photo_url ? (
                               <img src={(item as any).photo_url} alt={item.name_zh} className="w-full h-full object-cover" />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-2xl">
-                                {item.name_zh === '蛋' ? '🥚' : item.name_zh === '吐司' ? '🍞' : item.name_zh === '雞肉' ? '🍗' : item.name_zh === '白飯' ? '🍚' : item.name_zh === '鮭魚' ? '🐟' : item.name_zh === '地瓜' ? '🍠' : '🍽️'}
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Utensils className="h-6 w-6 text-gray-400" strokeWidth={2} />
                               </div>
                             )}
                           </div>
@@ -448,7 +448,7 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
 
         {todayPlan.workout.type === 'rest' ? (
           <div className="px-4 py-6 text-center">
-            <p className="text-2xl mb-2">😴</p>
+            <Bed className="h-8 w-8 mx-auto mb-2 text-gray-400" strokeWidth={2} />
             <p className="font-medium text-gray-700">今天是休息日</p>
             <p className="text-sm text-gray-400 mt-1">好好休息，讓肌肉恢復</p>
             {todayPlan.workout.cooldown.length > 0 && (
@@ -460,7 +460,10 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
             {/* Warmup */}
             {todayPlan.workout.warmup.length > 0 && (
               <div className="px-4 py-2 bg-yellow-50 border-b border-gray-50">
-                <p className="text-xs font-medium text-yellow-700 mb-1">🔥 暖身</p>
+                <p className="text-xs font-medium text-yellow-700 mb-1 flex items-center gap-1">
+                  <Flame className="h-3.5 w-3.5" strokeWidth={2} />
+                  暖身
+                </p>
                 {todayPlan.workout.warmup.map(ex => (
                   <p key={ex.exercise_id} className="text-xs text-gray-600">
                     {ex.exercise_name_zh} · {ex.sets}組 {ex.duration_secs ? `${ex.duration_secs}秒` : `${ex.reps}次`}

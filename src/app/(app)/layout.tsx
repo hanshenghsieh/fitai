@@ -17,7 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!profile?.onboarding_completed) redirect('/onboarding')
 
   return (
-    <div className="min-h-screen min-h-[100dvh] pb-24 overscroll-none" style={{ backgroundColor: TODAY.bg }}>
+    <div className="min-h-screen min-h-[100dvh] pb-[92px] overscroll-none" style={{ backgroundColor: TODAY.bg }}>
       {children}
       <BottomNav />
     </div>

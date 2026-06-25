@@ -66,6 +66,8 @@ export interface MealSuggestion {
   walk_minutes?: number
   maps_url?: string
   nutrition_score: number
+  /** Dev only — why this suggestion passed validation */
+  recommendation_debug_reason?: string
 }
 
 export interface SuggestContext {

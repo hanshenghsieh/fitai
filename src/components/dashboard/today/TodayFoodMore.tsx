@@ -7,12 +7,14 @@ import { primaryFoodLabel } from '@/lib/food-photography'
 import type { FoodSlot } from '@/lib/food-slots'
 import { isNativeIOS } from '@/lib/capacitor-native'
 
+import { BB_V2 } from '@/lib/betterbit-v2'
+
 const DS = {
-  text: '#2F241D',
-  textSecondary: '#8E8378',
-  sheet: '#FDFCFA',
-  mocha: '#8B7355',
-  cardShadow: '0 12px 40px rgba(0, 0, 0, 0.05)',
+  text: BB_V2.text.primary,
+  textSecondary: BB_V2.text.secondary,
+  sheet: BB_V2.bg.card,
+  mocha: BB_V2.accent.orange,
+  cardShadow: BB_V2.shadow.card,
 } as const
 
 const ICON_STROKE = 1.8

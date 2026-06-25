@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ClipboardList, Loader2, RefreshCw, Camera, Trash2 } from 'lucide-react'
+import { ClipboardList, Loader2, RefreshCw, Camera } from 'lucide-react'
 import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu } from '@/lib/food-search'
 import { estimateFreeTextMeal } from '@/lib/food-estimate'
@@ -38,16 +38,14 @@ import {
   type FoodDna,
 } from '@/lib/food-memory'
 import {
-  FOOD_SLOTS,
   defaultFoodSlot,
-  slotLabel,
   mealHoursFromLogs,
   logMatchesFoodSlot,
   normalizeFoodLogSlot,
   customEatOutMealTypeForSlot,
   type FoodSlot,
 } from '@/lib/food-slots'
-import { getTaipeiHour, nutritionDayResetLabel, getNutritionDayKey } from '@/lib/timezone'
+import { getTaipeiHour, getNutritionDayKey } from '@/lib/timezone'
 import {
   rollMealSuggestion,
   suggestionToSelections,
@@ -74,10 +72,10 @@ import {
 } from '@/lib/checkin-utils'
 import { useGeolocation } from '@/lib/use-geolocation'
 import type { DayPlan, UserProfile } from '@/types'
-import FoodPhotoThumb from '@/components/dashboard/today/FoodPhotoThumb'
 import { mealMacroSplit } from '@/lib/goal-calculator'
 import { currentMealSlotForSchedule, type WorkSchedule } from '@/lib/human-mode'
 import { TODAY } from '@/lib/today-design'
+import BBCard from '@/components/ui/BBCard'
 import { toast } from 'sonner'
 import { isNearDailyTarget, nearTargetRollMessage } from '@/lib/light-snack-suggest'
 
@@ -196,6 +194,7 @@ interface Props {
     userMemory: UserMemoryMeta
     logEntry: FoodLogEntry
   }) => void
+  registerDeleteLog?: (handler: (logId: string) => void) => void
 }
 
 function buildAdherenceContext(
@@ -239,120 +238,6 @@ function buildAdherenceContext(
   return { adherence, banks, line }
 }
 
-function CapturedLogRow({
-  log,
-  onNameSubmit,
-  onDelete,
-}: {
-  log: FoodLogEntry
-  onNameSubmit: (name: string) => void
-  onDelete?: () => void
-}) {
-  const [nameDraft, setNameDraft] = useState('')
-
-  return (
-    <div className="flex gap-4 w-full">
-      {log.photo_data_url && (
-        <FoodPhotoThumb photo_url={log.photo_data_url} userUploadedPhoto={log.photo_data_url} size={80} radius={20} />
-      )}
-      <div className="flex-1 min-w-0 space-y-1.5">
-        <div className="flex items-start justify-between gap-2">
-          <p className="text-[17px] leading-snug flex-1 min-w-0" style={{ color: TODAY.text, fontWeight: 500 }}>
-            {log.name}
-          </p>
-          {onDelete && (
-            <button
-              type="button"
-              onClick={onDelete}
-              className="p-1.5 -mr-1 shrink-0 rounded-full active:opacity-70"
-              aria-label="移除紀錄"
-            >
-              <Trash2 className="h-4 w-4" strokeWidth={TODAY.iconStroke} style={{ color: TODAY.textSecondary }} />
-            </button>
-          )}
-        </div>
-
-        {log.learning && (
-          <p className="text-[14px] flex items-center gap-1.5" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            <Loader2 className="h-3 w-3 animate-spin shrink-0" strokeWidth={TODAY.iconStroke} />
-            正在學習中…
-          </p>
-        )}
-
-        {!log.learning && log.needs_name && (
-          <div className="mt-2 space-y-2">
-            <p className="text-[13px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-              沒辨識出來？它其實是：
-            </p>
-            <input
-              type="text"
-              value={nameDraft}
-              onChange={e => setNameDraft(e.target.value)}
-              placeholder="例如：阿城雞腿便當"
-              className="w-full px-0 py-2 text-[15px] border-b outline-none bg-transparent"
-              style={{ color: TODAY.text, fontWeight: 400, borderColor: 'rgba(142, 131, 120, 0.2)' }}
-            />
-            <button
-              type="button"
-              disabled={!nameDraft.trim()}
-              onClick={() => onNameSubmit(nameDraft.trim())}
-              className="text-[13px] px-4 py-1.5 rounded-full disabled:opacity-40"
-              style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
-            >
-              完成
-            </button>
-          </div>
-        )}
-
-        {!log.learning && !log.needs_name && log.calories > 0 && (
-          <p className="text-[15px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            {log.calories} kcal · 蛋白質 {Math.round(log.protein_g)}g
-          </p>
-        )}
-
-        {!log.learning && !log.needs_name && log.capture_status === 'resolved' && log.source === 'photo' && (
-          <p className="text-[13px]" style={{ color: TODAY.mocha, fontWeight: 500 }}>
-            已加入今天
-          </p>
-        )}
-
-        {log.community_verified && (
-          <p className="text-[13px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            由社群共同建立
-          </p>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function LogTextRow({ log, onDelete }: { log: FoodLogEntry; onDelete?: () => void }) {
-  return (
-    <div className="space-y-1.5 w-full">
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-[17px] leading-snug flex-1 min-w-0" style={{ color: TODAY.text, fontWeight: 500 }}>
-          {log.name}
-        </p>
-        {onDelete && (
-          <button
-            type="button"
-            onClick={onDelete}
-            className="p-1.5 -mr-1 shrink-0 rounded-full active:opacity-70"
-            aria-label="移除紀錄"
-          >
-            <Trash2 className="h-4 w-4" strokeWidth={TODAY.iconStroke} style={{ color: TODAY.textSecondary }} />
-          </button>
-        )}
-      </div>
-      {log.calories > 0 && (
-        <p className="text-[15px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-          {log.calories} kcal · 蛋白質 {Math.round(log.protein_g)}g
-        </p>
-      )}
-    </div>
-  )
-}
-
 export default function TodayOS({
   todayPlan,
   profile,
@@ -373,14 +258,16 @@ export default function TodayOS({
   onClearMealSelection,
   onPostureLine,
   onDiceApply,
+  registerDeleteLog,
 }: Props) {
   const coords = useGeolocation(userMemory.eat_out_prefs?.work_location)
   const memory = memoryFromCheckinMeta({ user_memory: userMemory })
 
   const foodLogs = userMemory.food_logs_today ?? []
 
-  const [activeSlot, setActiveSlot] = useState<FoodSlot>(() =>
-    defaultFoodSlot(getTaipeiHour(), mealHoursFromLogs(recentFoodLogs))
+  const activeSlot = useMemo<FoodSlot>(
+    () => defaultFoodSlot(getTaipeiHour(), mealHoursFromLogs(recentFoodLogs)),
+    [recentFoodLogs]
   )
   const mealSlotLegacy = useMemo(
     () => mealTypeForFoodSlot(activeSlot, userMemory.work_schedule ?? 'standard'),
@@ -439,7 +326,6 @@ export default function TodayOS({
 
   const [rolling, setRolling] = useState(false)
   const [confirming, setConfirming] = useState(false)
-  const [repeating, setRepeating] = useState(false)
   const rollingRef = useRef(false)
   const confirmingRef = useRef(false)
   const loggingRef = useRef(false)
@@ -471,29 +357,12 @@ export default function TodayOS({
     [foodLogs, activeSlot]
   )
 
-  const slotLogTotals = useMemo(
-    () => slotLogs.reduce((acc, { log }) => ({ kcal: acc.kcal + log.calories, protein: acc.protein + log.protein_g }), { kcal: 0, protein: 0 }),
-    [slotLogs]
-  )
-
   const lastSlotLog = slotLogs.length > 0 ? slotLogs[slotLogs.length - 1]!.log : null
 
   const slotLoggedItems = useMemo(
     () => (lastSlotLog ? logToDisplayItems(lastSlotLog) : []),
     [lastSlotLog]
   )
-
-  const slotContentFlags = useMemo(() => {
-    const flags: Partial<Record<FoodSlot, boolean>> = {}
-    for (const s of FOOD_SLOTS) {
-      if (s.id === 'other') continue
-      const customMealType = customEatOutMealTypeForSlot(s.id)
-      flags[s.id] =
-        foodLogs.some(l => logMatchesFoodSlot(l, s.id)) ||
-        (customMealType != null && (customEatOut[customMealType]?.length ?? 0) > 0)
-    }
-    return flags
-  }, [customEatOut, foodLogs])
 
   const slotSelectedItems = useMemo(() => {
     const customMealType = customEatOutMealTypeForSlot(activeSlot)
@@ -681,6 +550,10 @@ export default function TodayOS({
     setDeleteConfirmId(logId)
   }, [])
 
+  useEffect(() => {
+    registerDeleteLog?.(requestDeleteLog)
+  }, [registerDeleteLog, requestDeleteLog])
+
   const confirmDeleteLog = useCallback(() => {
     if (!deleteConfirmId) return
     removeLogById(deleteConfirmId)
@@ -859,38 +732,6 @@ export default function TodayOS({
     closePhotoSheet()
   }, [photoDraft, photoSaving, commitLog, closePhotoSheet])
 
-  const handleCaptureName = useCallback(
-    (logId: string, name: string) => {
-      const trimmed = name.trim()
-      if (!trimmed) return
-      const dna = userMemory.food_dna ?? foodDna
-      const verified = lookupVerifiedFood(trimmed, dna)
-      if (verified) {
-        patchLog(logId, {
-          name: verified.name,
-          store: verified.store,
-          calories: verified.calories,
-          protein_g: verified.protein_g,
-          carbs_g: verified.carbs_g,
-          fat_g: verified.fat_g,
-          needs_name: false,
-          community_verified: true,
-          capture_status: 'resolved',
-        })
-        return
-      }
-      const est = estimateFreeTextMeal(trimmed, mealTargets.calories, mealTargets.protein)
-      patchLog(logId, {
-        name: est.name,
-        calories: est.calories,
-        protein_g: est.protein_g,
-        needs_name: false,
-        capture_status: 'resolved',
-      })
-    },
-    [patchLog, userMemory.food_dna, foodDna, mealTargets.calories, mealTargets.protein]
-  )
-
   const rollDice = useCallback(() => {
     if (!dayStateRef.current.allowDiceAndSuggest || rollingRef.current) return
     if (customEatOut[mealSlotLegacy]?.length) {
@@ -1066,15 +907,6 @@ export default function TodayOS({
     }
   }, [dayState.overTargetProtection])
 
-  const formatLogTime = (loggedAt: string) => {
-    try {
-      const d = new Date(loggedAt)
-      return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
-    } catch {
-      return ''
-    }
-  }
-
   const openMore = useCallback(() => setMoreOpen(true), [])
   const closeMore = useCallback(() => setMoreOpen(false), [])
   const openPhoto = useCallback(() => setPhotoOpen(true), [])
@@ -1119,69 +951,27 @@ export default function TodayOS({
     },
     [frequentList, selectedFrequentId, activeSlot, commitLog]
   )
-  const repeatLastLog = useCallback(() => {
-    if (!lastSlotLog || repeating) return
-    setRepeating(true)
-    commitLog({
-      id: `repeat-${Date.now()}`,
-      name: lastSlotLog.name,
-      store: lastSlotLog.store,
-      calories: lastSlotLog.calories,
-      protein_g: lastSlotLog.protein_g,
-      carbs_g: lastSlotLog.carbs_g,
-      fat_g: lastSlotLog.fat_g,
-      confidence: lastSlotLog.confidence,
-      slot: activeSlot,
-      source: 'frequent',
-    })
-    queueMicrotask(() => setRepeating(false))
-  }, [lastSlotLog, repeating, commitLog, activeSlot])
 
   useEffect(() => {
     void preloadDiceMenuBulk()
   }, [])
 
-  return (
-    <div className="px-5 pb-6 space-y-8 max-w-[640px] mx-auto" style={{ fontFamily: TODAY.font }}>
-      <div
-        className="p-6 space-y-5"
-        style={{
-          backgroundColor: TODAY.card,
-          borderRadius: TODAY.radiusCard,
-          boxShadow: TODAY.cardShadow,
-        }}
-      >
-        <div className="flex gap-2 overflow-x-auto pb-0.5 -mx-1 px-1">
-          {FOOD_SLOTS.filter(s => s.id !== 'other').map(s => {
-            const active = activeSlot === s.id
-            const hasContent = slotContentFlags[s.id]
-            return (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setActiveSlot(s.id)}
-                className="flex-shrink-0 px-4 py-2 rounded-full text-[13px] flex items-center gap-1.5"
-                style={{
-                  backgroundColor: active ? TODAY.pillActiveBg : TODAY.pillBg,
-                  color: active ? TODAY.pillActiveText : TODAY.text,
-                  fontWeight: active ? 500 : 400,
-                }}
-              >
-                {s.label}
-                {hasContent && (
-                  <span
-                    className="w-1.5 h-1.5 rounded-full shrink-0"
-                    style={{
-                      backgroundColor: active ? TODAY.pillActiveText : TODAY.mocha,
-                      opacity: active ? 0.85 : 0.55,
-                    }}
-                  />
-                )}
-              </button>
-            )
-          })}
-        </div>
+  useEffect(() => {
+    const openPhoto = () => setPhotoOpen(true)
+    window.addEventListener('betterbit:open-photo', openPhoto)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('photo') === '1') {
+        setPhotoOpen(true)
+        window.history.replaceState({}, '', '/dashboard')
+      }
+    }
+    return () => window.removeEventListener('betterbit:open-photo', openPhoto)
+  }, [])
 
+  return (
+    <div className="pb-2 space-y-8 max-w-[640px] mx-auto" style={{ fontFamily: TODAY.font }}>
+      <BBCard className="space-y-5">
         {rolling && !dicePreview && displayItems.length === 0 ? (
           <div className="py-14 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             想一下…
@@ -1201,6 +991,7 @@ export default function TodayOS({
               prefersCook={profile?.cooking_time_mins != null && profile.cooking_time_mins >= 20}
               highlightKey={highlightKey}
               highlightPriceMeta={dicePreview?.highlight_price_meta}
+              debugReason={dicePreview?.recommendation_debug_reason}
             />
             {showingConfirmedSelection && slotMealSuggest?.current_highlight && (
               <p className="text-[13px] px-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
@@ -1210,7 +1001,7 @@ export default function TodayOS({
           </>
         ) : (
           <div className="py-10 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            點下方換一個，或從更多記錄
+            點下方換一個，或從文字紀錄
           </div>
         )}
 
@@ -1245,7 +1036,7 @@ export default function TodayOS({
               style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
             >
               <ClipboardList className="h-[16px] w-[16px]" strokeWidth={TODAY.iconStroke} />
-              更多記錄
+              文字紀錄
             </button>
           </div>
 
@@ -1259,65 +1050,7 @@ export default function TodayOS({
             拍今天吃的
           </button>
         </div>
-      </div>
-
-      <div className="space-y-4">
-        {slotLogs.length > 0 ? (
-          <>
-            <div className="flex items-baseline justify-between gap-3 px-0.5">
-              <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 500 }}>
-                {slotLabel(activeSlot)}已記錄
-                {slotLogTotals.kcal > 0 && (
-                  <span style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-                    {' '}· {slotLogTotals.kcal} kcal
-                  </span>
-                )}
-              </p>
-              {lastSlotLog?.logged_at && (
-                <p className="text-[11px] shrink-0" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-                  {formatLogTime(lastSlotLog.logged_at)}
-                </p>
-              )}
-            </div>
-
-            {lastSlotLog && (
-              <button
-                type="button"
-                disabled={repeating}
-                onClick={repeatLastLog}
-                className="h-11 px-5 rounded-full text-[13px] disabled:opacity-40"
-                style={{ backgroundColor: TODAY.pillBg, color: TODAY.mocha, fontWeight: 500 }}
-              >
-                再記一次…
-              </button>
-            )}
-
-            <ul className="space-y-7 pt-2">
-              {slotLogs.map(({ log, index }) => (
-                <li key={`${log.id}-${index}`} className="px-0.5">
-                  {log.source === 'photo' || log.photo_data_url ? (
-                    <CapturedLogRow
-                      log={log}
-                      onNameSubmit={name => handleCaptureName(log.id, name)}
-                      onDelete={() => requestDeleteLog(log.id)}
-                    />
-                  ) : (
-                    <LogTextRow log={log} onDelete={() => requestDeleteLog(log.id)} />
-                  )}
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <p className="text-[13px] text-center py-6" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            這餐還沒記錄
-          </p>
-        )}
-
-        <p className="text-center text-[11px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-          {nutritionDayResetLabel()}
-        </p>
-      </div>
+      </BBCard>
 
       <TodayFoodMore
         open={moreOpen}

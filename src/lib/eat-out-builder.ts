@@ -11,9 +11,22 @@ export interface PortionOption {
 
 export const PORTION_OPTIONS: PortionOption[] = [
   { id: 'full', label: '全份', multiplier: 1 },
-  { id: 'three_quarter', label: '七成五', multiplier: 0.75 },
-  { id: 'half', label: '半份', multiplier: 0.5 },
+  { id: 'three_quarter', label: '吃 75%', multiplier: 0.75 },
+  { id: 'half', label: '吃一半', multiplier: 0.5 },
 ]
+
+type PortionFoodKind = 'rice' | 'noodle' | 'general'
+
+function getPortionFoodKind(item: ConvenienceItem): PortionFoodKind {
+  const tags = item.tags ?? []
+  if (tags.includes('rice') || tags.includes('starch') || /飯|便當|燴飯|炒飯|拌飯|丼/.test(item.name)) {
+    return 'rice'
+  }
+  if (tags.includes('noodle') || /麵|拉麵|河粉|米粉|烏龍/.test(item.name)) {
+    return 'noodle'
+  }
+  return 'general'
+}
 
 export interface SelectedEatOutItem {
   item: ConvenienceItem
@@ -139,13 +152,27 @@ export function portionMultiplier(portion: PortionId): number {
   return PORTION_OPTIONS.find(p => p.id === portion)?.multiplier ?? 1
 }
 
-export function portionLabel(portion: PortionId): string {
+export function portionLabel(portion: PortionId, item?: ConvenienceItem): string {
+  if (portion === 'full') return '全份'
+
+  const kind = item ? getPortionFoodKind(item) : 'general'
+  if (portion === 'half') {
+    if (kind === 'rice') return '飯吃一半'
+    if (kind === 'noodle') return '麵吃一半'
+    return '吃一半'
+  }
+  if (portion === 'three_quarter') {
+    if (kind === 'rice') return '飯吃 75%'
+    if (kind === 'noodle') return '麵吃 75%'
+    return '吃 75%'
+  }
+
   return PORTION_OPTIONS.find(p => p.id === portion)?.label ?? '全份'
 }
 
 export function applyPortion(item: ConvenienceItem, portion: PortionId): ConvenienceItem & { displayName: string } {
   const m = portionMultiplier(portion)
-  const label = portionLabel(portion)
+  const label = portionLabel(portion, item)
   const suffix = m === 1 ? '' : `（${label}）`
   return {
     ...item,
@@ -242,7 +269,7 @@ export function validateEatOutCombo(
         const half = applyPortion(s.item, 'half')
         const saved = totals.calories - half.calories
         if (saved > 30) {
-          tips.push(`${s.item.name} 改半份約可少 ${Math.round(s.item.calories * 0.5)} kcal`)
+          tips.push(`${s.item.name} ${portionLabel('half', s.item)}約可少 ${Math.round(s.item.calories * 0.5)} kcal`)
         }
       }
     }

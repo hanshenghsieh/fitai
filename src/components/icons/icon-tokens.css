@@ -1,0 +1,28 @@
+.bb-icon {
+  color: var(--bb-icon-color);
+  flex-shrink: 0;
+}
+
+.bb-icon--accent {
+  color: var(--bb-icon-color-accent);
+}
+
+.bb-icon--success {
+  color: var(--bb-icon-color-success);
+}
+
+.bb-icon--warning {
+  color: var(--bb-icon-color-warning);
+}
+
+.bb-icon--danger {
+  color: var(--bb-icon-color-danger);
+}
+
+.bb-icon--muted {
+  color: var(--bb-icon-color-muted);
+}
+
+.bb-icon--water {
+  color: var(--bb-icon-color-water);
+}

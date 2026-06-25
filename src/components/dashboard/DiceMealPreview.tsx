@@ -18,6 +18,7 @@ interface Props {
   prefersCook?: boolean
   highlightKey?: HighlightKey
   highlightPriceMeta?: MealSuggestion['highlight_price_meta']
+  debugReason?: string
 }
 
 export default function DiceMealPreview({
@@ -28,6 +29,7 @@ export default function DiceMealPreview({
   prefersCook,
   highlightKey = 'balanced',
   highlightPriceMeta,
+  debugReason,
 }: Props) {
   const [trustOpen, setTrustOpen] = useState(false)
   if (!items.length) return null
@@ -93,6 +95,15 @@ export default function DiceMealPreview({
             {trust.body}
           </p>
         </div>
+      )}
+
+      {process.env.NODE_ENV === 'development' && debugReason && (
+        <pre
+          className="text-[11px] leading-relaxed whitespace-pre-wrap px-0.5 pt-2"
+          style={{ color: TODAY.textSecondary, fontWeight: 400 }}
+        >
+          {debugReason}
+        </pre>
       )}
     </div>
   )

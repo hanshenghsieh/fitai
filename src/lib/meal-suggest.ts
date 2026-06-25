@@ -7,6 +7,11 @@ import { recoveryFoodScoreAdjust, isRecoveryActive } from './engines/calorie-ban
 import { scoreMealCandidate } from './engines/next-meal-engine'
 import { suggestLightSnack } from './light-snack-suggest'
 import { isValidMealLines } from './meal-combo-validity'
+import {
+  attachRecommendationDebugReason,
+  filterValidSuggestions,
+  validateMealLines,
+} from './nutrition/recommendation-validator'
 import { nearestPlaceForBrand } from './nearby-engine'
 import type { ConvenienceItem } from './convenience-store-menu'
 import type { MealLine, MealSuggestion, SuggestContext, HighlightKey } from './meal-engine-types'
@@ -446,6 +451,7 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
   ) => {
     if (!lines.length || friedCount(lines.map(l => l.item)) > 1) return
     if (!isValidMealLines(lines)) return
+    if (!validateMealLines(lines, ctx).valid) return
     if (isExcludedByName(lines, [...excludeNames])) return
     const id = suggestionId(lines)
     if (seen.has(id) || exclude.has(id)) return
@@ -665,6 +671,7 @@ function filterCandidatesForRoll(pool: MealSuggestion[], ctx: SuggestContext): M
     if (excludeIds.has(c.id)) return false
     if (isExcludedByName(c.lines, excludeNames)) return false
     if (reroll > 0 && c.stores[0] && excludeStores.has(c.stores[0])) return false
+    if (!validateMealLines(c.lines, ctx).valid) return false
     return true
   })
 }
@@ -674,6 +681,7 @@ function finalizeSuggestionPick(
   candidates: MealSuggestion[],
   prev?: MealSuggestion | null
 ): { suggestion: MealSuggestion | null; pool_exhausted: boolean } {
+  candidates = filterValidSuggestions(candidates, ctx)
   if (!candidates.length) return { suggestion: null, pool_exhausted: true }
 
   const reroll = ctx.rolls_used ?? 0
@@ -800,8 +808,17 @@ function finalizeSuggestionPick(
         ctx
       )
 
+  if (!validateMealLines(enriched.lines, ctx).valid) {
+    return { suggestion: null, pool_exhausted: true }
+  }
+
+  const suggestion =
+    process.env.NODE_ENV === 'development'
+      ? attachRecommendationDebugReason(enriched, ctx)
+      : enriched
+
   return {
-    suggestion: enriched,
+    suggestion,
     pool_exhausted: candidates.length <= (ctx.exclude_ids?.length ?? 0) + 1,
   }
 }

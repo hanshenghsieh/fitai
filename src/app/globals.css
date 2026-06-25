@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "../styles/micro-interactions.css";
+@import "../components/icons/icon-tokens.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -82,6 +83,29 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  /* BetterBit icon system */
+  --bb-text-primary: #1c1c1e;
+  --bb-text-secondary: #6e6e73;
+  --bb-accent-orange: #d89a52;
+  --bb-accent-green: #76b69a;
+  --bb-icon-size: 24px;
+  --bb-icon-stroke: 2;
+  --bb-icon-color: var(--bb-text-secondary);
+  --bb-icon-color-accent: var(--bb-accent-orange);
+  --bb-icon-color-success: var(--bb-accent-green);
+  --bb-icon-color-warning: #e8a24e;
+  --bb-icon-color-danger: #e97855;
+  --bb-icon-color-muted: var(--bb-text-secondary);
+  --bb-icon-color-water: #6b9fd4;
+  --bb-text-success: var(--bb-accent-green);
+  --bb-text-warning: #e8a24e;
+  --bb-text-danger: #e97855;
+  --bb-text-accent: var(--bb-accent-orange);
+  --bb-surface-today: rgba(216, 154, 82, 0.14);
+  --bb-surface-success: rgba(118, 182, 154, 0.14);
+  --bb-surface-warning: rgba(232, 162, 78, 0.16);
+  --bb-surface-danger: rgba(233, 120, 85, 0.14);
+  --bb-surface-neutral: rgba(0, 0, 0, 0.03);
 }
 
 .dark {
