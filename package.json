@@ -32,6 +32,7 @@
     "cap:sync": "npx cap sync ios",
     "cap:open:ios": "npx cap open ios",
     "cap:ios": "npx cap sync ios && npx cap open ios",
+    "testflight:prep": "node scripts/testflight-prep.mjs",
     "testflight:3a-prep": "node scripts/testflight-build-3a-prep.mjs"
   },
   "dependencies": {
