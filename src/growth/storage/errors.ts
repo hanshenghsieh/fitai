@@ -1,9 +1,11 @@
 export function isGrowthTableMissingError(message: string): boolean {
   return (
-    message.includes('growth_posts') &&
-    (message.includes('schema cache') ||
-      message.includes('PGRST205') ||
-      message.includes('does not exist'))
+    (message.includes('growth_posts') &&
+      (message.includes('schema cache') ||
+        message.includes('PGRST205') ||
+        message.includes('does not exist'))) ||
+    message.includes('posted_at') ||
+    message.includes('is_demo')
   )
 }
 

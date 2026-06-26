@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Plus, RefreshCw, Database } from 'lucide-react'
+import { Plus, RefreshCw, Database, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { GrowthStatsBar } from '@/growth/components/GrowthStatsBar'
 import { GrowthPostCard } from '@/growth/components/GrowthPostCard'
@@ -18,12 +18,31 @@ const EMPTY_STATS: GrowthDashboardStats = {
   pending: 0,
 }
 
+function PostSection({ title, posts, onUpdate }: {
+  title: string
+  posts: GrowthPost[]
+  onUpdate: (post: GrowthPost) => void
+}) {
+  if (!posts.length) return null
+  return (
+    <section className="space-y-3">
+      <h2 className="text-sm font-medium text-muted-foreground">{title}</h2>
+      <div className="space-y-4">
+        {posts.map(post => (
+          <GrowthPostCard key={post.id} post={post} onUpdate={onUpdate} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export function GrowthDashboard() {
   const router = useRouter()
   const [posts, setPosts] = useState<GrowthPost[]>([])
   const [stats, setStats] = useState<GrowthDashboardStats>(EMPTY_STATS)
   const [loading, setLoading] = useState(true)
   const [seeding, setSeeding] = useState(false)
+  const [clearing, setClearing] = useState(false)
   const [setupError, setSetupError] = useState<{
     setup?: string
     sqlEditorUrl?: string
@@ -70,10 +89,28 @@ export function GrowthDashboard() {
     }
   }
 
+  async function clearDemo() {
+    setClearing(true)
+    try {
+      const res = await fetch('/api/growth/demo', { method: 'DELETE' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? '清除失敗')
+      toast.success(data.message)
+      await load()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '清除失敗')
+    } finally {
+      setClearing(false)
+    }
+  }
+
   function handleUpdate(updated: GrowthPost) {
     setPosts(prev => prev.map(p => (p.id === updated.id ? updated : p)))
     load()
   }
+
+  const worthPosts = posts.filter(p => p.status === 'worth_reply')
+  const otherPosts = posts.filter(p => p.status !== 'worth_reply')
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
@@ -89,7 +126,10 @@ export function GrowthDashboard() {
             <RefreshCw className="size-3.5" /> 重新整理
           </Button>
           <Button variant="outline" size="sm" onClick={seedMock} disabled={seeding}>
-            <Database className="size-3.5" /> 匯入測試資料
+            <Database className="size-3.5" /> 匯入示範資料
+          </Button>
+          <Button variant="outline" size="sm" onClick={clearDemo} disabled={clearing}>
+            <Trash2 className="size-3.5" /> 清除示範
           </Button>
           <Button size="sm" onClick={() => router.push('/growth/new')}>
             <Plus className="size-3.5" /> 新增貼文
@@ -112,18 +152,20 @@ export function GrowthDashboard() {
       ) : posts.length === 0 ? (
         <div className="rounded-xl border border-dashed p-8 text-center">
           <p className="text-muted-foreground">尚無貼文</p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            示範資料僅供測試流程，不含假連結。真實文章請用「新增貼文」。
+          </p>
           <div className="mt-4 flex justify-center gap-2">
-            <Button size="sm" onClick={() => router.push('/growth/new')}>新增第一篇</Button>
+            <Button size="sm" onClick={() => router.push('/growth/new')}>新增真實貼文</Button>
             <Button size="sm" variant="outline" onClick={seedMock} disabled={seeding}>
-              匯入 20 篇測試資料
+              匯入示範資料
             </Button>
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
-          {posts.map(post => (
-            <GrowthPostCard key={post.id} post={post} onUpdate={handleUpdate} />
-          ))}
+        <div className="space-y-8">
+          <PostSection title={`值得留言（${worthPosts.length}）`} posts={worthPosts} onUpdate={handleUpdate} />
+          <PostSection title="其他" posts={otherPosts} onUpdate={handleUpdate} />
         </div>
       )}
     </div>
