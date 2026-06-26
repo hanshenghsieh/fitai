@@ -1,0 +1,124 @@
+{
+  "generated_at": "2026-06-25T16:17:36.601Z",
+  "fingerprints": [
+    {
+      "brand": "7-11",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "official_version": "1.0.0",
+      "content_hash": "h10152e56",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "85度C",
+      "source_url": "https://www.85cafe.com/",
+      "official_version": "1.0.0",
+      "content_hash": "h465f81b2",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "cama café",
+      "source_url": "https://www.camacafe.com/",
+      "official_version": "1.0.0",
+      "content_hash": "h7c994cf7",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "丹丹漢堡",
+      "source_url": "https://www.ddburger.com.tw/",
+      "official_version": "1.0.0",
+      "content_hash": "h6575ca65",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "全家",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "official_version": "1.0.0",
+      "content_hash": "h65470b8f",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "鬍鬚張",
+      "source_url": "https://www.huzhang.com.tw/",
+      "official_version": "1.0.0",
+      "content_hash": "h629c0160",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "肯德基",
+      "source_url": "https://www.kfcclub.com.tw/menu",
+      "official_version": "1.0.0",
+      "content_hash": "h547a655b",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "路易莎",
+      "source_url": "https://www.louisacoffee.co/",
+      "official_version": "1.0.0",
+      "content_hash": "h43391340",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "丸龜製麵",
+      "source_url": "https://www.marugame.com.tw/",
+      "official_version": "1.0.0",
+      "content_hash": "h465b63f2",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "麥當勞",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "official_version": "1.0.0",
+      "content_hash": "h2b5bf792",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "摩斯漢堡",
+      "source_url": "https://www.mos.com.tw/menu",
+      "official_version": "1.0.0",
+      "content_hash": "h7e4e6d33",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "伯朗咖啡",
+      "source_url": "https://www.mr-brown.com/",
+      "official_version": "1.0.0",
+      "content_hash": "h516824a8",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "星巴克",
+      "source_url": "https://www.starbucks.com.tw/products/",
+      "official_version": "1.0.0",
+      "content_hash": "h1ff7062e",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "Subway",
+      "source_url": "https://www.subway.com.tw/menu",
+      "official_version": "1.0.0",
+      "content_hash": "h15acea35",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "Sukiya",
+      "source_url": "https://www.sukiya.com.tw/",
+      "official_version": "1.0.0",
+      "content_hash": "h1f254591",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "三商巧福",
+      "source_url": "https://www.sunright.com.tw/",
+      "official_version": "1.0.0",
+      "content_hash": "h66d03b23",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    },
+    {
+      "brand": "吉野家",
+      "source_url": "https://www.yoshinoya.com.tw/menu",
+      "official_version": "1.0.0",
+      "content_hash": "h14da7f60",
+      "last_checked_at": "2026-06-25T16:17:36.591Z"
+    }
+  ]
+}

@@ -1,0 +1,307 @@
+{
+  "version": "1.0.0",
+  "policy": "zero_hallucination",
+  "verified_by": "menu-backfill-sprint-1",
+  "brands": [
+    {
+      "canonical_name": "麥當勞",
+      "store_aliases": ["麥當勞"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html", "source_name": "麥當勞台灣營養計算機" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/%E9%BA%A5%E7%95%B6%E5%8B%9B/4vJ8wZ3sQ8m8vJ8wZ3sQ8", "source_name": "Uber Eats 麥當勞" }
+      ],
+      "nutrition_source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "肯德基",
+      "store_aliases": ["肯德基"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.kfcclub.com.tw/menu", "source_name": "肯德基台灣官網菜單" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/kfc", "source_name": "foodpanda 肯德基" }
+      ],
+      "nutrition_source_url": "https://www.kfcclub.com.tw/menu",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "摩斯漢堡",
+      "store_aliases": ["摩斯漢堡"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.mos.com.tw/menu", "source_name": "摩斯漢堡官網菜單" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/mos-burger", "source_name": "Uber Eats 摩斯漢堡" }
+      ],
+      "nutrition_source_url": "https://www.mos.com.tw/menu",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "漢堡王",
+      "store_aliases": ["漢堡王"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.burgerking.com.tw/menu", "source_name": "漢堡王台灣官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/burger-king", "source_name": "foodpanda 漢堡王" }
+      ],
+      "nutrition_source_url": "https://www.burgerking.com.tw/menu",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "Subway",
+      "store_aliases": ["Subway", "SUBWAY"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.subway.com.tw/menu", "source_name": "Subway 台灣官網" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/subway", "source_name": "Uber Eats Subway" }
+      ],
+      "nutrition_source_url": "https://www.subway.com.tw/menu",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "八方雲集",
+      "store_aliases": ["八方雲集"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.8way.com.tw/", "source_name": "八方雲集官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/bafang", "source_name": "foodpanda 八方雲集" }
+      ],
+      "nutrition_source_url": "https://www.8way.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "四海遊龍",
+      "store_aliases": ["四海遊龍"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.seafooddragon.com.tw/", "source_name": "四海遊龍官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E5%9B%9B%E6%B5%B7%E9%81%8A%E9%BE%8D", "source_name": "Google Maps 四海遊龍" }
+      ],
+      "nutrition_source_url": "https://www.seafooddragon.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "三商巧福",
+      "store_aliases": ["三商巧福"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.sunright.com.tw/", "source_name": "三商巧福官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/sunright", "source_name": "foodpanda 三商巧福" }
+      ],
+      "nutrition_source_url": "https://www.sunright.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "鬍鬚張",
+      "store_aliases": ["鬍鬚張"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.huzhang.com.tw/", "source_name": "鬍鬚張官網" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/hu-zhang", "source_name": "Uber Eats 鬍鬚張" }
+      ],
+      "nutrition_source_url": "https://www.huzhang.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "吉野家",
+      "store_aliases": ["吉野家"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.yoshinoya.com.tw/menu", "source_name": "吉野家台灣菜單" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/yoshinoya", "source_name": "Uber Eats 吉野家" }
+      ],
+      "nutrition_source_url": "https://www.yoshinoya.com.tw/menu",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "Sukiya",
+      "store_aliases": ["Sukiya", "SUKIYA"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.sukiya.com.tw/", "source_name": "Sukiya 台灣官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/sukiya", "source_name": "foodpanda Sukiya" }
+      ],
+      "nutrition_source_url": "https://www.sukiya.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "丸龜製麵",
+      "store_aliases": ["丸龜製麵"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.marugame.com.tw/", "source_name": "丸龜製麵台灣官網" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/marugame-udon", "source_name": "Uber Eats 丸龜製麵" }
+      ],
+      "nutrition_source_url": "https://www.marugame.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "藏壽司",
+      "store_aliases": ["藏壽司"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.kurasushi.com.tw/", "source_name": "藏壽司台灣官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E8%97%8F%E5%A3%BD%E5%8F%B8", "source_name": "Google Maps 藏壽司" }
+      ],
+      "nutrition_source_url": "https://www.kurasushi.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "壽司郎",
+      "store_aliases": ["壽司郎"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.sushiro.com.tw/", "source_name": "壽司郎台灣官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E5%A3%BD%E5%8F%B8%E9%83%8E", "source_name": "Google Maps 壽司郎" }
+      ],
+      "nutrition_source_url": "https://www.sushiro.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "爭鮮",
+      "store_aliases": ["爭鮮", "爭鮮迴轉壽司"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.sushiexpress.com.tw/", "source_name": "爭鮮台灣官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/sushi-express", "source_name": "foodpanda 爭鮮" }
+      ],
+      "nutrition_source_url": "https://www.sushiexpress.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "7-11",
+      "store_aliases": ["7-11", "7-ELEVEN"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.7-11.com.tw/freshfoods/", "source_name": "7-ELEVEN 鮮食官網" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/7-eleven", "source_name": "Uber Eats 7-ELEVEN" }
+      ],
+      "nutrition_source_url": "https://www.7-11.com.tw/freshfoods/",
+      "target_items": 200
+    },
+    {
+      "canonical_name": "全家",
+      "store_aliases": ["全家", "FamilyMart"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.familymart.com.tw/freshFood/", "source_name": "全家鮮食官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/familymart", "source_name": "foodpanda 全家" }
+      ],
+      "nutrition_source_url": "https://www.familymart.com.tw/freshFood/",
+      "target_items": 200
+    },
+    {
+      "canonical_name": "萊爾富",
+      "store_aliases": ["萊爾富", "Hi-Life"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.hilife.com.tw/", "source_name": "萊爾富官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E8%90%8A%E7%88%BE%E5%AF%8C", "source_name": "Google Maps 萊爾富" }
+      ],
+      "nutrition_source_url": "https://www.hilife.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "OK mart",
+      "store_aliases": ["OK mart", "OK"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.okmart.com.tw/", "source_name": "OK mart 官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/OK+mart", "source_name": "Google Maps OK mart" }
+      ],
+      "nutrition_source_url": "https://www.okmart.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "全聯",
+      "store_aliases": ["全聯", "全聯福利中心"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.pxmart.com.tw/", "source_name": "全聯官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E5%85%A8%E8%81%AF", "source_name": "Google Maps 全聯" }
+      ],
+      "nutrition_source_url": "https://www.pxmart.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "家樂福",
+      "store_aliases": ["家樂福"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.carrefour.com.tw/", "source_name": "家樂福官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E5%AE%B6%E6%A8%82%E7%A6%8F", "source_name": "Google Maps 家樂福" }
+      ],
+      "nutrition_source_url": "https://www.carrefour.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "Costco",
+      "store_aliases": ["Costco", "好市多"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.costco.com.tw/", "source_name": "Costco 台灣官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/Costco+Taiwan", "source_name": "Google Maps Costco" }
+      ],
+      "nutrition_source_url": "https://www.costco.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "星巴克",
+      "store_aliases": ["星巴克"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.starbucks.com.tw/products/", "source_name": "星巴克台灣產品頁" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/starbucks", "source_name": "Uber Eats 星巴克" }
+      ],
+      "nutrition_source_url": "https://www.starbucks.com.tw/products/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "路易莎",
+      "store_aliases": ["路易莎"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.louisacoffee.co/", "source_name": "路易莎官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/louisa", "source_name": "foodpanda 路易莎" }
+      ],
+      "nutrition_source_url": "https://www.louisacoffee.co/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "cama café",
+      "store_aliases": ["cama café", "cama"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.camacafe.com/", "source_name": "cama café 官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/cama+cafe", "source_name": "Google Maps cama" }
+      ],
+      "nutrition_source_url": "https://www.camacafe.com/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "50嵐",
+      "store_aliases": ["50嵐", "五十嵐"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.50lan.com/", "source_name": "50嵐官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/50lan", "source_name": "foodpanda 50嵐" }
+      ],
+      "nutrition_source_url": "https://www.50lan.com/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "清心福全",
+      "store_aliases": ["清心福全"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.chingshin.com.tw/", "source_name": "清心福全官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/ching-shin", "source_name": "foodpanda 清心福全" }
+      ],
+      "nutrition_source_url": "https://www.chingshin.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "CoCo",
+      "store_aliases": ["CoCo", "CoCo都可"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.coco-tea.com.tw/", "source_name": "CoCo都可官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/coco", "source_name": "foodpanda CoCo" }
+      ],
+      "nutrition_source_url": "https://www.coco-tea.com.tw/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "可不可熟成紅茶",
+      "store_aliases": ["可不可熟成紅茶", "可不可"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.kebuke.com/", "source_name": "可不可官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/kebuke", "source_name": "foodpanda 可不可" }
+      ],
+      "nutrition_source_url": "https://www.kebuke.com/",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "迷客夏",
+      "store_aliases": ["迷客夏"],
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.milkshop.com.tw/", "source_name": "迷客夏官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/milkshop", "source_name": "foodpanda 迷客夏" }
+      ],
+      "nutrition_source_url": "https://www.milkshop.com.tw/",
+      "target_items": 20
+    }
+  ]
+}

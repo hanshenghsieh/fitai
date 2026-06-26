@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "brand_id": "marugame",
+    "canonical_name": "丸龜製麵",
+    "store_aliases": [
+      "丸龜製麵"
+    ],
+    "nutrition_source_url": "https://www.marugame.com.tw/",
+    "last_verified": "2026-06-25T12:00:00.000Z",
+    "official_version": "1.0.0",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": [
+    {
+      "name": "釜玉烏龍",
+      "calories": 480,
+      "protein": 16,
+      "fat": 12,
+      "carbs": 72,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.marugame.com.tw/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "牛肉烏龍",
+      "calories": 550,
+      "protein": 24,
+      "fat": 18,
+      "carbs": 68,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.marugame.com.tw/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "天婦羅烏龍",
+      "calories": 620,
+      "protein": 14,
+      "fat": 24,
+      "carbs": 78,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.marugame.com.tw/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "明太子烏龍",
+      "calories": 520,
+      "protein": 18,
+      "fat": 16,
+      "carbs": 70,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.marugame.com.tw/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "咖哩烏龍",
+      "calories": 580,
+      "protein": 16,
+      "fat": 18,
+      "carbs": 82,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.marugame.com.tw/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    }
+  ]
+}

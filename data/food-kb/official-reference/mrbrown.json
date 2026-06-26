@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "brand_id": "mrbrown",
+    "canonical_name": "伯朗咖啡",
+    "store_aliases": [
+      "伯朗咖啡",
+      "伯朗"
+    ],
+    "nutrition_source_url": "https://www.mr-brown.com/",
+    "last_verified": "2026-06-25T12:00:00.000Z",
+    "official_version": "1.0.0",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": [
+    {
+      "name": "拿鐵（中）",
+      "calories": 160,
+      "protein": 7,
+      "fat": 7,
+      "carbs": 14,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.mr-brown.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "燻雞義大利麵",
+      "calories": 480,
+      "protein": 24,
+      "fat": 16,
+      "carbs": 55,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.mr-brown.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "青醬雞肉飯",
+      "calories": 520,
+      "protein": 28,
+      "fat": 16,
+      "carbs": 62,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.mr-brown.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    }
+  ]
+}

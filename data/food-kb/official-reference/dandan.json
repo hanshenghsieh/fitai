@@ -1,0 +1,49 @@
+{
+  "metadata": {
+    "brand_id": "dandan",
+    "canonical_name": "丹丹漢堡",
+    "store_aliases": [
+      "丹丹漢堡"
+    ],
+    "nutrition_source_url": "https://www.ddburger.com.tw/",
+    "last_verified": "2026-06-25T12:00:00.000Z",
+    "official_version": "1.0.0",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": [
+    {
+      "name": "炸雞腿堡",
+      "calories": 520,
+      "protein": 24,
+      "fat": 28,
+      "carbs": 42,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.ddburger.com.tw/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "招牌麵線",
+      "calories": 380,
+      "protein": 12,
+      "fat": 14,
+      "carbs": 52,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.ddburger.com.tw/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    }
+  ]
+}

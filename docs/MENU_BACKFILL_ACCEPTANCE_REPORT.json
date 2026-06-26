@@ -1,0 +1,1939 @@
+{
+  "generated_at": "2026-06-25T16:17:26.406Z",
+  "restaurant_coverage": {
+    "allowlist_total": 600,
+    "with_runtime_menu": 150,
+    "with_staging_menu": 91,
+    "missing": 450,
+    "coverage_pct": 40.2
+  },
+  "menu_coverage": {
+    "runtime_items": 6407,
+    "staging_items": 0,
+    "runtime_recommendable": 279,
+    "staging_production_candidates": 0
+  },
+  "nutrition_coverage": {
+    "calories_pct": 100,
+    "protein_pct": 100,
+    "fat_pct": 100,
+    "carbs_pct": 100,
+    "fiber_pct": 0,
+    "sugar_pct": 18,
+    "sodium_pct": 0
+  },
+  "verification_coverage": {
+    "restaurants_with_2plus_sources": 91,
+    "items_with_traceable_source": 0,
+    "items_pending_conflict_review": 0
+  },
+  "duplicate_report": [
+    {
+      "canonical_name": "牛丼",
+      "store": "吉野家",
+      "variants": [
+        {
+          "id": "sprint1-吉野家-牛丼（中）",
+          "name": "牛丼（中）"
+        },
+        {
+          "id": "sprint1-吉野家-牛丼（中）",
+          "name": "牛丼（中）"
+        },
+        {
+          "id": "dk-dn-2",
+          "name": "牛丼（小）"
+        },
+        {
+          "id": "sprint1-吉野家-牛丼（中）",
+          "name": "牛丼（中）"
+        },
+        {
+          "id": "sprint1-吉野家-牛丼（中）",
+          "name": "牛丼（中）"
+        },
+        {
+          "id": "yoshinoya-牛丼-小",
+          "name": "牛丼（小）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "飯包",
+      "store": "東池飯包",
+      "variants": [
+        {
+          "id": "東池飯包-招牌飯包",
+          "name": "招牌飯包"
+        },
+        {
+          "id": "dongchi-飯包-排骨",
+          "name": "飯包（排骨）"
+        },
+        {
+          "id": "dongchi-飯包-雞腿",
+          "name": "飯包（雞腿）"
+        },
+        {
+          "id": "dongchi-飯包-滷肉",
+          "name": "飯包（滷肉）"
+        },
+        {
+          "id": "dongchi-飯包-鯖魚",
+          "name": "飯包（鯖魚）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "火雞胸潛艇堡",
+      "store": "Subway",
+      "variants": [
+        {
+          "id": "sub-ln-2",
+          "name": "火雞胸潛艇堡（6吋）"
+        },
+        {
+          "id": "sub-6in-turkey-breast",
+          "name": "火雞胸潛艇堡（6吋·全麥·不加醬）"
+        },
+        {
+          "id": "sub-footlong-turkey",
+          "name": "火雞胸潛艇堡（12吋·全麥·不加醬）"
+        },
+        {
+          "id": "subway-火雞胸潛艇堡-6吋-全麥",
+          "name": "火雞胸潛艇堡（6吋·全麥）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "鍋貼套餐",
+      "store": "八方雲集",
+      "variants": [
+        {
+          "id": "bdf-bf-1",
+          "name": "鍋貼套餐（10顆+酸辣湯）"
+        },
+        {
+          "id": "bdf-ln-1",
+          "name": "鍋貼套餐（15顆+玉米湯）"
+        },
+        {
+          "id": "bdf-鍋貼套餐-10顆-酸辣湯",
+          "name": "鍋貼套餐（10顆+酸辣湯）"
+        },
+        {
+          "id": "bdf-鍋貼套餐-15顆-玉米湯",
+          "name": "鍋貼套餐（15顆+玉米湯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "打拋豬肉片套餐",
+      "store": "瓦城",
+      "variants": [
+        {
+          "id": "wc-ln-2",
+          "name": "打拋豬肉片套餐"
+        },
+        {
+          "id": "fp-ln-2",
+          "name": "打拋豬肉片套餐"
+        },
+        {
+          "id": "瓦城-打拋豬肉片套餐",
+          "name": "打拋豬肉片套餐"
+        },
+        {
+          "id": "wangcheng-打拋豬肉片套餐",
+          "name": "打拋豬肉片套餐"
+        }
+      ]
+    },
+    {
+      "canonical_name": "紅茶拿鐵",
+      "store": "迷客夏",
+      "variants": [
+        {
+          "id": "迷客夏-紅茶拿鐵",
+          "name": "紅茶拿鐵"
+        },
+        {
+          "id": "milkshop-紅茶拿鐵-大杯",
+          "name": "紅茶拿鐵（大杯）"
+        },
+        {
+          "id": "milkshop-紅茶拿鐵-中杯",
+          "name": "紅茶拿鐵（中杯）"
+        },
+        {
+          "id": "milkshop-紅茶拿鐵-小杯",
+          "name": "紅茶拿鐵（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "鮮奶茶",
+      "store": "迷客夏",
+      "variants": [
+        {
+          "id": "迷客夏-鮮奶茶",
+          "name": "鮮奶茶"
+        },
+        {
+          "id": "milkshop-鮮奶茶-大杯",
+          "name": "鮮奶茶（大杯）"
+        },
+        {
+          "id": "milkshop-鮮奶茶-中杯",
+          "name": "鮮奶茶（中杯）"
+        },
+        {
+          "id": "milkshop-鮮奶茶-小杯",
+          "name": "鮮奶茶（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "大麥克",
+      "store": "麥當勞",
+      "variants": [
+        {
+          "id": "sprint1-麥當勞-大麥克",
+          "name": "大麥克"
+        },
+        {
+          "id": "sprint1-麥當勞-大麥克",
+          "name": "大麥克"
+        },
+        {
+          "id": "sprint1-麥當勞-大麥克",
+          "name": "大麥克"
+        }
+      ]
+    },
+    {
+      "canonical_name": "麥克雞塊",
+      "store": "麥當勞",
+      "variants": [
+        {
+          "id": "sprint1-麥當勞-麥克雞塊（6塊）",
+          "name": "麥克雞塊（6塊）"
+        },
+        {
+          "id": "麥當勞-麥克雞塊",
+          "name": "麥克雞塊"
+        },
+        {
+          "id": "sprint1-麥當勞-麥克雞塊（6塊）",
+          "name": "麥克雞塊（6塊）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "勁辣雞腿堡",
+      "store": "麥當勞",
+      "variants": [
+        {
+          "id": "麥當勞-勁辣雞腿堡-單點",
+          "name": "勁辣雞腿堡（單點）"
+        },
+        {
+          "id": "sprint1-麥當勞-勁辣雞腿堡",
+          "name": "勁辣雞腿堡"
+        },
+        {
+          "id": "sprint1-麥當勞-勁辣雞腿堡",
+          "name": "勁辣雞腿堡"
+        }
+      ]
+    },
+    {
+      "canonical_name": "海洋堡",
+      "store": "摩斯漢堡",
+      "variants": [
+        {
+          "id": "mos-ln-2",
+          "name": "海洋堡"
+        },
+        {
+          "id": "摩斯漢堡-海洋堡",
+          "name": "海洋堡"
+        },
+        {
+          "id": "mos-海洋堡",
+          "name": "海洋堡"
+        }
+      ]
+    },
+    {
+      "canonical_name": "摩斯漢堡",
+      "store": "摩斯漢堡",
+      "variants": [
+        {
+          "id": "mos-dn-1",
+          "name": "摩斯漢堡（單點）"
+        },
+        {
+          "id": "sprint3-摩斯漢堡-摩斯漢堡",
+          "name": "摩斯漢堡"
+        },
+        {
+          "id": "sprint3-摩斯漢堡-摩斯漢堡",
+          "name": "摩斯漢堡"
+        }
+      ]
+    },
+    {
+      "canonical_name": "雞肉沙拉三明治",
+      "store": "星巴克",
+      "variants": [
+        {
+          "id": "sprint1-星巴克-雞肉沙拉三明治",
+          "name": "雞肉沙拉三明治"
+        },
+        {
+          "id": "sprint1-星巴克-雞肉沙拉三明治",
+          "name": "雞肉沙拉三明治"
+        },
+        {
+          "id": "sprint1-星巴克-雞肉沙拉三明治",
+          "name": "雞肉沙拉三明治"
+        }
+      ]
+    },
+    {
+      "canonical_name": "烤雞沙拉潛艇堡",
+      "store": "Subway",
+      "variants": [
+        {
+          "id": "sub-ln-1",
+          "name": "烤雞沙拉潛艇堡（6吋）"
+        },
+        {
+          "id": "sub-dn-1",
+          "name": "烤雞沙拉潛艇堡"
+        },
+        {
+          "id": "subway-烤雞沙拉潛艇堡",
+          "name": "烤雞沙拉潛艇堡"
+        }
+      ]
+    },
+    {
+      "canonical_name": "照燒雞胸潛艇堡",
+      "store": "Subway",
+      "variants": [
+        {
+          "id": "sprint1-subway-照燒雞胸潛艇堡",
+          "name": "照燒雞胸潛艇堡"
+        },
+        {
+          "id": "sub-6in-chicken-teriyaki",
+          "name": "照燒雞胸潛艇堡（6吋·全麥·不加醬）"
+        },
+        {
+          "id": "subway-照燒雞胸潛艇堡-6吋",
+          "name": "照燒雞胸潛艇堡（6吋）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "烤雞胸潛艇堡",
+      "store": "Subway",
+      "variants": [
+        {
+          "id": "sub-6in-oven-roasted-chicken",
+          "name": "烤雞胸潛艇堡（6吋·全麥·不加醬）"
+        },
+        {
+          "id": "sub-footlong-chicken",
+          "name": "烤雞胸潛艇堡（12吋·全麥·不加醬）"
+        },
+        {
+          "id": "subway-烤雞胸潛艇堡-6吋-全麥",
+          "name": "烤雞胸潛艇堡（6吋·全麥）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "雞胸+地瓜餐盒",
+      "store": "梁社漢",
+      "variants": [
+        {
+          "id": "lsh-dn-1",
+          "name": "舒肥雞胸+地瓜餐盒"
+        },
+        {
+          "id": "fp-dn-1",
+          "name": "舒肥雞胸+地瓜餐盒"
+        },
+        {
+          "id": "梁社漢-舒肥雞胸-地瓜餐盒",
+          "name": "舒肥雞胸+地瓜餐盒"
+        }
+      ]
+    },
+    {
+      "canonical_name": "鯛魚健康餐盒",
+      "store": "梁社漢",
+      "variants": [
+        {
+          "id": "lsh-dn-2",
+          "name": "鯛魚健康餐盒"
+        },
+        {
+          "id": "梁社漢-鯛魚健康餐盒",
+          "name": "鯛魚健康餐盒"
+        },
+        {
+          "id": "梁社漢-鯛魚健康餐盒-1",
+          "name": "鯛魚健康餐盒"
+        }
+      ]
+    },
+    {
+      "canonical_name": "雞胸餐盒",
+      "store": "野宴",
+      "variants": [
+        {
+          "id": "ye-ln-2",
+          "name": "舒肥雞胸餐盒"
+        },
+        {
+          "id": "fp-ln-3",
+          "name": "舒肥雞胸餐盒"
+        },
+        {
+          "id": "野宴-舒肥雞胸餐盒",
+          "name": "舒肥雞胸餐盒"
+        }
+      ]
+    },
+    {
+      "canonical_name": "雞胸+糙米餐盒",
+      "store": "野宴",
+      "variants": [
+        {
+          "id": "ye-dn-1",
+          "name": "舒肥雞胸+糙米餐盒"
+        },
+        {
+          "id": "ub-dn-2",
+          "name": "舒肥雞胸+糙米餐盒"
+        },
+        {
+          "id": "野宴-舒肥雞胸-糙米餐盒",
+          "name": "舒肥雞胸+糙米餐盒"
+        }
+      ]
+    },
+    {
+      "canonical_name": "綠咖哩雞套餐",
+      "store": "瓦城",
+      "variants": [
+        {
+          "id": "wc-ln-1",
+          "name": "綠咖哩雞套餐"
+        },
+        {
+          "id": "瓦城-綠咖哩雞套餐",
+          "name": "綠咖哩雞套餐"
+        },
+        {
+          "id": "wangcheng-綠咖哩雞套餐",
+          "name": "綠咖哩雞套餐"
+        }
+      ]
+    },
+    {
+      "canonical_name": "月亮蝦餅",
+      "store": "瓦城",
+      "variants": [
+        {
+          "id": "瓦城-月亮蝦餅",
+          "name": "月亮蝦餅"
+        },
+        {
+          "id": "瓦城-月亮蝦餅-1",
+          "name": "月亮蝦餅"
+        },
+        {
+          "id": "wangcheng-月亮蝦餅",
+          "name": "月亮蝦餅"
+        }
+      ]
+    },
+    {
+      "canonical_name": "炙烤雞腿餐盒",
+      "store": "健人餐廚",
+      "variants": [
+        {
+          "id": "ub-ln-2",
+          "name": "炙烤雞腿餐盒"
+        },
+        {
+          "id": "健人餐廚-炙烤雞腿餐盒",
+          "name": "炙烤雞腿餐盒"
+        },
+        {
+          "id": "健人餐廚-炙烤雞腿餐盒-1",
+          "name": "炙烤雞腿餐盒"
+        }
+      ]
+    },
+    {
+      "canonical_name": "糖心蛋雞胸餐",
+      "store": "森度餐廚",
+      "variants": [
+        {
+          "id": "ub-dn-1",
+          "name": "糖心蛋雞胸餐"
+        },
+        {
+          "id": "森度餐廚-糖心蛋雞胸餐",
+          "name": "糖心蛋雞胸餐"
+        },
+        {
+          "id": "森度餐廚-糖心蛋雞胸餐-1",
+          "name": "糖心蛋雞胸餐"
+        }
+      ]
+    },
+    {
+      "canonical_name": "排骨飯",
+      "store": "鬍鬚張",
+      "variants": [
+        {
+          "id": "sprint1-鬍鬚張-排骨飯",
+          "name": "排骨飯"
+        },
+        {
+          "id": "sprint1-鬍鬚張-排骨飯",
+          "name": "排骨飯"
+        },
+        {
+          "id": "sprint1-鬍鬚張-排骨飯",
+          "name": "排骨飯"
+        }
+      ]
+    },
+    {
+      "canonical_name": "珍珠奶茶",
+      "store": "清心福全",
+      "variants": [
+        {
+          "id": "ching-shin-珍珠奶茶-大杯",
+          "name": "珍珠奶茶（大杯）"
+        },
+        {
+          "id": "ching-shin-珍珠奶茶-中杯",
+          "name": "珍珠奶茶（中杯）"
+        },
+        {
+          "id": "ching-shin-珍珠奶茶-小杯",
+          "name": "珍珠奶茶（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "波霸奶茶",
+      "store": "清心福全",
+      "variants": [
+        {
+          "id": "ching-shin-波霸奶茶-大杯",
+          "name": "波霸奶茶（大杯）"
+        },
+        {
+          "id": "ching-shin-波霸奶茶-中杯",
+          "name": "波霸奶茶（中杯）"
+        },
+        {
+          "id": "ching-shin-波霸奶茶-小杯",
+          "name": "波霸奶茶（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "鮮榨柳橙汁",
+      "store": "清心福全",
+      "variants": [
+        {
+          "id": "ching-shin-鮮榨柳橙汁-大杯",
+          "name": "鮮榨柳橙汁（大杯）"
+        },
+        {
+          "id": "ching-shin-鮮榨柳橙汁-中杯",
+          "name": "鮮榨柳橙汁（中杯）"
+        },
+        {
+          "id": "ching-shin-鮮榨柳橙汁-小杯",
+          "name": "鮮榨柳橙汁（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "鮮榨西瓜汁",
+      "store": "清心福全",
+      "variants": [
+        {
+          "id": "ching-shin-鮮榨西瓜汁-大杯",
+          "name": "鮮榨西瓜汁（大杯）"
+        },
+        {
+          "id": "ching-shin-鮮榨西瓜汁-中杯",
+          "name": "鮮榨西瓜汁（中杯）"
+        },
+        {
+          "id": "ching-shin-鮮榨西瓜汁-小杯",
+          "name": "鮮榨西瓜汁（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "百雙響炮",
+      "store": "清心福全",
+      "variants": [
+        {
+          "id": "ching-shin-百香雙響炮-大杯",
+          "name": "百香雙響炮（大杯）"
+        },
+        {
+          "id": "ching-shin-百香雙響炮-中杯",
+          "name": "百香雙響炮（中杯）"
+        },
+        {
+          "id": "ching-shin-百香雙響炮-小杯",
+          "name": "百香雙響炮（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "鮭魚握壽司",
+      "store": "爭鮮迴轉壽司",
+      "variants": [
+        {
+          "id": "爭鮮迴轉壽司-鮭魚握壽司-2貫",
+          "name": "鮭魚握壽司（2貫）"
+        },
+        {
+          "id": "sushi-salmon-nigiri",
+          "name": "鮭魚握壽司（2貫）"
+        },
+        {
+          "id": "sushi-express-鮭魚握壽司-2貫",
+          "name": "鮭魚握壽司（2貫）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "鮪魚握壽司",
+      "store": "爭鮮迴轉壽司",
+      "variants": [
+        {
+          "id": "爭鮮迴轉壽司-鮪魚握壽司-2貫",
+          "name": "鮪魚握壽司（2貫）"
+        },
+        {
+          "id": "sushi-tuna-nigiri",
+          "name": "鮪魚握壽司（2貫）"
+        },
+        {
+          "id": "sushi-express-鮪魚握壽司-2貫",
+          "name": "鮪魚握壽司（2貫）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "綠茶",
+      "store": "迷客夏",
+      "variants": [
+        {
+          "id": "迷客夏-綠茶",
+          "name": "綠茶"
+        },
+        {
+          "id": "milkshop-綠茶-大杯",
+          "name": "綠茶（大杯）"
+        },
+        {
+          "id": "milkshop-綠茶-中杯",
+          "name": "綠茶（中杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "百雙響炮",
+      "store": "迷客夏",
+      "variants": [
+        {
+          "id": "milkshop-百香雙響炮-大杯",
+          "name": "百香雙響炮（大杯）"
+        },
+        {
+          "id": "milkshop-百香雙響炮-中杯",
+          "name": "百香雙響炮（中杯）"
+        },
+        {
+          "id": "milkshop-百香雙響炮-小杯",
+          "name": "百香雙響炮（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "百雙響炮",
+      "store": "茶湯會",
+      "variants": [
+        {
+          "id": "tea-top-百香雙響炮-大杯",
+          "name": "百香雙響炮（大杯）"
+        },
+        {
+          "id": "tea-top-百香雙響炮-中杯",
+          "name": "百香雙響炮（中杯）"
+        },
+        {
+          "id": "tea-top-百香雙響炮-小杯",
+          "name": "百香雙響炮（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "鮮奶茶",
+      "store": "茶湯會",
+      "variants": [
+        {
+          "id": "tea-top-鮮奶茶-大杯",
+          "name": "鮮奶茶（大杯）"
+        },
+        {
+          "id": "tea-top-鮮奶茶-中杯",
+          "name": "鮮奶茶（中杯）"
+        },
+        {
+          "id": "tea-top-鮮奶茶-小杯",
+          "name": "鮮奶茶（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "紅茶拿鐵",
+      "store": "茶湯會",
+      "variants": [
+        {
+          "id": "tea-top-紅茶拿鐵-大杯",
+          "name": "紅茶拿鐵（大杯）"
+        },
+        {
+          "id": "tea-top-紅茶拿鐵-中杯",
+          "name": "紅茶拿鐵（中杯）"
+        },
+        {
+          "id": "tea-top-紅茶拿鐵-小杯",
+          "name": "紅茶拿鐵（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "重焙烏龍拿鐵",
+      "store": "茶湯會",
+      "variants": [
+        {
+          "id": "tea-top-重焙烏龍拿鐵-大杯",
+          "name": "重焙烏龍拿鐵（大杯）"
+        },
+        {
+          "id": "tea-top-重焙烏龍拿鐵-中杯",
+          "name": "重焙烏龍拿鐵（中杯）"
+        },
+        {
+          "id": "tea-top-重焙烏龍拿鐵-小杯",
+          "name": "重焙烏龍拿鐵（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "池上便當",
+      "store": "悟饕池上便當",
+      "variants": [
+        {
+          "id": "wutao-池上便當-雞腿",
+          "name": "池上便當（雞腿）"
+        },
+        {
+          "id": "wutao-池上便當-排骨",
+          "name": "池上便當（排骨）"
+        },
+        {
+          "id": "wutao-池上便當-鯛魚",
+          "name": "池上便當（鯛魚）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "阿華田",
+      "store": "五十嵐",
+      "variants": [
+        {
+          "id": "50lan-阿華田-中杯",
+          "name": "阿華田（中杯）"
+        },
+        {
+          "id": "50lan-阿華田-大杯",
+          "name": "阿華田（大杯）"
+        },
+        {
+          "id": "50lan-阿華田-小杯",
+          "name": "阿華田（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "可可芭蕾",
+      "store": "五十嵐",
+      "variants": [
+        {
+          "id": "50lan-可可芭蕾-大杯",
+          "name": "可可芭蕾（大杯）"
+        },
+        {
+          "id": "50lan-可可芭蕾-中杯",
+          "name": "可可芭蕾（中杯）"
+        },
+        {
+          "id": "50lan-可可芭蕾-小杯",
+          "name": "可可芭蕾（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "芒果青",
+      "store": "五十嵐",
+      "variants": [
+        {
+          "id": "50lan-芒果青-大杯",
+          "name": "芒果青（大杯）"
+        },
+        {
+          "id": "50lan-芒果青-中杯",
+          "name": "芒果青（中杯）"
+        },
+        {
+          "id": "50lan-芒果青-小杯",
+          "name": "芒果青（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "金桔檸檬",
+      "store": "五十嵐",
+      "variants": [
+        {
+          "id": "50lan-金桔檸檬-大杯",
+          "name": "金桔檸檬（大杯）"
+        },
+        {
+          "id": "50lan-金桔檸檬-中杯",
+          "name": "金桔檸檬（中杯）"
+        },
+        {
+          "id": "50lan-金桔檸檬-小杯",
+          "name": "金桔檸檬（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "仙草凍奶茶",
+      "store": "五十嵐",
+      "variants": [
+        {
+          "id": "50lan-仙草凍奶茶-大杯",
+          "name": "仙草凍奶茶（大杯）"
+        },
+        {
+          "id": "50lan-仙草凍奶茶-中杯",
+          "name": "仙草凍奶茶（中杯）"
+        },
+        {
+          "id": "50lan-仙草凍奶茶-小杯",
+          "name": "仙草凍奶茶（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "仙草凍奶茶",
+      "store": "CoCo都可",
+      "variants": [
+        {
+          "id": "coco-tea-仙草凍奶茶-大杯",
+          "name": "仙草凍奶茶（大杯）"
+        },
+        {
+          "id": "coco-tea-仙草凍奶茶-中杯",
+          "name": "仙草凍奶茶（中杯）"
+        },
+        {
+          "id": "coco-tea-仙草凍奶茶-小杯",
+          "name": "仙草凍奶茶（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "布丁奶茶",
+      "store": "CoCo都可",
+      "variants": [
+        {
+          "id": "coco-tea-布丁奶茶-大杯",
+          "name": "布丁奶茶（大杯）"
+        },
+        {
+          "id": "coco-tea-布丁奶茶-中杯",
+          "name": "布丁奶茶（中杯）"
+        },
+        {
+          "id": "coco-tea-布丁奶茶-小杯",
+          "name": "布丁奶茶（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "椰果奶茶",
+      "store": "CoCo都可",
+      "variants": [
+        {
+          "id": "coco-tea-椰果奶茶-大杯",
+          "name": "椰果奶茶（大杯）"
+        },
+        {
+          "id": "coco-tea-椰果奶茶-中杯",
+          "name": "椰果奶茶（中杯）"
+        },
+        {
+          "id": "coco-tea-椰果奶茶-小杯",
+          "name": "椰果奶茶（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "芋頭奶茶",
+      "store": "CoCo都可",
+      "variants": [
+        {
+          "id": "coco-tea-芋頭奶茶-大杯",
+          "name": "芋頭奶茶（大杯）"
+        },
+        {
+          "id": "coco-tea-芋頭奶茶-中杯",
+          "name": "芋頭奶茶（中杯）"
+        },
+        {
+          "id": "coco-tea-芋頭奶茶-小杯",
+          "name": "芋頭奶茶（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "燕麥奶茶",
+      "store": "CoCo都可",
+      "variants": [
+        {
+          "id": "coco-tea-燕麥奶茶-大杯",
+          "name": "燕麥奶茶（大杯）"
+        },
+        {
+          "id": "coco-tea-燕麥奶茶-中杯",
+          "name": "燕麥奶茶（中杯）"
+        },
+        {
+          "id": "coco-tea-燕麥奶茶-小杯",
+          "name": "燕麥奶茶（小杯）"
+        }
+      ]
+    },
+    {
+      "canonical_name": "蜂蜜檸檬",
+      "store": "CoCo都可",
+      "variants": [
+        {
+          "id": "coco-tea-蜂蜜檸檬-大杯",
+          "name": "蜂蜜檸檬（大杯）"
+        },
+        {
+          "id": "coco-tea-蜂蜜檸檬-中杯",
+          "name": "蜂蜜檸檬（中杯）"
+        },
+        {
+          "id": "coco-tea-蜂蜜檸檬-小杯",
+          "name": "蜂蜜檸檬（小杯）"
+        }
+      ]
+    }
+  ],
+  "conflict_report": [],
+  "confidence_distribution": {
+    "A": 256,
+    "B": 23,
+    "C": 6,
+    "D": 6122
+  },
+  "missing_restaurants": [
+    "美廉社",
+    "合點壽司",
+    "金子半之助",
+    "燒肉同話",
+    "胡同燒肉",
+    "這一鍋",
+    "馬辣",
+    "辛殿麻辣鍋",
+    "鼎王",
+    "無老鍋",
+    "老四川",
+    "王品牛排",
+    "原燒",
+    "藝奇",
+    "品田牧場",
+    "青花驕",
+    "尬鍋",
+    "1010湘",
+    "時時香",
+    "開飯川食堂",
+    "金色三麥",
+    "怡客咖啡",
+    "Mister Donut",
+    "Krispy Kreme",
+    "Dunkin'",
+    "一芳水果茶",
+    "翰林茶館",
+    "五桐號",
+    "度小月",
+    "阿霞飯店",
+    "金峰魯肉飯",
+    "黃記魯肉飯",
+    "今大魯肉飯",
+    "矮仔財滷肉飯",
+    "天天利美食坊",
+    "阜杭豆漿",
+    "永和豆漿",
+    "世界豆漿大王",
+    "鬍鬚張便當",
+    "佳味鮮便當",
+    "大埔鐵板燒",
+    "紅花鐵板燒",
+    "龐德羅莎",
+    "貴族世家",
+    "孫東寶",
+    "我家牛排",
+    "牛角日本燒肉",
+    "安安燒肉",
+    "燒肉眾",
+    "添好運",
+    "檀島香港茶餐廳",
+    "金獅樓",
+    "京星港式飲茶",
+    "了凡油雞飯",
+    "香港發財燒臘",
+    "香港九記海鮮",
+    "茗香園冰室",
+    "波記茶餐廳",
+    "大阪王將",
+    "京都勝牛",
+    "銀座杏子日式豬排",
+    "靜岡勝政",
+    "一風堂",
+    "一蘭拉麵",
+    "Nagi凪拉麵",
+    "鷹流拉麵",
+    "鬼金棒",
+    "博多一幸舍",
+    "拉麵公子",
+    "麵屋壹之穴",
+    "麵屋一燈",
+    "bb.q CHICKEN",
+    "起家雞",
+    "NENE CHICKEN",
+    "八色烤肉",
+    "姜虎東白丁",
+    "小韓坊",
+    "雙月食品社",
+    "林東芳牛肉麵",
+    "永康牛肉麵",
+    "劉山東牛肉麵",
+    "老山東牛肉家常麵店",
+    "建宏牛肉麵",
+    "史記正宗牛肉麵",
+    "牛店精燉牛肉麵",
+    "老王記牛肉麵",
+    "張家清真黃牛肉麵館",
+    "阿宗麵線",
+    "陳記腸蚵專業麵線",
+    "油庫口麵線",
+    "賴阿婆芋圓",
+    "東區粉圓",
+    "三兄妹雪花冰",
+    "冰讚",
+    "龍都冰菓專業家",
+    "陳三鼎黑糖青蛙鮮奶",
+    "施家鮮肉湯圓",
+    "士林夜市",
+    "饒河夜市",
+    "寧夏夜市",
+    "臨江街夜市",
+    "南機場夜市",
+    "樂華夜市",
+    "輔大花園夜市",
+    "逢甲夜市",
+    "一中街商圈",
+    "旱溪夜市",
+    "花園夜市",
+    "武聖夜市",
+    "六合夜市",
+    "瑞豐夜市",
+    "羅東夜市",
+    "東大門夜市",
+    "基隆廟口夜市",
+    "城隍廟小吃",
+    "淡水老街",
+    "九份老街",
+    "遠東SOGO美食街",
+    "台北101美食街",
+    "遠百美食街",
+    "板橋大遠百美食街",
+    "Global Mall 環球購物中心美食街",
+    "LaLaport美食街",
+    "南紡購物中心美食街",
+    "夢時代美食街",
+    "漢神巨蛋美食街",
+    "台茂購物中心美食街",
+    "大江購物中心美食街",
+    "美麗華美食街",
+    "CITYLINK美食街",
+    "Mitsui Outlet Park美食街",
+    "ATT 4 FUN美食街",
+    "統一時代百貨美食街",
+    "MUJI Café",
+    "TSUTAYA BOOKSTORE Café",
+    "N.Y. Bagels Café",
+    "Sarabeth’s",
+    "Belle Époque",
+    "Woolloomooloo",
+    "開丼",
+    "金子咖哩",
+    "魔法咖哩",
+    "咖哩匠",
+    "甘泉魚麵",
+    "大呼過癮",
+    "養鍋",
+    "饗饗",
+    "旭集",
+    "果然匯",
+    "島語",
+    "SaladStop!",
+    "Miacucina",
+    "Miss Green",
+    "BaganHood",
+    "Herban Kitchen & Bar",
+    "Ooh Cha Cha",
+    "Plants",
+    "Naked Deli",
+    "健身工廠",
+    "福勝亭便當",
+    "健康橘子工坊",
+    "Light House",
+    "有肌勵",
+    "初飯",
+    "貝果貝果之東西廚房",
+    "三明治先生",
+    "卡路里",
+    "Muscle Food",
+    "野人舒食",
+    "良食煮意",
+    "好丘",
+    "碳佐麻里",
+    "阿城鵝肉",
+    "富霸王豬腳",
+    "米其林餐盤餐廳",
+    "山海樓",
+    "富錦樹台菜香檳",
+    "雙月食品社",
+    "小王煮瓜",
+    "侯布雄法式餐廳",
+    "RAW",
+    "MUME",
+    "Longtail",
+    "Tairroir 態芮",
+    "JL Studio",
+    "鹽之華",
+    "Forchetta",
+    "The Tavernist",
+    "Logy",
+    "Impromptu by Paul Lee",
+    "Molino de Urdániz",
+    "Orchid 蘭",
+    "明福台菜海產",
+    "頤宮",
+    "教父牛排",
+    "A CUT",
+    "Robin's Grill",
+    "Lawry's The Prime Rib",
+    "N°168 Prime",
+    "俺達の肉屋",
+    "樂軒和牛專門店",
+    "牧島燒肉",
+    "燒肉風間",
+    "屋馬燒肉",
+    "脂板前炭火燒肉",
+    "橘色涮涮屋",
+    "囍聚精緻鍋物",
+    "二本松涮涮屋",
+    "詹記麻辣火鍋",
+    "滿堂紅",
+    "天外天麻辣火鍋",
+    "問鼎麻辣鍋",
+    "麻神麻辣鍋",
+    "小福利火鍋會所",
+    "樂崎火鍋",
+    "鍋爸涮涮鍋",
+    "天喜迷你火鍋",
+    "三媽臭臭鍋",
+    "石研室",
+    "湯棧",
+    "鬼椒麻辣王",
+    "秦味館",
+    "銀翼餐廳",
+    "點水樓",
+    "杭州小籠湯包",
+    "盛園絲瓜小籠湯包",
+    "濟南鮮湯包",
+    "好公道金雞園",
+    "高記",
+    "蘇杭餐廳",
+    "上海鄉村",
+    "老牌張豬腳飯",
+    "富霸王豬腳",
+    "鄭記豬腳飯",
+    "大橋頭老牌筒仔米糕",
+    "慈聖宮葉家肉粥",
+    "原汁排骨湯",
+    "高家莊米苔目",
+    "賣麵炎仔",
+    "阿角紅燒肉",
+    "大稻埕魯肉飯",
+    "梁記嘉義雞肉飯",
+    "劉里長雞肉飯",
+    "嘉義噴水雞肉飯",
+    "民主火雞肉飯",
+    "郭家雞肉飯",
+    "阿宏師火雞肉飯",
+    "桃城三禾火雞肉飯",
+    "阿溪雞肉飯",
+    "呆獅雞肉飯",
+    "正老牌草魚粥",
+    "阿堂鹹粥",
+    "阿憨鹹粥",
+    "文章牛肉湯",
+    "六千牛肉湯",
+    "阿裕牛肉湯",
+    "康樂街牛肉湯",
+    "集品蝦仁飯",
+    "矮仔成蝦仁飯",
+    "度小月",
+    "赤崁擔仔麵",
+    "富盛號碗粿",
+    "一味品碗粿",
+    "森茂碗粿",
+    "阿松割包",
+    "石精臼牛肉湯",
+    "永樂米糕",
+    "金得春捲",
+    "邱家小卷米粉",
+    "葉家小卷米粉",
+    "阿鳳浮水魚羹",
+    "老牌白糖粿",
+    "同記安平豆花",
+    "修安扁擔豆花",
+    "裕成水果店",
+    "泰成水果店",
+    "莉莉水果店",
+    "蜷尾家",
+    "雙生綠豆沙牛奶",
+    "清水堂",
+    "八寶彬圓仔惠",
+    "老江紅茶牛奶",
+    "興隆居",
+    "果貿來來豆漿",
+    "老周燒肉飯",
+    "鄧師傅滷味",
+    "牛老大涮牛肉",
+    "港園牛肉麵",
+    "汕頭泉成沙茶火鍋",
+    "鴨肉珍",
+    "老牌周燒肉飯",
+    "北港蔡三代筒仔米糕",
+    "廖記米糕",
+    "米糕城",
+    "香味海產粥",
+    "阿霞燒肉飯",
+    "柏弘肉燥飯",
+    "江豪記臭豆腐",
+    "西子灣海之冰",
+    "瑞豐夜市天使雞排",
+    "六合夜市木瓜牛奶",
+    "老牌木瓜牛奶",
+    "正老牌白糖粿",
+    "大溝頂虱目魚米粉湯",
+    "龍袍湯包",
+    "大牛牛肉麵",
+    "菜市仔嬤汾陽餛飩",
+    "厚得福湯包麵食",
+    "高雄婆婆冰",
+    "宮原眼科",
+    "第四信用合作社",
+    "一中豐仁冰",
+    "阿坤麵",
+    "第二市場王記菜頭粿",
+    "山河魯肉飯",
+    "范記金之園草袋飯",
+    "丁山肉丸",
+    "台中肉員",
+    "富鼎旺豬腳",
+    "李海魯肉飯",
+    "老舅的家鄉味",
+    "滬舍餘味",
+    "老吳的西洋料理",
+    "林家麵線",
+    "嘉義香菇肉羹",
+    "阿水獅豬腳大王",
+    "旱溪肉圓",
+    "東山棧甕缸雞",
+    "逢甲地瓜球",
+    "逢甲官芝霖大腸包小腸",
+    "明倫蛋餅",
+    "黃金右腿",
+    "一中街胖子雞丁",
+    "旅禾泡芙之家",
+    "老虎堂",
+    "春芳號",
+    "木子日青",
+    "叮哥茶飲",
+    "康青龍",
+    "鮮自然",
+    "Mr. Wish",
+    "烏鐵茶水舖",
+    "龍角",
+    "署茗職茶",
+    "吃茶三千",
+    "小木屋鬆餅",
+    "樂檸漢堡",
+    "魔法咖哩",
+    "好初早餐",
+    "豐盛號",
+    "吐司男",
+    "早安公雞農場晨食",
+    "瑞麟美而美",
+    "阿寶早餐",
+    "多那之咖啡",
+    "彼得好咖啡",
+    "快可立",
+    "清玉",
+    "喫茶小舖",
+    "老虎堂黑糖專売",
+    "黑糖道",
+    "幸福堂",
+    "十二韻",
+    "樺達奶茶",
+    "雙妃奶茶",
+    "木衛二醫務所",
+    "良粟商號",
+    "Upper Stairs",
+    "Fika Fika Cafe",
+    "Coffee Law",
+    "Simple Kaffa",
+    "興波咖啡",
+    "All Day Roasting Company",
+    "Paper St. Coffee",
+    "Woolloomooloo",
+    "光一咖啡",
+    "角公園咖啡",
+    "卜卜商店",
+    "Coffee Essential",
+    "深夜裡的法國手工甜點",
+    "Le Ruban Pâtisserie",
+    "Quelques Pâtisseries",
+    "狸小路",
+    "Lady M",
+    "Sugar Miss",
+    "深夜甜點",
+    "米詩堤甜點王國",
+    "狸小路",
+    "法朋烘焙甜點坊",
+    "順成蛋糕",
+    "維格餅家",
+    "李鵠餅店",
+    "佳德糕餅",
+    "微熱山丘",
+    "舊振南",
+    "日出鳳梨酥",
+    "阿聰師",
+    "裕珍馨",
+    "犁記餅店",
+    "郭元益",
+    "千翔肉乾",
+    "新東陽",
+    "黑橋牌",
+    "唯豐肉鬆",
+    "快車肉乾",
+    "江記華隆",
+    "阮的肉干",
+    "所長茶葉蛋",
+    "阿婆鐵蛋",
+    "淡水可口魚丸",
+    "淡水阿給老店",
+    "文化阿給",
+    "三姐妹阿給",
+    "榕堤水灣",
+    "九份阿柑姨芋圓",
+    "九份賴阿婆芋圓",
+    "阿蘭草仔粿",
+    "金枝紅糟肉圓",
+    "深坑大樹下豆腐",
+    "王水成老店",
+    "基隆廟口天婦羅",
+    "基隆廟口泡泡冰",
+    "基隆廟口營養三明治",
+    "三兄弟豆花",
+    "連珍糕餅店",
+    "周家蔥油餅",
+    "花蓮公正包子",
+    "液香扁食",
+    "廟口紅茶",
+    "炸彈蔥油餅",
+    "東大門夜市第一家烤肉串",
+    "蔣家官財板",
+    "戴記扁食",
+    "玉里橋頭臭豆腐",
+    "玉里麵",
+    "羅東夜市阿灶伯羊肉湯",
+    "羅東夜市三星蔥肉串",
+    "正好鮮肉小籠包",
+    "北門綠豆沙牛乳",
+    "柯氏蔥油餅",
+    "阿宗芋冰城",
+    "宜蘭正常鮮肉小籠包",
+    "奕順軒",
+    "諾貝爾奶凍",
+    "蘭城晶英紅樓中餐廳",
+    "礁溪老爺酒店雲天餐廳",
+    "林場肉羹",
+    "黑店冰店",
+    "鴨肉送",
+    "阿娘給的蒜味肉羹"
+  ],
+  "missing_menus": [
+    {
+      "restaurant": "美廉社",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "合點壽司",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "金子半之助",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "燒肉同話",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "胡同燒肉",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "這一鍋",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "馬辣",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "辛殿麻辣鍋",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "鼎王",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "無老鍋",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "老四川",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "王品牛排",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "原燒",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "藝奇",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "品田牧場",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "青花驕",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "尬鍋",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "1010湘",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "時時香",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "開飯川食堂",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "金色三麥",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "怡客咖啡",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "Mister Donut",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "Krispy Kreme",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "Dunkin'",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "一芳水果茶",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "翰林茶館",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "五桐號",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "度小月",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "阿霞飯店",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "金峰魯肉飯",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "黃記魯肉飯",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "今大魯肉飯",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "矮仔財滷肉飯",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "天天利美食坊",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "阜杭豆漿",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "永和豆漿",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "世界豆漿大王",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "鬍鬚張便當",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "佳味鮮便當",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "大埔鐵板燒",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "紅花鐵板燒",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "龐德羅莎",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "貴族世家",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "孫東寶",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "我家牛排",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "牛角日本燒肉",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "安安燒肉",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "燒肉眾",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "添好運",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "檀島香港茶餐廳",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "金獅樓",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "京星港式飲茶",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "了凡油雞飯",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "香港發財燒臘",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "香港九記海鮮",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "茗香園冰室",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "波記茶餐廳",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "大阪王將",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "京都勝牛",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "銀座杏子日式豬排",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "靜岡勝政",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "一風堂",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "一蘭拉麵",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "Nagi凪拉麵",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "鷹流拉麵",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "鬼金棒",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "博多一幸舍",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "拉麵公子",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "麵屋壹之穴",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "麵屋一燈",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "bb.q CHICKEN",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "起家雞",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "NENE CHICKEN",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "八色烤肉",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "姜虎東白丁",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "小韓坊",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "雙月食品社",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "林東芳牛肉麵",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "永康牛肉麵",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "劉山東牛肉麵",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "老山東牛肉家常麵店",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "建宏牛肉麵",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "史記正宗牛肉麵",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "牛店精燉牛肉麵",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "老王記牛肉麵",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "張家清真黃牛肉麵館",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "阿宗麵線",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "陳記腸蚵專業麵線",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "油庫口麵線",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "賴阿婆芋圓",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "東區粉圓",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "三兄妹雪花冰",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "冰讚",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "龍都冰菓專業家",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "陳三鼎黑糖青蛙鮮奶",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "施家鮮肉湯圓",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "士林夜市",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "饒河夜市",
+      "needed": 20,
+      "have": 0
+    },
+    {
+      "restaurant": "寧夏夜市",
+      "needed": 20,
+      "have": 0
+    }
+  ],
+  "runtime_ready": {
+    "restaurants_ready": 57,
+    "items_ready": 279,
+    "blocked_d_count": 6122,
+    "search_only_c_count": 6
+  }
+}

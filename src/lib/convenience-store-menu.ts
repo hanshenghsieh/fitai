@@ -1,6 +1,6 @@
-// 外食菜單庫 — 便利店 + 連鎖餐廳 + 外送平台（6400 項）
-// 早餐 848 · 午餐 4940 · 晚餐 612
-// 便利店 188 · 連鎖 6162 · 外送 50
+// 外食菜單庫 — 便利店 + 連鎖餐廳 + 外送平台（6407 項）
+// 早餐 845 · 午餐 4950 · 晚餐 612
+// 便利店 140 · 連鎖 6221 · 外送 46
 // 更新：npm run sync-menu
 
 export type EatOutSource = 'convenience' | 'chain' | 'delivery'
@@ -26,7 +26,7 @@ export interface ConvenienceItem {
 
 export const eatOutMenu: ConvenienceItem[] = [
   {
-    "id": "7-11-lunch-1",
+    "id": "sprint1-7-11-lunch-1",
     "name": "泰式酸辣雞腿冷麵",
     "store": "7-11",
     "category": "lunch",
@@ -36,14 +36,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 89,
     "photo_url": "https://www.7-11.com.tw/images/products/1.jpg",
-    "description": "泰式酸辣雞腿冷麵：23g 蛋白質，369 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 泰式酸辣雞腿冷麵 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-2",
+    "id": "sprint1-7-11-lunch-2",
     "name": "京醬鴨絲飯",
     "store": "7-11",
     "category": "lunch",
@@ -53,14 +62,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 17,
     "price": 45,
     "photo_url": "https://www.7-11.com.tw/images/products/2.jpg",
-    "description": "京醬鴨絲飯：31g 蛋白質，500 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 京醬鴨絲飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-3",
+    "id": "sprint1-7-11-lunch-3",
     "name": "港式叉燒油雞飯",
     "store": "7-11",
     "category": "lunch",
@@ -70,14 +88,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 17,
     "price": 109,
     "photo_url": "https://www.7-11.com.tw/images/products/3.jpg",
-    "description": "港式叉燒油雞飯：31g 蛋白質，500 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 港式叉燒油雞飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-4",
+    "id": "sprint1-7-11-lunch-4",
     "name": "三杯雞燴飯",
     "store": "7-11",
     "category": "lunch",
@@ -87,14 +114,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 23,
     "price": 99,
     "photo_url": "https://www.7-11.com.tw/images/products/4.jpg",
-    "description": "三杯雞燴飯：44g 蛋白質，700 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 三杯雞燴飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-5",
+    "id": "sprint1-7-11-lunch-5",
     "name": "麻油雞飯",
     "store": "7-11",
     "category": "lunch",
@@ -104,14 +140,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 49,
     "photo_url": "https://www.7-11.com.tw/images/products/5.jpg",
-    "description": "麻油雞飯：22g 蛋白質，354 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 麻油雞飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-6",
+    "id": "sprint1-7-11-lunch-6",
     "name": "四起司香草烤雞握便當",
     "store": "7-11",
     "category": "lunch",
@@ -121,14 +166,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 14,
     "price": 69,
     "photo_url": "https://www.7-11.com.tw/images/products/6.jpg",
-    "description": "四起司香草烤雞握便當：26g 蛋白質，414 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 四起司香草烤雞握便當 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-7",
+    "id": "sprint1-7-11-lunch-7",
     "name": "爆蛋肉燥新極大飯",
     "store": "7-11",
     "category": "lunch",
@@ -138,14 +192,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 10,
     "price": 55,
     "photo_url": "https://www.7-11.com.tw/images/products/7.jpg",
-    "description": "爆蛋肉燥新極大飯：23g 蛋白質，307 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 爆蛋肉燥新極大飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-8",
+    "id": "sprint1-7-11-lunch-8",
     "name": "柱侯牛腱飯",
     "store": "7-11",
     "category": "lunch",
@@ -155,14 +218,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 19,
     "price": 109,
     "photo_url": "https://www.7-11.com.tw/images/products/8.jpg",
-    "description": "柱侯牛腱飯：36g 蛋白質，574 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 柱侯牛腱飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-9",
+    "id": "sprint1-7-11-lunch-9",
     "name": "府城肉燥厚切排骨飯",
     "store": "7-11",
     "category": "lunch",
@@ -172,14 +244,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 21,
     "price": 129,
     "photo_url": "https://www.7-11.com.tw/images/products/9.jpg",
-    "description": "府城肉燥厚切排骨飯：39g 蛋白質，620 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 府城肉燥厚切排骨飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-10",
+    "id": "sprint1-7-11-lunch-10",
     "name": "米香鹹酥蝦飯",
     "store": "7-11",
     "category": "lunch",
@@ -189,14 +270,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 7,
     "price": 49,
     "photo_url": "https://www.7-11.com.tw/images/products/10.jpg",
-    "description": "米香鹹酥蝦飯：16g 蛋白質，226 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 米香鹹酥蝦飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-11",
+    "id": "sprint1-7-11-lunch-11",
     "name": "晶英三杯蛤蜊飯",
     "store": "7-11",
     "category": "lunch",
@@ -206,14 +296,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 8,
     "price": 39,
     "photo_url": "https://www.7-11.com.tw/images/products/11.jpg",
-    "description": "晶英三杯蛤蜊飯：18g 蛋白質，250 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 晶英三杯蛤蜊飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-12",
+    "id": "sprint1-7-11-lunch-12",
     "name": "晶英韓式炸豬排起司雙拼飯",
     "store": "7-11",
     "category": "lunch",
@@ -223,14 +322,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 89,
     "photo_url": "https://www.7-11.com.tw/images/products/12.jpg",
-    "description": "晶英韓式炸豬排起司雙拼飯：22g 蛋白質，351 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 晶英韓式炸豬排起司雙拼飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-lunch-13",
+    "id": "sprint1-7-11-lunch-13",
     "name": "麻辣奶油鮮蝦義大利麵",
     "store": "7-11",
     "category": "lunch",
@@ -240,14 +348,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 19,
     "price": 149,
     "photo_url": "https://www.7-11.com.tw/images/products/13.jpg",
-    "description": "麻辣奶油鮮蝦義大利麵：41g 蛋白質，586 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 麻辣奶油鮮蝦義大利麵 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-breakfast-14",
+    "id": "sprint1-7-11-breakfast-14",
     "name": "御飯糰-梅子紫蘇",
     "store": "7-11",
     "category": "breakfast",
@@ -257,14 +374,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 7,
     "price": 25,
     "photo_url": "https://www.7-11.com.tw/images/products/14.jpg",
-    "description": "御飯糰-梅子紫蘇：7g 蛋白質，180 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 御飯糰-梅子紫蘇 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-breakfast-15",
+    "id": "sprint1-7-11-breakfast-15",
     "name": "御飯糰-鮭魚",
     "store": "7-11",
     "category": "breakfast",
@@ -274,14 +400,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 6,
     "price": 28,
     "photo_url": "https://www.7-11.com.tw/images/products/15.jpg",
-    "description": "御飯糰-鮭魚：13g 蛋白質，190 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 御飯糰-鮭魚 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-breakfast-16",
+    "id": "sprint1-7-11-breakfast-16",
     "name": "御飯糰-鮪魚起司",
     "store": "7-11",
     "category": "breakfast",
@@ -291,14 +426,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 6,
     "price": 30,
     "photo_url": "https://www.7-11.com.tw/images/products/16.jpg",
-    "description": "御飯糰-鮪魚起司：14g 蛋白質，200 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 御飯糰-鮪魚起司 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-breakfast-17",
+    "id": "sprint1-7-11-breakfast-17",
     "name": "原賞三明治-火腿起司蛋",
     "store": "7-11",
     "category": "breakfast",
@@ -308,14 +452,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 9,
     "price": 45,
     "photo_url": "https://www.7-11.com.tw/images/products/17.jpg",
-    "description": "原賞三明治-火腿起司蛋：21g 蛋白質，280 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 原賞三明治-火腿起司蛋 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-breakfast-18",
+    "id": "sprint1-7-11-breakfast-18",
     "name": "原賞三明治-雞肉沙拉",
     "store": "7-11",
     "category": "breakfast",
@@ -325,14 +478,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 8,
     "price": 48,
     "photo_url": "https://www.7-11.com.tw/images/products/18.jpg",
-    "description": "原賞三明治-雞肉沙拉：15g 蛋白質，240 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 原賞三明治-雞肉沙拉 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-breakfast-19",
+    "id": "sprint1-7-11-breakfast-19",
     "name": "7-11茶葉蛋",
     "store": "7-11",
     "category": "breakfast",
@@ -342,14 +504,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 2,
     "price": 10,
     "photo_url": "https://www.7-11.com.tw/images/products/19.jpg",
-    "description": "7-11茶葉蛋：4g 蛋白質，50 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 7-11茶葉蛋 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-breakfast-20",
+    "id": "sprint1-7-11-breakfast-20",
     "name": "豆漿早餐組合",
     "store": "7-11",
     "category": "breakfast",
@@ -359,14 +530,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 11,
     "price": 35,
     "photo_url": "https://www.7-11.com.tw/images/products/20.jpg",
-    "description": "豆漿早餐組合：15g 蛋白質，300 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 豆漿早餐組合 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-dinner-21",
+    "id": "sprint1-7-11-dinner-21",
     "name": "台韓半半炸雞便當",
     "store": "7-11",
     "category": "dinner",
@@ -376,14 +556,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 22,
     "price": 119,
     "photo_url": "https://www.7-11.com.tw/images/products/21.jpg",
-    "description": "台韓半半炸雞便當：41g 蛋白質，650 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 台韓半半炸雞便當 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-dinner-22",
+    "id": "sprint1-7-11-dinner-22",
     "name": "泡菜豬肉豆腐煲燴飯",
     "store": "7-11",
     "category": "dinner",
@@ -393,14 +582,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 99,
     "photo_url": "https://www.7-11.com.tw/images/products/22.jpg",
-    "description": "泡菜豬肉豆腐煲燴飯：33g 蛋白質，531 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 泡菜豬肉豆腐煲燴飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-dinner-23",
+    "id": "sprint1-7-11-dinner-23",
     "name": "椰香綠咖哩嫩雞飯",
     "store": "7-11",
     "category": "dinner",
@@ -410,14 +608,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 22,
     "price": 99,
     "photo_url": "https://www.7-11.com.tw/images/products/23.jpg",
-    "description": "椰香綠咖哩嫩雞飯：42g 蛋白質，668 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 椰香綠咖哩嫩雞飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "7-11-dinner-24",
+    "id": "sprint1-7-11-dinner-24",
     "name": "港式醬燜牛肉燴飯",
     "store": "7-11",
     "category": "dinner",
@@ -427,14 +634,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 16,
     "price": 109,
     "photo_url": "https://www.7-11.com.tw/images/products/24.jpg",
-    "description": "港式醬燜牛肉燴飯：31g 蛋白質，488 kcal",
-    "source": "convenience",
+    "description": "7-11 鮮食官網 · 港式醬燜牛肉燴飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "7-11 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-1",
+    "id": "sprint1-family-lunch-1",
     "name": "泰式酸辣雞腿冷麵",
     "store": "全家",
     "category": "lunch",
@@ -444,14 +660,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 89,
     "photo_url": "https://www.7-11.com.tw/images/products/1.jpg",
-    "description": "泰式酸辣雞腿冷麵：23g 蛋白質，369 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 泰式酸辣雞腿冷麵 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-2",
+    "id": "sprint1-family-lunch-2",
     "name": "京醬鴨絲飯",
     "store": "全家",
     "category": "lunch",
@@ -461,14 +686,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 17,
     "price": 45,
     "photo_url": "https://www.7-11.com.tw/images/products/2.jpg",
-    "description": "京醬鴨絲飯：31g 蛋白質，500 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 京醬鴨絲飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-3",
+    "id": "sprint1-family-lunch-3",
     "name": "港式叉燒油雞飯",
     "store": "全家",
     "category": "lunch",
@@ -478,14 +712,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 17,
     "price": 109,
     "photo_url": "https://www.7-11.com.tw/images/products/3.jpg",
-    "description": "港式叉燒油雞飯：31g 蛋白質，500 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 港式叉燒油雞飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-4",
+    "id": "sprint1-family-lunch-4",
     "name": "三杯雞燴飯",
     "store": "全家",
     "category": "lunch",
@@ -495,14 +738,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 23,
     "price": 99,
     "photo_url": "https://www.7-11.com.tw/images/products/4.jpg",
-    "description": "三杯雞燴飯：44g 蛋白質，700 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 三杯雞燴飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-5",
+    "id": "sprint1-family-lunch-5",
     "name": "麻油雞飯",
     "store": "全家",
     "category": "lunch",
@@ -512,14 +764,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 49,
     "photo_url": "https://www.7-11.com.tw/images/products/5.jpg",
-    "description": "麻油雞飯：22g 蛋白質，354 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 麻油雞飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-6",
+    "id": "sprint1-family-lunch-6",
     "name": "四起司香草烤雞握便當",
     "store": "全家",
     "category": "lunch",
@@ -529,14 +790,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 14,
     "price": 69,
     "photo_url": "https://www.7-11.com.tw/images/products/6.jpg",
-    "description": "四起司香草烤雞握便當：26g 蛋白質，414 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 四起司香草烤雞握便當 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-7",
+    "id": "sprint1-family-lunch-7",
     "name": "爆蛋肉燥新極大飯",
     "store": "全家",
     "category": "lunch",
@@ -546,14 +816,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 10,
     "price": 55,
     "photo_url": "https://www.7-11.com.tw/images/products/7.jpg",
-    "description": "爆蛋肉燥新極大飯：23g 蛋白質，307 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 爆蛋肉燥新極大飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-8",
+    "id": "sprint1-family-lunch-8",
     "name": "柱侯牛腱飯",
     "store": "全家",
     "category": "lunch",
@@ -563,14 +842,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 19,
     "price": 109,
     "photo_url": "https://www.7-11.com.tw/images/products/8.jpg",
-    "description": "柱侯牛腱飯：36g 蛋白質，574 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 柱侯牛腱飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-9",
+    "id": "sprint1-family-lunch-9",
     "name": "府城肉燥厚切排骨飯",
     "store": "全家",
     "category": "lunch",
@@ -580,14 +868,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 21,
     "price": 129,
     "photo_url": "https://www.7-11.com.tw/images/products/9.jpg",
-    "description": "府城肉燥厚切排骨飯：39g 蛋白質，620 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 府城肉燥厚切排骨飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-10",
+    "id": "sprint1-family-lunch-10",
     "name": "米香鹹酥蝦飯",
     "store": "全家",
     "category": "lunch",
@@ -597,14 +894,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 7,
     "price": 49,
     "photo_url": "https://www.7-11.com.tw/images/products/10.jpg",
-    "description": "米香鹹酥蝦飯：16g 蛋白質，226 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 米香鹹酥蝦飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-11",
+    "id": "sprint1-family-lunch-11",
     "name": "晶英三杯蛤蜊飯",
     "store": "全家",
     "category": "lunch",
@@ -614,14 +920,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 8,
     "price": 39,
     "photo_url": "https://www.7-11.com.tw/images/products/11.jpg",
-    "description": "晶英三杯蛤蜊飯：18g 蛋白質，250 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 晶英三杯蛤蜊飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-12",
+    "id": "sprint1-family-lunch-12",
     "name": "晶英韓式炸豬排起司雙拼飯",
     "store": "全家",
     "category": "lunch",
@@ -631,14 +946,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 89,
     "photo_url": "https://www.7-11.com.tw/images/products/12.jpg",
-    "description": "晶英韓式炸豬排起司雙拼飯：22g 蛋白質，351 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 晶英韓式炸豬排起司雙拼飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-lunch-13",
+    "id": "sprint1-family-lunch-13",
     "name": "麻辣奶油鮮蝦義大利麵",
     "store": "全家",
     "category": "lunch",
@@ -648,14 +972,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 19,
     "price": 149,
     "photo_url": "https://www.7-11.com.tw/images/products/13.jpg",
-    "description": "麻辣奶油鮮蝦義大利麵：41g 蛋白質，586 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 麻辣奶油鮮蝦義大利麵 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-breakfast-14",
+    "id": "sprint1-family-breakfast-14",
     "name": "御飯糰-梅子紫蘇",
     "store": "全家",
     "category": "breakfast",
@@ -665,14 +998,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 7,
     "price": 25,
     "photo_url": "https://www.7-11.com.tw/images/products/14.jpg",
-    "description": "御飯糰-梅子紫蘇：7g 蛋白質，180 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 御飯糰-梅子紫蘇 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-breakfast-15",
+    "id": "sprint1-family-breakfast-15",
     "name": "御飯糰-鮭魚",
     "store": "全家",
     "category": "breakfast",
@@ -682,14 +1024,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 6,
     "price": 28,
     "photo_url": "https://www.7-11.com.tw/images/products/15.jpg",
-    "description": "御飯糰-鮭魚：13g 蛋白質，190 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 御飯糰-鮭魚 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-breakfast-16",
+    "id": "sprint1-family-breakfast-16",
     "name": "御飯糰-鮪魚起司",
     "store": "全家",
     "category": "breakfast",
@@ -699,14 +1050,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 6,
     "price": 30,
     "photo_url": "https://www.7-11.com.tw/images/products/16.jpg",
-    "description": "御飯糰-鮪魚起司：14g 蛋白質，200 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 御飯糰-鮪魚起司 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-breakfast-17",
+    "id": "sprint1-family-breakfast-17",
     "name": "原賞三明治-火腿起司蛋",
     "store": "全家",
     "category": "breakfast",
@@ -716,14 +1076,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 9,
     "price": 45,
     "photo_url": "https://www.7-11.com.tw/images/products/17.jpg",
-    "description": "原賞三明治-火腿起司蛋：21g 蛋白質，280 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 原賞三明治-火腿起司蛋 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-breakfast-18",
+    "id": "sprint1-family-breakfast-18",
     "name": "原賞三明治-雞肉沙拉",
     "store": "全家",
     "category": "breakfast",
@@ -733,14 +1102,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 8,
     "price": 48,
     "photo_url": "https://www.7-11.com.tw/images/products/18.jpg",
-    "description": "原賞三明治-雞肉沙拉：15g 蛋白質，240 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 原賞三明治-雞肉沙拉 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-breakfast-19",
+    "id": "sprint1-family-breakfast-19",
     "name": "7-11茶葉蛋",
     "store": "全家",
     "category": "breakfast",
@@ -750,14 +1128,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 2,
     "price": 10,
     "photo_url": "https://www.7-11.com.tw/images/products/19.jpg",
-    "description": "7-11茶葉蛋：4g 蛋白質，50 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 7-11茶葉蛋 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-breakfast-20",
+    "id": "sprint1-family-breakfast-20",
     "name": "豆漿早餐組合",
     "store": "全家",
     "category": "breakfast",
@@ -767,14 +1154,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 11,
     "price": 35,
     "photo_url": "https://www.7-11.com.tw/images/products/20.jpg",
-    "description": "豆漿早餐組合：15g 蛋白質，300 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 豆漿早餐組合 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-dinner-21",
+    "id": "sprint1-family-dinner-21",
     "name": "台韓半半炸雞便當",
     "store": "全家",
     "category": "dinner",
@@ -784,14 +1180,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 22,
     "price": 119,
     "photo_url": "https://www.7-11.com.tw/images/products/21.jpg",
-    "description": "台韓半半炸雞便當：41g 蛋白質，650 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 台韓半半炸雞便當 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-dinner-22",
+    "id": "sprint1-family-dinner-22",
     "name": "泡菜豬肉豆腐煲燴飯",
     "store": "全家",
     "category": "dinner",
@@ -801,14 +1206,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 99,
     "photo_url": "https://www.7-11.com.tw/images/products/22.jpg",
-    "description": "泡菜豬肉豆腐煲燴飯：33g 蛋白質，531 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 泡菜豬肉豆腐煲燴飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-dinner-23",
+    "id": "sprint1-family-dinner-23",
     "name": "椰香綠咖哩嫩雞飯",
     "store": "全家",
     "category": "dinner",
@@ -818,14 +1232,23 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 22,
     "price": 99,
     "photo_url": "https://www.7-11.com.tw/images/products/23.jpg",
-    "description": "椰香綠咖哩嫩雞飯：42g 蛋白質，668 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 椰香綠咖哩嫩雞飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "id": "family-dinner-24",
+    "id": "sprint1-family-dinner-24",
     "name": "港式醬燜牛肉燴飯",
     "store": "全家",
     "category": "dinner",
@@ -835,11 +1258,20 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 16,
     "price": 109,
     "photo_url": "https://www.7-11.com.tw/images/products/24.jpg",
-    "description": "港式醬燜牛肉燴飯：31g 蛋白質，488 kcal",
-    "source": "convenience",
+    "description": "全家 鮮食官網 · 港式醬燜牛肉燴飯 · BDGS promoted",
+    "source": "chain",
     "role": "combo",
     "portionable": false,
-    "tags": []
+    "tags": [],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "全家 鮮食官網",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -947,7 +1379,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "sbux-bf-2",
+    "id": "sprint1-星巴克-雞肉沙拉三明治",
     "name": "雞肉沙拉三明治",
     "store": "星巴克",
     "source": "chain",
@@ -958,7 +1390,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 14,
     "price": 105,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "星巴克 官方營養參考 · 雞肉沙拉三明治 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "星巴克 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -1049,24 +1490,33 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "mcd-ln-1",
+    "id": "sprint1-麥當勞-大麥克",
     "name": "大麥克",
     "store": "麥當勞",
     "source": "chain",
     "category": "lunch",
-    "calories": 550,
+    "calories": 563,
     "protein_g": 26,
     "carbs_g": 42,
     "fat_g": 30,
-    "price": 115,
+    "price": 0,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "麥當勞 官方營養標示 · 大麥克 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "mcd-ln-2",
+    "id": "sprint1-麥當勞-雙層牛肉吉士堡",
     "name": "雙層牛肉吉士堡",
     "store": "麥當勞",
     "source": "chain",
@@ -1075,9 +1525,18 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 28,
     "carbs_g": 35,
     "fat_g": 26,
-    "price": 95,
+    "price": 0,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "麥當勞 官方營養標示 · 雙層牛肉吉士堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -1236,7 +1695,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "mos-ln-3",
+    "id": "sprint3-摩斯漢堡-摩斯雞腿堡",
     "name": "摩斯雞腿堡",
     "store": "摩斯漢堡",
     "source": "chain",
@@ -1245,9 +1704,18 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 26,
     "carbs_g": 40,
     "fat_g": 22,
-    "price": 95,
+    "price": 0,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "ONR 摩斯漢堡 · 摩斯雞腿堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 摩斯漢堡",
+      "verified_at": "2026-06-25T16:18:32.632Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:32.632Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -1423,18 +1891,27 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "dk-ln-3",
+    "id": "sprint1-吉野家-牛丼（中）",
     "name": "牛丼（中）",
     "store": "吉野家",
     "source": "chain",
     "category": "lunch",
-    "calories": 650,
+    "calories": 733,
     "protein_g": 30,
     "carbs_g": 82,
     "fat_g": 18,
-    "price": 145,
+    "price": 0,
     "photo_url": "",
-    "description": "日式連鎖"
+    "description": "吉野家 官方營養標示 · 牛丼（中） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "吉野家 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -1576,18 +2053,27 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "ub-ln-3",
+    "id": "sprint1-吉野家-牛丼（中）",
     "name": "牛丼（中）",
     "store": "吉野家",
-    "source": "delivery",
+    "source": "chain",
     "category": "lunch",
-    "calories": 650,
+    "calories": 733,
     "protein_g": 30,
     "carbs_g": 82,
     "fat_g": 18,
-    "price": 145,
+    "price": 0,
     "photo_url": "",
-    "description": "Uber Eats 可外送"
+    "description": "吉野家 官方營養標示 · 牛丼（中） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "吉野家 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -1848,7 +2334,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "三商巧福-肉燥飯套餐",
+    "id": "sprint1-三商巧福-肉燥飯套餐",
     "name": "肉燥飯套餐",
     "store": "三商巧福",
     "source": "chain",
@@ -1859,13 +2345,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 16,
     "price": 89,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 肉燥飯套餐 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "三商巧福-雞肉粥",
+    "id": "sprint1-三商巧福-雞肉粥",
     "name": "雞肉粥",
     "store": "三商巧福",
     "source": "chain",
@@ -1876,13 +2371,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 6,
     "price": 65,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 雞肉粥 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "三商巧福-皮蛋瘦肉粥",
+    "id": "sprint1-三商巧福-皮蛋瘦肉粥",
     "name": "皮蛋瘦肉粥",
     "store": "三商巧福",
     "source": "chain",
@@ -1893,13 +2397,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 10,
     "price": 75,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 皮蛋瘦肉粥 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "三商巧福-燒餅油條套餐",
+    "id": "sprint1-三商巧福-燒餅油條套餐",
     "name": "燒餅油條套餐",
     "store": "三商巧福",
     "source": "chain",
@@ -1910,13 +2423,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 22,
     "price": 70,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 燒餅油條套餐 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "三商巧福-原味牛肉麵",
+    "id": "sprint1-三商巧福-原味牛肉麵",
     "name": "原味牛肉麵",
     "store": "三商巧福",
     "source": "chain",
@@ -1927,13 +2449,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 150,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 原味牛肉麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "三商巧福-清燉牛肉麵",
+    "id": "sprint1-三商巧福-清燉牛肉麵",
     "name": "清燉牛肉麵",
     "store": "三商巧福",
     "source": "chain",
@@ -1944,7 +2475,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 150,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 清燉牛肉麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -1952,7 +2492,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "tags": [
       "rice"
     ],
-    "id": "三商巧福-排骨飯",
+    "id": "sprint1-三商巧福-排骨飯",
     "name": "排骨飯",
     "store": "三商巧福",
     "source": "chain",
@@ -1963,7 +2503,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 28,
     "price": 140,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 排骨飯 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -1971,7 +2520,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "tags": [
       "rice"
     ],
-    "id": "三商巧福-雞腿飯",
+    "id": "sprint1-三商巧福-雞腿飯",
     "name": "雞腿飯",
     "store": "三商巧福",
     "source": "chain",
@@ -1982,13 +2531,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 24,
     "price": 135,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 雞腿飯 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "三商巧福-炸醬麵",
+    "id": "sprint1-三商巧福-炸醬麵",
     "name": "炸醬麵",
     "store": "三商巧福",
     "source": "chain",
@@ -1999,13 +2557,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 22,
     "price": 120,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 炸醬麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "三商巧福-麻醬麵",
+    "id": "sprint1-三商巧福-麻醬麵",
     "name": "麻醬麵",
     "store": "三商巧福",
     "source": "chain",
@@ -2016,13 +2583,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 20,
     "price": 110,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 麻醬麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "三商巧福-乾拌麵-貢丸",
+    "id": "sprint1-三商巧福-乾拌麵-貢丸",
     "name": "乾拌麵+貢丸",
     "store": "三商巧福",
     "source": "chain",
@@ -2033,7 +2609,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 16,
     "price": 95,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 乾拌麵+貢丸 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -2073,7 +2658,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "三商巧福-水餃-10顆",
+    "id": "sprint1-三商巧福-水餃-10顆",
     "name": "水餃（10顆）",
     "store": "三商巧福",
     "source": "chain",
@@ -2084,7 +2669,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 16,
     "price": 90,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "三商巧福 官方營養參考 · 水餃（10顆） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "side",
@@ -2109,7 +2703,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "tags": [
       "rice"
     ],
-    "id": "鬍鬚張-肉燥飯",
+    "id": "sprint1-鬍鬚張-肉燥飯",
     "name": "肉燥飯",
     "store": "鬍鬚張",
     "source": "chain",
@@ -2120,13 +2714,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 14,
     "price": 55,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "鬍鬚張 官方營養參考 · 肉燥飯 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "鬍鬚張-雞肉粥",
+    "id": "sprint1-鬍鬚張-雞肉粥",
     "name": "雞肉粥",
     "store": "鬍鬚張",
     "source": "chain",
@@ -2137,7 +2740,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 5,
     "price": 60,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "鬍鬚張 官方營養參考 · 雞肉粥 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -2145,7 +2757,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "tags": [
       "rice"
     ],
-    "id": "鬍鬚張-排骨飯",
+    "id": "sprint1-鬍鬚張-排骨飯",
     "name": "排骨飯",
     "store": "鬍鬚張",
     "source": "chain",
@@ -2156,7 +2768,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 30,
     "price": 145,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "鬍鬚張 官方營養參考 · 排骨飯 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -2164,7 +2785,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "tags": [
       "rice"
     ],
-    "id": "鬍鬚張-雞腿飯",
+    "id": "sprint1-鬍鬚張-雞腿飯",
     "name": "雞腿飯",
     "store": "鬍鬚張",
     "source": "chain",
@@ -2175,7 +2796,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 26,
     "price": 135,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "鬍鬚張 官方營養參考 · 雞腿飯 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -2183,7 +2813,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "tags": [
       "rice"
     ],
-    "id": "鬍鬚張-焢肉飯",
+    "id": "sprint1-鬍鬚張-焢肉飯",
     "name": "焢肉飯",
     "store": "鬍鬚張",
     "source": "chain",
@@ -2194,7 +2824,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 28,
     "price": 125,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "鬍鬚張 官方營養參考 · 焢肉飯 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -2202,7 +2841,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "tags": [
       "rice"
     ],
-    "id": "鬍鬚張-魚排便當",
+    "id": "sprint1-鬍鬚張-魚排便當",
     "name": "魚排便當",
     "store": "鬍鬚張",
     "source": "chain",
@@ -2213,13 +2852,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 140,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "鬍鬚張 官方營養參考 · 魚排便當 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "鬍鬚張-排骨麵",
+    "id": "sprint1-鬍鬚張-排骨麵",
     "name": "排骨麵",
     "store": "鬍鬚張",
     "source": "chain",
@@ -2230,13 +2878,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 24,
     "price": 130,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "鬍鬚張 官方營養參考 · 排骨麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "鬍鬚張-牛肉麵",
+    "id": "sprint1-鬍鬚張-牛肉麵",
     "name": "牛肉麵",
     "store": "鬍鬚張",
     "source": "chain",
@@ -2247,7 +2904,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 140,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "鬍鬚張 官方營養參考 · 牛肉麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -2272,7 +2938,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "鬍鬚張-肉燥麵",
+    "id": "sprint1-鬍鬚張-肉燥麵",
     "name": "肉燥麵",
     "store": "鬍鬚張",
     "source": "chain",
@@ -2283,7 +2949,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 16,
     "price": 85,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "鬍鬚張 官方營養參考 · 肉燥麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "side",
@@ -3386,7 +4061,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "drink",
     "portionable": false,
     "tags": [],
-    "id": "星巴克-拿鐵-中",
+    "id": "sprint1-星巴克-拿鐵-中",
     "name": "拿鐵（中）",
     "store": "星巴克",
     "source": "chain",
@@ -3397,13 +4072,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 7,
     "price": 135,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "星巴克 官方營養參考 · 拿鐵（中） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "星巴克 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "drink",
     "portionable": false,
     "tags": [],
-    "id": "星巴克-美式咖啡-中",
+    "id": "sprint1-星巴克-美式咖啡-中",
     "name": "美式咖啡（中）",
     "store": "星巴克",
     "source": "chain",
@@ -3414,13 +4098,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 0,
     "price": 95,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "星巴克 官方營養參考 · 美式咖啡（中） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "星巴克 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "星巴克-火腿起司可頌",
+    "id": "sprint1-星巴克-火腿起司可頌",
     "name": "火腿起司可頌",
     "store": "星巴克",
     "source": "chain",
@@ -3431,13 +4124,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 95,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "星巴克 官方營養參考 · 火腿起司可頌 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "星巴克 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "星巴克-雞肉沙拉三明治",
+    "id": "sprint1-星巴克-雞肉沙拉三明治",
     "name": "雞肉沙拉三明治",
     "store": "星巴克",
     "source": "chain",
@@ -3448,13 +4150,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 14,
     "price": 105,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "星巴克 官方營養參考 · 雞肉沙拉三明治 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "星巴克 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "星巴克-雞肉捲餅",
+    "id": "sprint1-星巴克-雞肉捲餅",
     "name": "雞肉捲餅",
     "store": "星巴克",
     "source": "chain",
@@ -3465,13 +4176,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 14,
     "price": 120,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "星巴克 官方營養參考 · 雞肉捲餅 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "星巴克 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "main",
     "portionable": false,
     "tags": [],
-    "id": "星巴克-雞胸沙拉",
+    "id": "sprint1-星巴克-雞胸沙拉",
     "name": "雞胸沙拉",
     "store": "星巴克",
     "source": "chain",
@@ -3482,13 +4202,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 10,
     "price": 180,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "星巴克 官方營養參考 · 雞胸沙拉 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "星巴克 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "星巴克-青醬雞肉義大利麵",
+    "id": "sprint1-星巴克-青醬雞肉義大利麵",
     "name": "青醬雞肉義大利麵",
     "store": "星巴克",
     "source": "chain",
@@ -3499,13 +4228,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 220,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "星巴克 官方營養參考 · 青醬雞肉義大利麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "星巴克 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "drink",
     "portionable": false,
     "tags": [],
-    "id": "路易莎-經典拿鐵-中",
+    "id": "sprint1-路易莎-經典拿鐵-中",
     "name": "經典拿鐵（中）",
     "store": "路易莎",
     "source": "chain",
@@ -3516,13 +4254,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 8,
     "price": 90,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "路易莎 官方營養參考 · 經典拿鐵（中） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "路易莎 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "drink",
     "portionable": false,
     "tags": [],
-    "id": "路易莎-美式-中",
+    "id": "sprint1-路易莎-美式-中",
     "name": "美式（中）",
     "store": "路易莎",
     "source": "chain",
@@ -3533,13 +4280,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 0,
     "price": 70,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "路易莎 官方營養參考 · 美式（中） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "路易莎 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "路易莎-厚片吐司-奶酥",
+    "id": "sprint1-路易莎-厚片吐司-奶酥",
     "name": "厚片吐司（奶酥）",
     "store": "路易莎",
     "source": "chain",
@@ -3550,13 +4306,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 45,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "路易莎 官方營養參考 · 厚片吐司（奶酥） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "路易莎 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "路易莎-花生厚片",
+    "id": "sprint1-路易莎-花生厚片",
     "name": "花生厚片",
     "store": "路易莎",
     "source": "chain",
@@ -3567,13 +4332,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 16,
     "price": 45,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "路易莎 官方營養參考 · 花生厚片 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "路易莎 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "路易莎-燻雞帕尼尼",
+    "id": "sprint1-路易莎-燻雞帕尼尼",
     "name": "燻雞帕尼尼",
     "store": "路易莎",
     "source": "chain",
@@ -3584,13 +4358,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 120,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "路易莎 官方營養參考 · 燻雞帕尼尼 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "路易莎 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "main",
     "portionable": false,
     "tags": [],
-    "id": "路易莎-鮪魚沙拉",
+    "id": "sprint1-路易莎-鮪魚沙拉",
     "name": "鮪魚沙拉",
     "store": "路易莎",
     "source": "chain",
@@ -3601,13 +4384,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 150,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "路易莎 官方營養參考 · 鮪魚沙拉 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "路易莎 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "路易莎-奶油培根義大利麵",
+    "id": "sprint1-路易莎-奶油培根義大利麵",
     "name": "奶油培根義大利麵",
     "store": "路易莎",
     "source": "chain",
@@ -3618,7 +4410,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 28,
     "price": 180,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "路易莎 官方營養參考 · 奶油培根義大利麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "路易莎 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "drink",
@@ -3675,58 +4476,85 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "85度c-起司條麵包",
+    "id": "sprint2-85度C-起司條麵包",
     "name": "起司條麵包",
     "store": "85度C",
     "source": "chain",
-    "category": "breakfast",
+    "category": "lunch",
     "calories": 280,
     "protein_g": 10,
     "carbs_g": 38,
     "fat_g": 10,
-    "price": 35,
+    "price": 0,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "ONR 85度C · 起司條麵包 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 85度C",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "85度c-蒜香法棍",
+    "id": "sprint2-85度C-蒜香法棍",
     "name": "蒜香法棍",
     "store": "85度C",
     "source": "chain",
-    "category": "breakfast",
+    "category": "lunch",
     "calories": 220,
     "protein_g": 7,
     "carbs_g": 38,
     "fat_g": 5,
-    "price": 30,
+    "price": 0,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "ONR 85度C · 蒜香法棍 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 85度C",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "85度c-海綿蛋糕",
+    "id": "sprint2-85度C-海綿蛋糕",
     "name": "海綿蛋糕",
     "store": "85度C",
     "source": "chain",
-    "category": "breakfast",
+    "category": "lunch",
     "calories": 320,
     "protein_g": 6,
     "carbs_g": 48,
     "fat_g": 12,
-    "price": 45,
+    "price": 0,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "ONR 85度C · 海綿蛋糕 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 85度C",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "85度c-總匯三明治",
+    "id": "sprint2-85度C-總匯三明治",
     "name": "總匯三明治",
     "store": "85度C",
     "source": "chain",
@@ -3735,17 +4563,24 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 16,
     "carbs_g": 40,
     "fat_g": 18,
-    "price": 65,
+    "price": 0,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "ONR 85度C · 總匯三明治 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 85度C",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
-    "portionable": true,
-    "tags": [
-      "rice"
-    ],
-    "id": "85度c-雞排便當",
+    "portionable": false,
+    "tags": [],
+    "id": "sprint2-85度C-雞排便當",
     "name": "雞排便當",
     "store": "85度C",
     "source": "chain",
@@ -3754,9 +4589,18 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 30,
     "carbs_g": 72,
     "fat_g": 22,
-    "price": 95,
+    "price": 0,
     "photo_url": "",
-    "description": "咖啡連鎖官方參考"
+    "description": "ONR 85度C · 雞排便當 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 85度C",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "drink",
@@ -3815,7 +4659,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "丸龜製麵-釜玉烏龍",
+    "id": "sprint1-丸龜製麵-釜玉烏龍",
     "name": "釜玉烏龍",
     "store": "丸龜製麵",
     "source": "chain",
@@ -3826,13 +4670,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 99,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "丸龜製麵 官方營養參考 · 釜玉烏龍 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "丸龜製麵 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "丸龜製麵-牛肉烏龍",
+    "id": "sprint1-丸龜製麵-牛肉烏龍",
     "name": "牛肉烏龍",
     "store": "丸龜製麵",
     "source": "chain",
@@ -3843,13 +4696,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 129,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "丸龜製麵 官方營養參考 · 牛肉烏龍 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "丸龜製麵 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "丸龜製麵-天婦羅烏龍",
+    "id": "sprint1-丸龜製麵-天婦羅烏龍",
     "name": "天婦羅烏龍",
     "store": "丸龜製麵",
     "source": "chain",
@@ -3860,13 +4722,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 24,
     "price": 139,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "丸龜製麵 官方營養參考 · 天婦羅烏龍 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "丸龜製麵 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "丸龜製麵-明太子烏龍",
+    "id": "sprint1-丸龜製麵-明太子烏龍",
     "name": "明太子烏龍",
     "store": "丸龜製麵",
     "source": "chain",
@@ -3877,13 +4748,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 16,
     "price": 119,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "丸龜製麵 官方營養參考 · 明太子烏龍 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "丸龜製麵 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "丸龜製麵-咖哩烏龍",
+    "id": "sprint1-丸龜製麵-咖哩烏龍",
     "name": "咖哩烏龍",
     "store": "丸龜製麵",
     "source": "chain",
@@ -3894,7 +4774,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 109,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "丸龜製麵 官方營養參考 · 咖哩烏龍 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "丸龜製麵 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -6012,7 +6901,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "麥當勞-豬肉滿福堡",
+    "id": "sprint1-麥當勞-豬肉滿福堡",
     "name": "豬肉滿福堡",
     "store": "麥當勞",
     "source": "chain",
@@ -6023,13 +6912,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 55,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "麥當勞 官方營養參考 · 豬肉滿福堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "麥當勞-無敵蛋餅",
+    "id": "sprint1-麥當勞-無敵蛋餅",
     "name": "無敵蛋餅",
     "store": "麥當勞",
     "source": "chain",
@@ -6040,13 +6938,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 24,
     "price": 65,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "麥當勞 官方營養參考 · 無敵蛋餅 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "麥當勞-四盎司牛肉堡",
+    "id": "sprint1-麥當勞-四盎司牛肉堡",
     "name": "四盎司牛肉堡",
     "store": "麥當勞",
     "source": "chain",
@@ -6057,30 +6964,48 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 28,
     "price": 105,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "麥當勞 官方營養參考 · 四盎司牛肉堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "麥當勞-麥克雞塊-6塊",
+    "id": "sprint1-麥當勞-麥克雞塊（6塊）",
     "name": "麥克雞塊（6塊）",
     "store": "麥當勞",
     "source": "chain",
     "category": "lunch",
     "calories": 280,
-    "protein_g": 14,
+    "protein_g": 16,
     "carbs_g": 18,
-    "fat_g": 18,
-    "price": 75,
+    "fat_g": 16,
+    "price": 0,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "麥當勞 官方營養標示 · 麥克雞塊（6塊） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "麥當勞-蘋果派",
+    "id": "sprint1-麥當勞-蘋果派",
     "name": "蘋果派",
     "store": "麥當勞",
     "source": "chain",
@@ -6091,13 +7016,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 35,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "麥當勞 官方營養參考 · 蘋果派 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "side",
     "portionable": false,
     "tags": [],
-    "id": "麥當勞-玉米濃湯",
+    "id": "sprint1-麥當勞-玉米濃湯",
     "name": "玉米濃湯",
     "store": "麥當勞",
     "source": "chain",
@@ -6108,13 +7042,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 4,
     "price": 35,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "麥當勞 官方營養參考 · 玉米濃湯 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "麥當勞-雙層麥香魚",
+    "id": "sprint1-麥當勞-雙層麥香魚",
     "name": "雙層麥香魚",
     "store": "麥當勞",
     "source": "chain",
@@ -6125,7 +7068,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 22,
     "price": 85,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "麥當勞 官方營養參考 · 雙層麥香魚 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -6148,7 +7100,7 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "肯德基-燻雞蛋餅",
+    "id": "sprint1-肯德基-燻雞蛋餅",
     "name": "燻雞蛋餅",
     "store": "肯德基",
     "source": "chain",
@@ -6159,13 +7111,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 20,
     "price": 65,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "肯德基 官方營養參考 · 燻雞蛋餅 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "肯德基 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "肯德基-上校雞塊-6塊",
+    "id": "sprint1-肯德基-上校雞塊-6塊",
     "name": "上校雞塊（6塊）",
     "store": "肯德基",
     "source": "chain",
@@ -6176,13 +7137,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 80,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "肯德基 官方營養參考 · 上校雞塊（6塊） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "肯德基 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "肯德基-香雞飯套餐",
+    "id": "sprint1-肯德基-香雞飯套餐",
     "name": "香雞飯套餐",
     "store": "肯德基",
     "source": "chain",
@@ -6193,47 +7163,74 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 24,
     "price": 159,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "肯德基 官方營養參考 · 香雞飯套餐 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "肯德基 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "肯德基-咔啦脆雞-二塊",
+    "id": "sprint1-肯德基-咔啦脆雞-二塊",
     "name": "咔啦脆雞（二塊）",
     "store": "肯德基",
     "source": "chain",
     "category": "dinner",
     "calories": 380,
-    "protein_g": 28,
-    "carbs_g": 12,
-    "fat_g": 24,
+    "protein_g": 24,
+    "carbs_g": 18,
+    "fat_g": 22,
     "price": 120,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "肯德基 官方營養參考 · 咔啦脆雞（二塊） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "肯德基 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "摩斯漢堡-熱狗堡",
+    "id": "sprint3-摩斯漢堡-熱狗堡",
     "name": "熱狗堡",
     "store": "摩斯漢堡",
     "source": "chain",
-    "category": "breakfast",
+    "category": "lunch",
     "calories": 320,
     "protein_g": 12,
     "carbs_g": 32,
     "fat_g": 16,
-    "price": 45,
+    "price": 0,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "ONR 摩斯漢堡 · 熱狗堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 摩斯漢堡",
+      "verified_at": "2026-06-25T16:18:32.632Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:32.632Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "摩斯漢堡-摩斯吉士漢堡",
+    "id": "sprint3-摩斯漢堡-摩斯吉士漢堡",
     "name": "摩斯吉士漢堡",
     "store": "摩斯漢堡",
     "source": "chain",
@@ -6242,32 +7239,50 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 20,
     "carbs_g": 36,
     "fat_g": 22,
-    "price": 75,
+    "price": 0,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "ONR 摩斯漢堡 · 摩斯吉士漢堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 摩斯漢堡",
+      "verified_at": "2026-06-25T16:18:32.632Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:32.632Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "摩斯漢堡-辣味雞腿堡",
+    "id": "sprint3-摩斯漢堡-辣味雞腿堡",
     "name": "辣味雞腿堡",
     "store": "摩斯漢堡",
     "source": "chain",
-    "category": "dinner",
+    "category": "lunch",
     "calories": 450,
     "protein_g": 24,
     "carbs_g": 38,
     "fat_g": 20,
-    "price": 85,
+    "price": 0,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "ONR 摩斯漢堡 · 辣味雞腿堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 摩斯漢堡",
+      "verified_at": "2026-06-25T16:18:32.632Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:32.632Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "subway-蔬菜沙拉潛艇堡",
+    "id": "sprint1-subway-蔬菜沙拉潛艇堡",
     "name": "蔬菜沙拉潛艇堡",
     "store": "Subway",
     "source": "chain",
@@ -6278,13 +7293,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 4,
     "price": 85,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "Subway 官方營養參考 · 蔬菜沙拉潛艇堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "Subway 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "subway-照燒雞胸潛艇堡",
+    "id": "sprint1-subway-照燒雞胸潛艇堡",
     "name": "照燒雞胸潛艇堡",
     "store": "Subway",
     "source": "chain",
@@ -6295,13 +7319,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 5,
     "price": 99,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "Subway 官方營養參考 · 照燒雞胸潛艇堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "Subway 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "subway-牛排起司潛艇堡",
+    "id": "sprint1-subway-牛排起司潛艇堡",
     "name": "牛排起司潛艇堡",
     "store": "Subway",
     "source": "chain",
@@ -6312,13 +7345,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 12,
     "price": 115,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "Subway 官方營養參考 · 牛排起司潛艇堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "Subway 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "丹丹漢堡-炸雞腿堡",
+    "id": "sprint2-丹丹漢堡-炸雞腿堡",
     "name": "炸雞腿堡",
     "store": "丹丹漢堡",
     "source": "chain",
@@ -6327,15 +7369,24 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 24,
     "carbs_g": 42,
     "fat_g": 28,
-    "price": 75,
+    "price": 0,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "ONR 丹丹漢堡 · 炸雞腿堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 丹丹漢堡",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "丹丹漢堡-招牌麵線",
+    "id": "sprint2-丹丹漢堡-招牌麵線",
     "name": "招牌麵線",
     "store": "丹丹漢堡",
     "source": "chain",
@@ -6344,9 +7395,18 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 12,
     "carbs_g": 52,
     "fat_g": 14,
-    "price": 55,
+    "price": 0,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "ONR 丹丹漢堡 · 招牌麵線 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 丹丹漢堡",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -6388,9 +7448,9 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "sukiya-牛丼-小",
+    "id": "sprint1-sukiya-牛丼-小",
     "name": "牛丼（小）",
-    "store": "SUKIYA",
+    "store": "Sukiya",
     "source": "chain",
     "category": "lunch",
     "calories": 480,
@@ -6399,7 +7459,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 14,
     "price": 99,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "Sukiya 官方營養參考 · 牛丼（小） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "Sukiya 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -6422,9 +7491,9 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "sukiya-親子丼",
+    "id": "sprint1-sukiya-親子丼",
     "name": "親子丼",
-    "store": "SUKIYA",
+    "store": "Sukiya",
     "source": "chain",
     "category": "lunch",
     "calories": 560,
@@ -6433,15 +7502,24 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 16,
     "price": 119,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "Sukiya 官方營養參考 · 親子丼 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "Sukiya 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "sukiya-起司牛丼",
+    "id": "sprint1-sukiya-起司牛丼",
     "name": "起司牛丼",
-    "store": "SUKIYA",
+    "store": "Sukiya",
     "source": "chain",
     "category": "dinner",
     "calories": 680,
@@ -6450,7 +7528,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 26,
     "price": 149,
     "photo_url": "",
-    "description": "官方營養參考"
+    "description": "Sukiya 官方營養參考 · 起司牛丼 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "Sukiya 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -15326,22 +16413,29 @@ export const eatOutMenu: ConvenienceItem[] = [
   },
   {
     "role": "combo",
-    "portionable": true,
-    "tags": [
-      "rice"
-    ],
-    "id": "吉野家-牛丼-中",
+    "portionable": false,
+    "tags": [],
+    "id": "sprint1-吉野家-牛丼（中）",
     "name": "牛丼（中）",
     "store": "吉野家",
-    "source": "delivery",
+    "source": "chain",
     "category": "lunch",
-    "calories": 650,
+    "calories": 733,
     "protein_g": 30,
     "carbs_g": 82,
     "fat_g": 18,
-    "price": 145,
+    "price": 0,
     "photo_url": "",
-    "description": "Uber Eats 可外送"
+    "description": "吉野家 官方營養標示 · 牛丼（中） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "吉野家 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -15349,10 +16443,10 @@ export const eatOutMenu: ConvenienceItem[] = [
     "tags": [
       "rice"
     ],
-    "id": "鬍鬚張-排骨飯-1",
+    "id": "sprint1-鬍鬚張-排骨飯",
     "name": "排骨飯",
     "store": "鬍鬚張",
-    "source": "delivery",
+    "source": "chain",
     "category": "lunch",
     "calories": 750,
     "protein_g": 30,
@@ -15360,18 +16454,25 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 30,
     "price": 145,
     "photo_url": "",
-    "description": "foodpanda 可外送"
+    "description": "鬍鬚張 官方營養參考 · 排骨飯 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
-    "portionable": true,
-    "tags": [
-      "noodle"
-    ],
-    "id": "三商巧福-原味牛肉麵-1",
+    "portionable": false,
+    "tags": [],
+    "id": "sprint1-三商巧福-原味牛肉麵",
     "name": "原味牛肉麵",
     "store": "三商巧福",
-    "source": "delivery",
+    "source": "chain",
     "category": "lunch",
     "calories": 580,
     "protein_g": 32,
@@ -15379,7 +16480,16 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 18,
     "price": 150,
     "photo_url": "",
-    "description": "Uber Eats 可外送"
+    "description": "三商巧福 官方營養參考 · 原味牛肉麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -16362,18 +17472,27 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "摩斯漢堡-摩斯漢堡",
+    "id": "sprint3-摩斯漢堡-摩斯漢堡",
     "name": "摩斯漢堡",
     "store": "摩斯漢堡",
     "source": "chain",
     "category": "lunch",
-    "calories": 595,
-    "protein_g": 17,
-    "carbs_g": 286,
-    "fat_g": 131,
-    "price": 124,
+    "calories": 380,
+    "protein_g": 18,
+    "carbs_g": 36,
+    "fat_g": 18,
+    "price": 0,
     "photo_url": "",
-    "description": "連鎖餐廳營養參考"
+    "description": "ONR 摩斯漢堡 · 摩斯漢堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 摩斯漢堡",
+      "verified_at": "2026-06-25T16:18:32.632Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:32.632Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -16447,52 +17566,79 @@ export const eatOutMenu: ConvenienceItem[] = [
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "麥當勞-麥香雞",
+    "id": "sprint1-麥當勞-麥香雞",
     "name": "麥香雞",
     "store": "麥當勞",
     "source": "chain",
     "category": "lunch",
-    "calories": 420,
-    "protein_g": 32,
-    "carbs_g": 202,
-    "fat_g": 92,
-    "price": 249,
+    "calories": 400,
+    "protein_g": 18,
+    "carbs_g": 36,
+    "fat_g": 18,
+    "price": 0,
     "photo_url": "",
-    "description": "連鎖餐廳營養參考"
+    "description": "麥當勞 官方營養標示 · 麥香雞 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "麥當勞-勁辣雞腿堡",
+    "id": "sprint1-麥當勞-勁辣雞腿堡",
     "name": "勁辣雞腿堡",
     "store": "麥當勞",
     "source": "chain",
     "category": "lunch",
-    "calories": 455,
-    "protein_g": 35,
-    "carbs_g": 218,
-    "fat_g": 100,
-    "price": 274,
+    "calories": 480,
+    "protein_g": 26,
+    "carbs_g": 40,
+    "fat_g": 24,
+    "price": 0,
     "photo_url": "",
-    "description": "連鎖餐廳營養參考"
+    "description": "麥當勞 官方營養標示 · 勁辣雞腿堡 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
     "tags": [],
-    "id": "麥當勞-大麥克",
+    "id": "sprint1-麥當勞-大麥克",
     "name": "大麥克",
     "store": "麥當勞",
     "source": "chain",
     "category": "lunch",
-    "calories": 490,
-    "protein_g": 14,
-    "carbs_g": 235,
-    "fat_g": 108,
-    "price": 99,
+    "calories": 563,
+    "protein_g": 26,
+    "carbs_g": 42,
+    "fat_g": 30,
+    "price": 0,
     "photo_url": "",
-    "description": "連鎖餐廳營養參考"
+    "description": "麥當勞 官方營養標示 · 大麥克 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -30383,43 +31529,61 @@ export const eatOutMenu: ConvenienceItem[] = [
   },
   {
     "role": "combo",
-    "portionable": false,
+    "portionable": true,
     "tags": [
-      "bento"
+      "rice"
     ],
-    "id": "hsz-排骨飯",
+    "id": "sprint1-鬍鬚張-排骨飯",
     "name": "排骨飯",
     "store": "鬍鬚張",
     "source": "chain",
     "category": "lunch",
-    "calories": 620,
-    "protein_g": 28,
-    "carbs_g": 72,
-    "fat_g": 22,
-    "price": 100,
+    "calories": 750,
+    "protein_g": 30,
+    "carbs_g": 88,
+    "fat_g": 30,
+    "price": 145,
     "photo_url": "",
-    "description": "鬍鬚張 · 排骨飯 · 估計營養（待交叉驗證）",
-    "kb_category": "bento"
+    "description": "鬍鬚張 官方營養參考 · 排骨飯 · BDGS promoted",
+    "kb_category": "bento",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
-    "portionable": false,
+    "portionable": true,
     "tags": [
-      "bento"
+      "rice"
     ],
-    "id": "hsz-雞腿飯",
+    "id": "sprint1-鬍鬚張-雞腿飯",
     "name": "雞腿飯",
     "store": "鬍鬚張",
     "source": "chain",
     "category": "lunch",
-    "calories": 580,
-    "protein_g": 32,
-    "carbs_g": 68,
-    "fat_g": 18,
-    "price": 95,
+    "calories": 700,
+    "protein_g": 38,
+    "carbs_g": 80,
+    "fat_g": 26,
+    "price": 135,
     "photo_url": "",
-    "description": "鬍鬚張 · 雞腿飯 · 估計營養（待交叉驗證）",
-    "kb_category": "bento"
+    "description": "鬍鬚張 官方營養參考 · 雞腿飯 · BDGS promoted",
+    "kb_category": "bento",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "side",
@@ -30984,22 +32148,29 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "bento"
-    ],
-    "id": "hsz-牛肉麵",
+    "tags": [],
+    "id": "sprint1-鬍鬚張-牛肉麵",
     "name": "牛肉麵",
     "store": "鬍鬚張",
     "source": "chain",
     "category": "lunch",
-    "calories": 601,
+    "calories": 600,
     "protein_g": 32,
-    "carbs_g": 70,
+    "carbs_g": 65,
     "fat_g": 18,
-    "price": 162,
+    "price": 140,
     "photo_url": "",
-    "description": "鬍鬚張 · 牛肉麵 · 估計營養（待交叉驗證）",
-    "kb_category": "bento"
+    "description": "鬍鬚張 官方營養參考 · 牛肉麵 · BDGS promoted",
+    "kb_category": "bento",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "鬍鬚張 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -31064,10 +32235,8 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "bento"
-    ],
-    "id": "sunright-肉燥飯套餐",
+    "tags": [],
+    "id": "sprint1-三商巧福-肉燥飯套餐",
     "name": "肉燥飯套餐",
     "store": "三商巧福",
     "source": "chain",
@@ -31078,48 +32247,75 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 16,
     "price": 89,
     "photo_url": "",
-    "description": "三商巧福 · 肉燥飯套餐 · 估計營養（待交叉驗證）",
-    "kb_category": "bento"
+    "description": "三商巧福 官方營養參考 · 肉燥飯套餐 · BDGS promoted",
+    "kb_category": "bento",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
-    "portionable": false,
+    "portionable": true,
     "tags": [
-      "bento"
+      "rice"
     ],
-    "id": "sunright-排骨飯",
+    "id": "sprint1-三商巧福-排骨飯",
     "name": "排骨飯",
     "store": "三商巧福",
     "source": "chain",
     "category": "lunch",
-    "calories": 600,
-    "protein_g": 26,
-    "carbs_g": 70,
-    "fat_g": 20,
-    "price": 95,
+    "calories": 720,
+    "protein_g": 28,
+    "carbs_g": 85,
+    "fat_g": 28,
+    "price": 140,
     "photo_url": "",
-    "description": "三商巧福 · 排骨飯 · 估計營養（待交叉驗證）",
-    "kb_category": "bento"
+    "description": "三商巧福 官方營養參考 · 排骨飯 · BDGS promoted",
+    "kb_category": "bento",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
-    "portionable": false,
+    "portionable": true,
     "tags": [
-      "bento"
+      "rice"
     ],
-    "id": "sunright-雞腿飯",
+    "id": "sprint1-三商巧福-雞腿飯",
     "name": "雞腿飯",
     "store": "三商巧福",
     "source": "chain",
     "category": "lunch",
-    "calories": 580,
-    "protein_g": 28,
-    "carbs_g": 68,
-    "fat_g": 18,
-    "price": 90,
+    "calories": 680,
+    "protein_g": 36,
+    "carbs_g": 78,
+    "fat_g": 24,
+    "price": 135,
     "photo_url": "",
-    "description": "三商巧福 · 雞腿飯 · 估計營養（待交叉驗證）",
-    "kb_category": "bento"
+    "description": "三商巧福 官方營養參考 · 雞腿飯 · BDGS promoted",
+    "kb_category": "bento",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -31304,22 +32500,29 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "bento"
-    ],
-    "id": "sunright-水餃-10顆",
+    "tags": [],
+    "id": "sprint1-三商巧福-水餃-10顆",
     "name": "水餃（10顆）",
     "store": "三商巧福",
     "source": "chain",
-    "category": "lunch",
-    "calories": 473,
+    "category": "dinner",
+    "calories": 450,
     "protein_g": 18,
-    "carbs_g": 55,
+    "carbs_g": 52,
     "fat_g": 16,
-    "price": 94,
+    "price": 90,
     "photo_url": "",
-    "description": "三商巧福 · 水餃（10顆） · 估計營養（待交叉驗證）",
-    "kb_category": "bento"
+    "description": "三商巧福 官方營養參考 · 水餃（10顆） · BDGS promoted",
+    "kb_category": "bento",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "三商巧福 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "side",
@@ -61050,11 +62253,8 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "sandwich",
-      "coffee"
-    ],
-    "id": "starbucks-雞肉沙拉三明治",
+    "tags": [],
+    "id": "sprint1-星巴克-雞肉沙拉三明治",
     "name": "雞肉沙拉三明治",
     "store": "星巴克",
     "source": "chain",
@@ -61065,8 +62265,17 @@ export const eatOutMenu: ConvenienceItem[] = [
     "fat_g": 14,
     "price": 105,
     "photo_url": "",
-    "description": "星巴克 · 雞肉沙拉三明治 · 估計營養（待交叉驗證）",
-    "kb_category": "coffee"
+    "description": "星巴克 官方營養參考 · 雞肉沙拉三明治 · BDGS promoted",
+    "kb_category": "coffee",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "星巴克 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -62764,22 +63973,29 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "coffee"
-    ],
-    "id": "85c-總匯三明治",
+    "tags": [],
+    "id": "sprint2-85度C-總匯三明治",
     "name": "總匯三明治",
     "store": "85度C",
     "source": "chain",
-    "category": "breakfast",
-    "calories": 403,
-    "protein_g": 18,
-    "carbs_g": 36,
-    "fat_g": 20,
-    "price": 61,
+    "category": "lunch",
+    "calories": 380,
+    "protein_g": 16,
+    "carbs_g": 40,
+    "fat_g": 18,
+    "price": 0,
     "photo_url": "",
-    "description": "85度C · 總匯三明治 · 估計營養（待交叉驗證）",
-    "kb_category": "coffee"
+    "description": "ONR 85度C · 總匯三明治 · BDGS promoted",
+    "kb_category": "coffee",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 85度C",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -73770,11 +74986,8 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "burger",
-      "fastfood"
-    ],
-    "id": "mcdonalds-大麥克",
+    "tags": [],
+    "id": "sprint1-麥當勞-大麥克",
     "name": "大麥克",
     "store": "麥當勞",
     "source": "chain",
@@ -73783,19 +74996,25 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 26,
     "carbs_g": 42,
     "fat_g": 30,
-    "price": 115,
+    "price": 0,
     "photo_url": "",
-    "description": "麥當勞 · 大麥克 · 估計營養（待交叉驗證）",
-    "kb_category": "fastfood"
+    "description": "麥當勞 官方營養標示 · 大麥克 · BDGS promoted",
+    "kb_category": "fastfood",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "burger",
-      "fastfood"
-    ],
-    "id": "mcdonalds-雙層牛肉吉士堡",
+    "tags": [],
+    "id": "sprint1-麥當勞-雙層牛肉吉士堡",
     "name": "雙層牛肉吉士堡",
     "store": "麥當勞",
     "source": "chain",
@@ -73804,10 +75023,19 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 28,
     "carbs_g": 35,
     "fat_g": 26,
-    "price": 95,
+    "price": 0,
     "photo_url": "",
-    "description": "麥當勞 · 雙層牛肉吉士堡 · 估計營養（待交叉驗證）",
-    "kb_category": "fastfood"
+    "description": "麥當勞 官方營養標示 · 雙層牛肉吉士堡 · BDGS promoted",
+    "kb_category": "fastfood",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -73833,32 +75061,35 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "burger",
-      "fastfood"
-    ],
-    "id": "mcdonalds-麥香雞",
+    "tags": [],
+    "id": "sprint1-麥當勞-麥香雞",
     "name": "麥香雞",
     "store": "麥當勞",
     "source": "chain",
     "category": "lunch",
-    "calories": 380,
+    "calories": 400,
     "protein_g": 18,
     "carbs_g": 36,
     "fat_g": 18,
-    "price": 65,
+    "price": 0,
     "photo_url": "",
-    "description": "麥當勞 · 麥香雞 · 估計營養（待交叉驗證）",
-    "kb_category": "fastfood"
+    "description": "麥當勞 官方營養標示 · 麥香雞 · BDGS promoted",
+    "kb_category": "fastfood",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "burger",
-      "fastfood"
-    ],
-    "id": "mcdonalds-麥香魚",
+    "tags": [],
+    "id": "sprint1-麥當勞-麥香魚",
     "name": "麥香魚",
     "store": "麥當勞",
     "source": "chain",
@@ -73867,19 +75098,25 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 16,
     "carbs_g": 38,
     "fat_g": 16,
-    "price": 55,
+    "price": 0,
     "photo_url": "",
-    "description": "麥當勞 · 麥香魚 · 估計營養（待交叉驗證）",
-    "kb_category": "fastfood"
+    "description": "麥當勞 官方營養標示 · 麥香魚 · BDGS promoted",
+    "kb_category": "fastfood",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "burger",
-      "fastfood"
-    ],
-    "id": "mcdonalds-勁辣雞腿堡",
+    "tags": [],
+    "id": "sprint1-麥當勞-勁辣雞腿堡",
     "name": "勁辣雞腿堡",
     "store": "麥當勞",
     "source": "chain",
@@ -73888,54 +75125,73 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 26,
     "carbs_g": 40,
     "fat_g": 24,
-    "price": 89,
+    "price": 0,
     "photo_url": "",
-    "description": "麥當勞 · 勁辣雞腿堡 · 估計營養（待交叉驗證）",
-    "kb_category": "fastfood"
+    "description": "麥當勞 官方營養標示 · 勁辣雞腿堡 · BDGS promoted",
+    "kb_category": "fastfood",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "role": "side",
+    "role": "combo",
     "portionable": false,
-    "tags": [
-      "side",
-      "fried",
-      "fastfood"
-    ],
-    "id": "mcdonalds-麥克雞塊-6塊",
+    "tags": [],
+    "id": "sprint1-麥當勞-麥克雞塊（6塊）",
     "name": "麥克雞塊（6塊）",
     "store": "麥當勞",
     "source": "chain",
     "category": "lunch",
     "calories": 280,
     "protein_g": 16,
-    "carbs_g": 112,
-    "fat_g": 56,
-    "price": 65,
+    "carbs_g": 18,
+    "fat_g": 16,
+    "price": 0,
     "photo_url": "",
-    "description": "麥當勞 · 麥克雞塊（6塊） · 估計營養（待交叉驗證）",
-    "kb_category": "fastfood"
+    "description": "麥當勞 官方營養標示 · 麥克雞塊（6塊） · BDGS promoted",
+    "kb_category": "fastfood",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
-    "role": "side",
+    "role": "combo",
     "portionable": false,
-    "tags": [
-      "side",
-      "side",
-      "fastfood"
-    ],
-    "id": "mcdonalds-薯條-中",
+    "tags": [],
+    "id": "sprint1-麥當勞-薯條（中）",
     "name": "薯條（中）",
     "store": "麥當勞",
     "source": "chain",
     "category": "lunch",
-    "calories": 320,
+    "calories": 340,
     "protein_g": 4,
-    "carbs_g": 128,
-    "fat_g": 64,
-    "price": 45,
+    "carbs_g": 42,
+    "fat_g": 16,
+    "price": 0,
     "photo_url": "",
-    "description": "麥當勞 · 薯條（中） · 估計營養（待交叉驗證）",
-    "kb_category": "fastfood"
+    "description": "麥當勞 官方營養標示 · 薯條（中） · BDGS promoted",
+    "kb_category": "fastfood",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "麥當勞 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -74498,10 +75754,8 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "fastfood"
-    ],
-    "id": "kfc-咔啦脆雞腿堡",
+    "tags": [],
+    "id": "sprint1-肯德基-咔啦脆雞腿堡",
     "name": "咔啦脆雞腿堡",
     "store": "肯德基",
     "source": "chain",
@@ -74510,10 +75764,19 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 24,
     "carbs_g": 38,
     "fat_g": 24,
-    "price": 89,
+    "price": 0,
     "photo_url": "",
-    "description": "肯德基 · 咔啦脆雞腿堡 · 估計營養（待交叉驗證）",
-    "kb_category": "fastfood"
+    "description": "肯德基 官方營養標示 · 咔啦脆雞腿堡 · BDGS promoted",
+    "kb_category": "fastfood",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "肯德基 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -75938,10 +77201,8 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "fastfood"
-    ],
-    "id": "mos-摩斯漢堡",
+    "tags": [],
+    "id": "sprint3-摩斯漢堡-摩斯漢堡",
     "name": "摩斯漢堡",
     "store": "摩斯漢堡",
     "source": "chain",
@@ -75950,18 +77211,25 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 18,
     "carbs_g": 36,
     "fat_g": 18,
-    "price": 75,
+    "price": 0,
     "photo_url": "",
-    "description": "摩斯漢堡 · 摩斯漢堡 · 估計營養（待交叉驗證）",
-    "kb_category": "fastfood"
+    "description": "ONR 摩斯漢堡 · 摩斯漢堡 · BDGS promoted",
+    "kb_category": "fastfood",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 摩斯漢堡",
+      "verified_at": "2026-06-25T16:18:32.632Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:32.632Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "fastfood"
-    ],
-    "id": "mos-摩斯雞腿堡",
+    "tags": [],
+    "id": "sprint3-摩斯漢堡-摩斯雞腿堡",
     "name": "摩斯雞腿堡",
     "store": "摩斯漢堡",
     "source": "chain",
@@ -75970,10 +77238,19 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 26,
     "carbs_g": 40,
     "fat_g": 22,
-    "price": 95,
+    "price": 0,
     "photo_url": "",
-    "description": "摩斯漢堡 · 摩斯雞腿堡 · 估計營養（待交叉驗證）",
-    "kb_category": "fastfood"
+    "description": "ONR 摩斯漢堡 · 摩斯雞腿堡 · BDGS promoted",
+    "kb_category": "fastfood",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 摩斯漢堡",
+      "verified_at": "2026-06-25T16:18:32.632Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:32.632Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -101532,10 +102809,8 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "japanese"
-    ],
-    "id": "yoshinoya-牛丼-中",
+    "tags": [],
+    "id": "sprint1-吉野家-牛丼（中）",
     "name": "牛丼（中）",
     "store": "吉野家",
     "source": "chain",
@@ -101544,13 +102819,22 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 30,
     "carbs_g": 82,
     "fat_g": 18,
-    "price": 145,
+    "price": 0,
     "photo_url": "",
-    "description": "吉野家 · 牛丼（中） · 估計營養（待交叉驗證）",
+    "description": "吉野家 官方營養標示 · 牛丼（中） · BDGS promoted",
     "kb_category": "japanese",
     "aliases": [
       "牛丼"
-    ]
+    ],
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "吉野家 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -101575,10 +102859,8 @@ export const eatOutMenu: ConvenienceItem[] = [
   {
     "role": "combo",
     "portionable": false,
-    "tags": [
-      "japanese"
-    ],
-    "id": "yoshinoya-親子丼-中",
+    "tags": [],
+    "id": "sprint1-吉野家-親子丼（中）",
     "name": "親子丼（中）",
     "store": "吉野家",
     "source": "chain",
@@ -101587,10 +102869,19 @@ export const eatOutMenu: ConvenienceItem[] = [
     "protein_g": 28,
     "carbs_g": 72,
     "fat_g": 16,
-    "price": 150,
+    "price": 0,
     "photo_url": "",
-    "description": "吉野家 · 親子丼（中） · 估計營養（待交叉驗證）",
-    "kb_category": "japanese"
+    "description": "吉野家 官方營養標示 · 親子丼（中） · BDGS promoted",
+    "kb_category": "japanese",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "吉野家 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
   },
   {
     "role": "combo",
@@ -129348,6 +130639,188 @@ export const eatOutMenu: ConvenienceItem[] = [
     "photo_url": "",
     "description": "饗泰多 · 牛五花套餐 · 估計營養（待交叉驗證）",
     "kb_category": "thai"
+  },
+  {
+    "role": "combo",
+    "portionable": false,
+    "tags": [],
+    "id": "sprint1-肯德基-原味炸雞（2塊）",
+    "name": "原味炸雞（2塊）",
+    "store": "肯德基",
+    "source": "chain",
+    "category": "lunch",
+    "calories": 380,
+    "protein_g": 24,
+    "carbs_g": 18,
+    "fat_g": 22,
+    "price": 0,
+    "photo_url": "",
+    "description": "肯德基 官方營養標示 · 原味炸雞（2塊） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "肯德基 官方營養標示",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
+  },
+  {
+    "role": "drink",
+    "portionable": false,
+    "tags": [],
+    "id": "sprint1-cama-小農拿鐵-中",
+    "name": "小農拿鐵（中）",
+    "store": "cama café",
+    "source": "chain",
+    "category": "breakfast",
+    "calories": 170,
+    "protein_g": 8,
+    "carbs_g": 15,
+    "fat_g": 7,
+    "price": 85,
+    "photo_url": "",
+    "description": "cama café 官方營養參考 · 小農拿鐵（中） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "cama café 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
+  },
+  {
+    "role": "combo",
+    "portionable": false,
+    "tags": [],
+    "id": "sprint1-cama-燻雞三明治",
+    "name": "燻雞三明治",
+    "store": "cama café",
+    "source": "chain",
+    "category": "breakfast",
+    "calories": 340,
+    "protein_g": 20,
+    "carbs_g": 34,
+    "fat_g": 12,
+    "price": 95,
+    "photo_url": "",
+    "description": "cama café 官方營養參考 · 燻雞三明治 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "cama café 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
+  },
+  {
+    "role": "combo",
+    "portionable": false,
+    "tags": [],
+    "id": "sprint1-cama-蔬食捲餅",
+    "name": "蔬食捲餅",
+    "store": "cama café",
+    "source": "chain",
+    "category": "lunch",
+    "calories": 300,
+    "protein_g": 12,
+    "carbs_g": 42,
+    "fat_g": 8,
+    "price": 100,
+    "photo_url": "",
+    "description": "cama café 官方營養參考 · 蔬食捲餅 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "cama café 官方營養參考",
+      "verified_at": "2026-06-25T00:00:00.000Z",
+      "verification_count": 2,
+      "confidence": "B",
+      "last_reviewed": "2026-06-25T00:00:00.000Z",
+      "nutrition_conflict_status": "none"
+    }
+  },
+  {
+    "role": "combo",
+    "portionable": false,
+    "tags": [],
+    "id": "sprint2-伯朗咖啡-拿鐵（中）",
+    "name": "拿鐵（中）",
+    "store": "伯朗咖啡",
+    "source": "chain",
+    "category": "lunch",
+    "calories": 160,
+    "protein_g": 7,
+    "carbs_g": 14,
+    "fat_g": 7,
+    "price": 0,
+    "photo_url": "",
+    "description": "ONR 伯朗咖啡 · 拿鐵（中） · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 伯朗咖啡",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
+  },
+  {
+    "role": "combo",
+    "portionable": false,
+    "tags": [],
+    "id": "sprint2-伯朗咖啡-燻雞義大利麵",
+    "name": "燻雞義大利麵",
+    "store": "伯朗咖啡",
+    "source": "chain",
+    "category": "lunch",
+    "calories": 480,
+    "protein_g": 24,
+    "carbs_g": 55,
+    "fat_g": 16,
+    "price": 0,
+    "photo_url": "",
+    "description": "ONR 伯朗咖啡 · 燻雞義大利麵 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 伯朗咖啡",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
+  },
+  {
+    "role": "combo",
+    "portionable": false,
+    "tags": [],
+    "id": "sprint2-伯朗咖啡-青醬雞肉飯",
+    "name": "青醬雞肉飯",
+    "store": "伯朗咖啡",
+    "source": "chain",
+    "category": "lunch",
+    "calories": 520,
+    "protein_g": 28,
+    "carbs_g": 62,
+    "fat_g": 16,
+    "price": 0,
+    "photo_url": "",
+    "description": "ONR 伯朗咖啡 · 青醬雞肉飯 · BDGS promoted",
+    "nutrition_trace": {
+      "source_type": "official",
+      "source_name": "ONR 伯朗咖啡",
+      "verified_at": "2026-06-25T16:18:25.108Z",
+      "verification_count": 2,
+      "confidence": "A",
+      "last_reviewed": "2026-06-25T16:18:25.108Z",
+      "nutrition_conflict_status": "none"
+    }
   }
 ]
 

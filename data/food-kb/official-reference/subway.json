@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "brand_id": "subway",
+    "canonical_name": "Subway",
+    "store_aliases": [
+      "Subway",
+      "SUBWAY"
+    ],
+    "nutrition_source_url": "https://www.subway.com.tw/menu",
+    "last_verified": "2026-06-25T12:00:00.000Z",
+    "official_version": "1.0.0",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": [
+    {
+      "name": "蔬菜沙拉潛艇堡",
+      "calories": 230,
+      "protein": 10,
+      "fat": 4,
+      "carbs": 38,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.subway.com.tw/menu",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "照燒雞胸潛艇堡",
+      "calories": 300,
+      "protein": 26,
+      "fat": 5,
+      "carbs": 40,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.subway.com.tw/menu",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "牛排起司潛艇堡",
+      "calories": 380,
+      "protein": 28,
+      "fat": 12,
+      "carbs": 42,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.subway.com.tw/menu",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    }
+  ]
+}

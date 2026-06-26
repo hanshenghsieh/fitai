@@ -21,6 +21,11 @@ const chainExpansion = fs.existsSync(chainExpansionPath)
   ? JSON.parse(fs.readFileSync(chainExpansionPath, 'utf8'))
   : []
 
+const stagingPromotedPath = path.join(__dirname, 'food-kb/seeds/staging-promoted.json')
+const stagingPromoted = fs.existsSync(stagingPromotedPath)
+  ? (JSON.parse(fs.readFileSync(stagingPromotedPath, 'utf8')).items ?? [])
+  : []
+
 const generatedDir = path.join(__dirname, 'food-kb/seeds/generated')
 const generatedSeeds = []
 if (fs.existsSync(generatedDir)) {
@@ -53,6 +58,37 @@ for (const item of [...chains, ...expanded, ...chainExpansion, ...generatedSeeds
   if (!seen.has(normalized.id)) {
     merged.push(normalized)
     seen.add(normalized.id)
+  }
+}
+
+function normKey(store, name) {
+  return `${String(store).trim().toLowerCase()}::${String(name).trim().toLowerCase()}`
+}
+
+if (stagingPromoted.length) {
+  const promotedByKey = new Map(stagingPromoted.map(i => [normKey(i.store, i.name), i]))
+  const promotedIds = new Set(stagingPromoted.map(i => i.id))
+  const upgraded = new Set()
+  for (let i = 0; i < merged.length; i++) {
+    const item = merged[i]
+    const override = promotedByKey.get(normKey(item.store, item.name))
+    if (override) {
+      merged[i] = { ...item, ...override, id: override.id }
+      upgraded.add(normKey(item.store, item.name))
+    }
+  }
+  for (const item of stagingPromoted) {
+    const key = normKey(item.store, item.name)
+    if (!upgraded.has(key) && !seen.has(item.id)) {
+      merged.push({
+        role: 'combo',
+        portionable: false,
+        tags: [],
+        ...item,
+        source: item.source ?? 'chain',
+      })
+      seen.add(item.id)
+    }
   }
 }
 

@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "brand_id": "cama",
+    "canonical_name": "cama café",
+    "store_aliases": [
+      "cama café",
+      "cama"
+    ],
+    "nutrition_source_url": "https://www.camacafe.com/",
+    "last_verified": "2026-06-25T12:00:00.000Z",
+    "official_version": "1.0.0",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": [
+    {
+      "name": "小農拿鐵（中）",
+      "calories": 170,
+      "protein": 8,
+      "fat": 7,
+      "carbs": 15,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.camacafe.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "燻雞三明治",
+      "calories": 340,
+      "protein": 20,
+      "fat": 12,
+      "carbs": 34,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.camacafe.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "蔬食捲餅",
+      "calories": 300,
+      "protein": 12,
+      "fat": 8,
+      "carbs": 42,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.camacafe.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    }
+  ]
+}

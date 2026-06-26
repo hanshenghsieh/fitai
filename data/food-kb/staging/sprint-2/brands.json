@@ -1,0 +1,713 @@
+{
+  "version": "2.0.0",
+  "policy": "zero_hallucination",
+  "verified_by": "menu-backfill-sprint-2",
+  "sprint": 2,
+  "batch_size": 50,
+  "status": "source_skeleton",
+  "notes": "僅餐廳來源配置骨架 — 不含菜單品項、不含營養數字。A 組沿用 Sprint 1；B 組 nutrition_source_url 待人工確認營養頁面後方可 build。",
+  "brands": [
+    {
+      "canonical_name": "漢堡王",
+      "store_aliases": ["漢堡王"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 13,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.burgerking.com.tw/menu", "source_name": "漢堡王台灣官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/burger-king", "source_name": "foodpanda 漢堡王" }
+      ],
+      "nutrition_source_url": "https://www.burgerking.com.tw/menu",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "八方雲集",
+      "store_aliases": ["八方雲集"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 20,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.8way.com.tw/", "source_name": "八方雲集官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/bafang", "source_name": "foodpanda 八方雲集" }
+      ],
+      "nutrition_source_url": "https://www.8way.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "四海遊龍",
+      "store_aliases": ["四海遊龍"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 21,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.seafooddragon.com.tw/", "source_name": "四海遊龍官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E5%9B%9B%E6%B5%B7%E9%81%8A%E9%BE%8D", "source_name": "Google Maps 四海遊龍" }
+      ],
+      "nutrition_source_url": "https://www.seafooddragon.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "藏壽司",
+      "store_aliases": ["藏壽司"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 32,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.kurasushi.com.tw/", "source_name": "藏壽司台灣官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E8%97%8F%E5%A3%BD%E5%8F%B8", "source_name": "Google Maps 藏壽司" }
+      ],
+      "nutrition_source_url": "https://www.kurasushi.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "壽司郎",
+      "store_aliases": ["壽司郎"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 33,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.sushiro.com.tw/", "source_name": "壽司郎台灣官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E5%A3%BD%E5%8F%B8%E9%83%8E", "source_name": "Google Maps 壽司郎" }
+      ],
+      "nutrition_source_url": "https://www.sushiro.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "爭鮮",
+      "store_aliases": ["爭鮮", "爭鮮迴轉壽司"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 34,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.sushiexpress.com.tw/", "source_name": "爭鮮台灣官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/sushi-express", "source_name": "foodpanda 爭鮮" }
+      ],
+      "nutrition_source_url": "https://www.sushiexpress.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "萊爾富",
+      "store_aliases": ["萊爾富", "Hi-Life"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 3,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.hilife.com.tw/", "source_name": "萊爾富官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E8%90%8A%E7%88%BE%E5%AF%8C", "source_name": "Google Maps 萊爾富" }
+      ],
+      "nutrition_source_url": "https://www.hilife.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 200
+    },
+    {
+      "canonical_name": "OK mart",
+      "store_aliases": ["OK mart", "OK", "OK超商"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 4,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.okmart.com.tw/", "source_name": "OK mart 官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/OK+mart", "source_name": "Google Maps OK mart" }
+      ],
+      "nutrition_source_url": "https://www.okmart.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 200
+    },
+    {
+      "canonical_name": "全聯",
+      "store_aliases": ["全聯", "全聯福利中心"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 5,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.pxmart.com.tw/", "source_name": "全聯官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E5%85%A8%E8%81%AF", "source_name": "Google Maps 全聯" }
+      ],
+      "nutrition_source_url": "https://www.pxmart.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "家樂福",
+      "store_aliases": ["家樂福"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 6,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.carrefour.com.tw/", "source_name": "家樂福官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E5%AE%B6%E6%A8%82%E7%A6%8F", "source_name": "Google Maps 家樂福" }
+      ],
+      "nutrition_source_url": "https://www.carrefour.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "Costco",
+      "store_aliases": ["Costco", "好市多"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": 7,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.costco.com.tw/", "source_name": "Costco 台灣官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/Costco+Taiwan", "source_name": "Google Maps Costco" }
+      ],
+      "nutrition_source_url": "https://www.costco.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "50嵐",
+      "store_aliases": ["50嵐", "五十嵐"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.50lan.com/", "source_name": "50嵐官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/50lan", "source_name": "foodpanda 50嵐" }
+      ],
+      "nutrition_source_url": "https://www.50lan.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "清心福全",
+      "store_aliases": ["清心福全"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.chingshin.com.tw/", "source_name": "清心福全官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/ching-shin", "source_name": "foodpanda 清心福全" }
+      ],
+      "nutrition_source_url": "https://www.chingshin.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "CoCo",
+      "store_aliases": ["CoCo", "CoCo都可"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.coco-tea.com.tw/", "source_name": "CoCo都可官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/coco", "source_name": "foodpanda CoCo" }
+      ],
+      "nutrition_source_url": "https://www.coco-tea.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "可不可熟成紅茶",
+      "store_aliases": ["可不可熟成紅茶", "可不可"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.kebuke.com/", "source_name": "可不可官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/kebuke", "source_name": "foodpanda 可不可" }
+      ],
+      "nutrition_source_url": "https://www.kebuke.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "迷客夏",
+      "store_aliases": ["迷客夏"],
+      "group": "A",
+      "sprint1_carryover": true,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.milkshop.com.tw/", "source_name": "迷客夏官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/milkshop", "source_name": "foodpanda 迷客夏" }
+      ],
+      "nutrition_source_url": "https://www.milkshop.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "愛買",
+      "store_aliases": ["愛買"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 10,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.a-mart.com.tw/", "source_name": "愛買官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E6%84%9B%E8%B2%B7", "source_name": "Google Maps 愛買" }
+      ],
+      "nutrition_source_url": "https://www.a-mart.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "大潤發",
+      "store_aliases": ["大潤發"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 11,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.rt-mart.com.tw/", "source_name": "大潤發官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E5%A4%A7%E6%BD%A4%E7%99%BC", "source_name": "Google Maps 大潤發" }
+      ],
+      "nutrition_source_url": "https://www.rt-mart.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "美廉社",
+      "store_aliases": ["美廉社"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 12,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.simplemart.com.tw/", "source_name": "美廉社官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E7%BE%8E%E5%BB%89%E7%A4%BE", "source_name": "Google Maps 美廉社" }
+      ],
+      "nutrition_source_url": "https://www.simplemart.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "丹丹漢堡",
+      "store_aliases": ["丹丹漢堡"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 21,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.ddburger.com.tw/", "source_name": "丹丹漢堡官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/dd-burger", "source_name": "foodpanda 丹丹漢堡" }
+      ],
+      "nutrition_source_url": "https://www.ddburger.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "頂呱呱",
+      "store_aliases": ["頂呱呱"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 22,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.tkkinc.com.tw/", "source_name": "頂呱呱官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E9%A0%82%E7%93%9C%E7%93%9C", "source_name": "Google Maps 頂呱呱" }
+      ],
+      "nutrition_source_url": "https://www.tkkinc.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "拿坡里",
+      "store_aliases": ["拿坡里"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 23,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.napoli.com.tw/", "source_name": "拿坡里官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E6%8B%BF%E5%9D%A1%E9%87%8C", "source_name": "Google Maps 拿坡里" }
+      ],
+      "nutrition_source_url": "https://www.napoli.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "必勝客",
+      "store_aliases": ["必勝客"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 24,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.pizzahut.com.tw/", "source_name": "必勝客台灣官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/pizza-hut", "source_name": "foodpanda 必勝客" }
+      ],
+      "nutrition_source_url": "https://www.pizzahut.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "達美樂",
+      "store_aliases": ["達美樂"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 25,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.dominos.com.tw/", "source_name": "達美樂台灣官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/dominos", "source_name": "foodpanda 達美樂" }
+      ],
+      "nutrition_source_url": "https://www.dominos.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "大戶屋",
+      "store_aliases": ["大戶屋"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 28,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.ohtaya.com.tw/", "source_name": "大戶屋台灣官網" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/ohtaya", "source_name": "Uber Eats 大戶屋" }
+      ],
+      "nutrition_source_url": "https://www.ohtaya.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "YAYOI彌生軒",
+      "store_aliases": ["YAYOI彌生軒", "YAYOI", "彌生軒"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 29,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.yayoik.com.tw/", "source_name": "YAYOI彌生軒台灣官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/YAYOI%E5%BD%A5%E7%94%9F%E8%BB%92", "source_name": "Google Maps YAYOI彌生軒" }
+      ],
+      "nutrition_source_url": "https://www.yayoik.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "合點壽司",
+      "store_aliases": ["合點壽司"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 35,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.goten.com.tw/", "source_name": "合點壽司台灣官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E5%90%88%E9%BB%9E%E5%A3%BD%E5%8F%B8", "source_name": "Google Maps 合點壽司" }
+      ],
+      "nutrition_source_url": "https://www.goten.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "金子半之助",
+      "store_aliases": ["金子半之助"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 36,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.kanekohannosuke.com/", "source_name": "金子半之助官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E9%87%91%E5%AD%90%E5%8D%8A%E4%B9%8B%E5%8A%A9", "source_name": "Google Maps 金子半之助" }
+      ],
+      "nutrition_source_url": "https://www.kanekohannosuke.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "石二鍋",
+      "store_aliases": ["石二鍋"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 42,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.wowprime.com/", "source_name": "王品集團官網（石二鍋）" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/shih-hotpot", "source_name": "foodpanda 石二鍋" }
+      ],
+      "nutrition_source_url": "https://www.wowprime.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "12MINI",
+      "store_aliases": ["12MINI", "12mini"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 43,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.wowprime.com/", "source_name": "王品集團官網（12MINI）" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/12mini", "source_name": "foodpanda 12MINI" }
+      ],
+      "nutrition_source_url": "https://www.wowprime.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "這一鍋",
+      "store_aliases": ["這一鍋"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 44,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.potwarehouse.com.tw/", "source_name": "這一鍋官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E9%80%99%E4%B8%80%E9%8D%8B", "source_name": "Google Maps 這一鍋" }
+      ],
+      "nutrition_source_url": "https://www.potwarehouse.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "鼎王",
+      "store_aliases": ["鼎王"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 46,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.twdingwang.com/", "source_name": "鼎王官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E9%BC%8E%E7%8E%8B", "source_name": "Google Maps 鼎王" }
+      ],
+      "nutrition_source_url": "https://www.twdingwang.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "馬辣",
+      "store_aliases": ["馬辣"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 47,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.malacurry.com.tw/", "source_name": "馬辣官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E9%A6%AC%E8%BE%A3", "source_name": "Google Maps 馬辣" }
+      ],
+      "nutrition_source_url": "https://www.malacurry.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "瓦城",
+      "store_aliases": ["瓦城"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 52,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.thaitown.com.tw/", "source_name": "瓦城泰統集團官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/thai-town", "source_name": "foodpanda 瓦城" }
+      ],
+      "nutrition_source_url": "https://www.thaitown.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "大心",
+      "store_aliases": ["大心"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 55,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.thaitown.com.tw/", "source_name": "瓦城泰統集團官網（大心）" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/taixin", "source_name": "foodpanda 大心" }
+      ],
+      "nutrition_source_url": "https://www.thaitown.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "西堤牛排",
+      "store_aliases": ["西堤牛排", "西堤"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 48,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.wowprime.com/", "source_name": "王品集團官網（西堤牛排）" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/tastiesteak", "source_name": "foodpanda 西堤牛排" }
+      ],
+      "nutrition_source_url": "https://www.wowprime.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "陶板屋",
+      "store_aliases": ["陶板屋"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 49,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.wowprime.com/", "source_name": "王品集團官網（陶板屋）" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/tako", "source_name": "foodpanda 陶板屋" }
+      ],
+      "nutrition_source_url": "https://www.wowprime.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "築間",
+      "store_aliases": ["築間"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 41,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.zhujian.com.tw/", "source_name": "築間官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E7%AF%89%E9%96%93", "source_name": "Google Maps 築間" }
+      ],
+      "nutrition_source_url": "https://www.zhujian.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "金色三麥",
+      "store_aliases": ["金色三麥"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 56,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.lebien.com.tw/", "source_name": "金色三麥官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E9%87%91%E8%89%B2%E4%B8%89%E9%BA%A5", "source_name": "Google Maps 金色三麥" }
+      ],
+      "nutrition_source_url": "https://www.lebien.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "85度C",
+      "store_aliases": ["85度C"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 62,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.85cafe.com/", "source_name": "85度C官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/85c", "source_name": "foodpanda 85度C" }
+      ],
+      "nutrition_source_url": "https://www.85cafe.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "伯朗咖啡",
+      "store_aliases": ["伯朗咖啡", "伯朗"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 63,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.mr-brown.com/", "source_name": "伯朗咖啡官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E4%BC%AF%E6%9C%97%E5%92%96%E5%95%A1", "source_name": "Google Maps 伯朗咖啡" }
+      ],
+      "nutrition_source_url": "https://www.mr-brown.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "丹堤咖啡",
+      "store_aliases": ["丹堤咖啡"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 64,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.dante.com.tw/", "source_name": "丹堤咖啡官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E4%B8%B9%E5%A0%95%E5%92%96%E5%95%A1", "source_name": "Google Maps 丹堤咖啡" }
+      ],
+      "nutrition_source_url": "https://www.dante.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "一芳水果茶",
+      "store_aliases": ["一芳水果茶", "一芳"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.yifangtea.com/", "source_name": "一芳水果茶官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/yifang", "source_name": "foodpanda 一芳水果茶" }
+      ],
+      "nutrition_source_url": "https://www.yifangtea.com/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "金峰魯肉飯",
+      "store_aliases": ["金峰魯肉飯"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E9%87%91%E5%B3%B0%E9%AD%AF%E8%82%89%E9%A3%AF", "source_name": "Google Maps 金峰魯肉飯" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/jin-feng-lu-rou-fan", "source_name": "Uber Eats 金峰魯肉飯" }
+      ],
+      "nutrition_source_url": null,
+      "nutrition_source_status": "pending_manual_discovery",
+      "target_items": 20,
+      "notes": "單店名店 — 需人工確認可追溯營養來源（菜單照片/官方標示）後方可納入"
+    },
+    {
+      "canonical_name": "大埔鐵板燒",
+      "store_aliases": ["大埔鐵板燒"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.daipu.com.tw/", "source_name": "大埔鐵板燒官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/daipu", "source_name": "foodpanda 大埔鐵板燒" }
+      ],
+      "nutrition_source_url": "https://www.daipu.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "貴族世家",
+      "store_aliases": ["貴族世家"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.noblevit.com.tw/", "source_name": "貴族世家官網" },
+        { "priority": "B", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E8%B2%B4%E6%97%8F%E4%B8%96%E5%AE%B6", "source_name": "Google Maps 貴族世家" }
+      ],
+      "nutrition_source_url": "https://www.noblevit.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "bb.q CHICKEN",
+      "store_aliases": ["bb.q CHICKEN", "bbq CHICKEN"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.bbqchicken.tw/", "source_name": "bb.q CHICKEN 台灣官網" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/bbq-chicken", "source_name": "foodpanda bb.q CHICKEN" }
+      ],
+      "nutrition_source_url": "https://www.bbqchicken.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "林東芳牛肉麵",
+      "store_aliases": ["林東芳牛肉麵"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": null,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "google_maps", "source_url": "https://www.google.com/maps/search/%E6%9E%97%E6%9D%B1%E8%8A%B3%E7%89%9B%E8%82%89%E9%BA%B5", "source_name": "Google Maps 林東芳牛肉麵" },
+        { "priority": "B", "source_type": "ubereats", "source_url": "https://www.ubereats.com/tw/store/lin-dong-fang-beef-noodle", "source_name": "Uber Eats 林東芳牛肉麵" }
+      ],
+      "nutrition_source_url": null,
+      "nutrition_source_status": "pending_manual_discovery",
+      "target_items": 20,
+      "notes": "單店名店 — 需人工確認可追溯營養來源後方可納入"
+    },
+    {
+      "canonical_name": "饗泰多",
+      "store_aliases": ["饗泰多"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 54,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.thaitown.com.tw/", "source_name": "瓦城泰統集團官網（饗泰多）" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/siam-more", "source_name": "foodpanda 饗泰多" }
+      ],
+      "nutrition_source_url": "https://www.thaitown.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    },
+    {
+      "canonical_name": "非常泰",
+      "store_aliases": ["非常泰"],
+      "group": "B",
+      "sprint1_carryover": false,
+      "allowlist_rank": 53,
+      "restaurant_sources": [
+        { "priority": "A", "source_type": "official_website", "source_url": "https://www.thaitown.com.tw/", "source_name": "瓦城泰統集團官網（非常泰）" },
+        { "priority": "B", "source_type": "foodpanda", "source_url": "https://www.foodpanda.com.tw/restaurant/very-thai", "source_name": "foodpanda 非常泰" }
+      ],
+      "nutrition_source_url": "https://www.thaitown.com.tw/",
+      "nutrition_source_status": "pending_page_discovery",
+      "target_items": 20
+    }
+  ]
+}

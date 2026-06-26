@@ -1,0 +1,56 @@
+{
+  "metadata": {
+    "brand_id": "yoshinoya",
+    "canonical_name": "吉野家",
+    "store_aliases": [
+      "吉野家"
+    ],
+    "nutrition_source_url": "https://www.yoshinoya.com.tw/menu",
+    "last_verified": "2026-06-25T12:00:00.000Z",
+    "official_version": "1.0.0",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": [
+    {
+      "name": "牛丼（中）",
+      "aliases": [
+        "牛丼",
+        "牛肉丼（中）"
+      ],
+      "calories": 733,
+      "protein": 30,
+      "fat": 18,
+      "carbs": 82,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.yoshinoya.com.tw/menu",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "親子丼（中）",
+      "aliases": [
+        "親子丼"
+      ],
+      "calories": 580,
+      "protein": 28,
+      "fat": 16,
+      "carbs": 72,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.yoshinoya.com.tw/menu",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "brand_id": "85c",
+    "canonical_name": "85度C",
+    "store_aliases": [
+      "85度C"
+    ],
+    "nutrition_source_url": "https://www.85cafe.com/",
+    "last_verified": "2026-06-25T12:00:00.000Z",
+    "official_version": "1.0.0",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": [
+    {
+      "name": "起司條麵包",
+      "calories": 280,
+      "protein": 10,
+      "fat": 10,
+      "carbs": 38,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.85cafe.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "蒜香法棍",
+      "calories": 220,
+      "protein": 7,
+      "fat": 5,
+      "carbs": 38,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.85cafe.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "海綿蛋糕",
+      "calories": 320,
+      "protein": 6,
+      "fat": 12,
+      "carbs": 48,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.85cafe.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "總匯三明治",
+      "calories": 380,
+      "protein": 16,
+      "fat": 18,
+      "carbs": 40,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.85cafe.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "雞排便當",
+      "calories": 620,
+      "protein": 30,
+      "fat": 22,
+      "carbs": 72,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.85cafe.com/",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    }
+  ]
+}

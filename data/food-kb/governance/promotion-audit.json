@@ -1,0 +1,3994 @@
+{
+  "entries": [
+    {
+      "id": "audit-1782404207687-1",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-大麥克",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-2",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-雙層牛肉吉士堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-3",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-麥香雞",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-4",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-麥香魚",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-5",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-勁辣雞腿堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-6",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-麥克雞塊（6塊）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-7",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-薯條（中）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-8",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-豬肉滿福堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-9",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-無敵蛋餅",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-10",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-四盎司牛肉堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-11",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-蘋果派",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-12",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-玉米濃湯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-13",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-雙層麥香魚",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-14",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-咔啦脆雞腿堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-15",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-原味炸雞（2塊）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-16",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-燻雞蛋餅",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-17",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-上校雞塊-6塊",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-18",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-香雞飯套餐",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-19",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-咔啦脆雞-二塊",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-20",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-subway-蔬菜沙拉潛艇堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-21",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-subway-照燒雞胸潛艇堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-22",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-subway-牛排起司潛艇堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-23",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-肉燥飯套餐",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-24",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-雞肉粥",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-25",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-皮蛋瘦肉粥",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-26",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-燒餅油條套餐",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-27",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-原味牛肉麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-28",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-清燉牛肉麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-29",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-排骨飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-30",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-雞腿飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-31",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-炸醬麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-32",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-麻醬麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-33",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-乾拌麵-貢丸",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-34",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-水餃-10顆",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-35",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-肉燥飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-36",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-雞肉粥",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-37",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-排骨飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-38",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-雞腿飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-39",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-焢肉飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-40",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-魚排便當",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-41",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-排骨麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-42",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-牛肉麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-43",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-肉燥麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-44",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-吉野家-牛丼（中）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-45",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-吉野家-親子丼（中）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-46",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-sukiya-牛丼-小",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-47",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-sukiya-親子丼",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-48",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-sukiya-起司牛丼",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-49",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-丸龜製麵-釜玉烏龍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-50",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-丸龜製麵-牛肉烏龍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-51",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-丸龜製麵-天婦羅烏龍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-52",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-丸龜製麵-明太子烏龍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-53",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-丸龜製麵-咖哩烏龍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-54",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-1",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-55",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-2",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-56",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-3",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-57",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-4",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-58",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-5",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-59",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-6",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-60",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-7",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-61",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-8",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-62",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-9",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-63",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-10",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-64",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-11",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-65",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-12",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-66",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-13",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-67",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-14",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-68",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-15",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-69",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-16",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-70",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-17",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-71",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-18",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-72",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-19",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-73",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-20",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-74",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-dinner-21",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-75",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-dinner-22",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-76",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-dinner-23",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-77",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-dinner-24",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-78",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-1",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-79",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-2",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-80",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-3",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-81",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-4",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-82",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-5",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-83",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-6",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-84",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-7",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-85",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-8",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-86",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-9",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-87",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-10",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-88",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-11",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-89",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-12",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-90",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-13",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-91",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-14",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-92",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-15",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-93",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-16",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-94",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-17",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-95",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-18",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-96",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-19",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-97",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-20",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-98",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-dinner-21",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-99",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-dinner-22",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-100",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-dinner-23",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-101",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-dinner-24",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-102",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-拿鐵-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-103",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-美式咖啡-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-104",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-火腿起司可頌",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-105",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-雞肉沙拉三明治",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-106",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-雞肉捲餅",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-107",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-雞胸沙拉",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-108",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-青醬雞肉義大利麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-109",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-經典拿鐵-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-110",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-美式-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-111",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-厚片吐司-奶酥",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-112",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-花生厚片",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-113",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-燻雞帕尼尼",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-114",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-鮪魚沙拉",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-115",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-奶油培根義大利麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-116",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-cama-小農拿鐵-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-117",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-cama-燻雞三明治",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-118",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-cama-蔬食捲餅",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-119",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-丹丹漢堡-炸雞腿堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-120",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-丹丹漢堡-招牌麵線",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-121",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-85度c-起司條麵包",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-122",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-85度c-蒜香法棍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-123",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-85度c-海綿蛋糕",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-124",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-85度c-總匯三明治",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-125",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-85度c-雞排便當",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207687-126",
+      "at": "2026-06-25T16:16:47.687Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-伯朗-拿鐵-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207688-127",
+      "at": "2026-06-25T16:16:47.688Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-伯朗-燻雞義大利麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207688-128",
+      "at": "2026-06-25T16:16:47.688Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-伯朗-青醬雞肉飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207688-129",
+      "at": "2026-06-25T16:16:47.688Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint3-摩斯漢堡-摩斯漢堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207688-130",
+      "at": "2026-06-25T16:16:47.688Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint3-摩斯漢堡-摩斯雞腿堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207688-131",
+      "at": "2026-06-25T16:16:47.688Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint3-摩斯漢堡-熱狗堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207688-132",
+      "at": "2026-06-25T16:16:47.688Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint3-摩斯漢堡-摩斯吉士漢堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404207688-133",
+      "at": "2026-06-25T16:16:47.688Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint3-摩斯漢堡-辣味雞腿堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325086-1",
+      "at": "2026-06-25T16:18:45.086Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-大麥克",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325086-2",
+      "at": "2026-06-25T16:18:45.086Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-雙層牛肉吉士堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325086-3",
+      "at": "2026-06-25T16:18:45.086Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-麥香雞",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325086-4",
+      "at": "2026-06-25T16:18:45.086Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-麥香魚",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-5",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-勁辣雞腿堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-6",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-麥克雞塊（6塊）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-7",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-薯條（中）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-8",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-豬肉滿福堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-9",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-無敵蛋餅",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-10",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-四盎司牛肉堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-11",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-蘋果派",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-12",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-玉米濃湯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-13",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-麥當勞-雙層麥香魚",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-14",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-咔啦脆雞腿堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-15",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-原味炸雞（2塊）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-16",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-燻雞蛋餅",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-17",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-上校雞塊-6塊",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-18",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-香雞飯套餐",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-19",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-肯德基-咔啦脆雞-二塊",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-20",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-subway-蔬菜沙拉潛艇堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-21",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-subway-照燒雞胸潛艇堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-22",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-subway-牛排起司潛艇堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-23",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-肉燥飯套餐",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-24",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-雞肉粥",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-25",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-皮蛋瘦肉粥",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-26",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-燒餅油條套餐",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-27",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-原味牛肉麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-28",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-清燉牛肉麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-29",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-排骨飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-30",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-雞腿飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-31",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-炸醬麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-32",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-麻醬麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-33",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-乾拌麵-貢丸",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-34",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-三商巧福-水餃-10顆",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-35",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-肉燥飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-36",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-雞肉粥",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-37",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-排骨飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-38",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-雞腿飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-39",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-焢肉飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-40",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-魚排便當",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-41",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-排骨麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-42",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-牛肉麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-43",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-鬍鬚張-肉燥麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-44",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-吉野家-牛丼（中）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-45",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-吉野家-親子丼（中）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-46",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-sukiya-牛丼-小",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-47",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-sukiya-親子丼",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-48",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-sukiya-起司牛丼",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-49",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-丸龜製麵-釜玉烏龍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-50",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-丸龜製麵-牛肉烏龍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-51",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-丸龜製麵-天婦羅烏龍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-52",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-丸龜製麵-明太子烏龍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-53",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-丸龜製麵-咖哩烏龍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-54",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-1",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-55",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-2",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-56",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-3",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-57",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-4",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-58",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-5",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-59",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-6",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-60",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-7",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-61",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-8",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-62",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-9",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-63",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-10",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-64",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-11",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-65",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-12",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-66",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-lunch-13",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-67",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-14",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-68",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-15",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-69",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-16",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-70",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-17",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-71",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-18",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-72",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-19",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-73",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-breakfast-20",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-74",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-dinner-21",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-75",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-dinner-22",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-76",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-dinner-23",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-77",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-7-11-dinner-24",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-78",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-1",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-79",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-2",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-80",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-3",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-81",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-4",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-82",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-5",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-83",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-6",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-84",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-7",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-85",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-8",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-86",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-9",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-87",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-10",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-88",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-11",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-89",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-12",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-90",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-lunch-13",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-91",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-14",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-92",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-15",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-93",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-16",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-94",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-17",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-95",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-18",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-96",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-19",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-97",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-breakfast-20",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-98",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-dinner-21",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-99",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-dinner-22",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-100",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-dinner-23",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-101",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-family-dinner-24",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-102",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-拿鐵-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-103",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-美式咖啡-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-104",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-火腿起司可頌",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-105",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-雞肉沙拉三明治",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-106",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-雞肉捲餅",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-107",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-雞胸沙拉",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-108",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-星巴克-青醬雞肉義大利麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-109",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-經典拿鐵-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-110",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-美式-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-111",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-厚片吐司-奶酥",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-112",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-花生厚片",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-113",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-燻雞帕尼尼",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-114",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-鮪魚沙拉",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-115",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-路易莎-奶油培根義大利麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-116",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-cama-小農拿鐵-中",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-117",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-cama-燻雞三明治",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-118",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint1-cama-蔬食捲餅",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-119",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-丹丹漢堡-炸雞腿堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-120",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-丹丹漢堡-招牌麵線",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-121",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-85度C-起司條麵包",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-122",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-85度C-蒜香法棍",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-123",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-85度C-海綿蛋糕",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-124",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-85度C-總匯三明治",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-125",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-85度C-雞排便當",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-126",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-伯朗咖啡-拿鐵（中）",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-127",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-伯朗咖啡-燻雞義大利麵",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-128",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint2-伯朗咖啡-青醬雞肉飯",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-129",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint3-摩斯漢堡-摩斯漢堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-130",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint3-摩斯漢堡-摩斯雞腿堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325087-131",
+      "at": "2026-06-25T16:18:45.087Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint3-摩斯漢堡-熱狗堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325088-132",
+      "at": "2026-06-25T16:18:45.088Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint3-摩斯漢堡-摩斯吉士漢堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    },
+    {
+      "id": "audit-1782404325088-133",
+      "at": "2026-06-25T16:18:45.088Z",
+      "actor": "founder",
+      "entity_type": "promotion",
+      "entity_id": "sprint3-摩斯漢堡-辣味雞腿堡",
+      "action": "promote",
+      "reason": "Founder approved BDGS promotion",
+      "before": {
+        "stage": "production_candidate"
+      },
+      "after": {
+        "stage": "runtime"
+      }
+    }
+  ]
+}

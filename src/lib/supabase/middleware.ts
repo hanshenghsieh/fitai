@@ -26,10 +26,11 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register')
   const isLegalRoute = pathname === '/privacy' || pathname === '/terms' || pathname === '/support'
+  const isGrowthRoute = pathname.startsWith('/growth')
   const isApiRoute = pathname.startsWith('/api')
   const isPublicAsset = pathname.startsWith('/_next') || pathname.startsWith('/favicon')
 
-  if (!user && !isAuthRoute && !isLegalRoute && !isApiRoute && !isPublicAsset && pathname !== '/') {
+  if (!user && !isAuthRoute && !isLegalRoute && !isGrowthRoute && !isApiRoute && !isPublicAsset && pathname !== '/') {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)

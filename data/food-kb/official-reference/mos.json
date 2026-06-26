@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "brand_id": "mos",
+    "canonical_name": "摩斯漢堡",
+    "store_aliases": [
+      "摩斯漢堡"
+    ],
+    "nutrition_source_url": "https://www.mos.com.tw/menu",
+    "last_verified": "2026-06-25T12:00:00.000Z",
+    "official_version": "1.0.0",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": [
+    {
+      "name": "摩斯漢堡",
+      "calories": 380,
+      "protein": 18,
+      "fat": 18,
+      "carbs": 36,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.mos.com.tw/menu",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "摩斯雞腿堡",
+      "calories": 480,
+      "protein": 26,
+      "fat": 22,
+      "carbs": 40,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.mos.com.tw/menu",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "熱狗堡",
+      "calories": 320,
+      "protein": 12,
+      "fat": 16,
+      "carbs": 32,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.mos.com.tw/menu",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "摩斯吉士漢堡",
+      "calories": 420,
+      "protein": 20,
+      "fat": 22,
+      "carbs": 36,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.mos.com.tw/menu",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    },
+    {
+      "name": "辣味雞腿堡",
+      "calories": 450,
+      "protein": 24,
+      "fat": 20,
+      "carbs": 38,
+      "fiber": null,
+      "sugar": null,
+      "sodium": null,
+      "serving_size": null,
+      "source_url": "https://www.mos.com.tw/menu",
+      "verified_at": "2026-06-25T12:00:00.000Z",
+      "verified_by": "onr-seed-sprint",
+      "verification_count": 1,
+      "confidence": "A"
+    }
+  ]
+}
