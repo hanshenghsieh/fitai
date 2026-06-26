@@ -1,6 +1,6 @@
 # Menu Backfill Acceptance Report
 
-Generated: 2026-06-25T16:17:26.406Z
+Generated: 2026-06-26T15:47:34.884Z
 
 > Zero Hallucination Policy — staging data only. Runtime D blocked; C search-only.
 
@@ -8,13 +8,13 @@ Generated: 2026-06-25T16:17:26.406Z
 
 - Allowlist total: **600**
 - Runtime with menu: **150**
-- Staging restaurants: **91**
+- Staging restaurants: **113**
 - Still missing: **450**
 
 ## 2. Menu Coverage
 
 - Runtime items: **6407**
-- Staging items: **0**
+- Staging items: **133**
 - Runtime recommendable (A/B): **279**
 - Staging production candidates: **0**
 
@@ -32,8 +32,8 @@ Generated: 2026-06-25T16:17:26.406Z
 
 ## 4. Verification Coverage
 
-- Restaurants with 2+ sources: **91**
-- Items with traceable source: **0**
+- Restaurants with 2+ sources: **113**
+- Items with traceable source: **133**
 - Pending conflict review: **0**
 
 ## 5. Duplicate Report (top)

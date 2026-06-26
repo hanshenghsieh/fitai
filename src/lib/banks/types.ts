@@ -32,8 +32,8 @@ export interface FoodLogEntry {
   id: string
   name: string
   store?: string
-  calories: number
-  protein_g: number
+  calories: number | null
+  protein_g: number | null
   carbs_g?: number
   fat_g?: number
   confidence?: 'high' | 'medium' | 'low'
@@ -51,11 +51,13 @@ export interface FoodLogEntry {
   community_verified?: boolean
   /** UI category for fixed image pool — not used to search images */
   imageCategory?: import('@/lib/food-image-system').ImageCategory
-  capture_status?: 'learning' | 'resolved' | 'needs_name'
+  capture_status?: 'learning' | 'resolved' | 'needs_name' | 'photo_only'
+  nutrition_status?: 'official' | 'estimated' | 'unknown'
+  nutrition_confidence?: 'A' | 'B' | 'C' | 'Unknown'
   ai_confidence_pct?: number
   /** Nutrition Accuracy v1 metadata (client check-in JSON only) */
   nutrition_accuracy_meta?: {
-    accuracy_level: 'A' | 'B' | 'C' | 'D'
+    accuracy_level: 'A' | 'B' | 'C' | 'D' | 'Unknown'
     source_type: string
     user_confirmed: boolean
     portion_adjustments: Record<string, unknown>

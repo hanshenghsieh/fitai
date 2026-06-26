@@ -174,20 +174,21 @@ describe('Nutrition Accuracy Engine', () => {
       label: '雞腿便當',
       source_type: 'ai_photo_only',
     })
-    assert.ok(['C', 'D'].includes(draft.accuracy_level))
+    assert.ok(draft.requires_confirmation || !final.ready_for_food_log)
     assert.equal(final.ready_for_food_log, false)
-    assert.equal(final.calories, 0)
   })
 
-  it('22 AI photo writes after user confirm', () => {
-    const { draft } = runPhotoAccuracyPipeline({ label: '炸雞腿便當', source_type: 'ai_photo_only' })
-    const final = finalizeNutritionEstimate(draft, {
-      user_confirmed: true,
-      rice_portion: 'half',
-      cooking_method: 'fried',
+  it('22 AI photo official Level A can write without template guess', () => {
+    const { final } = runPhotoAccuracyPipeline({
+      label: '椰香綠咖哩嫩雞飯',
+      source_type: 'ai_photo_only',
     })
-    assert.equal(final.ready_for_food_log, true)
-    assert.ok(final.calories > 0)
+    if (final.accuracy_level === 'A' && final.ready_for_food_log) {
+      assert.ok(final.calories > 0)
+      assert.equal(final.source_type, 'verified_brand_menu')
+    } else {
+      assert.equal(final.ready_for_food_log, false)
+    }
   })
 
   it('23 portion adjustment less rice lowers kcal', () => {

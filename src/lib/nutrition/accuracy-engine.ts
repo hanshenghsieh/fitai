@@ -21,6 +21,7 @@ import type {
   UserConfirmationAnswers,
 } from './types'
 import { sumAddOnDeltas } from './add-ons'
+import { runPhotoSearchV2Pipeline } from '@/lib/nutrition/search-v2/photo-pipeline'
 import {
   generateVariantsForLabel,
   getFoodDNATemplate,
@@ -462,6 +463,7 @@ export function finalizeToFoodLogPayload(
   opts: { id: string; logged_at: string; source?: FoodLogWritePayload['source'] }
 ): FoodLogWritePayload | null {
   if (!final.ready_for_food_log) return null
+  if (final.source_type === 'ai_photo_only' && final.accuracy_level === 'D') return null
   const confidence =
     final.accuracy_level === 'A' ? 'high' : final.accuracy_level === 'B' ? 'medium' : 'low'
   return {
@@ -479,16 +481,55 @@ export function finalizeToFoodLogPayload(
   }
 }
 
-/** Full photo pipeline helper */
+/** Full photo pipeline helper — delegates to Nutrition Search V2 (photo cannot be looser than text). */
 export function runPhotoAccuracyPipeline(
   input: AccuracyEngineInput,
   answers: UserConfirmationAnswers = { user_confirmed: false }
 ) {
-  const scene = classifyMealScene({ ...input, photo_parse: true, source_type: input.source_type ?? 'ai_photo_only' })
+  const { state, resolved, ready, payload } = runPhotoSearchV2Pipeline(input.label, {
+    store: input.store,
+    user_confirmed: answers.user_confirmed,
+    clarification_answers: Object.fromEntries(
+      Object.entries(answers).filter(([k]) => !['user_confirmed', 'selected_candidate_id'].includes(k))
+    ) as Record<string, string>,
+  })
+
+  const scene = classifyMealScene({ ...input, photo_parse: true, source_type: 'ai_photo_only' })
   const candidates = generateFoodCandidates(input, scene)
   const selected =
     candidates.find(c => c.id === answers.selected_candidate_id) ?? candidates[0]!
   const draft = buildNutritionEstimateDraft({ ...input, photo_parse: true }, selected)
-  const final = finalizeNutritionEstimate(draft, answers)
-  return { scene, candidates, draft, final }
+
+  const unknown = resolved.action === 'create_unknown' || payload?.nutrition_status === 'unknown'
+  const official = resolved.official_record
+
+  const final: FinalNutritionEstimate = {
+    name: payload?.name ?? official?.name ?? (input.label.trim() || '未知食物'),
+    store: payload?.store ?? official?.store ?? input.store,
+    location_context: input.location_context,
+    calories: payload?.calories ?? 0,
+    protein_g: payload?.protein_g ?? 0,
+    carbs_g: payload?.carbs_g ?? 0,
+    fat_g: payload?.fat_g ?? 0,
+    fiber_g: payload?.fiber_g ?? undefined,
+    sodium_mg: payload?.sodium_mg ?? undefined,
+    source_type: unknown
+      ? 'ai_photo_only'
+      : official || payload?.nutrition_status === 'official'
+        ? 'verified_brand_menu'
+        : 'ai_photo_only',
+    accuracy_level:
+      payload?.nutrition_confidence === 'A' || resolved.level === 'A'
+        ? 'A'
+        : payload?.nutrition_confidence === 'B' || resolved.level === 'B'
+          ? 'B'
+          : 'D',
+    satiety_score: draft.satiety_score,
+    diet_score: draft.diet_score,
+    template_id: draft.template.template_id,
+    user_confirmed: answers.user_confirmed === true,
+    ready_for_food_log: ready,
+  }
+
+  return { scene, candidates, draft, final, photo_v2: state, v2_payload: payload }
 }

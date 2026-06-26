@@ -68,6 +68,8 @@ export interface MealSuggestion {
   nutrition_score: number
   /** Dev only — why this suggestion passed validation */
   recommendation_debug_reason?: string
+  /** Rule-engine explainability — max 5 reasons */
+  recommendation_reason?: Array<{ code: string; label: string }>
 }
 
 export interface SuggestContext {

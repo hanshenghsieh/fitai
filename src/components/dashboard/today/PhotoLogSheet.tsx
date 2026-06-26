@@ -18,8 +18,10 @@ export interface PhotoLogDraft {
   previewUrl: string
   dataUrl?: string
   name: string
-  calories: number
-  protein_g: number
+  calories: number | null
+  protein_g: number | null
+  carbs_g?: number | null
+  fat_g?: number | null
   loading: boolean
   accuracy?: PhotoAccuracyState
 }
@@ -189,11 +191,25 @@ function AccuracyConfirmSection({
   onAccuracyChange: NonNullable<Props['onAccuracyChange']>
 }) {
   const selectedId = accuracy.answers.selected_candidate_id ?? accuracy.candidates[0]?.id
-  const questions = accuracy.draft.confirmation_questions.slice(0, 2)
+  const questions = accuracy.confirmation_questions.slice(0, 3)
   const confirmed = accuracy.answers.user_confirmed === true
-  const ready = accuracy.final.ready_for_food_log
+  const ready = accuracy.ready_for_food_log
+  const unknown = accuracy.nutrition_status === 'unknown'
 
   const answerFor = (qid: ConfirmationQuestion['id']) => accuracy.answers[qid]
+
+  if (unknown) {
+    return (
+      <div className="space-y-3 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
+        <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
+          目前沒有可信營養資料
+        </p>
+        <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+          {accuracy.ui_message}
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -205,32 +221,34 @@ function AccuracyConfirmSection({
           我想先確認一下
         </p>
         <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-          這餐看起來像下面哪一個？幫我選最接近的。
+          這餐看起來像：
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {accuracy.candidates.map(c => {
-          const active = c.id === selectedId
-          return (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => onAccuracyChange({ selected_candidate_id: c.id, user_confirmed: false })}
-              className="px-4 py-2.5 text-[14px] active:opacity-85"
-              style={{
-                borderRadius: 20,
-                backgroundColor: active ? TODAY.pillActiveBg : TODAY.card,
-                color: active ? TODAY.pillActiveText : TODAY.text,
-                fontWeight: active ? 600 : 500,
-                border: active ? 'none' : `1.5px solid ${TODAY.pillBg}`,
-              }}
-            >
-              {c.display_name}
-            </button>
-          )
-        })}
-      </div>
+      {accuracy.candidates.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {accuracy.candidates.map(c => {
+            const active = c.id === selectedId
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => onAccuracyChange({ selected_candidate_id: c.id, user_confirmed: false })}
+                className="px-4 py-2.5 text-[14px] active:opacity-85"
+                style={{
+                  borderRadius: 20,
+                  backgroundColor: active ? TODAY.pillActiveBg : TODAY.card,
+                  color: active ? TODAY.pillActiveText : TODAY.text,
+                  fontWeight: active ? 600 : 500,
+                  border: active ? 'none' : `1.5px solid ${TODAY.pillBg}`,
+                }}
+              >
+                {c.display_name}
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       {questions.map(q => (
         <div key={q.id} className="space-y-2">
@@ -278,9 +296,9 @@ function AccuracyConfirmSection({
         </button>
       )}
 
-      {confirmed && ready && (
+      {confirmed && ready && accuracy.show_macros && (
         <p className="text-[13px] text-center leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-          好，我記下來了。熱量與蛋白質是依你選的份量估算。
+          好，我記下來了。營養資料來自官方資料庫。
         </p>
       )}
     </div>
@@ -307,15 +325,15 @@ function ReviewStep({
   saving?: boolean
 }) {
   const accuracyMode = accuracyEnabled && !!draft.accuracy
-  const readyForLog = !accuracyMode || draft.accuracy!.final.ready_for_food_log
-  const showMacros = !accuracyMode || draft.accuracy!.answers.user_confirmed === true
+  const readyForLog = !accuracyMode || draft.accuracy!.ready_for_food_log
+  const showMacros = !accuracyMode || draft.accuracy!.show_macros
 
-  const [calText, setCalText] = useState(String(draft.calories || ''))
-  const [proText, setProText] = useState(String(draft.protein_g || ''))
+  const [calText, setCalText] = useState(draft.calories != null ? String(draft.calories) : '')
+  const [proText, setProText] = useState(draft.protein_g != null ? String(draft.protein_g) : '')
 
   useEffect(() => {
-    setCalText(String(draft.calories || ''))
-    setProText(String(draft.protein_g || ''))
+    setCalText(draft.calories != null ? String(draft.calories) : '')
+    setProText(draft.protein_g != null ? String(draft.protein_g) : '')
   }, [draft.calories, draft.protein_g])
 
   return (
@@ -376,14 +394,14 @@ function ReviewStep({
               {draft.name || '這餐'}
             </p>
             <p className="text-[32px] tabular-nums mb-4" style={{ color: BB_V2.accent.orange, fontWeight: 700 }}>
-              {draft.calories || '—'}
+              {draft.calories ?? '—'}
               <span className="text-[16px] ml-1" style={{ fontWeight: 600 }}>kcal</span>
             </p>
             <div className="grid grid-cols-3 gap-3">
               {[
                 { label: '蛋白質', value: draft.protein_g, unit: 'g', color: BB_V2.macro.protein },
-                { label: '碳水', value: Math.round((draft.calories || 0) * 0.4 / 4), unit: 'g', color: BB_V2.macro.carbs },
-                { label: '脂肪', value: Math.round((draft.calories || 0) * 0.25 / 9), unit: 'g', color: BB_V2.macro.fat },
+                { label: '碳水', value: draft.carbs_g, unit: 'g', color: BB_V2.macro.carbs },
+                { label: '脂肪', value: draft.fat_g, unit: 'g', color: BB_V2.macro.fat },
               ].map(row => (
                 <div
                   key={row.label}
@@ -392,7 +410,7 @@ function ReviewStep({
                 >
                   <p className="text-[11px] mb-1" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>{row.label}</p>
                   <p className="text-[18px] tabular-nums" style={{ color: row.color, fontWeight: 700 }}>
-                    {row.value || '—'}
+                    {row.value ?? '—'}
                     <span className="text-[11px] font-medium">{row.unit}</span>
                   </p>
                 </div>
@@ -466,7 +484,9 @@ function ReviewStep({
 
       <div className="ios-bottom-sheet__footer shrink-0 px-5 pt-2 pb-3 space-y-2">
         <p className="text-[11px] text-center leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400, opacity: 0.8 }}>
-          熱量與蛋白質為估算值，僅供參考。
+          {accuracyMode && draft.accuracy?.nutrition_status === 'unknown'
+            ? '此筆為照片紀錄，不含營養統計。'
+            : '營養資料僅來自官方資料庫，經確認後入帳。'}
         </p>
         <button
           type="button"

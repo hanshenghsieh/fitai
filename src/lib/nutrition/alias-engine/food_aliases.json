@@ -1,0 +1,4322 @@
+{
+  "version": 1,
+  "generated_at": "2026-06-26T15:43:06.200Z",
+  "entry_count": 345,
+  "alias_count": 1327,
+  "entries": [
+    {
+      "official_name": "雞排",
+      "aliases": [
+        "炸雞排",
+        "香雞排",
+        "無骨雞排",
+        "豪大雞排",
+        "派克雞排",
+        "惡魔雞排",
+        "雞排飯"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Subway",
+      "store": "Subway",
+      "aliases": [
+        "潛艇堡"
+      ],
+      "restaurant_aliases": [
+        "SUBWAY",
+        "Sub Way",
+        "潛艇堡"
+      ]
+    },
+    {
+      "official_name": "椰香綠咖哩嫩雞飯",
+      "store": "7-11",
+      "aliases": [
+        "綠咖哩雞飯",
+        "椰香咖哩雞飯",
+        "711綠咖哩",
+        "7-11綠咖哩雞飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11",
+        "統一超商"
+      ]
+    },
+    {
+      "official_name": "竹筍排骨湯",
+      "store": "7-11",
+      "aliases": [
+        "711竹筍湯",
+        "711排骨湯",
+        "竹筍湯排骨",
+        "7-11竹筍排骨湯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "滷肉飯",
+      "aliases": [
+        "魯肉飯",
+        "滷肉便當",
+        "魯肉便當"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "珍珠奶茶",
+      "aliases": [
+        "波霸奶茶",
+        "粉圓奶茶",
+        "珍奶",
+        "黑糖珍奶"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "晶英韓式炸豬排起司雙拼飯",
+      "store": "7-11",
+      "item_id": "item_mql8paig_39",
+      "aliases": [
+        "晶英韓式",
+        "排起司雙拼飯",
+        "晶英韓式炸豬排起司雙拼饭",
+        "711晶英韓式炸豬排起司雙拼飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "嫩雞蔬食卷",
+      "store": "麥當勞",
+      "item_id": "item_mql8pako_197",
+      "aliases": [
+        "嫩雞蔬食",
+        "嫩鸡蔬食卷"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "烤雞沙拉潛艇堡（6吋）",
+      "store": "Subway",
+      "item_id": "item_mql8pakr_218",
+      "aliases": [
+        "烤雞沙拉",
+        "艇堡（6吋）",
+        "烤鸡沙拉潛艇堡（6吋）",
+        "SUBWAY"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "糖心蛋雞胸餐",
+      "store": "森度餐廚",
+      "item_id": "item_mql8palx_287",
+      "aliases": [
+        "糖心蛋雞",
+        "糖心蛋鸡胸餐"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "綜合壽司套餐",
+      "store": "爭鮮迴轉壽司",
+      "item_id": "item_mql8parl_650",
+      "aliases": [
+        "綜合壽司"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "雞排便當",
+      "store": "廣味香",
+      "item_id": "item_mql8paut_789",
+      "aliases": [
+        "鸡排便當"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "雞排便當",
+      "store": "圓福",
+      "item_id": "item_mql8pavc_795",
+      "aliases": [
+        "鸡排便當"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "牛排起司潛艇堡",
+      "store": "Subway",
+      "item_id": "item_mql8payw_1017",
+      "aliases": [
+        "牛排起司",
+        "排起司潛艇堡"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "鮭魚+時蔬",
+      "store": "鉑金健康餐盒",
+      "item_id": "item_mql8pb4n_1623",
+      "aliases": [
+        "鮭魚+時"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "蔬菜 Delite 潛艇堡（6吋·全麥·不加醬）",
+      "store": "Subway",
+      "item_id": "item_mql9dtyf_10",
+      "aliases": [
+        "蔬菜 D",
+        "麥·不加醬）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "烤牛肉潛艇堡（6吋·全麥·不加醬）",
+      "store": "Subway",
+      "item_id": "item_mql9dtyq_15",
+      "aliases": [
+        "烤牛肉潛"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "義式經典潛艇堡（6吋·全麥·不加醬）",
+      "store": "Subway",
+      "item_id": "item_mql9dtyt_19",
+      "aliases": [
+        "義式經典"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "鮪魚潛艇堡（6吋·全麥·不加醬）",
+      "store": "Subway",
+      "item_id": "item_mql9dtyv_22",
+      "aliases": [
+        "鮪魚潛艇"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "義式肉丸潛艇堡（6吋·全麥）",
+      "store": "Subway",
+      "item_id": "item_mql9dtz7_27",
+      "aliases": [
+        "義式肉丸",
+        "6吋·全麥）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "雞蛋起司潛艇堡（6吋·全麥）",
+      "store": "Subway",
+      "item_id": "item_mql9dtzo_35",
+      "aliases": [
+        "雞蛋起司",
+        "鸡蛋起司潛艇堡（6吋·全麥）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "培根雞蛋潛艇堡（6吋·全麥）",
+      "store": "Subway",
+      "item_id": "item_mql9dtzp_38",
+      "aliases": [
+        "培根雞蛋",
+        "培根鸡蛋潛艇堡（6吋·全麥）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "洋芋片（小包）",
+      "store": "Subway",
+      "item_id": "item_mql9dtzt_44",
+      "aliases": [
+        "芋片（小包）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "甜蝦握壽司（2貫）",
+      "store": "爭鮮迴轉壽司",
+      "item_id": "item_mql9dtzv_50",
+      "aliases": [
+        "甜蝦握壽",
+        "壽司（2貫）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "鮭魚細卷（8切）",
+      "store": "爭鮮迴轉壽司",
+      "item_id": "item_mql9du00_54",
+      "aliases": [
+        "細卷（8切）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "加州卷（8切）",
+      "store": "爭鮮迴轉壽司",
+      "item_id": "item_mql9du02_57",
+      "aliases": [
+        "州卷（8切）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "鮭魚生魚片（5片）",
+      "store": "爭鮮迴轉壽司",
+      "item_id": "item_mql9du06_64",
+      "aliases": [
+        "鮭魚生魚",
+        "魚片（5片）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "鮭魚握壽司（2貫）",
+      "store": "爭鮮PLUS",
+      "item_id": "item_mql9du09_72",
+      "aliases": [
+        "鮭魚握壽",
+        "壽司（2貫）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "極上綜合壽司（12貫）",
+      "store": "爭鮮PLUS",
+      "item_id": "item_mql9du0n_76",
+      "aliases": [
+        "極上綜合",
+        "司（12貫）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "晶瑩鮮蝦饺",
+      "store": "點點心",
+      "item_id": "item_mql9du0o_81",
+      "aliases": [
+        "晶瑩鮮蝦"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "香煎蘿蔔糕（3件）",
+      "store": "點點心",
+      "item_id": "item_mql9du0p_84",
+      "aliases": [
+        "香煎蘿蔔",
+        "蔔糕（3件）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "真係叉燒包（3件）",
+      "store": "點點心",
+      "item_id": "item_mql9du0r_87",
+      "aliases": [
+        "真係叉燒",
+        "燒包（3件）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "鳳爪（2件）",
+      "store": "點點心",
+      "item_id": "item_mql9du0s_90",
+      "aliases": [
+        "鳳爪（2"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "酥皮焗蛋撻（2件）",
+      "store": "點點心",
+      "item_id": "item_mql9du12_96",
+      "aliases": [
+        "酥皮焗蛋",
+        "蛋撻（2件）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "冰火菠蘿油",
+      "store": "點點心",
+      "item_id": "item_mql9du1j_99",
+      "aliases": [
+        "冰火菠蘿"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "皮蛋瘦肉粥",
+      "store": "點點心",
+      "item_id": "item_mql9du1q_102",
+      "aliases": [
+        "皮蛋瘦肉"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "揚州炒飯",
+      "store": "點點心",
+      "item_id": "item_mql9du1u_105",
+      "aliases": [
+        "揚州炒饭"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "鮮蝦雲吞麵",
+      "store": "點點心",
+      "item_id": "item_mql9du1v_108",
+      "aliases": [
+        "鮮蝦雲吞",
+        "鮮蝦雲吞面"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "點心拼盤套餐（4款）",
+      "store": "點點心",
+      "item_id": "item_mql9du1x_111",
+      "aliases": [
+        "點心拼盤",
+        "套餐（4款）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "及第粥套餐",
+      "store": "點點心",
+      "item_id": "item_mql9du1y_114",
+      "aliases": [
+        "及第粥套"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "綠咖哩雞套餐",
+      "store": "新光三越美食街",
+      "item_id": "item_mql9du20_119",
+      "aliases": [
+        "綠咖哩雞",
+        "綠咖哩鸡套餐"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "泰式炒河粉（雞肉）",
+      "store": "新光三越美食街",
+      "item_id": "item_mql9du21_122",
+      "aliases": [
+        "泰式炒河",
+        "河粉（雞肉）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "豚骨拉麵",
+      "store": "新光三越美食街",
+      "item_id": "item_mql9du22_125",
+      "aliases": [
+        "豚骨拉面"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "菲力牛排套餐",
+      "store": "新光三越美食街",
+      "item_id": "item_mql9du23_128",
+      "aliases": [
+        "菲力牛排"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "石鍋拌飯（牛肉）",
+      "store": "新光三越美食街",
+      "item_id": "item_mql9du24_131",
+      "aliases": [
+        "拌飯（牛肉）",
+        "石鍋拌饭（牛肉）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "奶油培根義大利麵",
+      "store": "新光三越美食街",
+      "item_id": "item_mql9du25_134",
+      "aliases": [
+        "奶油培根",
+        "培根義大利麵",
+        "奶油培根義大利面"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "親子丼定食",
+      "store": "新光三越美食街",
+      "item_id": "item_mql9du2h_137",
+      "aliases": [
+        "親子丼定"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "打拋豬肉片套餐",
+      "store": "微風廣場美食街",
+      "item_id": "item_mql9du2l_142",
+      "aliases": [
+        "打拋豬肉",
+        "拋豬肉片套餐"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "雞胸凱薩沙拉",
+      "store": "微風廣場美食街",
+      "item_id": "item_mql9du2m_145",
+      "aliases": [
+        "雞胸凱薩",
+        "鸡胸凱薩沙拉"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "紅燒牛肉麵",
+      "store": "微風廣場美食街",
+      "item_id": "item_mql9du2o_148",
+      "aliases": [
+        "紅燒牛肉",
+        "紅燒牛肉面"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "個人麻辣鍋",
+      "store": "微風廣場美食街",
+      "item_id": "item_mql9du2s_151",
+      "aliases": [
+        "個人麻辣"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "綜合壽司定食",
+      "store": "微風廣場美食街",
+      "item_id": "item_mql9du2w_154",
+      "aliases": [
+        "綜合壽司"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "咖哩豬排飯",
+      "store": "SOGO美食街",
+      "item_id": "item_mql9du2z_159",
+      "aliases": [
+        "咖哩豬排",
+        "咖哩豬排饭"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "牛丼（中）",
+      "store": "SOGO美食街",
+      "item_id": "item_mql9du30_162",
+      "aliases": [
+        "牛丼（中"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "鍋貼（10顆）+ 酸辣湯",
+      "store": "SOGO美食街",
+      "item_id": "item_mql9du31_165",
+      "aliases": [
+        "鍋貼（1",
+        "）+ 酸辣湯",
+        "鍋貼"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "鐵板牛柳套餐",
+      "store": "SOGO美食街",
+      "item_id": "item_mql9du32_168",
+      "aliases": [
+        "鐵板牛柳"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "晶瑩鮮蝦饺套餐",
+      "store": "京站美食街",
+      "item_id": "item_mql9du33_173",
+      "aliases": [
+        "晶瑩鮮蝦",
+        "瑩鮮蝦饺套餐"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "味噌拉麵",
+      "store": "京站美食街",
+      "item_id": "item_mql9du34_176",
+      "aliases": [
+        "味噌拉面"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "雞腿便當",
+      "store": "京站美食街",
+      "item_id": "item_mql9du3a_179",
+      "aliases": [
+        "鸡腿便當"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "海鮮義大利麵",
+      "store": "遠東百貨美食街",
+      "item_id": "item_mql9du3b_184",
+      "aliases": [
+        "海鮮義大",
+        "海鮮義大利面"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "韓式炸雞套餐",
+      "store": "遠東百貨美食街",
+      "item_id": "item_mql9du3c_187",
+      "aliases": [
+        "韓式炸雞",
+        "韓式炸鸡套餐"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "港式飲茶套餐",
+      "store": "遠東百貨美食街",
+      "item_id": "item_mql9du3d_190",
+      "aliases": [
+        "港式飲茶"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "經典牛肉堡套餐",
+      "store": "誠品生活美食街",
+      "item_id": "item_mql9du3e_195",
+      "aliases": [
+        "經典牛肉",
+        "典牛肉堡套餐"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "炙燒鮭魚握壽司定食",
+      "store": "誠品生活美食街",
+      "item_id": "item_mql9du3f_198",
+      "aliases": [
+        "炙燒鮭魚",
+        "魚握壽司定食"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "頌丹樂",
+      "store": "7-11",
+      "item_id": "item_mql9du3l_202",
+      "aliases": [
+        "711頌丹樂"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "潮粵坊",
+      "store": "7-11",
+      "item_id": "item_mql9du3s_208",
+      "aliases": [
+        "711潮粵坊"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "109元",
+      "store": "7-11",
+      "item_id": "item_mql9du4i_218",
+      "aliases": [
+        "711109元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "阜杭豆漿饅頭夾豬排蛋",
+      "store": "7-11",
+      "item_id": "item_mql9du5b_225",
+      "aliases": [
+        "阜杭豆漿",
+        "饅頭夾豬排蛋",
+        "711阜杭豆漿饅頭夾豬排蛋"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "晶華嫩雞鮮蔬貝果堡",
+      "store": "7-11",
+      "item_id": "item_mql9du5s_236",
+      "aliases": [
+        "晶華嫩雞",
+        "雞鮮蔬貝果堡",
+        "晶華嫩鸡鮮蔬貝果堡",
+        "711晶華嫩雞鮮蔬貝果堡"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "帕泰家",
+      "store": "7-11",
+      "item_id": "item_mql9du6c_248",
+      "aliases": [
+        "711帕泰家"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "晶英滷肉刈包",
+      "store": "7-11",
+      "item_id": "item_mql9du6k_252",
+      "aliases": [
+        "晶英滷肉",
+        "711晶英滷肉刈包"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "88元",
+      "store": "7-11",
+      "item_id": "item_mql9du6m_255",
+      "aliases": [
+        "71188元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "馨苑干貝海鮮煲粥",
+      "store": "7-11",
+      "item_id": "item_mql9du6p_258",
+      "aliases": [
+        "馨苑干貝",
+        "干貝海鮮煲粥",
+        "711馨苑干貝海鮮煲粥"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "晶英酒店布朗尼蛋糕棒",
+      "store": "7-11",
+      "item_id": "item_mql9du6v_263",
+      "aliases": [
+        "晶英酒店",
+        "布朗尼蛋糕棒",
+        "711晶英酒店布朗尼蛋糕棒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "晶英酒店奶凍蜜瓜包",
+      "store": "7-11",
+      "item_id": "item_mql9du75_267",
+      "aliases": [
+        "店奶凍蜜瓜包",
+        "711晶英酒店奶凍蜜瓜包"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "香辣魷魚拌麵",
+      "store": "7-11",
+      "item_id": "item_mql9du79_273",
+      "aliases": [
+        "香辣魷魚",
+        "香辣魷魚拌面",
+        "711香辣魷魚拌麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "可口紅燒牛肉麵",
+      "store": "7-11",
+      "item_id": "item_mql9du7o_279",
+      "aliases": [
+        "可口紅燒",
+        "口紅燒牛肉麵",
+        "可口紅燒牛肉面",
+        "711可口紅燒牛肉麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "法式起司燻培根厚土司",
+      "store": "7-11",
+      "item_id": "item_mql9du88_287",
+      "aliases": [
+        "法式起司",
+        "燻培根厚土司",
+        "711法式起司燻培根厚土司"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "21Plus糯米參雞湯",
+      "store": "7-11",
+      "item_id": "item_mql9du8y_294",
+      "aliases": [
+        "21Pl",
+        "s糯米參雞湯",
+        "21Plus糯米參鸡湯",
+        "71121Plus糯米參雞湯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "韓式醬燉蛋",
+      "store": "7-11",
+      "item_id": "item_mql9du91_297",
+      "aliases": [
+        "韓式醬燉",
+        "711韓式醬燉蛋"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "59元",
+      "store": "7-11",
+      "item_id": "item_mql9du94_300",
+      "aliases": [
+        "71159元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "韓式辣醬起司洋芋燒",
+      "store": "7-11",
+      "item_id": "item_mql9du99_303",
+      "aliases": [
+        "韓式辣醬",
+        "醬起司洋芋燒",
+        "711韓式辣醬起司洋芋燒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "白種元韓式牛肉拌飯",
+      "store": "7-11",
+      "item_id": "item_mql9du9c_306",
+      "aliases": [
+        "白種元韓",
+        "韓式牛肉拌飯",
+        "白種元韓式牛肉拌饭",
+        "711白種元韓式牛肉拌飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "白種元韓式洋釀拌拌炸雞",
+      "store": "7-11",
+      "item_id": "item_mql9du9k_310",
+      "aliases": [
+        "洋釀拌拌炸雞",
+        "白種元韓式洋釀拌拌炸鸡",
+        "711白種元韓式洋釀拌拌炸雞"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "加賀屋",
+      "store": "7-11",
+      "item_id": "item_mql9du9s_314",
+      "aliases": [
+        "711加賀屋"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "熱壓土司",
+      "store": "7-11",
+      "item_id": "item_mql9dua4_319",
+      "aliases": [
+        "711熱壓土司"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "60元",
+      "store": "7-11",
+      "item_id": "item_mql9duaa_322",
+      "aliases": [
+        "71160元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "星級饗宴X晶華",
+      "store": "7-11",
+      "item_id": "item_mql9duay_329",
+      "aliases": [
+        "星級饗宴",
+        "級饗宴X晶華",
+        "711星級饗宴X晶華"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "星級饗宴x晶華法式牛肉丸焗烤飯",
+      "store": "7-11",
+      "item_id": "item_mql9dub7_333",
+      "aliases": [
+        "牛肉丸焗烤飯",
+        "星級饗宴x晶華法式牛肉丸焗烤饭",
+        "711星級饗宴x晶華法式牛肉丸焗烤飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "香辣椰奶雞肉義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9dud1_359",
+      "aliases": [
+        "香辣椰奶",
+        "雞肉義大利麵",
+        "香辣椰奶鸡肉義大利麵",
+        "香辣椰奶雞肉義大利面",
+        "711香辣椰奶雞肉義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "瑪格麗特筆管麵",
+      "store": "7-11",
+      "item_id": "item_mql9dud8_363",
+      "aliases": [
+        "瑪格麗特",
+        "格麗特筆管麵",
+        "瑪格麗特筆管面",
+        "711瑪格麗特筆管麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "鮮蝦明太子冷義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9dudk_367",
+      "aliases": [
+        "鮮蝦明太",
+        "子冷義大利麵",
+        "鮮蝦明太子冷義大利面",
+        "711鮮蝦明太子冷義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "SAY",
+      "store": "7-11",
+      "item_id": "item_mql9dudt_371",
+      "aliases": [
+        "711SAY"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "烤雞奶香焗飯",
+      "store": "7-11",
+      "item_id": "item_mql9due9_375",
+      "aliases": [
+        "烤雞奶香",
+        "烤鸡奶香焗飯",
+        "烤雞奶香焗饭",
+        "711烤雞奶香焗飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "真飽貪心雙醬義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9duei_379",
+      "aliases": [
+        "真飽貪心",
+        "雙醬義大利麵",
+        "真飽貪心雙醬義大利面",
+        "711真飽貪心雙醬義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "三起司肉醬焗飯",
+      "store": "7-11",
+      "item_id": "item_mql9duem_382",
+      "aliases": [
+        "三起司肉",
+        "起司肉醬焗飯",
+        "三起司肉醬焗饭",
+        "711三起司肉醬焗飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "蝦仁白醬焗烤飯",
+      "store": "7-11",
+      "item_id": "item_mql9duey_386",
+      "aliases": [
+        "蝦仁白醬",
+        "仁白醬焗烤飯",
+        "蝦仁白醬焗烤饭",
+        "711蝦仁白醬焗烤飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "半熟玉子辣擔擔義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9dufy_390",
+      "aliases": [
+        "半熟玉子",
+        "擔擔義大利麵",
+        "半熟玉子辣擔擔義大利面",
+        "711半熟玉子辣擔擔義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "雙拼起司紅醬焗飯",
+      "store": "7-11",
+      "item_id": "item_mql9dug7_394",
+      "aliases": [
+        "雙拼起司",
+        "起司紅醬焗飯",
+        "雙拼起司紅醬焗饭",
+        "711雙拼起司紅醬焗飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "海鮮青醬焗飯",
+      "store": "7-11",
+      "item_id": "item_mql9dugb_397",
+      "aliases": [
+        "海鮮青醬",
+        "海鮮青醬焗饭",
+        "711海鮮青醬焗飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "香蒜奶油雙拼義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9dugk_401",
+      "aliases": [
+        "香蒜奶油",
+        "雙拼義大利麵",
+        "香蒜奶油雙拼義大利面",
+        "711香蒜奶油雙拼義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "奶油蛋黃醬培根義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9dugu_405",
+      "aliases": [
+        "奶油蛋黃",
+        "培根義大利麵",
+        "奶油蛋黃醬培根義大利面",
+        "711奶油蛋黃醬培根義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "焗烤奶油蝦仁通心粉",
+      "store": "7-11",
+      "item_id": "item_mql9duh7_409",
+      "aliases": [
+        "焗烤奶油",
+        "油蝦仁通心粉",
+        "711焗烤奶油蝦仁通心粉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "青醬蛤蠣義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9duhf_413",
+      "aliases": [
+        "青醬蛤蠣",
+        "蛤蠣義大利麵",
+        "青醬蛤蠣義大利面",
+        "711青醬蛤蠣義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "烤雞燻腸白醬焗飯",
+      "store": "7-11",
+      "item_id": "item_mql9duhm_416",
+      "aliases": [
+        "烤雞燻腸",
+        "燻腸白醬焗飯",
+        "烤鸡燻腸白醬焗飯",
+        "烤雞燻腸白醬焗饭",
+        "711烤雞燻腸白醬焗飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "三起司燻腸完熟番茄義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9duhv_420",
+      "aliases": [
+        "三起司燻",
+        "番茄義大利麵",
+        "三起司燻腸完熟番茄義大利面",
+        "711三起司燻腸完熟番茄義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "香蒜白酒蛤蠣義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9dui6_424",
+      "aliases": [
+        "香蒜白酒",
+        "香蒜白酒蛤蠣義大利面",
+        "711香蒜白酒蛤蠣義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "義式蕃茄肉醬義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9duif_428",
+      "aliases": [
+        "義式蕃茄",
+        "肉醬義大利麵",
+        "義式蕃茄肉醬義大利面",
+        "711義式蕃茄肉醬義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "陽明春天香辣豆腐拌麵香辣入味豆腐x特製波浪麵熱量493kca",
+      "store": "7-11",
+      "item_id": "item_mql9duj3_434",
+      "aliases": [
+        "陽明春天",
+        "493kca",
+        "陽明春天香辣豆腐拌面香辣入味豆腐x特製波浪面熱量493kca",
+        "711陽明春天香辣豆腐拌麵香辣入味豆腐x特製波浪麵熱量493kca"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "日式豆皮蕎麥風味冷麵熱量398kcal65元",
+      "store": "7-11",
+      "item_id": "item_mql9dujl_440",
+      "aliases": [
+        "日式豆皮",
+        "cal65元",
+        "日式豆皮蕎麥風味冷面熱量398kcal65元",
+        "711日式豆皮蕎麥風味冷麵熱量398kcal65元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "陽明春天南洋咖哩燴飯熱量627kcal89元",
+      "store": "7-11",
+      "item_id": "item_mql9duju_444",
+      "aliases": [
+        "cal89元",
+        "陽明春天南洋咖哩燴饭熱量627kcal89元",
+        "711陽明春天南洋咖哩燴飯熱量627kcal89元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "經典獅子頭燴飯熱量537kcal89元",
+      "store": "7-11",
+      "item_id": "item_mql9duka_450",
+      "aliases": [
+        "經典獅子",
+        "經典獅子頭燴饭熱量537kcal89元",
+        "711經典獅子頭燴飯熱量537kcal89元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "彩蔬堅果青醬筆管麵帕瑪森起司X堅果青醬熱量715kcal89",
+      "store": "7-11",
+      "item_id": "item_mql9dukz_456",
+      "aliases": [
+        "彩蔬堅果",
+        "kcal89",
+        "彩蔬堅果青醬筆管面帕瑪森起司X堅果青醬熱量715kcal89",
+        "711彩蔬堅果青醬筆管麵帕瑪森起司X堅果青醬熱量715kcal89"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "麻油菇菇油飯麻油薑香",
+      "store": "7-11",
+      "item_id": "item_mql9duld_460",
+      "aliases": [
+        "麻油菇菇",
+        "油飯麻油薑香",
+        "麻油菇菇油饭麻油薑香",
+        "711麻油菇菇油飯麻油薑香"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "松露蕈菇燕麥粥65元",
+      "store": "7-11",
+      "item_id": "item_mql9dulv_466",
+      "aliases": [
+        "松露蕈菇",
+        "燕麥粥65元",
+        "711松露蕈菇燕麥粥65元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "松露菇菇燉飯",
+      "store": "7-11",
+      "item_id": "item_mql9dum6_470",
+      "aliases": [
+        "松露菇菇",
+        "松露菇菇燉饭",
+        "711松露菇菇燉飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "隨緣川味時蔬炒飯",
+      "store": "7-11",
+      "item_id": "item_mql9duna_478",
+      "aliases": [
+        "隨緣川味",
+        "川味時蔬炒飯",
+        "隨緣川味時蔬炒饭",
+        "711隨緣川味時蔬炒飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "隨緣白醬松露義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9dunf_481",
+      "aliases": [
+        "隨緣白醬",
+        "松露義大利麵",
+        "隨緣白醬松露義大利面",
+        "711隨緣白醬松露義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "塔香鹹蔬雞球",
+      "store": "7-11",
+      "item_id": "item_mql9duno_484",
+      "aliases": [
+        "塔香鹹蔬",
+        "塔香鹹蔬鸡球",
+        "711塔香鹹蔬雞球"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "陽明春天古早味香菇竹筍粥",
+      "store": "7-11",
+      "item_id": "item_mql9duo0_489",
+      "aliases": [
+        "味香菇竹筍粥",
+        "711陽明春天古早味香菇竹筍粥"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "香辣堅果蛋炒飯",
+      "store": "7-11",
+      "item_id": "item_mql9duou_495",
+      "aliases": [
+        "香辣堅果",
+        "辣堅果蛋炒飯",
+        "香辣堅果蛋炒饭",
+        "711香辣堅果蛋炒飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "油香椒麻蒟蒻",
+      "store": "7-11",
+      "item_id": "item_mql9dupb_499",
+      "aliases": [
+        "油香椒麻",
+        "711油香椒麻蒟蒻"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "弘揚植物肉青花椒熟水餃",
+      "store": "7-11",
+      "item_id": "item_mql9dupr_503",
+      "aliases": [
+        "弘揚植物",
+        "青花椒熟水餃",
+        "711弘揚植物肉青花椒熟水餃"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "桂冠素三杯炒飯",
+      "store": "7-11",
+      "item_id": "item_mql9duqq_508",
+      "aliases": [
+        "桂冠素三",
+        "冠素三杯炒飯",
+        "桂冠素三杯炒饭",
+        "711桂冠素三杯炒飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "桂冠素青醬野菇義大利麵",
+      "store": "7-11",
+      "item_id": "item_mql9durp_512",
+      "aliases": [
+        "桂冠素青",
+        "野菇義大利麵",
+        "桂冠素青醬野菇義大利面",
+        "711桂冠素青醬野菇義大利麵"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "松珍素沙嗲醬爆蝦",
+      "store": "7-11",
+      "item_id": "item_mql9dusy_516",
+      "aliases": [
+        "松珍素沙",
+        "素沙嗲醬爆蝦",
+        "711松珍素沙嗲醬爆蝦"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "松珍素鮮嫩炸雞塊",
+      "store": "7-11",
+      "item_id": "item_mql9dutc_520",
+      "aliases": [
+        "松珍素鮮",
+        "素鮮嫩炸雞塊",
+        "松珍素鮮嫩炸鸡塊",
+        "711松珍素鮮嫩炸雞塊"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "松珍素花枝丸",
+      "store": "7-11",
+      "item_id": "item_mql9dutu_524",
+      "aliases": [
+        "松珍素花",
+        "711松珍素花枝丸"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "TOMMI私房花雕雞腿排米漢堡",
+      "store": "7-11",
+      "item_id": "item_mql9duuz_532",
+      "aliases": [
+        "TOMM",
+        "雞腿排米漢堡",
+        "TOMMI私房花雕鸡腿排米漢堡",
+        "711TOMMI私房花雕雞腿排米漢堡"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "日本豆皮壽司",
+      "store": "7-11",
+      "item_id": "item_mql9duw9_540",
+      "aliases": [
+        "日本豆皮",
+        "711日本豆皮壽司"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "爆漿燻腸起司飯卷",
+      "store": "7-11",
+      "item_id": "item_mql9duxn_547",
+      "aliases": [
+        "爆漿燻腸",
+        "燻腸起司飯卷",
+        "爆漿燻腸起司饭卷",
+        "711爆漿燻腸起司飯卷"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "林聰明",
+      "store": "7-11",
+      "item_id": "item_mql9duyn_553",
+      "aliases": [
+        "711林聰明"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "鮪魚肉鬆雙手卷",
+      "store": "7-11",
+      "item_id": "item_mql9duzh_560",
+      "aliases": [
+        "鮪魚肉鬆",
+        "魚肉鬆雙手卷",
+        "711鮪魚肉鬆雙手卷"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "北海道秋鮭鮪魚雙手卷",
+      "store": "7-11",
+      "item_id": "item_mql9duzx_564",
+      "aliases": [
+        "北海道秋",
+        "鮭鮪魚雙手卷",
+        "711北海道秋鮭鮪魚雙手卷"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "太和殿麻辣烤雞堡",
+      "store": "7-11",
+      "item_id": "item_mql9dv23_579",
+      "aliases": [
+        "太和殿麻",
+        "殿麻辣烤雞堡",
+        "太和殿麻辣烤鸡堡",
+        "711太和殿麻辣烤雞堡"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "檸檬卡士達綜合水果三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dv2a_582",
+      "aliases": [
+        "檸檬卡士",
+        "合水果三明治",
+        "711檸檬卡士達綜合水果三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "重量級",
+      "store": "7-11",
+      "item_id": "item_mql9dv2l_585",
+      "aliases": [
+        "711重量級"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "日式雞蛋沙拉三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dv2s_588",
+      "aliases": [
+        "日式雞蛋",
+        "蛋沙拉三明治",
+        "日式鸡蛋沙拉三明治",
+        "711日式雞蛋沙拉三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "塔塔香炸鱈魚堡",
+      "store": "7-11",
+      "item_id": "item_mql9dv36_591",
+      "aliases": [
+        "塔塔香炸",
+        "塔香炸鱈魚堡",
+        "711塔塔香炸鱈魚堡"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "牛肉起司堡",
+      "store": "7-11",
+      "item_id": "item_mql9dv3l_594",
+      "aliases": [
+        "牛肉起司",
+        "711牛肉起司堡"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "四起司燻腸捲餅",
+      "store": "7-11",
+      "item_id": "item_mql9dv3y_597",
+      "aliases": [
+        "四起司燻",
+        "起司燻腸捲餅",
+        "711四起司燻腸捲餅"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "起司四重奏三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dv46_600",
+      "aliases": [
+        "起司四重",
+        "四重奏三明治",
+        "711起司四重奏三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "吉士香雞蛋堡",
+      "store": "7-11",
+      "item_id": "item_mql9dv4g_603",
+      "aliases": [
+        "吉士香雞",
+        "吉士香鸡蛋堡",
+        "711吉士香雞蛋堡"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "35元",
+      "store": "7-11",
+      "item_id": "item_mql9dv4x_607",
+      "aliases": [
+        "71135元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "草莓乳酪三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dv55_610",
+      "aliases": [
+        "草莓乳酪",
+        "莓乳酪三明治",
+        "711草莓乳酪三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "醬燒里肌鮮蔬三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dv5l_614",
+      "aliases": [
+        "醬燒里肌",
+        "肌鮮蔬三明治",
+        "711醬燒里肌鮮蔬三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "小龍蝦沙拉三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dv68_618",
+      "aliases": [
+        "小龍蝦沙",
+        "蝦沙拉三明治",
+        "711小龍蝦沙拉三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "70元",
+      "store": "7-11",
+      "item_id": "item_mql9dv6y_625",
+      "aliases": [
+        "71170元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "焗烤雙起司鮪魚三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dv7x_631",
+      "aliases": [
+        "焗烤雙起",
+        "司鮪魚三明治",
+        "711焗烤雙起司鮪魚三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "拔絲起司法式三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dv88_634",
+      "aliases": [
+        "拔絲起司",
+        "司法式三明治",
+        "711拔絲起司法式三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "溏心蛋紐奧良風味烤雞三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dv93_639",
+      "aliases": [
+        "溏心蛋紐",
+        "味烤雞三明治",
+        "溏心蛋紐奧良風味烤鸡三明治",
+        "711溏心蛋紐奧良風味烤雞三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "鮪魚洋芋溏心蛋三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dv9c_642",
+      "aliases": [
+        "鮪魚洋芋",
+        "溏心蛋三明治",
+        "711鮪魚洋芋溏心蛋三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "紐西蘭樂淇蘋果2入",
+      "store": "7-11",
+      "item_id": "item_mql9dv9x_646",
+      "aliases": [
+        "紐西蘭樂",
+        "樂淇蘋果2入",
+        "711紐西蘭樂淇蘋果2入"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "鮮果繽紛杯",
+      "store": "7-11",
+      "item_id": "item_mql9dva5_649",
+      "aliases": [
+        "鮮果繽紛",
+        "711鮮果繽紛杯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "美國空運藍莓盒",
+      "store": "7-11",
+      "item_id": "item_mql9dvap_655",
+      "aliases": [
+        "美國空運",
+        "國空運藍莓盒",
+        "711美國空運藍莓盒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "紐西蘭黃金奇異果2入",
+      "store": "7-11",
+      "item_id": "item_mql9dvaz_658",
+      "aliases": [
+        "紐西蘭黃",
+        "金奇異果2入",
+        "711紐西蘭黃金奇異果2入"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "愛文芒果切片",
+      "store": "7-11",
+      "item_id": "item_mql9dvb6_661",
+      "aliases": [
+        "愛文芒果",
+        "711愛文芒果切片"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台灣上等蕉550g",
+      "store": "7-11",
+      "item_id": "item_mql9dvbh_664",
+      "aliases": [
+        "台灣上等",
+        "等蕉550g",
+        "711台灣上等蕉550g"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "和風生鮭",
+      "store": "7-11",
+      "item_id": "item_mql9dvbr_667",
+      "aliases": [
+        "711和風生鮭"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "紐西蘭星空蘋果切片",
+      "store": "7-11",
+      "item_id": "item_mql9dvch_672",
+      "aliases": [
+        "紐西蘭星",
+        "星空蘋果切片",
+        "711紐西蘭星空蘋果切片"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "冰沁情人果",
+      "store": "7-11",
+      "item_id": "item_mql9dvcr_675",
+      "aliases": [
+        "冰沁情人",
+        "711冰沁情人果"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "搖搖沙拉",
+      "store": "7-11",
+      "item_id": "item_mql9dvcz_678",
+      "aliases": [
+        "711搖搖沙拉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "法式尼斯沙拉",
+      "store": "7-11",
+      "item_id": "item_mql9dvda_681",
+      "aliases": [
+        "法式尼斯",
+        "711法式尼斯沙拉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "西瓜鑽石杯",
+      "store": "7-11",
+      "item_id": "item_mql9dvdi_684",
+      "aliases": [
+        "西瓜鑽石",
+        "711西瓜鑽石杯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機山菠菜250g",
+      "store": "7-11",
+      "item_id": "item_mql9dvdt_687",
+      "aliases": [
+        "台塑有機",
+        "菠菜250g",
+        "711台塑有機山菠菜250g"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "小菜籃有機地瓜葉",
+      "store": "7-11",
+      "item_id": "item_mql9dve4_690",
+      "aliases": [
+        "小菜籃有",
+        "籃有機地瓜葉",
+        "711小菜籃有機地瓜葉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "繽紛水果拼盤",
+      "store": "7-11",
+      "item_id": "item_mql9dveb_693",
+      "aliases": [
+        "繽紛水果",
+        "711繽紛水果拼盤"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "橘肉洋香瓜切片",
+      "store": "7-11",
+      "item_id": "item_mql9dven_696",
+      "aliases": [
+        "橘肉洋香",
+        "肉洋香瓜切片",
+        "711橘肉洋香瓜切片"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "21Plus地中海風味雞肉麵沙拉",
+      "store": "7-11",
+      "item_id": "item_mql9dvev_699",
+      "aliases": [
+        "味雞肉麵沙拉",
+        "21Plus地中海風味鸡肉麵沙拉",
+        "21Plus地中海風味雞肉面沙拉",
+        "71121Plus地中海風味雞肉麵沙拉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "一日野菜",
+      "store": "7-11",
+      "item_id": "item_mql9dvfs_704",
+      "aliases": [
+        "711一日野菜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "綠寶石無籽葡萄杯",
+      "store": "7-11",
+      "item_id": "item_mql9dvgf_708",
+      "aliases": [
+        "綠寶石無",
+        "石無籽葡萄杯",
+        "711綠寶石無籽葡萄杯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "優格繽紛蔬果棒",
+      "store": "7-11",
+      "item_id": "item_mql9dvgn_711",
+      "aliases": [
+        "優格繽紛",
+        "格繽紛蔬果棒",
+        "711優格繽紛蔬果棒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "蜜香木瓜切片",
+      "store": "7-11",
+      "item_id": "item_mql9dvgx_714",
+      "aliases": [
+        "蜜香木瓜",
+        "711蜜香木瓜切片"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "安昕有機玉米筍",
+      "store": "7-11",
+      "item_id": "item_mql9dvh5_717",
+      "aliases": [
+        "安昕有機",
+        "昕有機玉米筍",
+        "711安昕有機玉米筍"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機玉米筍300g",
+      "store": "7-11",
+      "item_id": "item_mql9dvhu_721",
+      "aliases": [
+        "米筍300g",
+        "711台塑有機玉米筍300g"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機胡蘿蔔200",
+      "store": "7-11",
+      "item_id": "item_mql9dvi3_724",
+      "aliases": [
+        "胡蘿蔔200",
+        "711台塑有機胡蘿蔔200"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機節瓜200",
+      "store": "7-11",
+      "item_id": "item_mql9dvie_727",
+      "aliases": [
+        "機節瓜200",
+        "711台塑有機節瓜200"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "76元",
+      "store": "7-11",
+      "item_id": "item_mql9dvir_730",
+      "aliases": [
+        "71176元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機牛番茄300g",
+      "store": "7-11",
+      "item_id": "item_mql9dvj2_733",
+      "aliases": [
+        "番茄300g",
+        "711台塑有機牛番茄300g"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機青椒400g",
+      "store": "7-11",
+      "item_id": "item_mql9dvjr_737",
+      "aliases": [
+        "青椒400g",
+        "711台塑有機青椒400g"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "凱薩雞肉沙拉",
+      "store": "7-11",
+      "item_id": "item_mql9dvkr_742",
+      "aliases": [
+        "凱薩雞肉",
+        "凱薩鸡肉沙拉",
+        "711凱薩雞肉沙拉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "蔥鹽手撕雞沙拉",
+      "store": "7-11",
+      "item_id": "item_mql9dvl2_745",
+      "aliases": [
+        "蔥鹽手撕",
+        "鹽手撕雞沙拉",
+        "蔥鹽手撕鸡沙拉",
+        "711蔥鹽手撕雞沙拉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機羽衣甘藍",
+      "store": "7-11",
+      "item_id": "item_mql9dvm7_751",
+      "aliases": [
+        "有機羽衣甘藍",
+        "711台塑有機羽衣甘藍"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機芝麻葉",
+      "store": "7-11",
+      "item_id": "item_mql9dvmk_754",
+      "aliases": [
+        "塑有機芝麻葉",
+        "711台塑有機芝麻葉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機青江菜",
+      "store": "7-11",
+      "item_id": "item_mql9dvmx_757",
+      "aliases": [
+        "塑有機青江菜",
+        "711台塑有機青江菜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "溏心蛋洋芋",
+      "store": "7-11",
+      "item_id": "item_mql9dvn7_760",
+      "aliases": [
+        "溏心蛋洋",
+        "711溏心蛋洋芋"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "薯泥鮮蔬蛋沙拉",
+      "store": "7-11",
+      "item_id": "item_mql9dvnj_763",
+      "aliases": [
+        "薯泥鮮蔬",
+        "泥鮮蔬蛋沙拉",
+        "711薯泥鮮蔬蛋沙拉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "有機高麗菜",
+      "store": "7-11",
+      "item_id": "item_mql9dvnv_766",
+      "aliases": [
+        "有機高麗",
+        "711有機高麗菜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "29元",
+      "store": "7-11",
+      "item_id": "item_mql9dvoh_770",
+      "aliases": [
+        "71129元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "有機小白菜",
+      "store": "7-11",
+      "item_id": "item_mql9dvot_773",
+      "aliases": [
+        "有機小白",
+        "711有機小白菜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "安昕有機青江菜",
+      "store": "7-11",
+      "item_id": "item_mql9dvp2_776",
+      "aliases": [
+        "昕有機青江菜",
+        "711安昕有機青江菜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "50元",
+      "store": "7-11",
+      "item_id": "item_mql9dvpd_779",
+      "aliases": [
+        "71150元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "安昕有機黑葉白菜",
+      "store": "7-11",
+      "item_id": "item_mql9dvpz_783",
+      "aliases": [
+        "有機黑葉白菜",
+        "711安昕有機黑葉白菜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "芝麻葉海鮮佐義式油醋沙拉",
+      "store": "7-11",
+      "item_id": "item_mql9dvqq_787",
+      "aliases": [
+        "芝麻葉海",
+        "義式油醋沙拉",
+        "711芝麻葉海鮮佐義式油醋沙拉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "煙燻鮭魚",
+      "store": "7-11",
+      "item_id": "item_mql9dvrd_791",
+      "aliases": [
+        "711煙燻鮭魚"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "和風胡麻醬",
+      "store": "7-11",
+      "item_id": "item_mql9dvro_794",
+      "aliases": [
+        "和風胡麻",
+        "711和風胡麻醬"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "蔬果和風醬",
+      "store": "7-11",
+      "item_id": "item_mql9dvsi_798",
+      "aliases": [
+        "蔬果和風",
+        "711蔬果和風醬"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "千島醬",
+      "store": "7-11",
+      "item_id": "item_mql9dvt8_802",
+      "aliases": [
+        "711千島醬"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "20元",
+      "store": "7-11",
+      "item_id": "item_mql9dvuh_807",
+      "aliases": [
+        "71120元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台灣香蕉重量分享包",
+      "store": "7-11",
+      "item_id": "item_mql9dvuv_810",
+      "aliases": [
+        "台灣香蕉",
+        "蕉重量分享包",
+        "711台灣香蕉重量分享包"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "30元",
+      "store": "7-11",
+      "item_id": "item_mql9dvva_813",
+      "aliases": [
+        "71130元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "黃金玉米棒",
+      "store": "7-11",
+      "item_id": "item_mql9dvvj_816",
+      "aliases": [
+        "黃金玉米",
+        "711黃金玉米棒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "水果玉米棒",
+      "store": "7-11",
+      "item_id": "item_mql9dvvv_819",
+      "aliases": [
+        "水果玉米",
+        "711水果玉米棒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機苦瓜",
+      "store": "7-11",
+      "item_id": "item_mql9dvxt_827",
+      "aliases": [
+        "711台塑有機苦瓜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "太陽有機山菠菜",
+      "store": "7-11",
+      "item_id": "item_mql9dvz3_833",
+      "aliases": [
+        "太陽有機",
+        "陽有機山菠菜",
+        "711太陽有機山菠菜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "太陽有機空心菜",
+      "store": "7-11",
+      "item_id": "item_mql9dvzf_836",
+      "aliases": [
+        "陽有機空心菜",
+        "711太陽有機空心菜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "新鮮族產銷青江菜",
+      "store": "7-11",
+      "item_id": "item_mql9dvzo_839",
+      "aliases": [
+        "新鮮族產",
+        "族產銷青江菜",
+        "711新鮮族產銷青江菜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "新鮮族洋蔥",
+      "store": "7-11",
+      "item_id": "item_mql9dw0k_844",
+      "aliases": [
+        "新鮮族洋",
+        "711新鮮族洋蔥"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑鮮蒜仁120g",
+      "store": "7-11",
+      "item_id": "item_mql9dw1b_848",
+      "aliases": [
+        "台塑鮮蒜",
+        "蒜仁120g",
+        "711台塑鮮蒜仁120g"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機蒜頭",
+      "store": "7-11",
+      "item_id": "item_mql9dw1k_851",
+      "aliases": [
+        "711台塑有機蒜頭"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機粉蔥",
+      "store": "7-11",
+      "item_id": "item_mql9dw1y_854",
+      "aliases": [
+        "711台塑有機粉蔥"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑嚴選台灣乾香菇",
+      "store": "7-11",
+      "item_id": "item_mql9dw2u_859",
+      "aliases": [
+        "台塑嚴選",
+        "選台灣乾香菇",
+        "711台塑嚴選台灣乾香菇"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機金針菇",
+      "store": "7-11",
+      "item_id": "item_mql9dw3r_864",
+      "aliases": [
+        "塑有機金針菇",
+        "711台塑有機金針菇"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "42元",
+      "store": "7-11",
+      "item_id": "item_mql9dw44_867",
+      "aliases": [
+        "71142元"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台塑有機黑木耳",
+      "store": "7-11",
+      "item_id": "item_mql9dw4e_870",
+      "aliases": [
+        "塑有機黑木耳",
+        "711台塑有機黑木耳"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "好菇道鴻喜菇",
+      "store": "7-11",
+      "item_id": "item_mql9dw4q_873",
+      "aliases": [
+        "好菇道鴻",
+        "711好菇道鴻喜菇"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "好菇道舞菇",
+      "store": "7-11",
+      "item_id": "item_mql9dw5c_877",
+      "aliases": [
+        "好菇道舞",
+        "711好菇道舞菇"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "好菇道雪白菇",
+      "store": "7-11",
+      "item_id": "item_mql9dw5n_880",
+      "aliases": [
+        "好菇道雪",
+        "711好菇道雪白菇"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "如記真空玉米筍",
+      "store": "7-11",
+      "item_id": "item_mql9dw5y_883",
+      "aliases": [
+        "如記真空",
+        "記真空玉米筍",
+        "711如記真空玉米筍"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "這不是滷肉飯",
+      "store": "7-11",
+      "item_id": "item_mql9dw6k_888",
+      "aliases": [
+        "這不是滷",
+        "這不是滷肉饭",
+        "711這不是滷肉飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "肉絲黃金蛋炒飯",
+      "store": "7-11",
+      "item_id": "item_mql9dw7i_893",
+      "aliases": [
+        "肉絲黃金",
+        "絲黃金蛋炒飯",
+        "肉絲黃金蛋炒饭",
+        "711肉絲黃金蛋炒飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "紅燒牛雙寶燴飯",
+      "store": "7-11",
+      "item_id": "item_mql9dw8g_898",
+      "aliases": [
+        "紅燒牛雙",
+        "燒牛雙寶燴飯",
+        "紅燒牛雙寶燴饭",
+        "711紅燒牛雙寶燴飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "Homeal",
+      "store": "7-11",
+      "item_id": "item_mql9dw92_903",
+      "aliases": [
+        "Home",
+        "711Homeal"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "熱量295",
+      "store": "7-11",
+      "item_id": "item_mql9dwa3_908",
+      "aliases": [
+        "熱量29",
+        "711熱量295"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "熱量408",
+      "store": "7-11",
+      "item_id": "item_mql9dwae_911",
+      "aliases": [
+        "熱量40",
+        "711熱量408"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "鄧師傅花生豬腳",
+      "store": "7-11",
+      "item_id": "item_mql9dwb3_915",
+      "aliases": [
+        "鄧師傅花",
+        "師傅花生豬腳",
+        "711鄧師傅花生豬腳"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "呷七碗栗志鮑粽",
+      "store": "7-11",
+      "item_id": "item_mql9dwbd_918",
+      "aliases": [
+        "呷七碗栗",
+        "七碗栗志鮑粽",
+        "711呷七碗栗志鮑粽"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "膳馨綠竹筍排骨湯",
+      "store": "7-11",
+      "item_id": "item_mql9dwbq_921",
+      "aliases": [
+        "膳馨綠竹",
+        "綠竹筍排骨湯",
+        "711膳馨綠竹筍排骨湯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "山內雞肉椒麻雞腳",
+      "store": "7-11",
+      "item_id": "item_mql9dwcf_925",
+      "aliases": [
+        "山內雞肉",
+        "雞肉椒麻雞腳",
+        "山內鸡肉椒麻鸡腳",
+        "711山內雞肉椒麻雞腳"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "元進莊櫸木燻鴨",
+      "store": "7-11",
+      "item_id": "item_mql9dwcq_928",
+      "aliases": [
+        "元進莊櫸",
+        "進莊櫸木燻鴨",
+        "711元進莊櫸木燻鴨"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "馨苑傳統南部粽",
+      "store": "7-11",
+      "item_id": "item_mql9dwd2_931",
+      "aliases": [
+        "馨苑傳統",
+        "苑傳統南部粽",
+        "711馨苑傳統南部粽"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "呷七碗經典北部粽",
+      "store": "7-11",
+      "item_id": "item_mql9dwdg_934",
+      "aliases": [
+        "呷七碗經",
+        "碗經典北部粽",
+        "711呷七碗經典北部粽"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "蜂蜜香烤雞翅",
+      "store": "7-11",
+      "item_id": "item_mql9dwdp_937",
+      "aliases": [
+        "蜂蜜香烤",
+        "蜂蜜香烤鸡翅",
+        "711蜂蜜香烤雞翅"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "美而美玉米起司蛋餅",
+      "store": "7-11",
+      "item_id": "item_mql9dwe1_940",
+      "aliases": [
+        "美而美玉",
+        "玉米起司蛋餅",
+        "711美而美玉米起司蛋餅"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "富錦樹三合一味噌湯",
+      "store": "7-11",
+      "item_id": "item_mql9dwed_943",
+      "aliases": [
+        "富錦樹三",
+        "三合一味噌湯",
+        "711富錦樹三合一味噌湯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "恩美萊辣傑克起司棒",
+      "store": "7-11",
+      "item_id": "item_mql9dwf3_947",
+      "aliases": [
+        "恩美萊辣",
+        "辣傑克起司棒",
+        "711恩美萊辣傑克起司棒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "韓式麻藥溏心蛋",
+      "store": "7-11",
+      "item_id": "item_mql9dwfh_950",
+      "aliases": [
+        "韓式麻藥",
+        "式麻藥溏心蛋",
+        "711韓式麻藥溏心蛋"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "黑金松露嫩雞胸",
+      "store": "7-11",
+      "item_id": "item_mql9dwfv_953",
+      "aliases": [
+        "黑金松露",
+        "金松露嫩雞胸",
+        "黑金松露嫩鸡胸",
+        "711黑金松露嫩雞胸"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "飛燕煉乳炸銀絲卷",
+      "store": "7-11",
+      "item_id": "item_mql9dwgm_957",
+      "aliases": [
+        "飛燕煉乳",
+        "煉乳炸銀絲卷",
+        "711飛燕煉乳炸銀絲卷"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "左營劉家酸菜白肉冬粉",
+      "store": "7-11",
+      "item_id": "item_mql9dwha_961",
+      "aliases": [
+        "左營劉家",
+        "酸菜白肉冬粉",
+        "711左營劉家酸菜白肉冬粉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "鹽烤麻辣雞心",
+      "store": "7-11",
+      "item_id": "item_mql9dwi3_965",
+      "aliases": [
+        "鹽烤麻辣",
+        "鹽烤麻辣鸡心",
+        "711鹽烤麻辣雞心"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "21Plus玉米雞肉熟水餃",
+      "store": "7-11",
+      "item_id": "item_mql9dwis_969",
+      "aliases": [
+        "米雞肉熟水餃",
+        "21Plus玉米鸡肉熟水餃",
+        "71121Plus玉米雞肉熟水餃"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "粥天子",
+      "store": "7-11",
+      "item_id": "item_mql9dwj5_972",
+      "aliases": [
+        "711粥天子"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "Simple",
+      "store": "7-11",
+      "item_id": "item_mql9dwju_976",
+      "aliases": [
+        "Simp",
+        "711Simple"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "馨苑涼拌干絲",
+      "store": "7-11",
+      "item_id": "item_mql9dwkj_980",
+      "aliases": [
+        "馨苑涼拌",
+        "711馨苑涼拌干絲"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "21Plus藜麥毛豆嫩雞丁",
+      "store": "7-11",
+      "item_id": "item_mql9dwkx_983",
+      "aliases": [
+        "麥毛豆嫩雞丁",
+        "21Plus藜麥毛豆嫩鸡丁",
+        "71121Plus藜麥毛豆嫩雞丁"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "御料小館紫米飯",
+      "store": "7-11",
+      "item_id": "item_mql9dwlk_987",
+      "aliases": [
+        "御料小館",
+        "料小館紫米飯",
+        "御料小館紫米饭",
+        "711御料小館紫米飯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "鮪魚雞蛋蔬菜捲餅",
+      "store": "7-11",
+      "item_id": "item_mql9dwly_990",
+      "aliases": [
+        "鮪魚雞蛋",
+        "雞蛋蔬菜捲餅",
+        "鮪魚鸡蛋蔬菜捲餅",
+        "711鮪魚雞蛋蔬菜捲餅"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "火腿起司蛋凱薩堡",
+      "store": "7-11",
+      "item_id": "item_mql9dwmc_993",
+      "aliases": [
+        "火腿起司",
+        "起司蛋凱薩堡",
+        "711火腿起司蛋凱薩堡"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "21Plusx瓜瓜園紫薯QQ球",
+      "store": "7-11",
+      "item_id": "item_mql9dwmo_996",
+      "aliases": [
+        "園紫薯QQ球",
+        "71121Plusx瓜瓜園紫薯QQ球"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "熱量268",
+      "store": "7-11",
+      "item_id": "item_mql9dwmz_999",
+      "aliases": [
+        "熱量26",
+        "711熱量268"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "十二月",
+      "store": "7-11",
+      "item_id": "item_mql9dwno_1002",
+      "aliases": [
+        "711十二月"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "呷七碗古早味肉燥炒冬粉",
+      "store": "7-11",
+      "item_id": "item_mql9dwo1_1005",
+      "aliases": [
+        "呷七碗古",
+        "味肉燥炒冬粉",
+        "711呷七碗古早味肉燥炒冬粉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "呷七碗櫻花蝦炒炊粉",
+      "store": "7-11",
+      "item_id": "item_mql9dwob_1008",
+      "aliases": [
+        "呷七碗櫻",
+        "櫻花蝦炒炊粉",
+        "711呷七碗櫻花蝦炒炊粉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "石安牧場椒麻溫泉蛋",
+      "store": "7-11",
+      "item_id": "item_mql9dwon_1011",
+      "aliases": [
+        "石安牧場",
+        "場椒麻溫泉蛋",
+        "711石安牧場椒麻溫泉蛋"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "法蘭希迷你布里乾酪",
+      "store": "7-11",
+      "item_id": "item_mql9dwpj_1015",
+      "aliases": [
+        "法蘭希迷",
+        "迷你布里乾酪",
+        "711法蘭希迷你布里乾酪"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "恩美萊紅切達起司棒",
+      "store": "7-11",
+      "item_id": "item_mql9dwqg_1019",
+      "aliases": [
+        "恩美萊紅",
+        "紅切達起司棒",
+        "711恩美萊紅切達起司棒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "阿桐阿寶四神湯",
+      "store": "7-11",
+      "item_id": "item_mql9dwr5_1023",
+      "aliases": [
+        "阿桐阿寶",
+        "桐阿寶四神湯",
+        "711阿桐阿寶四神湯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "元進莊薑母鴨",
+      "store": "7-11",
+      "item_id": "item_mql9dwrv_1027",
+      "aliases": [
+        "元進莊薑",
+        "711元進莊薑母鴨"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "熱量231",
+      "store": "7-11",
+      "item_id": "item_mql9dws8_1030",
+      "aliases": [
+        "熱量23",
+        "711熱量231"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "日式半熟蛋",
+      "store": "7-11",
+      "item_id": "item_mql9dwsp_1033",
+      "aliases": [
+        "日式半熟",
+        "711日式半熟蛋"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "宗家府泡菜80g",
+      "store": "7-11",
+      "item_id": "item_mql9dwtf_1037",
+      "aliases": [
+        "宗家府泡",
+        "府泡菜80g",
+        "711宗家府泡菜80g"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "熱量100g",
+      "store": "7-11",
+      "item_id": "item_mql9dwtt_1040",
+      "aliases": [
+        "熱量10",
+        "711熱量100g"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "凱薩風味嫩雞鮮蔬捲餅",
+      "store": "7-11",
+      "item_id": "item_mql9dwu8_1043",
+      "aliases": [
+        "凱薩風味",
+        "嫩雞鮮蔬捲餅",
+        "凱薩風味嫩鸡鮮蔬捲餅",
+        "711凱薩風味嫩雞鮮蔬捲餅"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "21Plus甘梅薯條",
+      "store": "7-11",
+      "item_id": "item_mql9dwuk_1046",
+      "aliases": [
+        "us甘梅薯條",
+        "71121Plus甘梅薯條"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "蝦排總匯三明治",
+      "store": "7-11",
+      "item_id": "item_mql9dwva_1050",
+      "aliases": [
+        "蝦排總匯",
+        "排總匯三明治",
+        "711蝦排總匯三明治"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "快樂牛乾酪切片",
+      "store": "7-11",
+      "item_id": "item_mql9dwvo_1053",
+      "aliases": [
+        "快樂牛乾",
+        "樂牛乾酪切片",
+        "711快樂牛乾酪切片"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "安博格迷你有鹽奶油6入",
+      "store": "7-11",
+      "item_id": "item_mql9dww5_1056",
+      "aliases": [
+        "安博格迷",
+        "有鹽奶油6入",
+        "711安博格迷你有鹽奶油6入"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "及第豬肉熟水餃",
+      "store": "7-11",
+      "item_id": "item_mql9dwwk_1059",
+      "aliases": [
+        "及第豬肉",
+        "第豬肉熟水餃",
+        "711及第豬肉熟水餃"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "及第小籠湯包",
+      "store": "7-11",
+      "item_id": "item_mql9dwxb_1063",
+      "aliases": [
+        "及第小籠",
+        "711及第小籠湯包"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "中一排骨",
+      "store": "7-11",
+      "item_id": "item_mql9dwxn_1066",
+      "aliases": [
+        "711中一排骨"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "大腸肉羹麵線",
+      "store": "7-11",
+      "item_id": "item_mql9dwyt_1069",
+      "aliases": [
+        "大腸肉羹",
+        "大腸肉羹面線",
+        "711大腸肉羹麵線"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "滷鼎記麻辣雞胗",
+      "store": "7-11",
+      "item_id": "item_mql9dwzv_1073",
+      "aliases": [
+        "滷鼎記麻",
+        "鼎記麻辣雞胗",
+        "滷鼎記麻辣鸡胗",
+        "711滷鼎記麻辣雞胗"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "小腸豬血湯",
+      "store": "7-11",
+      "item_id": "item_mql9dx0u_1077",
+      "aliases": [
+        "小腸豬血",
+        "711小腸豬血湯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "醬烤牛五花捲餅",
+      "store": "7-11",
+      "item_id": "item_mql9dx1p_1081",
+      "aliases": [
+        "醬烤牛五",
+        "烤牛五花捲餅",
+        "711醬烤牛五花捲餅"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "恩美萊手撕起司棒",
+      "store": "7-11",
+      "item_id": "item_mql9dx2n_1084",
+      "aliases": [
+        "恩美萊手",
+        "萊手撕起司棒",
+        "711恩美萊手撕起司棒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "熱量85",
+      "store": "7-11",
+      "item_id": "item_mql9dx3d_1087",
+      "aliases": [
+        "711熱量85"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "博客海鹽嫩雞胸",
+      "store": "7-11",
+      "item_id": "item_mql9dx4f_1090",
+      "aliases": [
+        "博客海鹽",
+        "客海鹽嫩雞胸",
+        "博客海鹽嫩鸡胸",
+        "711博客海鹽嫩雞胸"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "熱量165",
+      "store": "7-11",
+      "item_id": "item_mql9dx6l_1097",
+      "aliases": [
+        "熱量16",
+        "711熱量165"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "獨饗薄皮黃金煎餃",
+      "store": "7-11",
+      "item_id": "item_mql9dx71_1100",
+      "aliases": [
+        "獨饗薄皮",
+        "薄皮黃金煎餃",
+        "711獨饗薄皮黃金煎餃"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "滿漢小香腸_青花椒",
+      "store": "7-11",
+      "item_id": "item_mql9dx8h_1104",
+      "aliases": [
+        "滿漢小香",
+        "香腸_青花椒",
+        "711滿漢小香腸_青花椒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "Marinfood煙燻乾酪",
+      "store": "7-11",
+      "item_id": "item_mql9dx8u_1107",
+      "aliases": [
+        "Mari",
+        "od煙燻乾酪",
+        "711Marinfood煙燻乾酪"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "21Plus剝皮辣椒雞胸肉",
+      "store": "7-11",
+      "item_id": "item_mql9dxbx_1111",
+      "aliases": [
+        "皮辣椒雞胸肉",
+        "21Plus剝皮辣椒鸡胸肉",
+        "71121Plus剝皮辣椒雞胸肉"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "馨苑薑絲鱸魚湯",
+      "store": "7-11",
+      "item_id": "item_mql9dxcn_1114",
+      "aliases": [
+        "馨苑薑絲",
+        "苑薑絲鱸魚湯",
+        "711馨苑薑絲鱸魚湯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "滷鼎記香滷鵪鶉蛋",
+      "store": "7-11",
+      "item_id": "item_mql9dxez_1118",
+      "aliases": [
+        "滷鼎記香",
+        "記香滷鵪鶉蛋",
+        "711滷鼎記香滷鵪鶉蛋"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "十三香烤雞翅",
+      "store": "7-11",
+      "item_id": "item_mql9dxhi_1122",
+      "aliases": [
+        "十三香烤",
+        "十三香烤鸡翅",
+        "711十三香烤雞翅"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "21Plus秘製炭火雞肉串",
+      "store": "7-11",
+      "item_id": "item_mql9dxim_1126",
+      "aliases": [
+        "製炭火雞肉串",
+        "21Plus秘製炭火鸡肉串",
+        "71121Plus秘製炭火雞肉串"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "冰心地瓜",
+      "store": "7-11",
+      "item_id": "item_mql9dxlo_1130",
+      "aliases": [
+        "711冰心地瓜"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "乾杯炭火燒肉包",
+      "store": "7-11",
+      "item_id": "item_mql9dxme_1133",
+      "aliases": [
+        "乾杯炭火",
+        "杯炭火燒肉包",
+        "711乾杯炭火燒肉包"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "雞肉蛋白棒",
+      "store": "7-11",
+      "item_id": "item_mql9dxpk_1137",
+      "aliases": [
+        "雞肉蛋白",
+        "鸡肉蛋白棒",
+        "711雞肉蛋白棒"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "21xBEING",
+      "store": "7-11",
+      "item_id": "item_mql9dxrv_1140",
+      "aliases": [
+        "21xB",
+        "xBEING",
+        "71121xBEING"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "麻辣椒香豬血煲",
+      "store": "7-11",
+      "item_id": "item_mql9dxth_1144",
+      "aliases": [
+        "麻辣椒香",
+        "辣椒香豬血煲",
+        "711麻辣椒香豬血煲"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "當歸湯",
+      "store": "7-11",
+      "item_id": "item_mql9dxuj_1148",
+      "aliases": [
+        "711當歸湯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "永心鳳茶剝皮辣椒燉雞盅",
+      "store": "7-11",
+      "item_id": "item_mql9dxv0_1151",
+      "aliases": [
+        "永心鳳茶",
+        "皮辣椒燉雞盅",
+        "永心鳳茶剝皮辣椒燉鸡盅",
+        "711永心鳳茶剝皮辣椒燉雞盅"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "芋頭排骨酥湯",
+      "store": "7-11",
+      "item_id": "item_mql9dxvv_1155",
+      "aliases": [
+        "芋頭排骨",
+        "711芋頭排骨酥湯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "麻油米血",
+      "store": "7-11",
+      "item_id": "item_mql9dxwn_1158",
+      "aliases": [
+        "711麻油米血"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "筒仔米糕",
+      "store": "7-11",
+      "item_id": "item_mql9dxx2_1161",
+      "aliases": [
+        "711筒仔米糕"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "膳馨原盅厚菇燉雞湯",
+      "store": "7-11",
+      "item_id": "item_mql9dxxc_1164",
+      "aliases": [
+        "膳馨原盅",
+        "盅厚菇燉雞湯",
+        "膳馨原盅厚菇燉鸡湯",
+        "711膳馨原盅厚菇燉雞湯"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "石安牧場剝皮辣椒茶碗蒸",
+      "store": "7-11",
+      "item_id": "item_mql9dxy2_1168",
+      "aliases": [
+        "皮辣椒茶碗蒸",
+        "711石安牧場剝皮辣椒茶碗蒸"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "石安牧場蔬食茶碗蒸",
+      "store": "7-11",
+      "item_id": "item_mql9dxyw_1172",
+      "aliases": [
+        "場蔬食茶碗蒸",
+        "711石安牧場蔬食茶碗蒸"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "台畜煙燻豬肝100g",
+      "store": "7-11",
+      "item_id": "item_mql9dxzo_1176",
+      "aliases": [
+        "台畜煙燻",
+        "豬肝100g",
+        "711台畜煙燻豬肝100g"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "如記真空綠竹筍",
+      "store": "7-11",
+      "item_id": "item_mql9dy09_1179",
+      "aliases": [
+        "記真空綠竹筍",
+        "711如記真空綠竹筍"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "厚燒玉子",
+      "store": "7-11",
+      "item_id": "item_mql9dy0k_1182",
+      "aliases": [
+        "711厚燒玉子"
+      ],
+      "restaurant_aliases": [
+        "711",
+        "7-11"
+      ]
+    },
+    {
+      "official_name": "薯條（中）",
+      "store": "麥當勞",
+      "item_id": "item_mqladn8n_628",
+      "aliases": [
+        "薯條（中"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Noir extra fondant",
+      "store": "Lindt",
+      "item_id": "item_mqladu0s_1958",
+      "aliases": [
+        "Noir",
+        "ondant"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Gratin dauphinois à la crème fraîche",
+      "store": "Carrefour",
+      "item_id": "item_mqladu0w_1962",
+      "aliases": [
+        "Grat",
+        "raîche"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Tabasco",
+      "store": "Tabasco",
+      "item_id": "item_mqladu10_1970",
+      "aliases": [
+        "Taba",
+        "abasco"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "New England Clam Chowder",
+      "store": "Campbell's Chunky",
+      "item_id": "item_mqladu12_1974",
+      "aliases": [
+        "New ",
+        "howder"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Jellied Cranberry Sauce",
+      "store": "Ocean Spray",
+      "item_id": "item_mqladu14_1978",
+      "aliases": [
+        "Jell",
+        " Sauce"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Pic's Really Good Peanut Butter Crunchy No Salt",
+      "store": "PIC's Peanut Butter",
+      "item_id": "item_mqladu16_1982",
+      "aliases": [
+        "Pic'",
+        "o Salt"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Salami Cheese",
+      "store": "Spomlek",
+      "item_id": "item_mqladu1b_1990",
+      "aliases": [
+        "Sala",
+        "Cheese"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Soft Baked Grain Bars Strawberry Banana",
+      "store": "Gerber",
+      "item_id": "item_mqladu1d_1994",
+      "aliases": [
+        "Soft",
+        "Banana"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Shih-chuan Mirin Vinegar 17.6 FL Oz",
+      "store": "supermarket",
+      "item_id": "item_mqladu1f_1998",
+      "aliases": [
+        "Shih",
+        " FL Oz"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Grinder Pepper Mix 45g Niko",
+      "store": "Niko",
+      "item_id": "item_mqladu1k_2006",
+      "aliases": [
+        "Grin",
+        "g Niko"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Nature Valley Protein Bar",
+      "store": "Nature Valley",
+      "item_id": "item_mqladu1m_2010",
+      "aliases": [
+        "Natu",
+        "in Bar"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Double Choco",
+      "store": "Oreo",
+      "item_id": "item_mqladu1o_2013",
+      "aliases": [
+        "Doub",
+        " Choco"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "伴天下朝天辣油",
+      "store": "WEIYI ENTERPRISE CORPORATION",
+      "item_id": "item_mqladu1s_2017",
+      "aliases": [
+        "伴天下朝",
+        "天下朝天辣油"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Hot Chili Sauce",
+      "store": "SOS Chili Hau Sanh",
+      "item_id": "item_mqladu1y_2021",
+      "aliases": [
+        "Hot ",
+        " Sauce"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Frozen Broccoli",
+      "store": "EZCHEF",
+      "item_id": "item_mqladu20_2025",
+      "aliases": [
+        "Froz",
+        "occoli"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Malibu Pineapple",
+      "store": "Malibu",
+      "item_id": "item_mqladu22_2029",
+      "aliases": [
+        "Mali",
+        "eapple"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Crunchy Oat Granola Breakfast Cereal with a Touch of Honey",
+      "store": "Fitnessse",
+      "item_id": "item_mqladu24_2033",
+      "aliases": [
+        "Crun",
+        " Honey"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "La nocciola",
+      "store": "Witor's",
+      "item_id": "item_mqladu25_2037",
+      "aliases": [
+        "La n",
+        "cciola"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Mama Instant Noodle - Shrimp Creamy Tom Yum - 1 X 60G",
+      "store": "มาม่า",
+      "item_id": "item_mqladu29_2041",
+      "aliases": [
+        "Mama",
+        " X 60G"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "ZANETTI Mascarpone Cheese",
+      "store": "Zanetti",
+      "item_id": "item_mqladu2b_2045",
+      "aliases": [
+        "ZANE",
+        "Cheese"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "inゼリー　マルチビタミン　グレープフルーツ味",
+      "store": "Morinaga",
+      "item_id": "item_mqladu2h_2057",
+      "aliases": [
+        "inゼリ",
+        "プフルーツ味"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "President unt 100 grame",
+      "store": "President",
+      "item_id": "item_mqladu2l_2064",
+      "aliases": [
+        "Pres",
+        " grame"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Camembert",
+      "store": "Emborg",
+      "item_id": "item_mqladu2r_2068",
+      "aliases": [
+        "Came",
+        "embert"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "乳香世家高品質純鮮乳",
+      "store": "KUANG CHUAN DAIRY",
+      "item_id": "item_mqladu2u_2072",
+      "aliases": [
+        "乳香世家",
+        "高品質純鮮乳"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Kellogg's Corn Flake",
+      "store": "Kellog's",
+      "item_id": "item_mqladu2w_2076",
+      "aliases": [
+        "Kell",
+        " Flake"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Li Jinli Eight Immortals Fruit",
+      "store": "Lee Chin Li",
+      "item_id": "item_mqladu2y_2080",
+      "aliases": [
+        "Li J",
+        " Fruit"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Nutrition Biscuits",
+      "store": "Ju Shui Xuan",
+      "item_id": "item_mqladu31_2084",
+      "aliases": [
+        "Nutr",
+        "scuits"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Kuang Chuan OAT Oat Milk",
+      "store": "Kuang Chuan",
+      "item_id": "item_mqladu33_2088",
+      "aliases": [
+        "Kuan",
+        "t Milk"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "質立希臘式優格（無加糖）",
+      "store": "台灣比菲多",
+      "item_id": "item_mqladu38_2092",
+      "aliases": [
+        "質立希臘",
+        "格（無加糖）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "洋芋片（原味）",
+      "store": "品客",
+      "item_id": "item_mqladu3g_2104",
+      "aliases": [
+        "芋片（原味）"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Cashews salt and pepper",
+      "store": "Dan-D Pak",
+      "item_id": "item_mqladu3o_2108",
+      "aliases": [
+        "Cash",
+        "pepper"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "MM Elephant Thai Roasted Seaweed-Cool Spicy Flavour",
+      "store": "Mammoth",
+      "item_id": "item_mqladu3q_2112",
+      "aliases": [
+        "MM E",
+        "lavour"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "有機紅棗枸杞銀耳露",
+      "store": "統一生機",
+      "item_id": "item_mqladu3s_2116",
+      "aliases": [
+        "有機紅棗",
+        "棗枸杞銀耳露"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "Salsa dip",
+      "store": "La Costeña",
+      "item_id": "item_mqladu3y_2124",
+      "aliases": [
+        "Sals",
+        "sa dip"
+      ],
+      "restaurant_aliases": []
+    },
+    {
+      "official_name": "麥當勞",
+      "aliases": [
+        "mcdonalds"
+      ],
+      "restaurant_aliases": [
+        "mcdonalds",
+        "McDonalds"
+      ]
+    },
+    {
+      "official_name": "肯德基",
+      "aliases": [
+        "kfc"
+      ],
+      "restaurant_aliases": [
+        "kfc",
+        "KFC"
+      ]
+    },
+    {
+      "official_name": "摩斯漢堡",
+      "aliases": [
+        "摩斯",
+        "mos"
+      ],
+      "restaurant_aliases": [
+        "摩斯",
+        "mos"
+      ]
+    },
+    {
+      "official_name": "星巴克",
+      "aliases": [
+        "starbucks"
+      ],
+      "restaurant_aliases": [
+        "starbucks"
+      ]
+    },
+    {
+      "official_name": "五十嵐",
+      "aliases": [
+        "50嵐"
+      ],
+      "restaurant_aliases": [
+        "50嵐"
+      ]
+    },
+    {
+      "official_name": "清心福全",
+      "aliases": [
+        "清心"
+      ],
+      "restaurant_aliases": [
+        "清心"
+      ]
+    },
+    {
+      "official_name": "路易莎",
+      "aliases": [
+        "louisa"
+      ],
+      "restaurant_aliases": [
+        "louisa"
+      ]
+    }
+  ]
+}

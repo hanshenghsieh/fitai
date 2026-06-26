@@ -2,6 +2,7 @@ import { eatOutMenu, type ConvenienceItem } from '@/lib/convenience-store-menu'
 import { searchFoodMenuExtended } from '@/lib/food-menu-lookup'
 import { passesMenuAccessGate } from '@/lib/nutrition/menu-confidence-runtime'
 
+/** Client-safe search — food-kb + runtime menu (no ONR fs). */
 export function searchFoodMenu(query: string, limit = 8): ConvenienceItem[] {
   const q = query.trim().toLowerCase()
   if (!q || q.length < 1) return []

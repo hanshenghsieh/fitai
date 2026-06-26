@@ -58,11 +58,19 @@ export const OVER_TARGET_COPY = {
 }
 
 export function sumLoggedCalories(logs: FoodLogEntry[]): number {
-  return logs.reduce((s, l) => s + (l.calories ?? 0), 0)
+  return logs.reduce((s, l) => {
+    if (l.nutrition_status === 'unknown' || l.capture_status === 'photo_only') return s
+    if (l.calories == null) return s
+    return s + l.calories
+  }, 0)
 }
 
 export function sumLoggedProtein(logs: FoodLogEntry[]): number {
-  return logs.reduce((s, l) => s + (l.protein_g ?? 0), 0)
+  return logs.reduce((s, l) => {
+    if (l.nutrition_status === 'unknown' || l.capture_status === 'photo_only') return s
+    if (l.protein_g == null) return s
+    return s + l.protein_g
+  }, 0)
 }
 
 export function computeTodayMealState(input: NextMealEngineInput): TodayMealState {

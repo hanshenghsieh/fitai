@@ -129,20 +129,17 @@ export async function parseFoodImage(imageBase64: string, mimeType: string): Pro
           {
             type: 'text',
             text: `分析這張食物照片（台灣常見外食/便利商店/手搖/便當皆可）。
+只輸出食物名稱與辨識信心，不得估算或輸出任何營養數值（熱量、蛋白質、碳水、脂肪等）。
 輸出 JSON：
 {
   "items": [{
     "name": "食物名稱",
-    "calories": number,
-    "protein_g": number,
-    "carbs_g": number,
-    "fat_g": number,
-    "portion": "份量描述",
+    "portion": "份量描述（可選）",
     "confidence": "high"|"medium"|"low"
   }],
   "meal_summary": "一句話描述"
 }
-估算可接受誤差。多項食物分開列。只輸出 JSON。`,
+多項食物分開列。只輸出 JSON。`,
           },
         ],
       }],

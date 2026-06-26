@@ -8,14 +8,13 @@ import { estimateFreeTextMeal, resolveOrEstimateFreeTextMeal } from '@/lib/food-
 import { enrichFoodLog, sumItemMacros } from '@/lib/food-log-macros'
 import {
   fileToDataUrl,
-  isLowConfidence,
-  lookupVerifiedFood,
   parseFoodPhotoDataUrl,
 } from '@/lib/food-capture'
 import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
 import {
   buildPhotoLogCommitFromAccuracy,
   createPhotoAccuracyState,
+  photoAccuracyDisplayMacros,
   photoAccuracyReadyForLog,
   updatePhotoAccuracyState,
 } from '@/lib/nutrition/photo-log-accuracy'
@@ -499,7 +498,7 @@ export default function TodayOS({
       setQuery('')
       setMoreOpen(false)
       onLogFood(nextLogs, nextMemory)
-      schedulePostureLine(nextLogs, nextMemory, full.calories - mealTargets.calories)
+      schedulePostureLine(nextLogs, nextMemory, (full.calories ?? 0) - mealTargets.calories)
       queueMicrotask(() => {
         loggingRef.current = false
       })
@@ -568,74 +567,52 @@ export default function TodayOS({
         previewUrl,
         dataUrl,
         name: '',
-        calories: 0,
-        protein_g: 0,
+        calories: null,
+        protein_g: null,
+        carbs_g: null,
+        fat_g: null,
         loading: true,
       })
       try {
         const parsed = await parseFoodPhotoDataUrl(dataUrl, file.type || 'image/jpeg')
-        if (isNutritionAccuracyV1()) {
-          const accuracy = createPhotoAccuracyState(parsed.name || '', { store: storesInText(parsed.name)?.[0] })
-          setPhotoDraft({
-            file,
-            previewUrl,
-            dataUrl,
-            name: accuracy.draft.candidate.display_name,
-            calories: accuracy.final.ready_for_food_log ? accuracy.final.calories : 0,
-            protein_g: accuracy.final.ready_for_food_log ? accuracy.final.protein_g : 0,
-            loading: false,
-            accuracy,
-          })
-          return
-        }
-        const dna = userMemory.food_dna ?? foodDna
-        const verified = lookupVerifiedFood(parsed.name, dna)
-        if (verified) {
-          setPhotoDraft(prev =>
-            prev
-              ? {
-                  ...prev,
-                  name: verified.name,
-                  calories: verified.calories,
-                  protein_g: verified.protein_g,
-                  loading: false,
-                }
-              : prev
-          )
-          return
-        }
-        if (isLowConfidence(parsed.confidence_pct)) {
-          setPhotoDraft(prev =>
-            prev
-              ? {
-                  ...prev,
-                  name: parsed.name || '',
-                  calories: parsed.calories || 0,
-                  protein_g: parsed.protein_g || 0,
-                  loading: false,
-                }
-              : prev
-          )
-          return
-        }
+        const photoId = `photo-parse-${Date.now()}`
+        const accuracy = createPhotoAccuracyState(parsed.name || '', {
+          store: storesInText(parsed.name)?.[0],
+          photo_id: photoId,
+        })
+        const resolved = accuracy.v2.outcome.official_record
+        const display = photoAccuracyDisplayMacros(accuracy)
+        setPhotoDraft({
+          file,
+          previewUrl,
+          dataUrl,
+          name: resolved?.name ?? accuracy.label,
+          calories: display.calories,
+          protein_g: display.protein_g,
+          carbs_g: display.carbs_g,
+          fat_g: display.fat_g,
+          loading: false,
+          accuracy,
+        })
+      } catch {
+        const accuracy = createPhotoAccuracyState('未知食物', { photo_id: `photo-parse-${Date.now()}` })
         setPhotoDraft(prev =>
           prev
             ? {
                 ...prev,
-                name: parsed.name,
-                calories: parsed.calories,
-                protein_g: parsed.protein_g,
+                name: accuracy.label,
+                calories: null,
+                protein_g: null,
+                carbs_g: null,
+                fat_g: null,
                 loading: false,
+                accuracy,
               }
             : prev
         )
-      } catch {
-        setPhotoDraft(prev =>
-          prev ? { ...prev, name: '', calories: 0, protein_g: 0, loading: false } : prev
-        )
       }
     },
-    [userMemory.food_dna, foodDna]
+    []
   )
 
   const handlePhotoPick = useCallback(
@@ -663,11 +640,15 @@ export default function TodayOS({
     setPhotoDraft(prev => {
       if (!prev?.accuracy) return prev
       const accuracy = updatePhotoAccuracyState(prev.accuracy, patch)
+      const resolved = accuracy.v2.outcome.official_record
+      const display = photoAccuracyDisplayMacros(accuracy)
       return {
         ...prev,
-        name: accuracy.draft.candidate.display_name,
-        calories: accuracy.final.ready_for_food_log ? accuracy.final.calories : 0,
-        protein_g: accuracy.final.ready_for_food_log ? accuracy.final.protein_g : 0,
+        name: resolved?.name ?? accuracy.label,
+        calories: display.calories,
+        protein_g: display.protein_g,
+        carbs_g: display.carbs_g,
+        fat_g: display.fat_g,
         accuracy,
       }
     })
@@ -675,62 +656,50 @@ export default function TodayOS({
 
   const savePhotoDraft = useCallback(() => {
     if (!photoDraft || photoSaving || photoDraft.loading) return
-    if (isNutritionAccuracyV1() && photoDraft.accuracy) {
-      if (!photoAccuracyReadyForLog(photoDraft.accuracy)) return
-      setPhotoSaving(true)
-      const logId = `photo-${Date.now()}`
-      const finish = (url: string) => {
-        const { payload, meta } = buildPhotoLogCommitFromAccuracy(photoDraft.accuracy!, {
-          id: logId,
-          photo_data_url: url,
-        })
-        if (!payload) {
-          setPhotoSaving(false)
-          return
-        }
-        commitLog({
-          ...payload,
-          photo_data_url: url,
-          capture_status: 'resolved',
-          nutrition_accuracy_meta: meta ?? undefined,
-        })
-        closePhotoSheet()
-      }
-      const dataUrl = photoDraft.dataUrl
-      if (!dataUrl) {
-        void fileToDataUrl(photoDraft.file).then(finish)
+    if (!photoDraft.accuracy) return
+    if (!photoAccuracyReadyForLog(photoDraft.accuracy)) return
+    setPhotoSaving(true)
+    const logId = `photo-${Date.now()}`
+    const finish = (url: string) => {
+      const { payload, meta } = buildPhotoLogCommitFromAccuracy(photoDraft.accuracy!, {
+        id: logId,
+        photo_data_url: url,
+      })
+      if (!payload) {
+        setPhotoSaving(false)
         return
       }
-      finish(dataUrl)
-      return
+      commitLog({
+        id: payload.id,
+        name: payload.name,
+        store: payload.store,
+        calories: payload.calories,
+        protein_g: payload.protein_g,
+        carbs_g: payload.carbs_g ?? undefined,
+        fat_g: payload.fat_g ?? undefined,
+        source: 'photo',
+        photo_data_url: url,
+        capture_status: payload.capture_status,
+        nutrition_status: payload.nutrition_status,
+        nutrition_confidence: payload.nutrition_confidence,
+        nutrition_accuracy_meta: meta
+          ? {
+              accuracy_level: meta.accuracy_level,
+              source_type: meta.source_type,
+              user_confirmed: meta.user_confirmed,
+              portion_adjustments: {},
+              candidate_label: meta.candidate_label,
+            }
+          : undefined,
+      })
+      closePhotoSheet()
     }
-    setPhotoSaving(true)
     const dataUrl = photoDraft.dataUrl
     if (!dataUrl) {
-      void fileToDataUrl(photoDraft.file).then(url => {
-        commitLog({
-          id: `photo-${Date.now()}`,
-          name: photoDraft.name.trim() || '未知食物',
-          calories: photoDraft.calories,
-          protein_g: photoDraft.protein_g,
-          source: 'photo',
-          photo_data_url: url,
-          capture_status: 'resolved',
-        })
-        closePhotoSheet()
-      })
+      void fileToDataUrl(photoDraft.file).then(finish)
       return
     }
-    commitLog({
-      id: `photo-${Date.now()}`,
-      name: photoDraft.name.trim() || '未知食物',
-      calories: photoDraft.calories,
-      protein_g: photoDraft.protein_g,
-      source: 'photo',
-      photo_data_url: dataUrl,
-      capture_status: 'resolved',
-    })
-    closePhotoSheet()
+    finish(dataUrl)
   }, [photoDraft, photoSaving, commitLog, closePhotoSheet])
 
   const rollDice = useCallback(() => {
@@ -939,9 +908,11 @@ export default function TodayOS({
     (name: string) => {
       const trimmed = name.trim()
       if (!trimmed) return
-      const est = resolveOrEstimateFreeTextMeal(trimmed, mealTargets.calories, mealTargets.protein)
-      if (est.estimated) {
-        toast.message('找不到這道菜的官方營養，請從搜尋建議點選正確品項')
+      const est = resolveOrEstimateFreeTextMeal(trimmed)
+      if (est.blocked) {
+        toast.message('需要再確認一下', {
+          description: est.explanation ?? '請從搜尋建議選擇正確品項，或輸入更明確的菜名。',
+        })
         return
       }
       commitLog({
@@ -950,12 +921,20 @@ export default function TodayOS({
         store: est.store,
         calories: est.calories,
         protein_g: est.protein_g,
-        carbs_g: est.carbs_g,
-        fat_g: est.fat_g,
+        carbs_g: est.carbs_g ?? undefined,
+        fat_g: est.fat_g ?? undefined,
         source: est.source,
+        nutrition_status: est.nutrition_status,
+        nutrition_confidence: est.nutrition_confidence,
+        capture_status: est.capture_status,
       })
+      if (est.nutrition_status === 'unknown') {
+        toast.message('已建立文字紀錄', {
+          description: '目前沒有可信營養資料；此筆不計入熱量統計。未來找到資料可一鍵更新。',
+        })
+      }
     },
-    [commitLog, mealTargets.calories, mealTargets.protein]
+    [commitLog]
   )
   const handleCommitFrequent = useCallback(
     (frequentId?: string) => {

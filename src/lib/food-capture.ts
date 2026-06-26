@@ -21,12 +21,10 @@ export async function fileToDataUrl(file: File): Promise<string> {
 
 export interface PhotoParseResult {
   name: string
-  calories: number
-  protein_g: number
-  carbs_g: number
-  fat_g: number
   confidence: 'high' | 'medium' | 'low'
   confidence_pct: number
+  /** AI must never supply nutrition — label only */
+  ai_nutrition_suppressed: true
 }
 
 export async function parseFoodPhotoDataUrl(
@@ -44,31 +42,11 @@ export async function parseFoodPhotoDataUrl(
 
   const items = json.data.items as Array<{
     name: string
-    calories: number
-    protein_g: number
-    carbs_g: number
-    fat_g: number
     confidence: 'high' | 'medium' | 'low'
   }>
 
-  const merged = items.reduce(
-    (acc, item) => ({
-      name: acc.name ? `${acc.name} + ${item.name}` : item.name,
-      calories: acc.calories + item.calories,
-      protein_g: acc.protein_g + item.protein_g,
-      carbs_g: acc.carbs_g + item.carbs_g,
-      fat_g: acc.fat_g + item.fat_g,
-      confidence: item.confidence,
-    }),
-    {
-      name: '',
-      calories: 0,
-      protein_g: 0,
-      carbs_g: 0,
-      fat_g: 0,
-      confidence: 'medium' as const,
-    }
-  )
+  const names = items.map(item => item.name.trim()).filter(Boolean)
+  const name = names.length > 1 ? names.join(' + ') : names[0] ?? ''
 
   const worst = items.reduce<'high' | 'medium' | 'low'>(
     (worstConf, item) => {
@@ -79,9 +57,10 @@ export async function parseFoodPhotoDataUrl(
   )
 
   return {
-    ...merged,
+    name,
     confidence: worst,
     confidence_pct: confidenceToPct(worst),
+    ai_nutrition_suppressed: true,
   }
 }
 
@@ -90,7 +69,7 @@ export async function parseFoodPhotoFile(file: File): Promise<PhotoParseResult> 
   return parseFoodPhotoDataUrl(dataUrl, file.type || 'image/jpeg')
 }
 
-/** Second+ encounter — use community averages from Food DNA */
+/** Community Food DNA — hero image / frequency only. Do NOT use for nutrition writes; use Search V2. */
 export function lookupVerifiedFood(name: string, dna: FoodDna | undefined): FrequentFood | null {
   const key = name.trim().toLowerCase()
   const hit = dna?.frequent?.find(f => f.name.trim().toLowerCase() === key && f.count >= 2)

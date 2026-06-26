@@ -19,8 +19,9 @@ export function resolveLogMacros(log: FoodLogEntry): { carbs_g: number; fat_g: n
   return inferMacrosFromLog(log)
 }
 
-/** Backfill missing macros for display and future saves. */
+/** Backfill missing macros for display and future saves. Unknown records skip inference. */
 export function enrichFoodLog(log: FoodLogEntry): FoodLogEntry {
+  if (log.nutrition_status === 'unknown' || log.capture_status === 'photo_only') return log
   const { carbs_g, fat_g } = resolveLogMacros(log)
   if (log.carbs_g === carbs_g && log.fat_g === fat_g) return log
   return { ...log, carbs_g, fat_g }
@@ -31,6 +32,9 @@ export function enrichFoodLogs(logs: FoodLogEntry[]): FoodLogEntry[] {
 }
 
 function inferMacrosFromLog(log: FoodLogEntry): { carbs_g: number; fat_g: number } {
+  if (log.nutrition_status === 'unknown' || log.calories == null) {
+    return { carbs_g: 0, fat_g: 0 }
+  }
   const calories = Math.max(0, log.calories ?? 0)
   const proteinKcal = Math.max(0, (log.protein_g ?? 0) * 4)
   const remaining = Math.max(0, calories - proteinKcal)

@@ -1,5 +1,6 @@
 import { eatOutMenu, type ConvenienceItem } from '@/lib/convenience-store-menu'
 import { normalizeBrandName, normalizeFoodName } from '@/lib/food-kb/normalize'
+import { resolveAliasQuery, expandQueryWithAliases } from '@/lib/nutrition/alias-engine'
 import { passesMenuAccessGate } from '@/lib/nutrition/menu-confidence-runtime'
 import kbIndex from '../../data/food-kb/menu-lookup-index.json'
 
@@ -29,9 +30,11 @@ function parseStorePrefix(query: string): { store?: string; foodName: string } {
   return { store, foodName }
 }
 
-function scoreNameMatch(queryNorm: string, itemName: string): number {
+function scoreNameMatch(queryNorm: string, itemName: string, store?: string): number {
   const nameNorm = normalizeFoodName(itemName)
   if (!queryNorm || !nameNorm) return 0
+  const aliasHit = resolveAliasQuery(queryNorm, { store })
+  if (aliasHit && normalizeFoodName(aliasHit.official_name) === nameNorm) return 98
   if (nameNorm === queryNorm) return 100
   if (nameNorm.includes(queryNorm) || queryNorm.includes(nameNorm)) return 80
   const qTokens = [...new Set(queryNorm.match(/[\u4e00-\u9fff]{2,}|[a-z0-9]{2,}/gi) ?? [])]
@@ -69,7 +72,7 @@ function searchRuntimeMenu(query: string, storeHint?: string, limit = 8): MenuLo
   return eatOutMenu
     .filter(item => passesMenuAccessGate(item, 'search'))
     .map(item => {
-      let score = scoreNameMatch(qNorm, item.name)
+      let score = scoreNameMatch(qNorm, item.name, store)
       if (score === 0) return null
       if (store) {
         const itemStore = normalizeBrandName(item.store)
@@ -93,7 +96,7 @@ function searchFoodKb(query: string, storeHint?: string, limit = 8): MenuLookupH
 
   return (kbIndex.items as KbRow[])
     .map(row => {
-      let score = scoreNameMatch(qNorm, row.name)
+      let score = scoreNameMatch(qNorm, row.name, store)
       if (score === 0) return null
       if (store) {
         const rowStore = normalizeBrandName(row.store)
@@ -141,13 +144,16 @@ export function searchFoodMenuExtended(query: string, limit = 8): MenuLookupHit[
   const trimmed = query.trim()
   if (!trimmed) return []
 
+  const queries = expandQueryWithAliases(trimmed)
   const seen = new Set<string>()
   const out: MenuLookupHit[] = []
-  for (const hit of [...searchFoodKb(trimmed, undefined, limit), ...searchRuntimeMenu(trimmed, undefined, limit)]) {
-    const key = `${hit.store}::${normalizeFoodName(hit.name)}`
-    if (seen.has(key)) continue
-    seen.add(key)
-    out.push(hit)
+  for (const q of queries) {
+    for (const hit of [...searchFoodKb(q, undefined, limit), ...searchRuntimeMenu(q, undefined, limit)]) {
+      const key = `${hit.store}::${normalizeFoodName(hit.name)}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      out.push(hit)
+    }
   }
   return out.sort((a, b) => b.confidence - a.confidence).slice(0, limit)
 }

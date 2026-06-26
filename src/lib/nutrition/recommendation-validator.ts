@@ -8,10 +8,13 @@ import {
   type RestaurantMenuRegistry,
 } from './restaurant-menu-registry'
 import {
-  buildRecommendationDebugReason,
   computeNutritionGaps,
   passesNutritionGapFilter,
 } from './nutrition-gap-filter'
+import {
+  attachRecommendationReasons,
+  buildRecommendationDebugReason,
+} from './recommendation-explain'
 import {
   evaluateMenuItemConfidence,
   passesMenuAccessGate,
@@ -105,8 +108,9 @@ export function attachRecommendationDebugReason(
   const gaps = computeNutritionGaps(ctx)
   const gapCheck = passesNutritionGapFilter(suggestion.totals, gaps, ctx)
   const items = suggestion.lines.map(l => l.item)
+  const withReasons = attachRecommendationReasons(suggestion, ctx)
   return {
-    ...suggestion,
+    ...withReasons,
     recommendation_debug_reason: buildRecommendationDebugReason(
       suggestion.totals,
       gaps,

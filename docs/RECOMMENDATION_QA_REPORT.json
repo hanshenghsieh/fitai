@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-26T09:23:48.820Z",
+  "generated_at": "2026-06-26T15:47:32.737Z",
   "scope": "offline_qa",
   "menu_scope": "core",
   "restaurant_coverage": {
@@ -1483,55 +1483,55 @@
     {
       "scenario": "protein_gap_high",
       "meal_type": "lunch",
-      "suggestion_id": "dept-qsquare-bento:full",
+      "suggestion_id": "sprint1-鬍鬚張-雞腿飯:full",
       "valid": true,
       "confidence": "A",
       "recommendable": true,
       "explainability_ok": true,
-      "explanation": "今天蛋白質還少約 102g，所以推薦高蛋白組合 推薦：京站美食街 · 雞腿便當 此餐 +32g 蛋白質、+620 kcal，脂肪 20g、碳水 72g。 營養來源：品牌公開（京站美食街 品牌公開資料） · 1 來源 · confidence A",
+      "explanation": "今天蛋白質還少約 102g，所以推薦高蛋白組合 推薦：鬍鬚張 · 雞腿飯 此餐 +38g 蛋白質、+700 kcal，脂肪 26g、碳水 80g。 營養來源：官方（鬍鬚張 官方營養參考） · 2 來源交叉驗證 · confidence B · 驗證 2026-06-25 · 複核 2026-06-25",
       "issues": [],
       "totals": {
-        "calories": 620,
-        "protein_g": 32,
-        "carbs_g": 72,
-        "fat_g": 20,
-        "price": 150
+        "calories": 700,
+        "protein_g": 38,
+        "carbs_g": 80,
+        "fat_g": 26,
+        "price": 135
       }
     },
     {
       "scenario": "fat_near_limit",
       "meal_type": "dinner",
-      "suggestion_id": "金仙滷肉飯-雞腿飯:full",
+      "suggestion_id": "sprint1-7-11-dinner-23:full",
       "valid": true,
       "confidence": "A",
       "recommendable": true,
       "explainability_ok": true,
-      "explanation": "今天蛋白質還少約 60g，所以推薦高蛋白組合 推薦：金仙滷肉飯 · 雞腿飯 此餐 +36g 蛋白質、+680 kcal，脂肪 24g、碳水 76g。 營養來源：品牌公開（金仙滷肉飯 品牌公開資料） · 1 來源 · confidence B",
+      "explanation": "今天蛋白質還少約 60g，所以推薦高蛋白組合 推薦：7-11 · 椰香綠咖哩嫩雞飯 此餐 +42g 蛋白質、+668 kcal，脂肪 22g、碳水 75g。 營養來源：官方（7-11 鮮食官網） · 2 來源交叉驗證 · confidence B · 驗證 2026-06-25 · 複核 2026-06-25",
       "issues": [],
       "totals": {
-        "calories": 680,
-        "protein_g": 36,
-        "carbs_g": 76,
-        "fat_g": 24,
-        "price": 115
+        "calories": 668,
+        "protein_g": 42,
+        "carbs_g": 75,
+        "fat_g": 22,
+        "price": 99
       }
     },
     {
       "scenario": "carb_near_limit",
       "meal_type": "lunch",
-      "suggestion_id": "dept-qsquare-bento:full",
+      "suggestion_id": "sprint1-鬍鬚張-雞腿飯:full",
       "valid": true,
       "confidence": "A",
       "recommendable": true,
       "explainability_ok": true,
-      "explanation": "今天蛋白質還少約 96g，所以推薦高蛋白組合 推薦：京站美食街 · 雞腿便當 此餐 +32g 蛋白質、+620 kcal，脂肪 20g、碳水 72g。 營養來源：品牌公開（京站美食街 品牌公開資料） · 1 來源 · confidence A",
+      "explanation": "今天蛋白質還少約 96g，所以推薦高蛋白組合 推薦：鬍鬚張 · 雞腿飯 此餐 +38g 蛋白質、+700 kcal，脂肪 26g、碳水 80g。 營養來源：官方（鬍鬚張 官方營養參考） · 2 來源交叉驗證 · confidence B · 驗證 2026-06-25 · 複核 2026-06-25",
       "issues": [],
       "totals": {
-        "calories": 620,
-        "protein_g": 32,
-        "carbs_g": 72,
-        "fat_g": 20,
-        "price": 150
+        "calories": 700,
+        "protein_g": 38,
+        "carbs_g": 80,
+        "fat_g": 26,
+        "price": 135
       }
     },
     {

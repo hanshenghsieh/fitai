@@ -1,8 +1,7 @@
 /**
- * Nutrition Accuracy Engine v1 — photo log confirmation flow.
- * Set NEXT_PUBLIC_NUTRITION_ACCURACY_V1=true to enable.
- * Default: false (legacy photo parse → direct calories).
+ * Nutrition Accuracy Engine v1 — photo log confirmation flow (Search V2 aligned).
+ * Default: enabled. Set NEXT_PUBLIC_NUTRITION_ACCURACY_V1=false to disable.
  */
 export function isNutritionAccuracyV1(): boolean {
-  return process.env.NEXT_PUBLIC_NUTRITION_ACCURACY_V1 === 'true'
+  return process.env.NEXT_PUBLIC_NUTRITION_ACCURACY_V1 !== 'false'
 }

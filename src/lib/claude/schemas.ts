@@ -87,11 +87,7 @@ export const InBodyParseSchema = z.object({
 export const FoodPhotoParseSchema = z.object({
   items: z.array(z.object({
     name: z.string(),
-    calories: z.number().min(0).max(5000),
-    protein_g: z.number().min(0).max(500),
-    carbs_g: z.number().min(0).max(500),
-    fat_g: z.number().min(0).max(500),
-    portion: z.string(),
+    portion: z.string().optional(),
     confidence: z.enum(['high', 'medium', 'low']),
   })).min(1).max(8),
   meal_summary: z.string().optional(),

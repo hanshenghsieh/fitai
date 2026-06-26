@@ -11,6 +11,12 @@ interface GoalSnap {
   lean_mass_kg?: number
 }
 
+function logCountsTowardTotals(log: FoodLogEntry): boolean {
+  if (log.nutrition_status === 'unknown') return false
+  if (log.capture_status === 'photo_only') return false
+  return log.calories != null && log.protein_g != null
+}
+
 export function buildUserBanks(
   todayPlan: DayPlan,
   goalSnapshot: GoalSnap | null | undefined,
@@ -25,8 +31,8 @@ export function buildUserBanks(
     goalSnapshot?.daily_deficit ??
     Math.max(200, Math.round((goalSnapshot?.total_deficit_kcal ?? 0) / Math.max(1, (goalSnapshot?.weeks_remaining ?? 12) * 7)))
 
-  const todayLoggedKcal = foodLogs.reduce((s, f) => s + f.calories, 0)
-  const todayLoggedProtein = foodLogs.reduce((s, f) => s + f.protein_g, 0)
+  const todayLoggedKcal = foodLogs.reduce((s, f) => s + (logCountsTowardTotals(f) ? (f.calories ?? 0) : 0), 0)
+  const todayLoggedProtein = foodLogs.reduce((s, f) => s + (logCountsTowardTotals(f) ? (f.protein_g ?? 0) : 0), 0)
   const proteinTarget = todayPlan.daily_targets.protein_g
 
   const weeklyTarget = todayPlan.workout?.type === 'rest' ? 0 : Math.max(3, workoutTotal > 0 ? 5 : 3)
