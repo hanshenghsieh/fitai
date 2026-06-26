@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-25T14:28:13.212Z",
+  "generated_at": "2026-06-26T09:23:48.820Z",
   "scope": "offline_qa",
   "menu_scope": "core",
   "restaurant_coverage": {
@@ -9,15 +9,15 @@
     "coverage_pct": 25
   },
   "menu_coverage": {
-    "items_audited": 6400,
-    "items_recommendable": 252,
-    "placeholder_count": 5252,
+    "items_audited": 6407,
+    "items_recommendable": 279,
+    "placeholder_count": 5231,
     "incomplete_nutrition": 0
   },
   "accuracy": {
-    "energy_balance_pass_pct": 87.5,
+    "energy_balance_pass_pct": 87.6,
     "macro_in_range_pct": 57,
-    "portion_plausible_pct": 80.2
+    "portion_plausible_pct": 80.3
   },
   "macro_fields": {
     "calories_complete_pct": 100,
@@ -29,12 +29,12 @@
     "sodium_coverage_pct": 0
   },
   "confidence_distribution": {
-    "A": 229,
+    "A": 256,
     "B": 23,
-    "C": 9,
-    "D": 6139
+    "C": 6,
+    "D": 6122
   },
-  "nutrition_outliers": 3107,
+  "nutrition_outliers": 3108,
   "recommendation_samples": {
     "scenarios_run": 4,
     "pass_rate_pct": 75,
@@ -71,7 +71,7 @@
   "top_missing_nutrition": [],
   "top_outliers": [
     {
-      "id": "7-11-lunch-1",
+      "id": "sprint1-7-11-lunch-1",
       "store": "7-11",
       "name": "泰式酸辣雞腿冷麵",
       "issues": [
@@ -79,7 +79,7 @@
       ]
     },
     {
-      "id": "7-11-lunch-5",
+      "id": "sprint1-7-11-lunch-5",
       "store": "7-11",
       "name": "麻油雞飯",
       "issues": [
@@ -87,7 +87,7 @@
       ]
     },
     {
-      "id": "7-11-lunch-7",
+      "id": "sprint1-7-11-lunch-7",
       "store": "7-11",
       "name": "爆蛋肉燥新極大飯",
       "issues": [
@@ -95,7 +95,7 @@
       ]
     },
     {
-      "id": "7-11-lunch-10",
+      "id": "sprint1-7-11-lunch-10",
       "store": "7-11",
       "name": "米香鹹酥蝦飯",
       "issues": [
@@ -103,7 +103,7 @@
       ]
     },
     {
-      "id": "7-11-lunch-11",
+      "id": "sprint1-7-11-lunch-11",
       "store": "7-11",
       "name": "晶英三杯蛤蜊飯",
       "issues": [
@@ -111,7 +111,7 @@
       ]
     },
     {
-      "id": "7-11-lunch-12",
+      "id": "sprint1-7-11-lunch-12",
       "store": "7-11",
       "name": "晶英韓式炸豬排起司雙拼飯",
       "issues": [
@@ -119,7 +119,7 @@
       ]
     },
     {
-      "id": "7-11-lunch-13",
+      "id": "sprint1-7-11-lunch-13",
       "store": "7-11",
       "name": "麻辣奶油鮮蝦義大利麵",
       "issues": [
@@ -127,7 +127,7 @@
       ]
     },
     {
-      "id": "7-11-breakfast-14",
+      "id": "sprint1-7-11-breakfast-14",
       "store": "7-11",
       "name": "御飯糰-梅子紫蘇",
       "issues": [
@@ -135,7 +135,7 @@
       ]
     },
     {
-      "id": "7-11-breakfast-15",
+      "id": "sprint1-7-11-breakfast-15",
       "store": "7-11",
       "name": "御飯糰-鮭魚",
       "issues": [
@@ -143,7 +143,7 @@
       ]
     },
     {
-      "id": "7-11-breakfast-16",
+      "id": "sprint1-7-11-breakfast-16",
       "store": "7-11",
       "name": "御飯糰-鮪魚起司",
       "issues": [
@@ -151,7 +151,7 @@
       ]
     },
     {
-      "id": "7-11-breakfast-19",
+      "id": "sprint1-7-11-breakfast-19",
       "store": "7-11",
       "name": "7-11茶葉蛋",
       "issues": [
@@ -159,7 +159,7 @@
       ]
     },
     {
-      "id": "7-11-breakfast-20",
+      "id": "sprint1-7-11-breakfast-20",
       "store": "7-11",
       "name": "豆漿早餐組合",
       "issues": [
@@ -167,7 +167,7 @@
       ]
     },
     {
-      "id": "7-11-dinner-21",
+      "id": "sprint1-7-11-dinner-21",
       "store": "7-11",
       "name": "台韓半半炸雞便當",
       "issues": [
@@ -175,7 +175,7 @@
       ]
     },
     {
-      "id": "family-lunch-1",
+      "id": "sprint1-family-lunch-1",
       "store": "全家",
       "name": "泰式酸辣雞腿冷麵",
       "issues": [
@@ -183,7 +183,7 @@
       ]
     },
     {
-      "id": "family-lunch-5",
+      "id": "sprint1-family-lunch-5",
       "store": "全家",
       "name": "麻油雞飯",
       "issues": [
@@ -191,7 +191,7 @@
       ]
     },
     {
-      "id": "family-lunch-7",
+      "id": "sprint1-family-lunch-7",
       "store": "全家",
       "name": "爆蛋肉燥新極大飯",
       "issues": [
@@ -199,7 +199,7 @@
       ]
     },
     {
-      "id": "family-lunch-10",
+      "id": "sprint1-family-lunch-10",
       "store": "全家",
       "name": "米香鹹酥蝦飯",
       "issues": [
@@ -207,7 +207,7 @@
       ]
     },
     {
-      "id": "family-lunch-11",
+      "id": "sprint1-family-lunch-11",
       "store": "全家",
       "name": "晶英三杯蛤蜊飯",
       "issues": [
@@ -215,7 +215,7 @@
       ]
     },
     {
-      "id": "family-lunch-12",
+      "id": "sprint1-family-lunch-12",
       "store": "全家",
       "name": "晶英韓式炸豬排起司雙拼飯",
       "issues": [
@@ -223,7 +223,7 @@
       ]
     },
     {
-      "id": "family-lunch-13",
+      "id": "sprint1-family-lunch-13",
       "store": "全家",
       "name": "麻辣奶油鮮蝦義大利麵",
       "issues": [
@@ -231,7 +231,7 @@
       ]
     },
     {
-      "id": "family-breakfast-14",
+      "id": "sprint1-family-breakfast-14",
       "store": "全家",
       "name": "御飯糰-梅子紫蘇",
       "issues": [
@@ -239,7 +239,7 @@
       ]
     },
     {
-      "id": "family-breakfast-15",
+      "id": "sprint1-family-breakfast-15",
       "store": "全家",
       "name": "御飯糰-鮭魚",
       "issues": [
@@ -247,7 +247,7 @@
       ]
     },
     {
-      "id": "family-breakfast-16",
+      "id": "sprint1-family-breakfast-16",
       "store": "全家",
       "name": "御飯糰-鮪魚起司",
       "issues": [
@@ -255,7 +255,7 @@
       ]
     },
     {
-      "id": "family-breakfast-19",
+      "id": "sprint1-family-breakfast-19",
       "store": "全家",
       "name": "7-11茶葉蛋",
       "issues": [
@@ -263,7 +263,7 @@
       ]
     },
     {
-      "id": "family-breakfast-20",
+      "id": "sprint1-family-breakfast-20",
       "store": "全家",
       "name": "豆漿早餐組合",
       "issues": [
@@ -273,7 +273,7 @@
   ],
   "item_results_sample": [
     {
-      "item_id": "7-11-lunch-1",
+      "item_id": "sprint1-7-11-lunch-1",
       "name": "泰式酸辣雞腿冷麵",
       "store": "7-11",
       "restaurant_exists": true,
@@ -284,7 +284,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -298,7 +298,7 @@
       "macro_band": "noodles"
     },
     {
-      "item_id": "7-11-lunch-2",
+      "item_id": "sprint1-7-11-lunch-2",
       "name": "京醬鴨絲飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -309,7 +309,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -321,7 +321,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-lunch-3",
+      "item_id": "sprint1-7-11-lunch-3",
       "name": "港式叉燒油雞飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -332,7 +332,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -344,7 +344,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-lunch-4",
+      "item_id": "sprint1-7-11-lunch-4",
       "name": "三杯雞燴飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -355,7 +355,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -367,7 +367,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-lunch-5",
+      "item_id": "sprint1-7-11-lunch-5",
       "name": "麻油雞飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -378,7 +378,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -392,7 +392,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-lunch-6",
+      "item_id": "sprint1-7-11-lunch-6",
       "name": "四起司香草烤雞握便當",
       "store": "7-11",
       "restaurant_exists": true,
@@ -403,7 +403,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -415,7 +415,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-lunch-7",
+      "item_id": "sprint1-7-11-lunch-7",
       "name": "爆蛋肉燥新極大飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -426,7 +426,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -440,7 +440,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-lunch-8",
+      "item_id": "sprint1-7-11-lunch-8",
       "name": "柱侯牛腱飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -451,7 +451,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -463,7 +463,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-lunch-9",
+      "item_id": "sprint1-7-11-lunch-9",
       "name": "府城肉燥厚切排骨飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -474,7 +474,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -486,7 +486,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-lunch-10",
+      "item_id": "sprint1-7-11-lunch-10",
       "name": "米香鹹酥蝦飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -497,7 +497,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -511,7 +511,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-lunch-11",
+      "item_id": "sprint1-7-11-lunch-11",
       "name": "晶英三杯蛤蜊飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -522,7 +522,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -536,7 +536,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-lunch-12",
+      "item_id": "sprint1-7-11-lunch-12",
       "name": "晶英韓式炸豬排起司雙拼飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -547,7 +547,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -561,7 +561,7 @@
       "macro_band": "fried"
     },
     {
-      "item_id": "7-11-lunch-13",
+      "item_id": "sprint1-7-11-lunch-13",
       "name": "麻辣奶油鮮蝦義大利麵",
       "store": "7-11",
       "restaurant_exists": true,
@@ -572,7 +572,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -586,7 +586,7 @@
       "macro_band": "noodles"
     },
     {
-      "item_id": "7-11-breakfast-14",
+      "item_id": "sprint1-7-11-breakfast-14",
       "name": "御飯糰-梅子紫蘇",
       "store": "7-11",
       "restaurant_exists": true,
@@ -597,7 +597,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -611,7 +611,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-breakfast-15",
+      "item_id": "sprint1-7-11-breakfast-15",
       "name": "御飯糰-鮭魚",
       "store": "7-11",
       "restaurant_exists": true,
@@ -622,7 +622,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -636,7 +636,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-breakfast-16",
+      "item_id": "sprint1-7-11-breakfast-16",
       "name": "御飯糰-鮪魚起司",
       "store": "7-11",
       "restaurant_exists": true,
@@ -647,7 +647,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -661,7 +661,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-breakfast-17",
+      "item_id": "sprint1-7-11-breakfast-17",
       "name": "原賞三明治-火腿起司蛋",
       "store": "7-11",
       "restaurant_exists": true,
@@ -672,7 +672,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -684,7 +684,7 @@
       "macro_band": "generic"
     },
     {
-      "item_id": "7-11-breakfast-18",
+      "item_id": "sprint1-7-11-breakfast-18",
       "name": "原賞三明治-雞肉沙拉",
       "store": "7-11",
       "restaurant_exists": true,
@@ -695,7 +695,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -707,7 +707,7 @@
       "macro_band": "salad"
     },
     {
-      "item_id": "7-11-breakfast-19",
+      "item_id": "sprint1-7-11-breakfast-19",
       "name": "7-11茶葉蛋",
       "store": "7-11",
       "restaurant_exists": true,
@@ -718,7 +718,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -732,7 +732,7 @@
       "macro_band": "generic"
     },
     {
-      "item_id": "7-11-breakfast-20",
+      "item_id": "sprint1-7-11-breakfast-20",
       "name": "豆漿早餐組合",
       "store": "7-11",
       "restaurant_exists": true,
@@ -743,7 +743,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -757,7 +757,7 @@
       "macro_band": "drink"
     },
     {
-      "item_id": "7-11-dinner-21",
+      "item_id": "sprint1-7-11-dinner-21",
       "name": "台韓半半炸雞便當",
       "store": "7-11",
       "restaurant_exists": true,
@@ -768,7 +768,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -782,7 +782,7 @@
       "macro_band": "fried"
     },
     {
-      "item_id": "7-11-dinner-22",
+      "item_id": "sprint1-7-11-dinner-22",
       "name": "泡菜豬肉豆腐煲燴飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -793,7 +793,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -807,7 +807,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-dinner-23",
+      "item_id": "sprint1-7-11-dinner-23",
       "name": "椰香綠咖哩嫩雞飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -818,7 +818,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -830,7 +830,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "7-11-dinner-24",
+      "item_id": "sprint1-7-11-dinner-24",
       "name": "港式醬燜牛肉燴飯",
       "store": "7-11",
       "restaurant_exists": true,
@@ -841,7 +841,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -853,7 +853,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-1",
+      "item_id": "sprint1-family-lunch-1",
       "name": "泰式酸辣雞腿冷麵",
       "store": "全家",
       "restaurant_exists": true,
@@ -864,7 +864,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -878,7 +878,7 @@
       "macro_band": "noodles"
     },
     {
-      "item_id": "family-lunch-2",
+      "item_id": "sprint1-family-lunch-2",
       "name": "京醬鴨絲飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -889,7 +889,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -901,7 +901,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-3",
+      "item_id": "sprint1-family-lunch-3",
       "name": "港式叉燒油雞飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -912,7 +912,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -924,7 +924,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-4",
+      "item_id": "sprint1-family-lunch-4",
       "name": "三杯雞燴飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -935,7 +935,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -947,7 +947,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-5",
+      "item_id": "sprint1-family-lunch-5",
       "name": "麻油雞飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -958,7 +958,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -972,7 +972,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-6",
+      "item_id": "sprint1-family-lunch-6",
       "name": "四起司香草烤雞握便當",
       "store": "全家",
       "restaurant_exists": true,
@@ -983,7 +983,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -995,7 +995,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-7",
+      "item_id": "sprint1-family-lunch-7",
       "name": "爆蛋肉燥新極大飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -1006,7 +1006,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1020,7 +1020,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-8",
+      "item_id": "sprint1-family-lunch-8",
       "name": "柱侯牛腱飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -1031,7 +1031,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -1043,7 +1043,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-9",
+      "item_id": "sprint1-family-lunch-9",
       "name": "府城肉燥厚切排骨飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -1054,7 +1054,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -1066,7 +1066,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-10",
+      "item_id": "sprint1-family-lunch-10",
       "name": "米香鹹酥蝦飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -1077,7 +1077,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1091,7 +1091,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-11",
+      "item_id": "sprint1-family-lunch-11",
       "name": "晶英三杯蛤蜊飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -1102,7 +1102,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1116,7 +1116,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-lunch-12",
+      "item_id": "sprint1-family-lunch-12",
       "name": "晶英韓式炸豬排起司雙拼飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -1127,7 +1127,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1141,7 +1141,7 @@
       "macro_band": "fried"
     },
     {
-      "item_id": "family-lunch-13",
+      "item_id": "sprint1-family-lunch-13",
       "name": "麻辣奶油鮮蝦義大利麵",
       "store": "全家",
       "restaurant_exists": true,
@@ -1152,7 +1152,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1166,7 +1166,7 @@
       "macro_band": "noodles"
     },
     {
-      "item_id": "family-breakfast-14",
+      "item_id": "sprint1-family-breakfast-14",
       "name": "御飯糰-梅子紫蘇",
       "store": "全家",
       "restaurant_exists": true,
@@ -1177,7 +1177,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1191,7 +1191,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-breakfast-15",
+      "item_id": "sprint1-family-breakfast-15",
       "name": "御飯糰-鮭魚",
       "store": "全家",
       "restaurant_exists": true,
@@ -1202,7 +1202,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1216,7 +1216,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-breakfast-16",
+      "item_id": "sprint1-family-breakfast-16",
       "name": "御飯糰-鮪魚起司",
       "store": "全家",
       "restaurant_exists": true,
@@ -1227,7 +1227,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1241,7 +1241,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-breakfast-17",
+      "item_id": "sprint1-family-breakfast-17",
       "name": "原賞三明治-火腿起司蛋",
       "store": "全家",
       "restaurant_exists": true,
@@ -1252,7 +1252,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -1264,7 +1264,7 @@
       "macro_band": "generic"
     },
     {
-      "item_id": "family-breakfast-18",
+      "item_id": "sprint1-family-breakfast-18",
       "name": "原賞三明治-雞肉沙拉",
       "store": "全家",
       "restaurant_exists": true,
@@ -1275,7 +1275,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -1287,7 +1287,7 @@
       "macro_band": "salad"
     },
     {
-      "item_id": "family-breakfast-19",
+      "item_id": "sprint1-family-breakfast-19",
       "name": "7-11茶葉蛋",
       "store": "全家",
       "restaurant_exists": true,
@@ -1298,7 +1298,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1312,7 +1312,7 @@
       "macro_band": "generic"
     },
     {
-      "item_id": "family-breakfast-20",
+      "item_id": "sprint1-family-breakfast-20",
       "name": "豆漿早餐組合",
       "store": "全家",
       "restaurant_exists": true,
@@ -1323,7 +1323,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1337,7 +1337,7 @@
       "macro_band": "drink"
     },
     {
-      "item_id": "family-dinner-21",
+      "item_id": "sprint1-family-dinner-21",
       "name": "台韓半半炸雞便當",
       "store": "全家",
       "restaurant_exists": true,
@@ -1348,7 +1348,7 @@
       "portion_plausible": true,
       "macro_in_range": false,
       "nutrition_outlier": true,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1362,7 +1362,7 @@
       "macro_band": "fried"
     },
     {
-      "item_id": "family-dinner-22",
+      "item_id": "sprint1-family-dinner-22",
       "name": "泡菜豬肉豆腐煲燴飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -1373,7 +1373,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "D",
       "recommendable": false,
       "issues": [
@@ -1387,7 +1387,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-dinner-23",
+      "item_id": "sprint1-family-dinner-23",
       "name": "椰香綠咖哩嫩雞飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -1398,7 +1398,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -1410,7 +1410,7 @@
       "macro_band": "rice_bowl"
     },
     {
-      "item_id": "family-dinner-24",
+      "item_id": "sprint1-family-dinner-24",
       "name": "港式醬燜牛肉燴飯",
       "store": "全家",
       "restaurant_exists": true,
@@ -1421,7 +1421,7 @@
       "portion_plausible": true,
       "macro_in_range": true,
       "nutrition_outlier": false,
-      "nutrition_source": "brand_public",
+      "nutrition_source": "official",
       "confidence": "A",
       "recommendable": true,
       "issues": [],
@@ -1483,55 +1483,55 @@
     {
       "scenario": "protein_gap_high",
       "meal_type": "lunch",
-      "suggestion_id": "三商巧福-排骨飯:full",
+      "suggestion_id": "dept-qsquare-bento:full",
       "valid": true,
       "confidence": "A",
       "recommendable": true,
       "explainability_ok": true,
-      "explanation": "今天蛋白質還少約 102g，所以推薦高蛋白組合 推薦：三商巧福 · 排骨飯 此餐 +28g 蛋白質、+720 kcal，脂肪 28g、碳水 85g。 營養來源：官方（三商巧福 官方營養標示） · 1 來源 · confidence A",
+      "explanation": "今天蛋白質還少約 102g，所以推薦高蛋白組合 推薦：京站美食街 · 雞腿便當 此餐 +32g 蛋白質、+620 kcal，脂肪 20g、碳水 72g。 營養來源：品牌公開（京站美食街 品牌公開資料） · 1 來源 · confidence A",
       "issues": [],
       "totals": {
-        "calories": 720,
-        "protein_g": 28,
-        "carbs_g": 85,
-        "fat_g": 28,
-        "price": 140
+        "calories": 620,
+        "protein_g": 32,
+        "carbs_g": 72,
+        "fat_g": 20,
+        "price": 150
       }
     },
     {
       "scenario": "fat_near_limit",
       "meal_type": "dinner",
-      "suggestion_id": "family-dinner-23:full",
+      "suggestion_id": "金仙滷肉飯-雞腿飯:full",
       "valid": true,
       "confidence": "A",
       "recommendable": true,
       "explainability_ok": true,
-      "explanation": "今天蛋白質還少約 60g，所以推薦高蛋白組合 推薦：全家 · 椰香綠咖哩嫩雞飯 此餐 +42g 蛋白質、+668 kcal，脂肪 22g、碳水 75g。 營養來源：品牌公開（全家 品牌公開菜單） · 1 來源 · confidence A",
+      "explanation": "今天蛋白質還少約 60g，所以推薦高蛋白組合 推薦：金仙滷肉飯 · 雞腿飯 此餐 +36g 蛋白質、+680 kcal，脂肪 24g、碳水 76g。 營養來源：品牌公開（金仙滷肉飯 品牌公開資料） · 1 來源 · confidence B",
       "issues": [],
       "totals": {
-        "calories": 668,
-        "protein_g": 42,
-        "carbs_g": 75,
-        "fat_g": 22,
-        "price": 99
+        "calories": 680,
+        "protein_g": 36,
+        "carbs_g": 76,
+        "fat_g": 24,
+        "price": 115
       }
     },
     {
       "scenario": "carb_near_limit",
       "meal_type": "lunch",
-      "suggestion_id": "福隆便當-雞腿飯:full",
+      "suggestion_id": "dept-qsquare-bento:full",
       "valid": true,
       "confidence": "A",
       "recommendable": true,
       "explainability_ok": true,
-      "explanation": "今天蛋白質還少約 96g，所以推薦高蛋白組合 推薦：福隆便當 · 雞腿飯 此餐 +36g 蛋白質、+680 kcal，脂肪 24g、碳水 78g。 營養來源：品牌公開（福隆便當 品牌公開資料） · 1 來源 · confidence A",
+      "explanation": "今天蛋白質還少約 96g，所以推薦高蛋白組合 推薦：京站美食街 · 雞腿便當 此餐 +32g 蛋白質、+620 kcal，脂肪 20g、碳水 72g。 營養來源：品牌公開（京站美食街 品牌公開資料） · 1 來源 · confidence A",
       "issues": [],
       "totals": {
-        "calories": 680,
-        "protein_g": 36,
-        "carbs_g": 78,
-        "fat_g": 24,
-        "price": 115
+        "calories": 620,
+        "protein_g": 32,
+        "carbs_g": 72,
+        "fat_g": 20,
+        "price": 150
       }
     },
     {

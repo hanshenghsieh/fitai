@@ -29,6 +29,7 @@ import { sumLoggedCalories, sumLoggedProtein, computeTodayMealState } from '@/li
 import { foodLogsNeedSync, reconcileFoodLogsToday } from '@/lib/food-log-reconcile'
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
+import { getNutritionDayKey } from '@/lib/timezone'
 import { TODAY } from '@/lib/today-design'
 import BBCard from '@/components/ui/BBCard'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
@@ -56,7 +57,7 @@ interface Props {
   recentMissedDays: number
   recentFoodLogs?: FoodLogEntry[]
   trialDaysLeft?: number | null
-  calorieBank?: CalorieBankRow | null
+  initialFoodLogs?: FoodLogEntry[]
 }
 
 function formatExerciseDetail(set: { sets: number; reps: number | null; duration_secs: number | null; rest_secs: number }): string {
@@ -80,7 +81,7 @@ export default function BetterBitHome({
   recentMissedDays,
   recentFoodLogs = [],
   trialDaysLeft,
-  calorieBank: initialCalorieBank = null,
+  initialFoodLogs = [],
 }: Props) {
   const [isPending, startTransition] = useTransition()
   const [expandedWorkout, setExpandedWorkout] = useState(false)
@@ -121,7 +122,8 @@ export default function BetterBitHome({
     [userMemory, displayFoodLogs]
   )
   const [postureLine, setPostureLine] = useState('最近忙嗎？回來就好。今天照常。')
-  const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(initialCalorieBank)
+  const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(null)
+  const calorieBankSyncedRef = useRef(false)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const persistPatchRef = useRef<{
     workoutItems?: WorkoutCheckinItem[]
@@ -144,6 +146,33 @@ export default function BetterBitHome({
   useEffect(() => {
     void preloadDiceMenuBulk()
   }, [])
+
+  useEffect(() => {
+    if (calorieBankSyncedRef.current) return
+    calorieBankSyncedRef.current = true
+    const logs = initialFoodLogs.length ? initialFoodLogs : displayFoodLogs
+    const actualKcal = sumLoggedCalories(logs)
+    const normalTargetKcal = todayPlan.daily_targets.calories
+    void fetch('/api/calorie-bank', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        normal_target_kcal: normalTargetKcal,
+        actual_kcal: actualKcal,
+        date: getNutritionDayKey(),
+      }),
+    })
+      .then(async res => {
+        const json = (await res.json()) as { bank?: CalorieBankRow | null }
+        if (json.bank) setCalorieBank(json.bank)
+        else if (!res.ok) {
+          const getRes = await fetch('/api/calorie-bank')
+          const getJson = (await getRes.json()) as { bank?: CalorieBankRow | null }
+          if (getJson.bank) setCalorieBank(getJson.bank)
+        }
+      })
+      .catch(() => {})
+  }, [todayPlan.daily_targets.calories, initialFoodLogs, displayFoodLogs])
 
   useEffect(() => {
     return () => {

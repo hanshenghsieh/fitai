@@ -32,11 +32,32 @@ function mapRow(row: Record<string, unknown>): GrowthPost {
   }
 }
 
-export async function listGrowthPosts(supabase: SupabaseClient): Promise<GrowthPost[]> {
-  const { data, error } = await supabase.from(TABLE).select('*')
+export interface ListGrowthPostsOptions {
+  realOnly?: boolean
+}
 
+export async function listGrowthPosts(
+  supabase: SupabaseClient,
+  options: ListGrowthPostsOptions = { realOnly: true }
+): Promise<GrowthPost[]> {
+  let query = supabase.from(TABLE).select('*')
+  if (options.realOnly !== false) {
+    query = query.eq('is_demo', false)
+  }
+
+  const { data, error } = await query
   if (error) throw new Error(error.message)
   return sortGrowthPosts((data ?? []).map(mapRow))
+}
+
+export async function countNonRealPosts(supabase: SupabaseClient): Promise<number> {
+  const { count, error } = await supabase
+    .from(TABLE)
+    .select('id', { count: 'exact', head: true })
+    .or('is_demo.eq.true,post_url.ilike.%mock%,post_url.ilike.%example.com%')
+
+  if (error) throw new Error(error.message)
+  return count ?? 0
 }
 
 export async function getGrowthPost(supabase: SupabaseClient, id: string): Promise<GrowthPost | null> {
@@ -92,11 +113,17 @@ export async function updateGrowthPost(
   return mapRow(data)
 }
 
-export async function getGrowthDashboardStats(supabase: SupabaseClient): Promise<GrowthDashboardStats> {
+export async function getGrowthDashboardStats(
+  supabase: SupabaseClient,
+  realOnly = true
+): Promise<GrowthDashboardStats> {
   const todayStart = startOfDay(new Date()).toISOString()
   const todayEnd = endOfDay(new Date()).toISOString()
 
-  const { data, error } = await supabase.from(TABLE).select('status, created_at')
+  let query = supabase.from(TABLE).select('status, created_at')
+  if (realOnly) query = query.eq('is_demo', false)
+
+  const { data, error } = await query
   if (error) throw new Error(error.message)
 
   const rows = data ?? []
@@ -111,28 +138,17 @@ export async function getGrowthDashboardStats(supabase: SupabaseClient): Promise
   }
 }
 
-export async function clearDemoGrowthPosts(supabase: SupabaseClient): Promise<number> {
-  const { data, error } = await supabase.from(TABLE).delete().eq('is_demo', true).select('id')
+export async function clearNonRealGrowthPosts(supabase: SupabaseClient): Promise<number> {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .delete()
+    .or('is_demo.eq.true,post_url.ilike.%mock%,post_url.ilike.%example.com%')
+    .select('id')
+
   if (error) throw new Error(error.message)
   return data?.length ?? 0
 }
 
-export async function seedGrowthPosts(
-  supabase: SupabaseClient,
-  posts: CreateGrowthPostInput[]
-): Promise<number> {
-  const payload = posts.map(p => ({
-    platform: p.platform,
-    post_url: p.postUrl ?? null,
-    author: p.author ?? null,
-    content: p.content,
-    keyword: p.keyword ?? null,
-    posted_at: p.postedAt ?? new Date().toISOString(),
-    is_demo: p.isDemo ?? false,
-    status: 'pending',
-  }))
-
-  const { error } = await supabase.from(TABLE).insert(payload)
-  if (error) throw new Error(error.message)
-  return payload.length
+export async function clearDemoGrowthPosts(supabase: SupabaseClient): Promise<number> {
+  return clearNonRealGrowthPosts(supabase)
 }

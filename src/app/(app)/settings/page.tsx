@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { colors } from '@/lib/design-system'
 import SettingsScreen from '@/components/settings/SettingsScreen'
@@ -6,6 +5,7 @@ import { getAccessStatus } from '@/lib/subscription-access'
 import { getNutritionDayKey } from '@/lib/timezone'
 import { userMemoryFromCheckin } from '@/lib/checkin-utils'
 import type { WorkSchedule } from '@/lib/human-mode'
+import { getAppUser } from '@/lib/supabase/app-session'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,8 +13,7 @@ const PROFILE_FIELDS =
   'id, display_name, weight_kg, body_fat_pct, created_at, gender, age, height_cm, goal_type, activity_level, is_vegetarian, is_vegan, is_halal, is_gluten_free, allergens, disliked_foods, food_budget, onboarding_completed'
 
 export default async function SettingsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getAppUser()
   if (!user) redirect('/login')
 
   const today = getNutritionDayKey()

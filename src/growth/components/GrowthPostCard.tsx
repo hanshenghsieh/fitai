@@ -27,7 +27,7 @@ export function GrowthPostCard({ post, onUpdate }: GrowthPostCardProps) {
   const postTime = post.posted_at ?? post.created_at
   const timeLabel = formatGrowthPostTime(postTime)
   const timeAgo = formatGrowthPostTimeAgo(postTime)
-  const showLink = post.post_url && !post.is_demo
+  const showLink = Boolean(post.post_url)
 
   async function patchPost(action: string, extra?: Record<string, string>) {
     setLoading(action)
@@ -91,8 +91,6 @@ export function GrowthPostCard({ post, onUpdate }: GrowthPostCardProps) {
           >
             查看原文 <ExternalLink className="size-3.5" />
           </a>
-        ) : post.is_demo ? (
-          <p className="text-xs text-muted-foreground">示範資料無真實連結，請用「新增貼文」貼上真實文章</p>
         ) : null}
 
         {post.ai_reason && (

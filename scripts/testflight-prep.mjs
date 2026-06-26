@@ -9,7 +9,7 @@ import { join } from 'node:path'
 
 const root = join(import.meta.dirname, '..')
 const pbxproj = join(root, 'ios/App/App.xcodeproj/project.pbxproj')
-const EXPECTED_BUILD = process.env.IOS_BUILD_NUMBER?.trim() || '4'
+const EXPECTED_BUILD = process.env.IOS_BUILD_NUMBER?.trim() || '5'
 
 function run(cmd, opts = {}) {
   console.log(`\n> ${cmd}`)
