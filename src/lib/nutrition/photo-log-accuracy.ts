@@ -11,6 +11,7 @@ import type {
   PortionAdjustment,
   UserConfirmationAnswers,
 } from './types'
+import { resolveMenuFromQuery } from '@/lib/food-menu-lookup'
 
 export interface PhotoAccuracyState {
   label: string
@@ -46,11 +47,28 @@ export function createPhotoAccuracyState(
   label: string,
   opts?: { store?: string; location_context?: string }
 ): PhotoAccuracyState {
-  const input = buildPhotoAccuracyInput(label, opts)
+  const verified = resolveMenuFromQuery(label, opts?.store)
+  const input: AccuracyEngineInput = verified
+    ? {
+        label: label.trim() || '未知食物',
+        store: verified.store ?? opts?.store,
+        location_context: opts?.location_context,
+        photo_parse: true,
+        source_type: 'verified_brand_menu',
+        verified_menu: {
+          kcal: verified.calories,
+          protein_g: verified.protein_g,
+          carbs_g: verified.carbs_g,
+          fat_g: verified.fat_g,
+          requires_confirmation: false,
+          high_risk_tags: [],
+        },
+      }
+    : buildPhotoAccuracyInput(label, opts)
   const { candidates, draft, final } = runPhotoAccuracyPipeline(input)
   return {
     label: input.label,
-    store: opts?.store,
+    store: opts?.store ?? verified?.store,
     candidates,
     draft,
     answers: { user_confirmed: false },

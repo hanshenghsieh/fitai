@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ClipboardList, Loader2, RefreshCw, Camera } from 'lucide-react'
 import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu } from '@/lib/food-search'
-import { estimateFreeTextMeal } from '@/lib/food-estimate'
+import { estimateFreeTextMeal, resolveOrEstimateFreeTextMeal } from '@/lib/food-estimate'
 import { enrichFoodLog, sumItemMacros } from '@/lib/food-log-macros'
 import {
   fileToDataUrl,
@@ -939,13 +939,20 @@ export default function TodayOS({
     (name: string) => {
       const trimmed = name.trim()
       if (!trimmed) return
-      const est = estimateFreeTextMeal(trimmed, mealTargets.calories, mealTargets.protein)
+      const est = resolveOrEstimateFreeTextMeal(trimmed, mealTargets.calories, mealTargets.protein)
+      if (est.estimated) {
+        toast.message('找不到這道菜的官方營養，請從搜尋建議點選正確品項')
+        return
+      }
       commitLog({
         id: est.id,
         name: est.name,
+        store: est.store,
         calories: est.calories,
         protein_g: est.protein_g,
-        source: 'search',
+        carbs_g: est.carbs_g,
+        fat_g: est.fat_g,
+        source: est.source,
       })
     },
     [commitLog, mealTargets.calories, mealTargets.protein]

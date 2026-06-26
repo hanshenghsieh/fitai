@@ -1,0 +1,3394 @@
+{
+  "generated_at": "2026-06-26T08:47:15.310Z",
+  "count": 339,
+  "items": [
+    {
+      "id": "item_mql8paig_39",
+      "name": "晶英韓式炸豬排起司雙拼飯",
+      "store": "7-11",
+      "calories": 351,
+      "protein_g": 25.56,
+      "carbs_g": 41.97,
+      "fat_g": 10.81,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql8pako_197",
+      "name": "嫩雞蔬食卷",
+      "store": "麥當勞",
+      "calories": 380,
+      "protein_g": 24,
+      "carbs_g": 36,
+      "fat_g": 14,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql8pakr_218",
+      "name": "烤雞沙拉潛艇堡（6吋）",
+      "store": "Subway",
+      "calories": 320,
+      "protein_g": 26,
+      "carbs_g": 40,
+      "fat_g": 6,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql8pal5_239",
+      "name": "燒肉丼（中）",
+      "store": "丼丼屋",
+      "calories": 620,
+      "protein_g": 32,
+      "carbs_g": 78,
+      "fat_g": 18,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql8pal5_242",
+      "name": "親子丼（中）",
+      "store": "丼丼屋",
+      "calories": 570,
+      "protein_g": 29,
+      "carbs_g": 70,
+      "fat_g": 16,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql8palx_287",
+      "name": "糖心蛋雞胸餐",
+      "store": "森度餐廚",
+      "calories": 400,
+      "protein_g": 38,
+      "carbs_g": 32,
+      "fat_g": 12,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql8parl_650",
+      "name": "綜合壽司套餐",
+      "store": "爭鮮迴轉壽司",
+      "calories": 480,
+      "protein_g": 28,
+      "carbs_g": 68,
+      "fat_g": 8,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql8paut_789",
+      "name": "雞排便當",
+      "store": "廣味香",
+      "calories": 693.33,
+      "protein_g": 30.67,
+      "carbs_g": 76.67,
+      "fat_g": 27.33,
+      "confidence": 0.8
+    },
+    {
+      "id": "item_mql8pavc_795",
+      "name": "雞排便當",
+      "store": "圓福",
+      "calories": 630,
+      "protein_g": 28,
+      "carbs_g": 71,
+      "fat_g": 23,
+      "confidence": 0.8
+    },
+    {
+      "id": "item_mql8payw_1017",
+      "name": "牛排起司潛艇堡",
+      "store": "Subway",
+      "calories": 380,
+      "protein_g": 28,
+      "carbs_g": 42,
+      "fat_g": 12,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql8pb4n_1623",
+      "name": "鮭魚+時蔬",
+      "store": "鉑金健康餐盒",
+      "calories": 420,
+      "protein_g": 36,
+      "carbs_g": 28,
+      "fat_g": 16,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql9dtyf_10",
+      "name": "蔬菜 Delite 潛艇堡（6吋·全麥·不加醬）",
+      "store": "Subway",
+      "calories": 200,
+      "protein_g": 8,
+      "carbs_g": 38,
+      "fat_g": 2,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql9dtyq_15",
+      "name": "烤牛肉潛艇堡（6吋·全麥·不加醬）",
+      "store": "Subway",
+      "calories": 320,
+      "protein_g": 28,
+      "carbs_g": 38,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dtyt_19",
+      "name": "義式經典潛艇堡（6吋·全麥·不加醬）",
+      "store": "Subway",
+      "calories": 410,
+      "protein_g": 22,
+      "carbs_g": 40,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dtyv_22",
+      "name": "鮪魚潛艇堡（6吋·全麥·不加醬）",
+      "store": "Subway",
+      "calories": 320,
+      "protein_g": 22,
+      "carbs_g": 38,
+      "fat_g": 12,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql9dtz7_27",
+      "name": "義式肉丸潛艇堡（6吋·全麥）",
+      "store": "Subway",
+      "calories": 420,
+      "protein_g": 20,
+      "carbs_g": 52,
+      "fat_g": 14,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dtzo_35",
+      "name": "雞蛋起司潛艇堡（6吋·全麥）",
+      "store": "Subway",
+      "calories": 380,
+      "protein_g": 18,
+      "carbs_g": 42,
+      "fat_g": 14,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dtzp_38",
+      "name": "培根雞蛋潛艇堡（6吋·全麥）",
+      "store": "Subway",
+      "calories": 420,
+      "protein_g": 22,
+      "carbs_g": 40,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dtzt_44",
+      "name": "洋芋片（小包）",
+      "store": "Subway",
+      "calories": 150,
+      "protein_g": 2,
+      "carbs_g": 18,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dtzv_50",
+      "name": "甜蝦握壽司（2貫）",
+      "store": "爭鮮迴轉壽司",
+      "calories": 110,
+      "protein_g": 7,
+      "carbs_g": 18,
+      "fat_g": 1,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql9du00_54",
+      "name": "鮭魚細卷（8切）",
+      "store": "爭鮮迴轉壽司",
+      "calories": 220,
+      "protein_g": 10,
+      "carbs_g": 36,
+      "fat_g": 3,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql9du02_57",
+      "name": "加州卷（8切）",
+      "store": "爭鮮迴轉壽司",
+      "calories": 250,
+      "protein_g": 8,
+      "carbs_g": 38,
+      "fat_g": 6,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql9du05_61",
+      "name": "海鮮丼",
+      "store": "爭鮮迴轉壽司",
+      "calories": 520,
+      "protein_g": 32,
+      "carbs_g": 72,
+      "fat_g": 10,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mql9du06_64",
+      "name": "鮭魚生魚片（5片）",
+      "store": "爭鮮迴轉壽司",
+      "calories": 180,
+      "protein_g": 24,
+      "carbs_g": 0,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du09_72",
+      "name": "鮭魚握壽司（2貫）",
+      "store": "爭鮮PLUS",
+      "calories": 175,
+      "protein_g": 9.5,
+      "carbs_g": 21,
+      "fat_g": 5.5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du0n_76",
+      "name": "極上綜合壽司（12貫）",
+      "store": "爭鮮PLUS",
+      "calories": 580,
+      "protein_g": 34,
+      "carbs_g": 78,
+      "fat_g": 12,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du0o_81",
+      "name": "晶瑩鮮蝦饺",
+      "store": "點點心",
+      "calories": 180,
+      "protein_g": 8,
+      "carbs_g": 24,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du0p_84",
+      "name": "香煎蘿蔔糕（3件）",
+      "store": "點點心",
+      "calories": 220,
+      "protein_g": 4,
+      "carbs_g": 32,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du0r_87",
+      "name": "真係叉燒包（3件）",
+      "store": "點點心",
+      "calories": 320,
+      "protein_g": 12,
+      "carbs_g": 48,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du0s_90",
+      "name": "鳳爪（2件）",
+      "store": "點點心",
+      "calories": 160,
+      "protein_g": 14,
+      "carbs_g": 6,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du0x_93",
+      "name": "牛肉腸粉",
+      "store": "點點心",
+      "calories": 280,
+      "protein_g": 12,
+      "carbs_g": 42,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du12_96",
+      "name": "酥皮焗蛋撻（2件）",
+      "store": "點點心",
+      "calories": 280,
+      "protein_g": 6,
+      "carbs_g": 32,
+      "fat_g": 14,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du1j_99",
+      "name": "冰火菠蘿油",
+      "store": "點點心",
+      "calories": 420,
+      "protein_g": 8,
+      "carbs_g": 52,
+      "fat_g": 20,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du1q_102",
+      "name": "皮蛋瘦肉粥",
+      "store": "點點心",
+      "calories": 320,
+      "protein_g": 16,
+      "carbs_g": 48,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du1u_105",
+      "name": "揚州炒飯",
+      "store": "點點心",
+      "calories": 520,
+      "protein_g": 16,
+      "carbs_g": 72,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du1v_108",
+      "name": "鮮蝦雲吞麵",
+      "store": "點點心",
+      "calories": 480,
+      "protein_g": 22,
+      "carbs_g": 62,
+      "fat_g": 12,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du1x_111",
+      "name": "點心拼盤套餐（4款）",
+      "store": "點點心",
+      "calories": 620,
+      "protein_g": 24,
+      "carbs_g": 78,
+      "fat_g": 20,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du1y_114",
+      "name": "及第粥套餐",
+      "store": "點點心",
+      "calories": 450,
+      "protein_g": 20,
+      "carbs_g": 58,
+      "fat_g": 12,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du20_119",
+      "name": "綠咖哩雞套餐",
+      "store": "新光三越美食街",
+      "calories": 680,
+      "protein_g": 28,
+      "carbs_g": 72,
+      "fat_g": 32,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du21_122",
+      "name": "泰式炒河粉（雞肉）",
+      "store": "新光三越美食街",
+      "calories": 620,
+      "protein_g": 26,
+      "carbs_g": 78,
+      "fat_g": 22,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du22_125",
+      "name": "豚骨拉麵",
+      "store": "新光三越美食街",
+      "calories": 580,
+      "protein_g": 24,
+      "carbs_g": 72,
+      "fat_g": 20,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du23_128",
+      "name": "菲力牛排套餐",
+      "store": "新光三越美食街",
+      "calories": 720,
+      "protein_g": 42,
+      "carbs_g": 48,
+      "fat_g": 36,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du24_131",
+      "name": "石鍋拌飯（牛肉）",
+      "store": "新光三越美食街",
+      "calories": 640,
+      "protein_g": 28,
+      "carbs_g": 82,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du25_134",
+      "name": "奶油培根義大利麵",
+      "store": "新光三越美食街",
+      "calories": 680,
+      "protein_g": 22,
+      "carbs_g": 78,
+      "fat_g": 28,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du2h_137",
+      "name": "親子丼定食",
+      "store": "新光三越美食街",
+      "calories": 580,
+      "protein_g": 28,
+      "carbs_g": 72,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du2l_142",
+      "name": "打拋豬肉片套餐",
+      "store": "微風廣場美食街",
+      "calories": 720,
+      "protein_g": 30,
+      "carbs_g": 75,
+      "fat_g": 34,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du2m_145",
+      "name": "雞胸凱薩沙拉",
+      "store": "微風廣場美食街",
+      "calories": 380,
+      "protein_g": 32,
+      "carbs_g": 18,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du2o_148",
+      "name": "紅燒牛肉麵",
+      "store": "微風廣場美食街",
+      "calories": 620,
+      "protein_g": 32,
+      "carbs_g": 72,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du2s_151",
+      "name": "個人麻辣鍋",
+      "store": "微風廣場美食街",
+      "calories": 580,
+      "protein_g": 28,
+      "carbs_g": 32,
+      "fat_g": 32,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du2w_154",
+      "name": "綜合壽司定食",
+      "store": "微風廣場美食街",
+      "calories": 520,
+      "protein_g": 26,
+      "carbs_g": 68,
+      "fat_g": 12,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du2z_159",
+      "name": "咖哩豬排飯",
+      "store": "SOGO美食街",
+      "calories": 720,
+      "protein_g": 24,
+      "carbs_g": 82,
+      "fat_g": 28,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du30_162",
+      "name": "牛丼（中）",
+      "store": "SOGO美食街",
+      "calories": 650,
+      "protein_g": 30,
+      "carbs_g": 82,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du31_165",
+      "name": "鍋貼（10顆）+ 酸辣湯",
+      "store": "SOGO美食街",
+      "calories": 480,
+      "protein_g": 22,
+      "carbs_g": 52,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du32_168",
+      "name": "鐵板牛柳套餐",
+      "store": "SOGO美食街",
+      "calories": 680,
+      "protein_g": 36,
+      "carbs_g": 58,
+      "fat_g": 28,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du33_173",
+      "name": "晶瑩鮮蝦饺套餐",
+      "store": "京站美食街",
+      "calories": 480,
+      "protein_g": 18,
+      "carbs_g": 58,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du34_176",
+      "name": "味噌拉麵",
+      "store": "京站美食街",
+      "calories": 540,
+      "protein_g": 22,
+      "carbs_g": 68,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du3a_179",
+      "name": "雞腿便當",
+      "store": "京站美食街",
+      "calories": 620,
+      "protein_g": 32,
+      "carbs_g": 72,
+      "fat_g": 20,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du3b_184",
+      "name": "海鮮義大利麵",
+      "store": "遠東百貨美食街",
+      "calories": 620,
+      "protein_g": 26,
+      "carbs_g": 72,
+      "fat_g": 22,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du3c_187",
+      "name": "韓式炸雞套餐",
+      "store": "遠東百貨美食街",
+      "calories": 780,
+      "protein_g": 32,
+      "carbs_g": 68,
+      "fat_g": 38,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du3d_190",
+      "name": "港式飲茶套餐",
+      "store": "遠東百貨美食街",
+      "calories": 580,
+      "protein_g": 22,
+      "carbs_g": 72,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du3e_195",
+      "name": "經典牛肉堡套餐",
+      "store": "誠品生活美食街",
+      "calories": 720,
+      "protein_g": 32,
+      "carbs_g": 68,
+      "fat_g": 32,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du3f_198",
+      "name": "炙燒鮭魚握壽司定食",
+      "store": "誠品生活美食街",
+      "calories": 520,
+      "protein_g": 30,
+      "carbs_g": 62,
+      "fat_g": 14,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du3l_202",
+      "name": "頌丹樂",
+      "store": "7-11",
+      "calories": 369,
+      "protein_g": 30,
+      "carbs_g": 46,
+      "fat_g": 10,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du3s_208",
+      "name": "潮粵坊",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du4i_218",
+      "name": "109元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9du5b_225",
+      "name": "阜杭豆漿饅頭夾豬排蛋",
+      "store": "7-11",
+      "calories": 382.5,
+      "protein_g": 30.5,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9du5s_236",
+      "name": "晶華嫩雞鮮蔬貝果堡",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du6c_248",
+      "name": "帕泰家",
+      "store": "7-11",
+      "calories": 668,
+      "protein_g": 53,
+      "carbs_g": 84,
+      "fat_g": 19,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du6k_252",
+      "name": "晶英滷肉刈包",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du6m_255",
+      "name": "88元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9du6p_258",
+      "name": "馨苑干貝海鮮煲粥",
+      "store": "7-11",
+      "calories": 175,
+      "protein_g": 14,
+      "carbs_g": 22,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du6v_263",
+      "name": "晶英酒店布朗尼蛋糕棒",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du75_267",
+      "name": "晶英酒店奶凍蜜瓜包",
+      "store": "7-11",
+      "calories": 258,
+      "protein_g": 21,
+      "carbs_g": 32,
+      "fat_g": 7,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du79_273",
+      "name": "香辣魷魚拌麵",
+      "store": "7-11",
+      "calories": 565,
+      "protein_g": 45,
+      "carbs_g": 71,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du7o_279",
+      "name": "可口紅燒牛肉麵",
+      "store": "7-11",
+      "calories": 610,
+      "protein_g": 49,
+      "carbs_g": 76,
+      "fat_g": 17,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du88_287",
+      "name": "法式起司燻培根厚土司",
+      "store": "7-11",
+      "calories": 387,
+      "protein_g": 31,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du8y_294",
+      "name": "21Plus糯米參雞湯",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du91_297",
+      "name": "韓式醬燉蛋",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du94_300",
+      "name": "59元",
+      "store": "7-11",
+      "calories": 424.5,
+      "protein_g": 34,
+      "carbs_g": 53.5,
+      "fat_g": 12,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du99_303",
+      "name": "韓式辣醬起司洋芋燒",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du9c_306",
+      "name": "白種元韓式牛肉拌飯",
+      "store": "7-11",
+      "calories": 546,
+      "protein_g": 44,
+      "carbs_g": 68,
+      "fat_g": 15,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du9k_310",
+      "name": "白種元韓式洋釀拌拌炸雞",
+      "store": "7-11",
+      "calories": 284,
+      "protein_g": 23,
+      "carbs_g": 36,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9du9s_314",
+      "name": "加賀屋",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dua4_319",
+      "name": "熱壓土司",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duaa_322",
+      "name": "60元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duay_329",
+      "name": "星級饗宴X晶華",
+      "store": "7-11",
+      "calories": 224,
+      "protein_g": 18,
+      "carbs_g": 28,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dub7_333",
+      "name": "星級饗宴x晶華法式牛肉丸焗烤飯",
+      "store": "7-11",
+      "calories": 379,
+      "protein_g": 30,
+      "carbs_g": 47,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dud1_359",
+      "name": "香辣椰奶雞肉義大利麵",
+      "store": "7-11",
+      "calories": 641,
+      "protein_g": 51,
+      "carbs_g": 80,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dud8_363",
+      "name": "瑪格麗特筆管麵",
+      "store": "7-11",
+      "calories": 632,
+      "protein_g": 51,
+      "carbs_g": 79,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dudk_367",
+      "name": "鮮蝦明太子冷義大利麵",
+      "store": "7-11",
+      "calories": 382,
+      "protein_g": 31,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dudt_371",
+      "name": "SAY",
+      "store": "7-11",
+      "calories": 733,
+      "protein_g": 59,
+      "carbs_g": 92,
+      "fat_g": 20,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9due9_375",
+      "name": "烤雞奶香焗飯",
+      "store": "7-11",
+      "calories": 642,
+      "protein_g": 51,
+      "carbs_g": 80,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duei_379",
+      "name": "真飽貪心雙醬義大利麵",
+      "store": "7-11",
+      "calories": 767,
+      "protein_g": 61,
+      "carbs_g": 96,
+      "fat_g": 21,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duem_382",
+      "name": "三起司肉醬焗飯",
+      "store": "7-11",
+      "calories": 670,
+      "protein_g": 54,
+      "carbs_g": 84,
+      "fat_g": 19,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duey_386",
+      "name": "蝦仁白醬焗烤飯",
+      "store": "7-11",
+      "calories": 567,
+      "protein_g": 45,
+      "carbs_g": 71,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dufy_390",
+      "name": "半熟玉子辣擔擔義大利麵",
+      "store": "7-11",
+      "calories": 573,
+      "protein_g": 46,
+      "carbs_g": 72,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dug7_394",
+      "name": "雙拼起司紅醬焗飯",
+      "store": "7-11",
+      "calories": 684,
+      "protein_g": 55,
+      "carbs_g": 86,
+      "fat_g": 19,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dugb_397",
+      "name": "海鮮青醬焗飯",
+      "store": "7-11",
+      "calories": 490,
+      "protein_g": 39,
+      "carbs_g": 61,
+      "fat_g": 14,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dugk_401",
+      "name": "香蒜奶油雙拼義大利麵",
+      "store": "7-11",
+      "calories": 646,
+      "protein_g": 52,
+      "carbs_g": 81,
+      "fat_g": 18,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dugu_405",
+      "name": "奶油蛋黃醬培根義大利麵",
+      "store": "7-11",
+      "calories": 594,
+      "protein_g": 48,
+      "carbs_g": 74,
+      "fat_g": 17,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duh7_409",
+      "name": "焗烤奶油蝦仁通心粉",
+      "store": "7-11",
+      "calories": 532,
+      "protein_g": 43,
+      "carbs_g": 67,
+      "fat_g": 15,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duhf_413",
+      "name": "青醬蛤蠣義大利麵",
+      "store": "7-11",
+      "calories": 666,
+      "protein_g": 53,
+      "carbs_g": 83,
+      "fat_g": 19,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duhm_416",
+      "name": "烤雞燻腸白醬焗飯",
+      "store": "7-11",
+      "calories": 592,
+      "protein_g": 47,
+      "carbs_g": 74,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duhv_420",
+      "name": "三起司燻腸完熟番茄義大利麵",
+      "store": "7-11",
+      "calories": 692,
+      "protein_g": 55,
+      "carbs_g": 87,
+      "fat_g": 19,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dui6_424",
+      "name": "香蒜白酒蛤蠣義大利麵",
+      "store": "7-11",
+      "calories": 450,
+      "protein_g": 36,
+      "carbs_g": 56,
+      "fat_g": 13,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duif_428",
+      "name": "義式蕃茄肉醬義大利麵",
+      "store": "7-11",
+      "calories": 609,
+      "protein_g": 49,
+      "carbs_g": 76,
+      "fat_g": 17,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duj3_434",
+      "name": "陽明春天香辣豆腐拌麵香辣入味豆腐x特製波浪麵熱量493kca",
+      "store": "7-11",
+      "calories": 493,
+      "protein_g": 39,
+      "carbs_g": 62,
+      "fat_g": 14,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dujl_440",
+      "name": "日式豆皮蕎麥風味冷麵熱量398kcal65元",
+      "store": "7-11",
+      "calories": 392,
+      "protein_g": 31.33,
+      "carbs_g": 49.33,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9duju_444",
+      "name": "陽明春天南洋咖哩燴飯熱量627kcal89元",
+      "store": "7-11",
+      "calories": 627,
+      "protein_g": 50,
+      "carbs_g": 78,
+      "fat_g": 17,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9duka_450",
+      "name": "經典獅子頭燴飯熱量537kcal89元",
+      "store": "7-11",
+      "calories": 537,
+      "protein_g": 43,
+      "carbs_g": 67,
+      "fat_g": 15,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dukz_456",
+      "name": "彩蔬堅果青醬筆管麵帕瑪森起司X堅果青醬熱量715kcal89",
+      "store": "7-11",
+      "calories": 715,
+      "protein_g": 57,
+      "carbs_g": 89,
+      "fat_g": 20,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9duld_460",
+      "name": "麻油菇菇油飯麻油薑香",
+      "store": "7-11",
+      "calories": 419,
+      "protein_g": 34,
+      "carbs_g": 52.5,
+      "fat_g": 11.5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dulv_466",
+      "name": "松露蕈菇燕麥粥65元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dum6_470",
+      "name": "松露菇菇燉飯",
+      "store": "7-11",
+      "calories": 520,
+      "protein_g": 42,
+      "carbs_g": 65,
+      "fat_g": 14,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duna_478",
+      "name": "隨緣川味時蔬炒飯",
+      "store": "7-11",
+      "calories": 520,
+      "protein_g": 42,
+      "carbs_g": 65,
+      "fat_g": 14,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dunf_481",
+      "name": "隨緣白醬松露義大利麵",
+      "store": "7-11",
+      "calories": 420,
+      "protein_g": 34,
+      "carbs_g": 53,
+      "fat_g": 12,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duno_484",
+      "name": "塔香鹹蔬雞球",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duo0_489",
+      "name": "陽明春天古早味香菇竹筍粥",
+      "store": "7-11",
+      "calories": 189,
+      "protein_g": 15,
+      "carbs_g": 24,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duou_495",
+      "name": "香辣堅果蛋炒飯",
+      "store": "7-11",
+      "calories": 585,
+      "protein_g": 47,
+      "carbs_g": 73,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dupb_499",
+      "name": "油香椒麻蒟蒻",
+      "store": "7-11",
+      "calories": 170,
+      "protein_g": 14,
+      "carbs_g": 21,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dupr_503",
+      "name": "弘揚植物肉青花椒熟水餃",
+      "store": "7-11",
+      "calories": 206,
+      "protein_g": 16,
+      "carbs_g": 26,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duqq_508",
+      "name": "桂冠素三杯炒飯",
+      "store": "7-11",
+      "calories": 620,
+      "protein_g": 50,
+      "carbs_g": 78,
+      "fat_g": 17,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9durp_512",
+      "name": "桂冠素青醬野菇義大利麵",
+      "store": "7-11",
+      "calories": 533,
+      "protein_g": 43,
+      "carbs_g": 67,
+      "fat_g": 15,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dusy_516",
+      "name": "松珍素沙嗲醬爆蝦",
+      "store": "7-11",
+      "calories": 178,
+      "protein_g": 14,
+      "carbs_g": 22,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dutc_520",
+      "name": "松珍素鮮嫩炸雞塊",
+      "store": "7-11",
+      "calories": 200,
+      "protein_g": 16,
+      "carbs_g": 25,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dutu_524",
+      "name": "松珍素花枝丸",
+      "store": "7-11",
+      "calories": 133,
+      "protein_g": 11,
+      "carbs_g": 17,
+      "fat_g": 4,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duuz_532",
+      "name": "TOMMI私房花雕雞腿排米漢堡",
+      "store": "7-11",
+      "calories": 320,
+      "protein_g": 26,
+      "carbs_g": 40,
+      "fat_g": 9,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duw9_540",
+      "name": "日本豆皮壽司",
+      "store": "7-11",
+      "calories": 300,
+      "protein_g": 24,
+      "carbs_g": 38,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duxn_547",
+      "name": "爆漿燻腸起司飯卷",
+      "store": "7-11",
+      "calories": 505,
+      "protein_g": 40,
+      "carbs_g": 63,
+      "fat_g": 14,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duyn_553",
+      "name": "林聰明",
+      "store": "7-11",
+      "calories": 226,
+      "protein_g": 18,
+      "carbs_g": 28,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duzh_560",
+      "name": "鮪魚肉鬆雙手卷",
+      "store": "7-11",
+      "calories": 404,
+      "protein_g": 32,
+      "carbs_g": 51,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9duzx_564",
+      "name": "北海道秋鮭鮪魚雙手卷",
+      "store": "7-11",
+      "calories": 364,
+      "protein_g": 29,
+      "carbs_g": 46,
+      "fat_g": 10,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv23_579",
+      "name": "太和殿麻辣烤雞堡",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv2a_582",
+      "name": "檸檬卡士達綜合水果三明治",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv2l_585",
+      "name": "重量級",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv2s_588",
+      "name": "日式雞蛋沙拉三明治",
+      "store": "7-11",
+      "calories": 280,
+      "protein_g": 22,
+      "carbs_g": 35,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv36_591",
+      "name": "塔塔香炸鱈魚堡",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv3l_594",
+      "name": "牛肉起司堡",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv3y_597",
+      "name": "四起司燻腸捲餅",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv46_600",
+      "name": "起司四重奏三明治",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv4g_603",
+      "name": "吉士香雞蛋堡",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv4x_607",
+      "name": "35元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv55_610",
+      "name": "草莓乳酪三明治",
+      "store": "7-11",
+      "calories": 188,
+      "protein_g": 15,
+      "carbs_g": 23.5,
+      "fat_g": 5.5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv5l_614",
+      "name": "醬燒里肌鮮蔬三明治",
+      "store": "7-11",
+      "calories": 268,
+      "protein_g": 21,
+      "carbs_g": 34,
+      "fat_g": 7,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv68_618",
+      "name": "小龍蝦沙拉三明治",
+      "store": "7-11",
+      "calories": 280,
+      "protein_g": 22,
+      "carbs_g": 35,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv6y_625",
+      "name": "70元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv7x_631",
+      "name": "焗烤雙起司鮪魚三明治",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv88_634",
+      "name": "拔絲起司法式三明治",
+      "store": "7-11",
+      "calories": 305,
+      "protein_g": 24,
+      "carbs_g": 38,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv93_639",
+      "name": "溏心蛋紐奧良風味烤雞三明治",
+      "store": "7-11",
+      "calories": 235,
+      "protein_g": 19,
+      "carbs_g": 29,
+      "fat_g": 7,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv9c_642",
+      "name": "鮪魚洋芋溏心蛋三明治",
+      "store": "7-11",
+      "calories": 281,
+      "protein_g": 22,
+      "carbs_g": 35,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dv9x_646",
+      "name": "紐西蘭樂淇蘋果2入",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dva5_649",
+      "name": "鮮果繽紛杯",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvap_655",
+      "name": "美國空運藍莓盒",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvaz_658",
+      "name": "紐西蘭黃金奇異果2入",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvb6_661",
+      "name": "愛文芒果切片",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvbh_664",
+      "name": "台灣上等蕉550g",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvbr_667",
+      "name": "和風生鮭",
+      "store": "7-11",
+      "calories": 51,
+      "protein_g": 4,
+      "carbs_g": 6,
+      "fat_g": 1,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvch_672",
+      "name": "紐西蘭星空蘋果切片",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvcr_675",
+      "name": "冰沁情人果",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvcz_678",
+      "name": "搖搖沙拉",
+      "store": "7-11",
+      "calories": 280,
+      "protein_g": 22,
+      "carbs_g": 35,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvda_681",
+      "name": "法式尼斯沙拉",
+      "store": "7-11",
+      "calories": 280,
+      "protein_g": 22,
+      "carbs_g": 35,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvdi_684",
+      "name": "西瓜鑽石杯",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvdt_687",
+      "name": "台塑有機山菠菜250g",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dve4_690",
+      "name": "小菜籃有機地瓜葉",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dveb_693",
+      "name": "繽紛水果拼盤",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dven_696",
+      "name": "橘肉洋香瓜切片",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvev_699",
+      "name": "21Plus地中海風味雞肉麵沙拉",
+      "store": "7-11",
+      "calories": 280,
+      "protein_g": 22,
+      "carbs_g": 35,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvfs_704",
+      "name": "一日野菜",
+      "store": "7-11",
+      "calories": 96,
+      "protein_g": 8,
+      "carbs_g": 12,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvgf_708",
+      "name": "綠寶石無籽葡萄杯",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvgn_711",
+      "name": "優格繽紛蔬果棒",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvgx_714",
+      "name": "蜜香木瓜切片",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvh5_717",
+      "name": "安昕有機玉米筍",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvhu_721",
+      "name": "台塑有機玉米筍300g",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvi3_724",
+      "name": "台塑有機胡蘿蔔200",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvie_727",
+      "name": "台塑有機節瓜200",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvir_730",
+      "name": "76元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvj2_733",
+      "name": "台塑有機牛番茄300g",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvjr_737",
+      "name": "台塑有機青椒400g",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvkr_742",
+      "name": "凱薩雞肉沙拉",
+      "store": "7-11",
+      "calories": 280,
+      "protein_g": 22,
+      "carbs_g": 35,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvl2_745",
+      "name": "蔥鹽手撕雞沙拉",
+      "store": "7-11",
+      "calories": 280,
+      "protein_g": 22,
+      "carbs_g": 35,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvm7_751",
+      "name": "台塑有機羽衣甘藍",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvmk_754",
+      "name": "台塑有機芝麻葉",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvmx_757",
+      "name": "台塑有機青江菜",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvn7_760",
+      "name": "溏心蛋洋芋",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvnj_763",
+      "name": "薯泥鮮蔬蛋沙拉",
+      "store": "7-11",
+      "calories": 280,
+      "protein_g": 22,
+      "carbs_g": 35,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvnv_766",
+      "name": "有機高麗菜",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvoh_770",
+      "name": "29元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvot_773",
+      "name": "有機小白菜",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvp2_776",
+      "name": "安昕有機青江菜",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvpd_779",
+      "name": "50元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvpz_783",
+      "name": "安昕有機黑葉白菜",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvqq_787",
+      "name": "芝麻葉海鮮佐義式油醋沙拉",
+      "store": "7-11",
+      "calories": 139,
+      "protein_g": 11,
+      "carbs_g": 17,
+      "fat_g": 4,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvrd_791",
+      "name": "煙燻鮭魚",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvro_794",
+      "name": "和風胡麻醬",
+      "store": "7-11",
+      "calories": 171,
+      "protein_g": 14,
+      "carbs_g": 21,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvsi_798",
+      "name": "蔬果和風醬",
+      "store": "7-11",
+      "calories": 28,
+      "protein_g": 2,
+      "carbs_g": 4,
+      "fat_g": 1,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvt8_802",
+      "name": "千島醬",
+      "store": "7-11",
+      "calories": 122,
+      "protein_g": 10,
+      "carbs_g": 15,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvuh_807",
+      "name": "20元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvuv_810",
+      "name": "台灣香蕉重量分享包",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvva_813",
+      "name": "30元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvvj_816",
+      "name": "黃金玉米棒",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvvv_819",
+      "name": "水果玉米棒",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvxt_827",
+      "name": "台塑有機苦瓜",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dvz3_833",
+      "name": "太陽有機山菠菜",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvzf_836",
+      "name": "太陽有機空心菜",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dvzo_839",
+      "name": "新鮮族產銷青江菜",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dw0k_844",
+      "name": "新鮮族洋蔥",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw1b_848",
+      "name": "台塑鮮蒜仁120g",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw1k_851",
+      "name": "台塑有機蒜頭",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw1y_854",
+      "name": "台塑有機粉蔥",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw2u_859",
+      "name": "台塑嚴選台灣乾香菇",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw3r_864",
+      "name": "台塑有機金針菇",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw44_867",
+      "name": "42元",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw4e_870",
+      "name": "台塑有機黑木耳",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw4q_873",
+      "name": "好菇道鴻喜菇",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw5c_877",
+      "name": "好菇道舞菇",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw5n_880",
+      "name": "好菇道雪白菇",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw5y_883",
+      "name": "如記真空玉米筍",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw6k_888",
+      "name": "這不是滷肉飯",
+      "store": "7-11",
+      "calories": 406,
+      "protein_g": 32,
+      "carbs_g": 51,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw7i_893",
+      "name": "肉絲黃金蛋炒飯",
+      "store": "7-11",
+      "calories": 616,
+      "protein_g": 49,
+      "carbs_g": 77,
+      "fat_g": 17,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw8g_898",
+      "name": "紅燒牛雙寶燴飯",
+      "store": "7-11",
+      "calories": 574,
+      "protein_g": 46,
+      "carbs_g": 72,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dw92_903",
+      "name": "Homeal",
+      "store": "7-11",
+      "calories": 592,
+      "protein_g": 47,
+      "carbs_g": 74,
+      "fat_g": 16,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwa3_908",
+      "name": "熱量295",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dwae_911",
+      "name": "熱量408",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwb3_915",
+      "name": "鄧師傅花生豬腳",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwbd_918",
+      "name": "呷七碗栗志鮑粽",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwbq_921",
+      "name": "膳馨綠竹筍排骨湯",
+      "store": "7-11",
+      "calories": 103,
+      "protein_g": 8,
+      "carbs_g": 13,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwcf_925",
+      "name": "山內雞肉椒麻雞腳",
+      "store": "7-11",
+      "calories": 223,
+      "protein_g": 18,
+      "carbs_g": 28,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwcq_928",
+      "name": "元進莊櫸木燻鴨",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwd2_931",
+      "name": "馨苑傳統南部粽",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwdg_934",
+      "name": "呷七碗經典北部粽",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwdp_937",
+      "name": "蜂蜜香烤雞翅",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwe1_940",
+      "name": "美而美玉米起司蛋餅",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwed_943",
+      "name": "富錦樹三合一味噌湯",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwf3_947",
+      "name": "恩美萊辣傑克起司棒",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwfh_950",
+      "name": "韓式麻藥溏心蛋",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwfv_953",
+      "name": "黑金松露嫩雞胸",
+      "store": "7-11",
+      "calories": 146,
+      "protein_g": 12,
+      "carbs_g": 18,
+      "fat_g": 4,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwgm_957",
+      "name": "飛燕煉乳炸銀絲卷",
+      "store": "7-11",
+      "calories": 265,
+      "protein_g": 21,
+      "carbs_g": 33,
+      "fat_g": 7,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwha_961",
+      "name": "左營劉家酸菜白肉冬粉",
+      "store": "7-11",
+      "calories": 163,
+      "protein_g": 13,
+      "carbs_g": 20,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwi3_965",
+      "name": "鹽烤麻辣雞心",
+      "store": "7-11",
+      "calories": 132,
+      "protein_g": 11,
+      "carbs_g": 17,
+      "fat_g": 4,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwis_969",
+      "name": "21Plus玉米雞肉熟水餃",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwj5_972",
+      "name": "粥天子",
+      "store": "7-11",
+      "calories": 152,
+      "protein_g": 12,
+      "carbs_g": 19,
+      "fat_g": 4,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwju_976",
+      "name": "Simple",
+      "store": "7-11",
+      "calories": 167,
+      "protein_g": 13,
+      "carbs_g": 21,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwkj_980",
+      "name": "馨苑涼拌干絲",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwkx_983",
+      "name": "21Plus藜麥毛豆嫩雞丁",
+      "store": "7-11",
+      "calories": 161,
+      "protein_g": 13,
+      "carbs_g": 20,
+      "fat_g": 4,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwlk_987",
+      "name": "御料小館紫米飯",
+      "store": "7-11",
+      "calories": 520,
+      "protein_g": 42,
+      "carbs_g": 65,
+      "fat_g": 14,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwly_990",
+      "name": "鮪魚雞蛋蔬菜捲餅",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwmc_993",
+      "name": "火腿起司蛋凱薩堡",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 1
+    },
+    {
+      "id": "item_mql9dwmo_996",
+      "name": "21Plusx瓜瓜園紫薯QQ球",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwmz_999",
+      "name": "熱量268",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwno_1002",
+      "name": "十二月",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwo1_1005",
+      "name": "呷七碗古早味肉燥炒冬粉",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwob_1008",
+      "name": "呷七碗櫻花蝦炒炊粉",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwon_1011",
+      "name": "石安牧場椒麻溫泉蛋",
+      "store": "7-11",
+      "calories": 106,
+      "protein_g": 8,
+      "carbs_g": 13,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwpj_1015",
+      "name": "法蘭希迷你布里乾酪",
+      "store": "7-11",
+      "calories": 67,
+      "protein_g": 5,
+      "carbs_g": 8,
+      "fat_g": 2,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwqg_1019",
+      "name": "恩美萊紅切達起司棒",
+      "store": "7-11",
+      "calories": 113,
+      "protein_g": 9,
+      "carbs_g": 14,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwr5_1023",
+      "name": "阿桐阿寶四神湯",
+      "store": "7-11",
+      "calories": 114,
+      "protein_g": 9,
+      "carbs_g": 14,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwrv_1027",
+      "name": "元進莊薑母鴨",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dws8_1030",
+      "name": "熱量231",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwsp_1033",
+      "name": "日式半熟蛋",
+      "store": "7-11",
+      "calories": 63,
+      "protein_g": 5,
+      "carbs_g": 8,
+      "fat_g": 2,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwtf_1037",
+      "name": "宗家府泡菜80g",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwtt_1040",
+      "name": "熱量100g",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwu8_1043",
+      "name": "凱薩風味嫩雞鮮蔬捲餅",
+      "store": "7-11",
+      "calories": 171,
+      "protein_g": 14,
+      "carbs_g": 21,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwuk_1046",
+      "name": "21Plus甘梅薯條",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwva_1050",
+      "name": "蝦排總匯三明治",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwvo_1053",
+      "name": "快樂牛乾酪切片",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dww5_1056",
+      "name": "安博格迷你有鹽奶油6入",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwwk_1059",
+      "name": "及第豬肉熟水餃",
+      "store": "7-11",
+      "calories": 430,
+      "protein_g": 34,
+      "carbs_g": 54,
+      "fat_g": 12,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwxb_1063",
+      "name": "及第小籠湯包",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwxn_1066",
+      "name": "中一排骨",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwyt_1069",
+      "name": "大腸肉羹麵線",
+      "store": "7-11",
+      "calories": 209,
+      "protein_g": 17,
+      "carbs_g": 26,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dwzv_1073",
+      "name": "滷鼎記麻辣雞胗",
+      "store": "7-11",
+      "calories": 120,
+      "protein_g": 10,
+      "carbs_g": 15,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dx0u_1077",
+      "name": "小腸豬血湯",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dx1p_1081",
+      "name": "醬烤牛五花捲餅",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dx2n_1084",
+      "name": "恩美萊手撕起司棒",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dx3d_1087",
+      "name": "熱量85",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dx4f_1090",
+      "name": "博客海鹽嫩雞胸",
+      "store": "7-11",
+      "calories": 99,
+      "protein_g": 8,
+      "carbs_g": 12,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dx6l_1097",
+      "name": "熱量165",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dx71_1100",
+      "name": "獨饗薄皮黃金煎餃",
+      "store": "7-11",
+      "calories": 276,
+      "protein_g": 22,
+      "carbs_g": 35,
+      "fat_g": 8,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dx8h_1104",
+      "name": "滿漢小香腸_青花椒",
+      "store": "7-11",
+      "calories": 221,
+      "protein_g": 18,
+      "carbs_g": 28,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dx8u_1107",
+      "name": "Marinfood煙燻乾酪",
+      "store": "7-11",
+      "calories": 170,
+      "protein_g": 14,
+      "carbs_g": 21,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxbx_1111",
+      "name": "21Plus剝皮辣椒雞胸肉",
+      "store": "7-11",
+      "calories": 163,
+      "protein_g": 13,
+      "carbs_g": 20,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxcn_1114",
+      "name": "馨苑薑絲鱸魚湯",
+      "store": "7-11",
+      "calories": 84,
+      "protein_g": 7,
+      "carbs_g": 11,
+      "fat_g": 2,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxez_1118",
+      "name": "滷鼎記香滷鵪鶉蛋",
+      "store": "7-11",
+      "calories": 176,
+      "protein_g": 14,
+      "carbs_g": 22,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxhi_1122",
+      "name": "十三香烤雞翅",
+      "store": "7-11",
+      "calories": 232,
+      "protein_g": 19,
+      "carbs_g": 29,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxim_1126",
+      "name": "21Plus秘製炭火雞肉串",
+      "store": "7-11",
+      "calories": 114,
+      "protein_g": 9,
+      "carbs_g": 14,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxlo_1130",
+      "name": "冰心地瓜",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxme_1133",
+      "name": "乾杯炭火燒肉包",
+      "store": "7-11",
+      "calories": 263,
+      "protein_g": 21,
+      "carbs_g": 33,
+      "fat_g": 7,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxpk_1137",
+      "name": "雞肉蛋白棒",
+      "store": "7-11",
+      "calories": 163,
+      "protein_g": 13,
+      "carbs_g": 20,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxrv_1140",
+      "name": "21xBEING",
+      "store": "7-11",
+      "calories": 120,
+      "protein_g": 10,
+      "carbs_g": 15,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxth_1144",
+      "name": "麻辣椒香豬血煲",
+      "store": "7-11",
+      "calories": 338,
+      "protein_g": 27,
+      "carbs_g": 42,
+      "fat_g": 9,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxuj_1148",
+      "name": "當歸湯",
+      "store": "7-11",
+      "calories": 380,
+      "protein_g": 30,
+      "carbs_g": 48,
+      "fat_g": 11,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxv0_1151",
+      "name": "永心鳳茶剝皮辣椒燉雞盅",
+      "store": "7-11",
+      "calories": 130,
+      "protein_g": 10,
+      "carbs_g": 16,
+      "fat_g": 4,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxvv_1155",
+      "name": "芋頭排骨酥湯",
+      "store": "7-11",
+      "calories": 207,
+      "protein_g": 17,
+      "carbs_g": 26,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxwn_1158",
+      "name": "麻油米血",
+      "store": "7-11",
+      "calories": 145,
+      "protein_g": 12,
+      "carbs_g": 18,
+      "fat_g": 4,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxx2_1161",
+      "name": "筒仔米糕",
+      "store": "7-11",
+      "calories": 207,
+      "protein_g": 17,
+      "carbs_g": 26,
+      "fat_g": 6,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxxc_1164",
+      "name": "膳馨原盅厚菇燉雞湯",
+      "store": "7-11",
+      "calories": 138,
+      "protein_g": 11,
+      "carbs_g": 17,
+      "fat_g": 4,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxy2_1168",
+      "name": "石安牧場剝皮辣椒茶碗蒸",
+      "store": "7-11",
+      "calories": 94,
+      "protein_g": 8,
+      "carbs_g": 12,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxyw_1172",
+      "name": "石安牧場蔬食茶碗蒸",
+      "store": "7-11",
+      "calories": 98,
+      "protein_g": 8,
+      "carbs_g": 12,
+      "fat_g": 3,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dxzo_1176",
+      "name": "台畜煙燻豬肝100g",
+      "store": "7-11",
+      "calories": 146,
+      "protein_g": 12,
+      "carbs_g": 18,
+      "fat_g": 4,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dy09_1179",
+      "name": "如記真空綠竹筍",
+      "store": "7-11",
+      "calories": 28,
+      "protein_g": 2,
+      "carbs_g": 4,
+      "fat_g": 1,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mql9dy0k_1182",
+      "name": "厚燒玉子",
+      "store": "7-11",
+      "calories": 164,
+      "protein_g": 13,
+      "carbs_g": 21,
+      "fat_g": 5,
+      "confidence": 0.95
+    },
+    {
+      "id": "item_mqladn8n_628",
+      "name": "薯條（中）",
+      "store": "麥當勞",
+      "calories": 334.62,
+      "protein_g": 4,
+      "carbs_g": 42,
+      "fat_g": 15.46,
+      "confidence": 0.8
+    },
+    {
+      "id": "item_mqladu0q_1954",
+      "name": "維多麥",
+      "store": "Weetabix",
+      "calories": 362,
+      "protein_g": 12,
+      "carbs_g": 69,
+      "fat_g": 2,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu0s_1958",
+      "name": "Noir extra fondant",
+      "store": "Lindt",
+      "calories": 534,
+      "protein_g": 6.5,
+      "carbs_g": 51,
+      "fat_g": 32,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu0w_1962",
+      "name": "Gratin dauphinois à la crème fraîche",
+      "store": "Carrefour",
+      "calories": 67,
+      "protein_g": 1.4,
+      "carbs_g": 9.5,
+      "fat_g": 2.3,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu0y_1966",
+      "name": "豆瓣酱",
+      "store": "Lee Kum Kee",
+      "calories": 83.33,
+      "protein_g": 0,
+      "carbs_g": 16.67,
+      "fat_g": 0,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu10_1970",
+      "name": "Tabasco",
+      "store": "Tabasco",
+      "calories": 16,
+      "protein_g": 1,
+      "carbs_g": 1.6,
+      "fat_g": 0.7,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu12_1974",
+      "name": "New England Clam Chowder",
+      "store": "Campbell's Chunky",
+      "calories": 81.2,
+      "protein_g": 2.5,
+      "carbs_g": 7.29,
+      "fat_g": 4.58,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu14_1978",
+      "name": "Jellied Cranberry Sauce",
+      "store": "Ocean Spray",
+      "calories": 171.43,
+      "protein_g": 0,
+      "carbs_g": 42.86,
+      "fat_g": 0,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu16_1982",
+      "name": "Pic's Really Good Peanut Butter Crunchy No Salt",
+      "store": "PIC's Peanut Butter",
+      "calories": 603.89,
+      "protein_g": 26.33,
+      "carbs_g": 11.33,
+      "fat_g": 49,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu1b_1990",
+      "name": "Salami Cheese",
+      "store": "Spomlek",
+      "calories": 352,
+      "protein_g": 26,
+      "carbs_g": 1.3,
+      "fat_g": 27,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu1d_1994",
+      "name": "Soft Baked Grain Bars Strawberry Banana",
+      "store": "Gerber",
+      "calories": 368.42,
+      "protein_g": 5.26,
+      "carbs_g": 68.42,
+      "fat_g": 7.89,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu1f_1998",
+      "name": "Shih-chuan Mirin Vinegar 17.6 FL Oz",
+      "store": "supermarket",
+      "calories": 164,
+      "protein_g": 0.1,
+      "carbs_g": 40.8,
+      "fat_g": 0,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu1k_2006",
+      "name": "Grinder Pepper Mix 45g Niko",
+      "store": "Niko",
+      "calories": 330,
+      "protein_g": 10,
+      "carbs_g": 66,
+      "fat_g": 2.7,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu1m_2010",
+      "name": "Nature Valley Protein Bar",
+      "store": "Nature Valley",
+      "calories": 196,
+      "protein_g": 10.2,
+      "carbs_g": 15.4,
+      "fat_g": 11.3,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu1o_2013",
+      "name": "Double Choco",
+      "store": "Oreo",
+      "calories": 520,
+      "protein_g": 8,
+      "carbs_g": 60,
+      "fat_g": 24,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu1s_2017",
+      "name": "伴天下朝天辣油",
+      "store": "WEIYI ENTERPRISE CORPORATION",
+      "calories": 828,
+      "protein_g": 0,
+      "carbs_g": 0,
+      "fat_g": 92,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu1y_2021",
+      "name": "Hot Chili Sauce",
+      "store": "SOS Chili Hau Sanh",
+      "calories": 45.8,
+      "protein_g": 0.4,
+      "carbs_g": 10.6,
+      "fat_g": 0.2,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu20_2025",
+      "name": "Frozen Broccoli",
+      "store": "EZCHEF",
+      "calories": 26.17,
+      "protein_g": 3,
+      "carbs_g": 4.58,
+      "fat_g": 0.17,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu22_2029",
+      "name": "Malibu Pineapple",
+      "store": "Malibu",
+      "calories": 78,
+      "carbs_g": 0,
+      "fat_g": 0,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu24_2033",
+      "name": "Crunchy Oat Granola Breakfast Cereal with a Touch of Honey",
+      "store": "Fitnessse",
+      "calories": 412,
+      "protein_g": 8.9,
+      "carbs_g": 76.2,
+      "fat_g": 9.6,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu25_2037",
+      "name": "La nocciola",
+      "store": "Witor's",
+      "calories": 537,
+      "protein_g": 7.5,
+      "carbs_g": 53.9,
+      "fat_g": 31.6,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu29_2041",
+      "name": "Mama Instant Noodle - Shrimp Creamy Tom Yum - 1 X 60G",
+      "store": "มาม่า",
+      "calories": 490.91,
+      "carbs_g": 0,
+      "fat_g": 0,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu2b_2045",
+      "name": "ZANETTI Mascarpone Cheese",
+      "store": "Zanetti",
+      "calories": 352,
+      "protein_g": 4,
+      "carbs_g": 5.3,
+      "fat_g": 35,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu2f_2053",
+      "name": "アクエリアス",
+      "store": "The Coca-Cola Company",
+      "calories": 18.5,
+      "protein_g": 0,
+      "carbs_g": 4.65,
+      "fat_g": 0,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu2h_2057",
+      "name": "inゼリー　マルチビタミン　グレープフルーツ味",
+      "store": "Morinaga",
+      "calories": 50,
+      "protein_g": 0,
+      "carbs_g": 12.5,
+      "fat_g": 0,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu2l_2064",
+      "name": "President unt 100 grame",
+      "store": "President",
+      "calories": 745,
+      "protein_g": 0.7,
+      "carbs_g": 1,
+      "fat_g": 82,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu2r_2068",
+      "name": "Camembert",
+      "store": "Emborg",
+      "calories": 290,
+      "protein_g": 19,
+      "carbs_g": 0.1,
+      "fat_g": 24,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu2u_2072",
+      "name": "乳香世家高品質純鮮乳",
+      "store": "KUANG CHUAN DAIRY",
+      "calories": 66.1,
+      "protein_g": 3.3,
+      "carbs_g": 4.9,
+      "fat_g": 3.7,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu2w_2076",
+      "name": "Kellogg's Corn Flake",
+      "store": "Kellog's",
+      "calories": 380,
+      "protein_g": 7,
+      "carbs_g": 87,
+      "fat_g": 1,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu2y_2080",
+      "name": "Li Jinli Eight Immortals Fruit",
+      "store": "Lee Chin Li",
+      "calories": 332,
+      "protein_g": 3.8,
+      "carbs_g": 70.3,
+      "fat_g": 4,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu31_2084",
+      "name": "Nutrition Biscuits",
+      "store": "Ju Shui Xuan",
+      "calories": 425.71,
+      "protein_g": 7.14,
+      "carbs_g": 80,
+      "fat_g": 8.57,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu33_2088",
+      "name": "Kuang Chuan OAT Oat Milk",
+      "store": "Kuang Chuan",
+      "calories": 52.77,
+      "protein_g": 1.31,
+      "carbs_g": 9.2,
+      "fat_g": 1.31,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu38_2092",
+      "name": "質立希臘式優格（無加糖）",
+      "store": "台灣比菲多",
+      "calories": 114,
+      "protein_g": 4,
+      "carbs_g": 13.2,
+      "fat_g": 5,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu3g_2104",
+      "name": "洋芋片（原味）",
+      "store": "品客",
+      "calories": 520,
+      "protein_g": 5.2,
+      "carbs_g": 64,
+      "fat_g": 28.4,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu3o_2108",
+      "name": "Cashews salt and pepper",
+      "store": "Dan-D Pak",
+      "calories": 650,
+      "protein_g": 17.5,
+      "carbs_g": 25,
+      "fat_g": 52.5,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu3q_2112",
+      "name": "MM Elephant Thai Roasted Seaweed-Cool Spicy Flavour",
+      "store": "Mammoth",
+      "calories": 320,
+      "protein_g": 20,
+      "carbs_g": 60,
+      "fat_g": 0,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu3s_2116",
+      "name": "有機紅棗枸杞銀耳露",
+      "store": "統一生機",
+      "calories": 16,
+      "protein_g": 0,
+      "carbs_g": 4,
+      "fat_g": 0,
+      "confidence": 0.85
+    },
+    {
+      "id": "item_mqladu3y_2124",
+      "name": "Salsa dip",
+      "store": "La Costeña",
+      "calories": 32,
+      "protein_g": 0,
+      "carbs_g": 6.45,
+      "fat_g": 0,
+      "confidence": 0.85
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import type { EatOutPreferences, UserMemoryState } from './meal-engine-types'
 import { budgetMaxForMeal } from './meal-engine-types'
 import { isSanitizedMenuItem } from './meal-combo-validity'
 import { isPlausibleBrandItem } from './store-menu-plausibility'
+import { passesMenuAccessGate, type MenuAccessMode } from './nutrition/menu-confidence-runtime'
 
 const MEAT_KEYWORDS = ['雞', '鴨', '肉', '蝦', '鮪', '牛', '豬', '魚', '蛤', '蚵', '鮭', '培根', '香腸']
 const DAIRY_KEYWORDS = ['蛋', '乳', '奶', '起司', '優格']
@@ -88,13 +89,15 @@ export function getFilteredMenu(
   mealType: MealType,
   profile?: UserProfile | null,
   memory?: UserMemoryState,
-  opts?: { includeBeverages?: boolean; source?: ConvenienceItem[] }
+  opts?: { includeBeverages?: boolean; source?: ConvenienceItem[]; mode?: MenuAccessMode }
 ): ConvenienceItem[] {
+  const mode = opts?.mode ?? 'recommend'
   let items = (opts?.source ?? eatOutMenu).filter(
     i =>
       i.category === mealType &&
       isSanitizedMenuItem(i, { allowBeverages: opts?.includeBeverages }) &&
-      isPlausibleBrandItem(i)
+      isPlausibleBrandItem(i) &&
+      passesMenuAccessGate(i, mode)
   )
   items = filterByProfile(items, profile)
   items = filterByBudget(items, mealType, profile, memory?.eat_out_prefs)

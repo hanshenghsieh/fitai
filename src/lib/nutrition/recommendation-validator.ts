@@ -12,17 +12,29 @@ import {
   computeNutritionGaps,
   passesNutritionGapFilter,
 } from './nutrition-gap-filter'
+import {
+  evaluateMenuItemConfidence,
+  passesMenuAccessGate,
+  type MenuAccessMode,
+} from './menu-confidence-runtime'
+import { resolveNutritionTrace } from './nutrition-source-trace'
 
 export interface ValidationResult {
   valid: boolean
   reasons: string[]
+  confidence?: 'A' | 'B' | 'C' | 'D'
+  nutrition_trace?: ReturnType<typeof resolveNutritionTrace>
 }
 
 function uniqueStores(lines: MealLine[]): string[] {
   return [...new Set(lines.map(l => l.item.store))]
 }
 
-export function validateMenuItem(item: ConvenienceItem, registry?: RestaurantMenuRegistry): ValidationResult {
+export function validateMenuItem(
+  item: ConvenienceItem,
+  registry?: RestaurantMenuRegistry,
+  mode: MenuAccessMode = 'recommend'
+): ValidationResult {
   const reg = registry ?? getRestaurantMenuRegistry()
   const reasons: string[] = []
   const store = (item.store ?? '').trim()
@@ -46,7 +58,15 @@ export function validateMenuItem(item: ConvenienceItem, registry?: RestaurantMen
   if (registered && registered.store !== item.store) {
     reasons.push(`餐點與店家不匹配：${item.name} @ ${item.store}`)
   }
-  return { valid: reasons.length === 0, reasons }
+  const confidence = evaluateMenuItemConfidence(item, reg)
+  if (!passesMenuAccessGate(item, mode)) {
+    if (mode === 'recommend') {
+      reasons.push(`confidence ${confidence} 不可推薦（僅 A/B 可推薦）`)
+    } else {
+      reasons.push(`confidence ${confidence} 已封鎖`)
+    }
+  }
+  return { valid: reasons.length === 0, reasons, confidence, nutrition_trace: resolveNutritionTrace(item) }
 }
 
 export function validateMealLines(lines: MealLine[], ctx: SuggestContext): ValidationResult {
