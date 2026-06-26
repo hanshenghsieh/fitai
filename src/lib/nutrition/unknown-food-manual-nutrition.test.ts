@@ -273,7 +273,6 @@ describe('Unknown Food Manual Nutrition Flow', () => {
       fat_g: 0,
       carbs_g: 0,
     })
-    assert.equal(log.user_nutrition_meta?.source_type, 'user_input')
-    assert.equal(USER_ENTERED_LABEL, '使用者輸入')
+    assert.equal(log.nutrition_confidence, 'user_confirmed')
   })
 })

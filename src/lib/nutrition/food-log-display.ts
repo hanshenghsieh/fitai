@@ -3,20 +3,49 @@ import type { FoodLogEntry, FoodNutritionStatus } from '@/lib/banks/types'
 export const NUTRITION_PENDING_LABEL = '營養待確認'
 export const USER_ENTERED_LABEL = '使用者輸入'
 
-export function isNutritionUnknown(log: Pick<FoodLogEntry, 'nutrition_status' | 'calories' | 'protein_g'>): boolean {
-  if (log.nutrition_status === 'unknown') return true
-  if (log.nutrition_status === 'estimated_pending_confirmation') return true
+const PENDING_STATUSES = new Set<FoodLogEntry['nutrition_status']>([
+  'unknown',
+  'pending_confirmation',
+  'pending_review',
+  'estimated_pending_confirmation',
+])
+
+export function isNutritionPendingConfirmation(
+  log: Pick<FoodLogEntry, 'nutrition_status' | 'calories' | 'protein_g'>
+): boolean {
+  if (log.nutrition_status && PENDING_STATUSES.has(log.nutrition_status)) return true
   return log.calories == null && log.protein_g == null && log.nutrition_status !== 'user_entered'
+}
+
+/** @alias isNutritionPendingConfirmation */
+export function isNutritionUnknown(log: Pick<FoodLogEntry, 'nutrition_status' | 'calories' | 'protein_g'>): boolean {
+  return isNutritionPendingConfirmation(log)
+}
+
+export function countPendingNutritionLogs(logs: FoodLogEntry[]): number {
+  return logs.filter(isNutritionPendingConfirmation).length
+}
+
+export function filterPendingNutritionLogs(logs: FoodLogEntry[]): FoodLogEntry[] {
+  return logs.filter(isNutritionPendingConfirmation)
 }
 
 export function isUserEnteredNutrition(log: Pick<FoodLogEntry, 'nutrition_status'>): boolean {
   return log.nutrition_status === 'user_entered'
 }
 
+export const AUTO_RESOLVED_LABEL = 'BetterBit 已補齊'
+
+export function isAutoResolvedNutrition(log: Pick<FoodLogEntry, 'nutrition_status'>): boolean {
+  return log.nutrition_status === 'auto_resolved'
+}
+
 export function countsTowardDailyTotals(log: FoodLogEntry): boolean {
-  if (log.nutrition_status === 'unknown') return false
-  if (log.nutrition_status === 'estimated_pending_confirmation') return false
-  if (log.capture_status === 'photo_only' && log.nutrition_status !== 'user_entered') return false
+  if (isNutritionPendingConfirmation(log)) return false
+  if (log.nutrition_status === 'pending_review') return false
+  if (log.capture_status === 'photo_only' && log.nutrition_status !== 'user_entered' && log.nutrition_status !== 'auto_resolved') {
+    return false
+  }
   return log.calories != null && log.protein_g != null
 }
 
@@ -28,7 +57,7 @@ export function formatMacroValue(value: number | null | undefined, unit: string)
 export function formatLogCaloriesLine(
   log: Pick<FoodLogEntry, 'nutrition_status' | 'calories' | 'protein_g'>
 ): string {
-  if (isNutritionUnknown(log)) return NUTRITION_PENDING_LABEL
+  if (isNutritionPendingConfirmation(log)) return NUTRITION_PENDING_LABEL
   if (log.calories == null) return NUTRITION_PENDING_LABEL
   return `${log.calories} kcal`
 }
@@ -36,7 +65,7 @@ export function formatLogCaloriesLine(
 export function formatLogProteinLine(
   log: Pick<FoodLogEntry, 'nutrition_status' | 'calories' | 'protein_g'>
 ): string {
-  if (isNutritionUnknown(log)) return ''
+  if (isNutritionPendingConfirmation(log)) return ''
   if (log.protein_g == null) return ''
   return `蛋白質 ${log.protein_g}g`
 }
@@ -44,7 +73,7 @@ export function formatLogProteinLine(
 export function formatLogMacroSummary(
   log: Pick<FoodLogEntry, 'nutrition_status' | 'calories' | 'protein_g'>
 ): string {
-  if (isNutritionUnknown(log)) return NUTRITION_PENDING_LABEL
+  if (isNutritionPendingConfirmation(log)) return NUTRITION_PENDING_LABEL
   const cal = log.calories
   const pro = log.protein_g
   if (cal == null && pro == null) return NUTRITION_PENDING_LABEL
@@ -55,7 +84,9 @@ export function formatLogMacroSummary(
 
 export function nutritionStatusBadge(log: Pick<FoodLogEntry, 'nutrition_status'>): string | null {
   if (log.nutrition_status === 'user_entered') return USER_ENTERED_LABEL
+  if (log.nutrition_status === 'auto_resolved') return AUTO_RESOLVED_LABEL
   if (log.nutrition_status === 'estimated_pending_confirmation') return '待確認'
+  if (log.nutrition_status === 'pending_review') return '待審核'
   return null
 }
 
@@ -66,7 +97,7 @@ export interface MacroDisplayItem {
 }
 
 export function formatItemMacroLine(item: MacroDisplayItem): string {
-  if (isNutritionUnknown(item)) return NUTRITION_PENDING_LABEL
+  if (isNutritionPendingConfirmation(item)) return NUTRITION_PENDING_LABEL
   const cal = item.calories
   const pro = item.protein_g
   if (cal == null && pro == null) return NUTRITION_PENDING_LABEL
@@ -83,7 +114,7 @@ export function sumDisplayMacros(items: MacroDisplayItem[]): { calories: number 
   let hasUnknown = false
 
   for (const item of items) {
-    if (isNutritionUnknown(item)) {
+    if (isNutritionPendingConfirmation(item)) {
       hasUnknown = true
       continue
     }

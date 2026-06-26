@@ -4,6 +4,9 @@ export type NutritionStatus =
   | 'official'
   | 'verified'
   | 'user_entered'
+  | 'auto_resolved'
+  | 'pending_review'
+  | 'pending_confirmation'
   | 'estimated_pending_confirmation'
   | 'estimated'
   | 'unknown'
@@ -75,7 +78,7 @@ export interface ClarificationSession {
   maxSteps: number
 }
 
-export type UnknownQueueStatus = 'waiting' | 'matched' | 'dismissed' | 'updated'
+export type UnknownQueueStatus = 'waiting' | 'matched' | 'dismissed' | 'updated' | 'pending_review'
 
 export interface UnknownQueueEntry {
   id: string

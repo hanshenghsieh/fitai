@@ -24,7 +24,7 @@ export function enrichFoodLog(log: FoodLogEntry): FoodLogEntry {
   if (
     log.nutrition_status === 'unknown' ||
     log.nutrition_status === 'estimated_pending_confirmation' ||
-    (log.capture_status === 'photo_only' && log.nutrition_status !== 'user_entered')
+    (log.capture_status === 'photo_only' && log.nutrition_status !== 'user_entered' && log.nutrition_status !== 'auto_resolved')
   ) {
     return log
   }

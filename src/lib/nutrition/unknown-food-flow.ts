@@ -88,7 +88,7 @@ export function applyManualNutritionToLog(log: FoodLogEntry, input: ManualNutrit
     fat_g: input.fat_g ?? undefined,
     carbs_g: input.carbs_g ?? undefined,
     nutrition_status: 'user_entered',
-    nutrition_confidence: 'Unknown',
+    nutrition_confidence: 'user_confirmed',
     capture_status: 'resolved',
     nutrition_accuracy_meta: {
       accuracy_level: partial ? 'D' : 'C',

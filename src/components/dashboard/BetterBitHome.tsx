@@ -19,8 +19,18 @@ import {
 import { toast } from 'sonner'
 import TodayHeader from '@/components/dashboard/today/TodayHeader'
 import TodayPosture from '@/components/dashboard/today/TodayPosture'
-import TodayHero from '@/components/dashboard/v2/TodayHero'
+import TodayHero, { filterPendingNutritionLogs } from '@/components/dashboard/v2/TodayHero'
 import TodayOS from '@/components/dashboard/TodayOS'
+import NutritionConfirmationSheet from '@/components/dashboard/today/NutritionConfirmationSheet'
+import PendingNutritionQueueSheet from '@/components/dashboard/today/PendingNutritionQueueSheet'
+import { enrichFoodLog } from '@/lib/food-log-macros'
+import {
+  applyManualNutritionToLog,
+  enqueueUnknownFromLog,
+  hitToFoodLogPatch,
+} from '@/lib/nutrition/unknown-food-flow'
+import type { MenuLookupHit } from '@/lib/food-menu-lookup'
+import type { ManualNutritionInput } from '@/lib/nutrition/unknown-food-flow'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { FoodDna } from '@/lib/food-memory'
@@ -337,6 +347,63 @@ export default function BetterBitHome({
     deleteLogRef.current = handler
   }, [])
 
+  const [confirmLog, setConfirmLog] = useState<FoodLogEntry | null>(null)
+  const [pendingQueueOpen, setPendingQueueOpen] = useState(false)
+
+  const confirmLogLive = useMemo(() => {
+    if (!confirmLog) return null
+    return displayFoodLogs.find(l => l.id === confirmLog.id) ?? confirmLog
+  }, [confirmLog, displayFoodLogs])
+
+  const pendingLogs = useMemo(() => filterPendingNutritionLogs(displayFoodLogs), [displayFoodLogs])
+
+  const patchFoodLog = useCallback(
+    (logId: string, patch: Partial<FoodLogEntry>) => {
+      const nextLogs = displayFoodLogs.map(l => {
+        if (l.id !== logId) return l
+        return enrichFoodLog({ ...l, ...patch })
+      })
+      handleLogFood(nextLogs, { ...userMemory, food_logs_today: nextLogs })
+    },
+    [displayFoodLogs, userMemory, handleLogFood]
+  )
+
+  const openNutritionConfirmation = useCallback((log: FoodLogEntry) => {
+    setConfirmLog(log)
+    enqueueUnknownFromLog(log)
+  }, [])
+
+  useEffect(() => {
+    for (const log of pendingLogs) {
+      enqueueUnknownFromLog(log)
+    }
+  }, [pendingLogs])
+
+  const handleConfirmVerified = useCallback(
+    (hit: MenuLookupHit) => {
+      if (!confirmLogLive) return
+      patchFoodLog(confirmLogLive.id, hitToFoodLogPatch(hit))
+      toast.message('已更新為可信營養資料')
+      setConfirmLog(null)
+    },
+    [confirmLogLive, patchFoodLog]
+  )
+
+  const handleManualNutritionSave = useCallback(
+    (logId: string, input: ManualNutritionInput) => {
+      const log = displayFoodLogs.find(l => l.id === logId) ?? confirmLogLive
+      if (!log) return
+      patchFoodLog(logId, applyManualNutritionToLog(log, input))
+      toast.message('已儲存營養資料', { description: '標記為使用者輸入，已計入今日統計。' })
+      setConfirmLog(null)
+    },
+    [displayFoodLogs, confirmLogLive, patchFoodLog]
+  )
+
+  const handleKeepTextRecord = useCallback((_logId: string) => {
+    setConfirmLog(null)
+  }, [])
+
   return (
     <>
       <TodayHeader trialDaysLeft={trialDaysLeft} />
@@ -351,6 +418,8 @@ export default function BetterBitHome({
         overTarget={intakeSummary.overTarget}
         foodLogs={displayFoodLogs}
         onDeleteLog={handleDeleteLog}
+        onConfirmNutrition={openNutritionConfirmation}
+        onOpenPendingQueue={() => setPendingQueueOpen(true)}
       />
 
       <div className="px-5 pb-32 max-w-[640px] mx-auto space-y-6" style={{ fontFamily: TODAY.font }}>
@@ -375,6 +444,7 @@ export default function BetterBitHome({
           onPostureLine={setPostureLine}
           onDiceApply={handleDiceApply}
           registerDeleteLog={registerDeleteLog}
+          onOpenNutritionConfirmation={openNutritionConfirmation}
         />
 
         {isPending && (
@@ -518,6 +588,22 @@ export default function BetterBitHome({
           </BBCard>
         ) : null}
       </div>
+
+      <PendingNutritionQueueSheet
+        open={pendingQueueOpen}
+        logs={pendingLogs}
+        onClose={() => setPendingQueueOpen(false)}
+        onSelectLog={log => openNutritionConfirmation(log)}
+      />
+
+      <NutritionConfirmationSheet
+        open={!!confirmLogLive}
+        log={confirmLogLive}
+        onClose={() => setConfirmLog(null)}
+        onConfirmVerified={handleConfirmVerified}
+        onManualSave={handleManualNutritionSave}
+        onKeepTextRecord={handleKeepTextRecord}
+      />
     </>
   )
 }

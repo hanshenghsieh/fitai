@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import { sumLoggedCarbs, sumLoggedFat } from '@/lib/food-log-macros'
+import { countPendingNutritionLogs, filterPendingNutritionLogs } from '@/lib/nutrition/food-log-display'
 import CalorieRing from './CalorieRing'
 import MacroBars from './MacroBars'
 import MealLogCard from './MealLogCard'
@@ -19,6 +20,8 @@ interface Props {
   overTarget?: boolean
   foodLogs?: FoodLogEntry[]
   onDeleteLog?: (id: string) => void
+  onConfirmNutrition?: (log: FoodLogEntry) => void
+  onOpenPendingQueue?: () => void
 }
 
 export default function TodayHero({
@@ -31,9 +34,12 @@ export default function TodayHero({
   overTarget = false,
   foodLogs = [],
   onDeleteLog,
+  onConfirmNutrition,
+  onOpenPendingQueue,
 }: Props) {
   const carbsLogged = sumLoggedCarbs(foodLogs)
   const fatLogged = sumLoggedFat(foodLogs)
+  const pendingCount = countPendingNutritionLogs(foodLogs)
 
   const sortedLogs = useMemo(
     () => [...foodLogs].sort((a, b) => b.logged_at.localeCompare(a.logged_at)),
@@ -64,12 +70,33 @@ export default function TodayHero({
 
       {sortedLogs.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-[17px] px-1" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-            今日餐點
-          </h2>
+          <div className="flex items-center justify-between gap-3 px-1">
+            <h2 className="text-[17px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+              今日餐點
+            </h2>
+            {pendingCount > 0 && onOpenPendingQueue && (
+              <button
+                type="button"
+                onClick={onOpenPendingQueue}
+                className="text-[13px] px-3 py-1 rounded-full active:opacity-80"
+                style={{
+                  color: BB_V2.accent.orange,
+                  fontWeight: 600,
+                  backgroundColor: 'rgba(232, 146, 74, 0.12)',
+                }}
+              >
+                待確認 {pendingCount}
+              </button>
+            )}
+          </div>
           <div className="space-y-3">
             {sortedLogs.map(log => (
-              <MealLogCard key={log.id} log={log} onDelete={onDeleteLog ? () => onDeleteLog(log.id) : undefined} />
+              <MealLogCard
+                key={log.id}
+                log={log}
+                onDelete={onDeleteLog ? () => onDeleteLog(log.id) : undefined}
+                onConfirmNutrition={onConfirmNutrition}
+              />
             ))}
           </div>
         </div>
@@ -77,3 +104,5 @@ export default function TodayHero({
     </div>
   )
 }
+
+export { filterPendingNutritionLogs }

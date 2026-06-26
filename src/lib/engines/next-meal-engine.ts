@@ -59,8 +59,17 @@ export const OVER_TARGET_COPY = {
 
 export function sumLoggedCalories(logs: FoodLogEntry[]): number {
   return logs.reduce((s, l) => {
-    if (l.nutrition_status === 'unknown' || l.nutrition_status === 'estimated_pending_confirmation') return s
-    if (l.capture_status === 'photo_only' && l.nutrition_status !== 'user_entered') return s
+    if (
+      l.nutrition_status === 'unknown' ||
+      l.nutrition_status === 'pending_confirmation' ||
+      l.nutrition_status === 'pending_review' ||
+      l.nutrition_status === 'estimated_pending_confirmation'
+    ) {
+      return s
+    }
+    if (l.capture_status === 'photo_only' && l.nutrition_status !== 'user_entered' && l.nutrition_status !== 'auto_resolved') {
+      return s
+    }
     if (l.calories == null) return s
     return s + l.calories
   }, 0)
@@ -68,8 +77,17 @@ export function sumLoggedCalories(logs: FoodLogEntry[]): number {
 
 export function sumLoggedProtein(logs: FoodLogEntry[]): number {
   return logs.reduce((s, l) => {
-    if (l.nutrition_status === 'unknown' || l.nutrition_status === 'estimated_pending_confirmation') return s
-    if (l.capture_status === 'photo_only' && l.nutrition_status !== 'user_entered') return s
+    if (
+      l.nutrition_status === 'unknown' ||
+      l.nutrition_status === 'pending_confirmation' ||
+      l.nutrition_status === 'pending_review' ||
+      l.nutrition_status === 'estimated_pending_confirmation'
+    ) {
+      return s
+    }
+    if (l.capture_status === 'photo_only' && l.nutrition_status !== 'user_entered' && l.nutrition_status !== 'auto_resolved') {
+      return s
+    }
     if (l.protein_g == null) return s
     return s + l.protein_g
   }, 0)

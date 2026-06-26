@@ -12,9 +12,17 @@ interface GoalSnap {
 }
 
 function logCountsTowardTotals(log: FoodLogEntry): boolean {
-  if (log.nutrition_status === 'unknown') return false
-  if (log.nutrition_status === 'estimated_pending_confirmation') return false
-  if (log.capture_status === 'photo_only' && log.nutrition_status !== 'user_entered') return false
+  if (
+    log.nutrition_status === 'unknown' ||
+    log.nutrition_status === 'pending_confirmation' ||
+    log.nutrition_status === 'pending_review' ||
+    log.nutrition_status === 'estimated_pending_confirmation'
+  ) {
+    return false
+  }
+  if (log.capture_status === 'photo_only' && log.nutrition_status !== 'user_entered' && log.nutrition_status !== 'auto_resolved') {
+    return false
+  }
   return log.calories != null && log.protein_g != null
 }
 
