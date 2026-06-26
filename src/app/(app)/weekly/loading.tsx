@@ -1,9 +1,9 @@
-import WeekScreenSkeleton from '@/components/week/WeekScreenSkeleton'
+import WeekPlanSkeleton from '@/components/dashboard/week/WeekPlanSkeleton'
 
 export default function WeeklyLoading() {
   return (
     <div className="min-h-screen">
-      <WeekScreenSkeleton />
+      <WeekPlanSkeleton />
     </div>
   )
 }

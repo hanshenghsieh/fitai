@@ -1,84 +1,95 @@
 export const dynamic = 'force-dynamic'
 
 import { Suspense } from 'react'
+import { format, startOfWeek, differenceInDays, parse } from 'date-fns'
 import { redirect } from 'next/navigation'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { getNutritionDayKey } from '@/lib/timezone'
-import { buildWeekSummary } from '@/lib/analytics/week-summary'
-import WeekScreen from '@/components/week/WeekScreen'
-import WeekScreenSkeleton from '@/components/week/WeekScreenSkeleton'
-import type { WeeklyPlanData } from '@/types'
-import {
-  buildDayPlansByDate,
-  loadAnalyticsBundle,
-  WEEK_ANALYTICS_LOOKBACK_DAYS,
-} from '@/lib/app/analytics-data'
+import WeeklyPlanView from '@/components/dashboard/WeeklyPlanView'
+import GeneratePlanButton from '@/components/dashboard/GeneratePlanButton'
+import ZaiJianPanel from '@/components/character/ZaiJianPanel'
+import WeekPlanSkeleton from '@/components/dashboard/week/WeekPlanSkeleton'
+import type { WeeklyFeedback, WeeklyPlanData } from '@/types'
 import { getAppUser } from '@/lib/supabase/app-session'
 
 async function WeekContent() {
   const { supabase, user } = await getAppUser()
   if (!user) redirect('/login')
 
-  const bundle = await loadAnalyticsBundle(supabase, user.id, WEEK_ANALYTICS_LOOKBACK_DAYS)
-  const dayPlansByDate = buildDayPlansByDate(bundle.weeklyPlans)
+  const now = new Date()
+  const todayStr = getNutritionDayKey(now)
+  const nutritionDate = parse(todayStr, 'yyyy-MM-dd', now)
+  const weekStart = format(startOfWeek(nutritionDate, { weekStartsOn: 1 }), 'yyyy-MM-dd')
+  const dayOfWeek = differenceInDays(nutritionDate, parse(weekStart, 'yyyy-MM-dd', now))
 
-  let latestTargets = { calories: 1800, protein_g: 120, water_ml: 2000, target_weight_kg: null as number | null }
-  let workoutTarget = 4
-  let fatTargetG = 60
+  const [{ data: weeklyPlan }, { data: checkins }, { data: feedback }] = await Promise.all([
+    supabase
+      .from('weekly_plans')
+      .select('plan_data, week_start, generation_status')
+      .eq('user_id', user.id)
+      .eq('week_start', weekStart)
+      .maybeSingle(),
+    supabase
+      .from('daily_checkins')
+      .select('checkin_date, diet_items, workout_items')
+      .eq('user_id', user.id)
+      .gte('checkin_date', weekStart),
+    supabase
+      .from('weekly_feedback')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('week_start', weekStart)
+      .maybeSingle(),
+  ])
 
-  const currentWeekPlan = bundle.weeklyPlans.find(p => p.week_start === bundle.weekStart)
-  const currentPlanData = currentWeekPlan?.plan_data as WeeklyPlanData | null
-  const todayPlan = currentPlanData?.days?.find(d => d.date === bundle.todayStr) ?? currentPlanData?.days?.[0]
-  if (todayPlan?.daily_targets) {
-    latestTargets = {
-      calories: todayPlan.daily_targets.calories,
-      protein_g: todayPlan.daily_targets.protein_g,
-      water_ml: todayPlan.daily_targets.water_ml,
-      target_weight_kg:
-        bundle.activeGoal?.target_weight_kg ?? currentPlanData?.goal_snapshot?.target_weight ?? null,
-    }
-    fatTargetG = todayPlan.daily_targets.fat_g
-  } else if (currentPlanData?.weekly_targets) {
-    latestTargets = {
-      calories: currentPlanData.weekly_targets.avg_daily_calories,
-      protein_g: currentPlanData.weekly_targets.avg_daily_protein_g,
-      water_ml: 2000,
-      target_weight_kg:
-        bundle.activeGoal?.target_weight_kg ?? currentPlanData?.goal_snapshot?.target_weight ?? null,
-    }
+  const planData = weeklyPlan?.plan_data as WeeklyPlanData | null
+  const checkinMap = Object.fromEntries((checkins ?? []).map(c => [c.checkin_date, c]))
+  const safeDayIndex = Math.min(Math.max(0, dayOfWeek), Math.max(0, (planData?.days?.length ?? 1) - 1))
+
+  if (weeklyPlan?.generation_status === 'generating') {
+    return <ZaiJianPanel moment="loading" />
   }
 
-  if (currentPlanData?.days) {
-    workoutTarget = currentPlanData.days.filter(d => d.workout?.type !== 'rest').length || 4
+  if (!weeklyPlan || !planData?.days?.length || weeklyPlan.generation_status === 'failed') {
+    return (
+      <div className="px-5 pt-12 pb-8 space-y-4">
+        <header>
+          <h1 className="text-[34px] leading-tight" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+            本週
+          </h1>
+          <p className="text-[15px] mt-2 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+            這週照計畫走。想吃什麼，去今日記就好。
+          </p>
+        </header>
+        <ZaiJianPanel moment="empty">
+          <GeneratePlanButton />
+        </ZaiJianPanel>
+      </div>
+    )
   }
 
-  const latestWeight =
-    bundle.measurements[bundle.measurements.length - 1]?.weight_kg ?? bundle.profileWeightKg ?? null
-
-  const summary = buildWeekSummary({
-    anchorDate: new Date(),
-    todayDate: bundle.todayStr,
-    measurements: bundle.measurements,
-    checkins: bundle.checkins,
-    targets: {
-      calories: latestTargets.calories,
-      protein_g: latestTargets.protein_g,
-      water_ml: latestTargets.water_ml,
-      target_weight_kg: latestTargets.target_weight_kg,
-    },
-    dayPlansByDate,
-    currentWeightKg: latestWeight,
-    workoutTarget,
-    fatTargetG,
-  })
-
-  return <WeekScreen summary={summary} />
+  return (
+    <div className="pb-4">
+      <div className="px-5 pt-4 pb-1">
+        <p className="text-[14px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+          這週照計畫走。想吃什麼，去今日記就好。
+        </p>
+      </div>
+      <WeeklyPlanView
+        planData={planData}
+        weekStart={weekStart}
+        todayDayIndex={safeDayIndex}
+        checkinMap={checkinMap}
+        existingFeedback={(feedback as WeeklyFeedback | null) ?? null}
+      />
+    </div>
+  )
 }
 
 export default function WeeklyPage() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: BB_V2.bg.canvas }}>
-      <Suspense fallback={<WeekScreenSkeleton />}>
+    <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: BB_V2.bg.canvas }}>
+      <Suspense fallback={<WeekPlanSkeleton />}>
         <WeekContent />
       </Suspense>
     </div>
