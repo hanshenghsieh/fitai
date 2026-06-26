@@ -9,9 +9,17 @@ import { TODAY } from '@/lib/today-design'
 import type { ConvenienceItem } from '@/lib/convenience-store-menu'
 import type { MealType } from '@/lib/checkin-utils'
 import type { LifeEventMode, WorkSchedule } from '@/lib/human-mode'
+import type { FoodNutritionStatus } from '@/lib/banks/types'
+import { formatItemMacroLine, formatTotalsLine } from '@/lib/nutrition/food-log-display'
+
+export interface MealPreviewItem extends Omit<ConvenienceItem, 'calories' | 'protein_g'> {
+  calories: number | null
+  protein_g: number | null
+  nutrition_status?: FoodNutritionStatus
+}
 
 interface Props {
-  items: ConvenienceItem[]
+  items: MealPreviewItem[]
   mealType?: MealType
   schedule?: WorkSchedule
   lifeEvent?: LifeEventMode | null
@@ -34,8 +42,6 @@ export default function DiceMealPreview({
   const [trustOpen, setTrustOpen] = useState(false)
   if (!items.length) return null
 
-  const totalCal = items.reduce((s, i) => s + (i.calories ?? 0), 0)
-  const totalPro = items.reduce((s, i) => s + (i.protein_g ?? 0), 0)
   const stores = [...new Set(items.map(i => i.store))]
   const storeLine =
     stores.length === 1
@@ -49,7 +55,7 @@ export default function DiceMealPreview({
     isCook: prefersCook,
     storeNames: stores,
   }
-  const trust = buildTrustFromSuggestion(highlightKey, items, trustCtx, highlightPriceMeta)
+  const trust = buildTrustFromSuggestion(highlightKey, items as ConvenienceItem[], trustCtx, highlightPriceMeta)
 
   return (
     <div className="space-y-6 py-2" style={{ fontFamily: TODAY.font }}>
@@ -64,14 +70,14 @@ export default function DiceMealPreview({
               {item.name}
             </p>
             <p className="text-[15px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-              {item.calories} kcal · 蛋白質 {item.protein_g}g
+              {formatItemMacroLine(item)}
             </p>
           </li>
         ))}
       </ul>
 
       <p className="text-[15px] pt-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-        合計 {totalCal} kcal · {Math.round(totalPro)}g 蛋白
+        {formatTotalsLine(items)}
       </p>
 
       <button

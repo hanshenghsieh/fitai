@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict'
 import { describe, it, beforeEach } from 'node:test'
-import { resolveOrEstimateFreeTextMeal, estimateFreeTextMeal } from './food-estimate'
+import {
+  createUnknownFreeTextMeal,
+  resolveOrEstimateFreeTextMeal,
+  estimateFreeTextMeal,
+} from './food-estimate'
 import { clearUnknownQueueForTests } from '@/lib/nutrition/search-v2/unknown-queue'
 
 beforeEach(() => clearUnknownQueueForTests())
@@ -25,6 +29,20 @@ describe('food-estimate Search V2', () => {
     const est = resolveOrEstimateFreeTextMeal('竹筍湯')
     assert.equal(est.blocked, true)
     assert.equal(est.calories, null)
+  })
+
+  it('creates unknown text record for 菜包 (no official nutrition)', () => {
+    const est = resolveOrEstimateFreeTextMeal('菜包')
+    assert.equal(est.blocked, undefined)
+    assert.equal(est.nutrition_status, 'unknown')
+    assert.equal(est.calories, null)
+  })
+
+  it('forceUnknown always committable even for ambiguous queries', () => {
+    const est = createUnknownFreeTextMeal('竹筍湯')
+    assert.equal(est.blocked, false)
+    assert.equal(est.nutrition_status, 'unknown')
+    assert.equal(est.name, '竹筍湯')
   })
 
   it('estimateFreeTextMeal never returns 632', () => {

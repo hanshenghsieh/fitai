@@ -28,6 +28,25 @@ export interface UserBanks {
   exercise: ExerciseBank
 }
 
+export type FoodNutritionStatus =
+  | 'official'
+  | 'verified'
+  | 'user_entered'
+  | 'estimated_pending_confirmation'
+  | 'unknown'
+
+export interface UserNutritionMeta {
+  source_type: 'user_input'
+  portion?: string
+  notes?: string
+  source_note?: string
+  entered_at: string
+  partial?: boolean
+  fiber_g?: number
+  sugar_g?: number
+  sodium_mg?: number
+}
+
 export interface FoodLogEntry {
   id: string
   name: string
@@ -52,8 +71,9 @@ export interface FoodLogEntry {
   /** UI category for fixed image pool — not used to search images */
   imageCategory?: import('@/lib/food-image-system').ImageCategory
   capture_status?: 'learning' | 'resolved' | 'needs_name' | 'photo_only'
-  nutrition_status?: 'official' | 'estimated' | 'unknown'
+  nutrition_status?: FoodNutritionStatus | 'estimated'
   nutrition_confidence?: 'A' | 'B' | 'C' | 'Unknown'
+  user_nutrition_meta?: UserNutritionMeta
   ai_confidence_pct?: number
   /** Nutrition Accuracy v1 metadata (client check-in JSON only) */
   nutrition_accuracy_meta?: {

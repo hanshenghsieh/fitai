@@ -1,6 +1,12 @@
 /** Nutrition Search V2 — shared types (Accuracy First) */
 
-export type NutritionStatus = 'official' | 'estimated' | 'unknown'
+export type NutritionStatus =
+  | 'official'
+  | 'verified'
+  | 'user_entered'
+  | 'estimated_pending_confirmation'
+  | 'estimated'
+  | 'unknown'
 
 /** A = official exact, B = official + clarification, C = trusted estimate (future), Unknown = text only */
 export type NutritionConfidence = 'A' | 'B' | 'C' | 'Unknown'
@@ -83,6 +89,13 @@ export interface UnknownQueueEntry {
   last_requested: string
   waiting_days: number
   possible_matches: string[]
+  user_entered_nutrition?: {
+    calories: number | null
+    protein_g: number | null
+    fat_g: number | null
+    carbs_g: number | null
+    partial?: boolean
+  } | null
   priority_score: number
   status: UnknownQueueStatus
 }

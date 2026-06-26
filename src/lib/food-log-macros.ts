@@ -21,7 +21,13 @@ export function resolveLogMacros(log: FoodLogEntry): { carbs_g: number; fat_g: n
 
 /** Backfill missing macros for display and future saves. Unknown records skip inference. */
 export function enrichFoodLog(log: FoodLogEntry): FoodLogEntry {
-  if (log.nutrition_status === 'unknown' || log.capture_status === 'photo_only') return log
+  if (
+    log.nutrition_status === 'unknown' ||
+    log.nutrition_status === 'estimated_pending_confirmation' ||
+    (log.capture_status === 'photo_only' && log.nutrition_status !== 'user_entered')
+  ) {
+    return log
+  }
   const { carbs_g, fat_g } = resolveLogMacros(log)
   if (log.carbs_g === carbs_g && log.fat_g === fat_g) return log
   return { ...log, carbs_g, fat_g }

@@ -10,6 +10,12 @@ import BBIcon from '@/components/icons/BBIcon'
 import { dietScoreIcon } from '@/components/icons'
 import FoodPhotoThumb from '@/components/dashboard/today/FoodPhotoThumb'
 import BBCard from '@/components/ui/BBCard'
+import {
+  formatLogCaloriesLine,
+  formatLogProteinLine,
+  isNutritionUnknown,
+  nutritionStatusBadge,
+} from '@/lib/nutrition/food-log-display'
 
 interface Props {
   log: FoodLogEntry
@@ -27,17 +33,20 @@ function formatTime(iso: string) {
 export default function MealLogCard({ log, onDelete }: Props) {
   const time = formatTime(log.logged_at)
   const hasPhoto = !!(log.photo_data_url || log.source === 'photo')
-  const dietScore = useMemo(
-    () =>
-      calculateDietScore({
-        name: log.name,
-        calories: log.calories,
-        protein_g: log.protein_g,
-        carbs_g: log.carbs_g,
-        fat_g: log.fat_g,
-      }),
-    [log.name, log.calories, log.protein_g, log.carbs_g, log.fat_g]
-  )
+  const unknown = isNutritionUnknown(log)
+  const badge = nutritionStatusBadge(log)
+  const dietScore = useMemo(() => {
+    if (unknown || log.calories == null) return null
+    return calculateDietScore({
+      name: log.name,
+      calories: log.calories,
+      protein_g: log.protein_g ?? 0,
+      carbs_g: log.carbs_g,
+      fat_g: log.fat_g,
+    })
+  }, [log.name, log.calories, log.protein_g, log.carbs_g, log.fat_g, unknown])
+
+  const proteinLine = formatLogProteinLine(log)
 
   return (
     <BBCard padding="16px 20px" className="flex items-center gap-4">
@@ -65,29 +74,44 @@ export default function MealLogCard({ log, onDelete }: Props) {
           {time && <span>{time}</span>}
           {time && log.store ? <span> · </span> : null}
           {log.store && <span>{log.store}</span>}
+          {badge && (
+            <span className="ml-1" style={{ color: BB_V2.accent.orange }}>
+              · {badge}
+            </span>
+          )}
         </p>
       </div>
       <div className="shrink-0 text-right flex items-center gap-2">
         <div>
-          <p className="text-[16px] tabular-nums" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-            {log.calories}
-          </p>
-          <p className="text-[11px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
-            kcal
-          </p>
           <p
-            className="text-[11px] tabular-nums mt-0.5 flex items-center justify-end gap-1"
-            style={{ color: BB_V2.text.secondary, fontWeight: 500 }}
-            title={dietScore.label}
-            aria-label={`減脂分數 ${dietScore.score}，${dietScore.label}`}
+            className="text-[16px] tabular-nums"
+            style={{
+              color: unknown ? BB_V2.accent.orange : BB_V2.text.primary,
+              fontWeight: unknown ? 600 : 700,
+            }}
           >
-            <BBIcon
-              name={dietScoreIcon(dietScore.signal)}
-              size={12}
-              tone={dietScore.signal === 'green' ? 'success' : dietScore.signal === 'yellow' ? 'warning' : 'danger'}
-            />
-            {dietScore.score}
+            {formatLogCaloriesLine(log)}
           </p>
+          {!unknown && proteinLine && (
+            <p className="text-[11px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
+              {proteinLine}
+            </p>
+          )}
+          {dietScore && (
+            <p
+              className="text-[11px] tabular-nums mt-0.5 flex items-center justify-end gap-1"
+              style={{ color: BB_V2.text.secondary, fontWeight: 500 }}
+              title={dietScore.label}
+              aria-label={`減脂分數 ${dietScore.score}，${dietScore.label}`}
+            >
+              <BBIcon
+                name={dietScoreIcon(dietScore.signal)}
+                size={12}
+                tone={dietScore.signal === 'green' ? 'success' : dietScore.signal === 'yellow' ? 'warning' : 'danger'}
+              />
+              {dietScore.score}
+            </p>
+          )}
         </div>
         {onDelete && (
           <button

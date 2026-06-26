@@ -32,7 +32,7 @@ interface Props {
   selectedFrequentId: string
   onSelectFrequent: (id: string) => void
   onCommitFrequent: (frequentId?: string) => void
-  onCreateFreeText?: (name: string) => void
+  onCreateFreeText?: (name: string, options?: { forceUnknown?: boolean }) => void
 }
 
 function FrequentRow({ food, onClick, compact }: { food: FrequentFood; onClick: () => void; compact?: boolean }) {
@@ -107,7 +107,7 @@ export default function TodayFoodMore({
 
   const handleCreate = () => {
     if (!trimmed || !onCreateFreeText) return
-    onCreateFreeText(trimmed)
+    onCreateFreeText(trimmed, noSearchHits ? { forceUnknown: true } : undefined)
   }
 
   return (

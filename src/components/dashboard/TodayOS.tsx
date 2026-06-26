@@ -4,7 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ClipboardList, Loader2, RefreshCw, Camera } from 'lucide-react'
 import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu } from '@/lib/food-search'
-import { estimateFreeTextMeal, resolveOrEstimateFreeTextMeal } from '@/lib/food-estimate'
+import {
+  createUnknownFreeTextMeal,
+  resolveOrEstimateFreeTextMeal,
+} from '@/lib/food-estimate'
 import { enrichFoodLog, sumItemMacros } from '@/lib/food-log-macros'
 import {
   fileToDataUrl,
@@ -56,10 +59,19 @@ import { preloadDiceMenuBulk, isDiceMenuBulkReady, getDiceMenuSource } from '@/l
 import { storesInText } from '@/lib/dice-store-names'
 import { linesToDisplayItems } from '@/lib/meal-suggest'
 import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
-import type { ConvenienceItem } from '@/lib/convenience-store-menu'
-import DiceMealPreview from '@/components/dashboard/DiceMealPreview'
+import DiceMealPreview, { type MealPreviewItem } from '@/components/dashboard/DiceMealPreview'
 import TodayFoodMore from '@/components/dashboard/today/TodayFoodMore'
+import UnknownFoodFlowSheet from '@/components/dashboard/today/UnknownFoodFlowSheet'
 import PhotoLogSheet, { type PhotoLogDraft } from '@/components/dashboard/today/PhotoLogSheet'
+import type { MenuLookupHit } from '@/lib/food-menu-lookup'
+import {
+  applyManualNutritionToLog,
+  enqueueUnknownFromLog,
+  hitToFoodLogPatch,
+  type ClarificationResolveResult,
+  type ManualNutritionInput,
+} from '@/lib/nutrition/unknown-food-flow'
+import { isNutritionUnknown } from '@/lib/nutrition/food-log-display'
 import {
   appendSeenForMeal,
   recordMealRoll,
@@ -89,10 +101,11 @@ function allItemNamesFromLogs(logs: FoodLogEntry[]): string[] {
   return [...new Set(logs.flatMap(l => l.name.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean)))]
 }
 
-function logToDisplayItems(log: FoodLogEntry): ConvenienceItem[] {
+function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
   const names = log.name.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean)
   if (!names.length) return []
   const store = log.store ?? '已記錄'
+  const unknown = isNutritionUnknown(log)
   if (names.length === 1) {
     return [
       {
@@ -104,15 +117,36 @@ function logToDisplayItems(log: FoodLogEntry): ConvenienceItem[] {
         role: 'main',
         portionable: false,
         tags: [],
-        calories: log.calories,
-        protein_g: log.protein_g,
+        calories: unknown ? null : log.calories,
+        protein_g: unknown ? null : log.protein_g,
         carbs_g: log.carbs_g ?? 0,
         fat_g: log.fat_g ?? 0,
         price: 0,
         photo_url: '',
         description: '',
+        nutrition_status: log.nutrition_status,
       },
     ]
+  }
+  if (unknown || log.calories == null || log.protein_g == null) {
+    return names.map((name, i) => ({
+      id: `${log.id}-${i}`,
+      name,
+      store,
+      source: 'convenience' as const,
+      category: 'lunch' as const,
+      role: 'main' as const,
+      portionable: false,
+      tags: [],
+      calories: null,
+      protein_g: null,
+      carbs_g: 0,
+      fat_g: 0,
+      price: 0,
+      photo_url: '',
+      description: '',
+      nutrition_status: log.nutrition_status,
+    }))
   }
   const perCal = Math.round(log.calories / names.length)
   const perPro = Math.round(log.protein_g / names.length)
@@ -132,6 +166,7 @@ function logToDisplayItems(log: FoodLogEntry): ConvenienceItem[] {
     price: 0,
     photo_url: '',
     description: '',
+    nutrition_status: log.nutrition_status,
   }))
 }
 
@@ -340,6 +375,7 @@ export default function TodayOS({
   const [photoDraft, setPhotoDraft] = useState<PhotoLogDraft | null>(null)
   const [photoSaving, setPhotoSaving] = useState(false)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+  const [unknownFlowLog, setUnknownFlowLog] = useState<FoodLogEntry | null>(null)
   const [query, setQuery] = useState('')
   const foodLogsRef = useRef(foodLogs)
   foodLogsRef.current = foodLogs
@@ -463,14 +499,18 @@ export default function TodayOS({
       loggingRef.current = true
       const current = foodLogsRef.current
       const prev = current.find(l => l.id === logId)
-      const nextLogs = current.map(l => (l.id === logId ? { ...l, ...patch } : l))
+      const nextLogs = current.map(l => {
+        if (l.id !== logId) return l
+        return enrichFoodLog({ ...l, ...patch })
+      })
       const updated = nextLogs.find(l => l.id === logId)
       let nextDna = userMemory.food_dna ?? foodDna
       if (updated && patch.capture_status === 'resolved' && updated.name !== '未知食物') {
         nextDna = learnFromLog(nextDna, updated)
       }
       const nextMemory = { ...userMemory, food_logs_today: nextLogs, food_dna: nextDna }
-      const delta = updated && prev ? updated.calories - prev.calories : 0
+      const delta =
+        updated && prev ? (updated.calories ?? 0) - (prev.calories ?? 0) : 0
       onLogFood(nextLogs, nextMemory)
       if (delta !== 0) schedulePostureLine(nextLogs, nextMemory, delta)
       queueMicrotask(() => {
@@ -479,6 +519,49 @@ export default function TodayOS({
     },
     [userMemory, foodDna, onLogFood, schedulePostureLine]
   )
+
+  const closeUnknownFlow = useCallback(() => {
+    setUnknownFlowLog(null)
+  }, [])
+
+  const handlePickVerifiedForUnknown = useCallback(
+    (hit: MenuLookupHit) => {
+      if (!unknownFlowLog) return
+      patchLog(unknownFlowLog.id, hitToFoodLogPatch(hit))
+      toast.message('已更新為可信營養資料')
+      closeUnknownFlow()
+    },
+    [unknownFlowLog, patchLog, closeUnknownFlow]
+  )
+
+  const handleManualNutritionSave = useCallback(
+    (logId: string, input: ManualNutritionInput) => {
+      const log = foodLogs.find(l => l.id === logId) ?? unknownFlowLog
+      if (!log) return
+      patchLog(logId, applyManualNutritionToLog(log, input))
+      toast.message('已儲存營養資料', { description: '標記為使用者輸入，已計入今日統計。' })
+      closeUnknownFlow()
+    },
+    [foodLogs, unknownFlowLog, patchLog, closeUnknownFlow]
+  )
+
+  const handleClarificationResolved = useCallback(
+    (logId: string, result: ClarificationResolveResult) => {
+      if (result.log_patch) {
+        patchLog(logId, result.log_patch)
+        toast.message(result.message)
+      } else {
+        toast.message(result.message)
+      }
+      closeUnknownFlow()
+    },
+    [patchLog, closeUnknownFlow]
+  )
+
+  const unknownFlowLogLive = useMemo(() => {
+    if (!unknownFlowLog) return null
+    return foodLogs.find(l => l.id === unknownFlowLog.id) ?? unknownFlowLog
+  }, [unknownFlowLog, foodLogs])
 
   const commitLog = useCallback(
     (entry: Omit<FoodLogEntry, 'logged_at' | 'user_declared'>) => {
@@ -905,17 +988,19 @@ export default function TodayOS({
     [commitLog]
   )
   const handleCreateFreeText = useCallback(
-    (name: string) => {
+    (name: string, options?: { forceUnknown?: boolean }) => {
       const trimmed = name.trim()
       if (!trimmed) return
-      const est = resolveOrEstimateFreeTextMeal(trimmed)
+      const est = options?.forceUnknown
+        ? createUnknownFreeTextMeal(trimmed)
+        : resolveOrEstimateFreeTextMeal(trimmed)
       if (est.blocked) {
         toast.message('需要再確認一下', {
           description: est.explanation ?? '請從搜尋建議選擇正確品項，或輸入更明確的菜名。',
         })
         return
       }
-      commitLog({
+      const pending: Omit<FoodLogEntry, 'logged_at' | 'user_declared'> = {
         id: est.id,
         name: est.name,
         store: est.store,
@@ -927,14 +1012,20 @@ export default function TodayOS({
         nutrition_status: est.nutrition_status,
         nutrition_confidence: est.nutrition_confidence,
         capture_status: est.capture_status,
-      })
+      }
+      commitLog(pending)
       if (est.nutrition_status === 'unknown') {
-        toast.message('已建立文字紀錄', {
-          description: '目前沒有可信營養資料；此筆不計入熱量統計。未來找到資料可一鍵更新。',
+        const full: FoodLogEntry = enrichFoodLog({
+          ...pending,
+          slot: activeSlot,
+          logged_at: new Date().toISOString(),
+          user_declared: true,
         })
+        enqueueUnknownFromLog(full)
+        setUnknownFlowLog(full)
       }
     },
-    [commitLog]
+    [commitLog, activeSlot]
   )
   const handleCommitFrequent = useCallback(
     (frequentId?: string) => {
@@ -1057,6 +1148,15 @@ export default function TodayOS({
         onSelectFrequent={setSelectedFrequentId}
         onCommitFrequent={handleCommitFrequent}
         onCreateFreeText={handleCreateFreeText}
+      />
+
+      <UnknownFoodFlowSheet
+        open={!!unknownFlowLogLive}
+        log={unknownFlowLogLive}
+        onClose={closeUnknownFlow}
+        onPickVerified={handlePickVerifiedForUnknown}
+        onManualSave={handleManualNutritionSave}
+        onClarificationResolved={handleClarificationResolved}
       />
 
       <PhotoLogSheet

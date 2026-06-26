@@ -2,6 +2,7 @@
 
 import { resolveMenuFromQuery } from '@/lib/food-menu-lookup'
 import { resolveFreeTextMealClient } from '@/lib/nutrition/search-v2/client-resolve'
+import type { FoodNutritionStatus } from '@/lib/banks/types'
 
 export interface FreeTextMealResult {
   id: string
@@ -15,7 +16,7 @@ export interface FreeTextMealResult {
   /** @deprecated use nutrition_status — true when blocked from commit (Level B clarify) */
   estimated: boolean
   blocked?: boolean
-  nutrition_status?: 'official' | 'unknown'
+  nutrition_status?: FoodNutritionStatus
   nutrition_confidence?: 'A' | 'B' | 'Unknown'
   capture_status?: 'resolved' | 'photo_only'
   explanation?: string
@@ -53,6 +54,26 @@ export function estimateFreeTextMeal(name: string, _mealTargetKcal?: number, _me
     nutrition_confidence: p.nutrition_confidence,
     capture_status: p.capture_status,
     explanation: p.explanation,
+  }
+}
+
+/** Level C text-only — always committable (UI: 搜尋無結果時建立紀錄). */
+export function createUnknownFreeTextMeal(name: string): FreeTextMealResult {
+  const trimmed = name.trim()
+  return {
+    id: `text-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    name: trimmed,
+    calories: null,
+    protein_g: null,
+    carbs_g: null,
+    fat_g: null,
+    source: 'free_text',
+    estimated: true,
+    blocked: false,
+    nutrition_status: 'unknown',
+    nutrition_confidence: 'Unknown',
+    capture_status: 'photo_only',
+    explanation: '完全沒有可信營養資料，建立 Text Only Record。',
   }
 }
 
