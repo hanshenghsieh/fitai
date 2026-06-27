@@ -697,11 +697,6 @@ function filterCandidatesForRoll(pool: MealSuggestion[], ctx: SuggestContext): M
   })
 }
 
-/** @internal test hook */
-export function filterDiceCandidatesForRoll(pool: MealSuggestion[], ctx: SuggestContext): MealSuggestion[] {
-  return filterCandidatesForRoll(pool, ctx)
-}
-
 function finalizeSuggestionPick(
   ctx: SuggestContext,
   candidates: MealSuggestion[],
