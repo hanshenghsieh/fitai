@@ -40,8 +40,9 @@ export const BB_V2 = {
     fill: '#D89A52',
   },
   nav: {
-    height: 84,
-    fabSize: 56,
+    /** Visible tab row height — safe-area padding is added separately in CSS */
+    height: 52,
+    fabSize: 52,
   },
   font: 'var(--font-noto-tc), -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif',
   iconStroke: 1.75,

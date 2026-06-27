@@ -43,7 +43,7 @@ export default function BottomNav() {
 
   return (
     <nav className="app-bottom-nav" style={{ borderTop: `1px solid ${BB_V2.divider}` }}>
-      <div className="flex items-end justify-between max-w-[640px] mx-auto px-6 h-[84px] pb-2">
+      <div className="app-bottom-nav__row">
         <div className="flex flex-1 justify-around">
           {left.map(({ href, label, icon: Icon, match }) => {
             const active = match(pathname)
@@ -52,11 +52,13 @@ export default function BottomNav() {
                 key={href}
                 href={href}
                 onClick={e => navigateTab(href, e)}
-                className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-2"
+                className="flex flex-col items-center justify-center gap-0.5 min-w-[52px]"
                 style={{ color: active ? BB_V2.accent.orange : BB_V2.text.secondary }}
               >
-                <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.2 : BB_V2.iconStroke} />
-                <span className="text-[10px]" style={{ fontWeight: active ? 600 : 400 }}>{label}</span>
+                <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : BB_V2.iconStroke} />
+                <span className="text-[10px] leading-none" style={{ fontWeight: active ? 600 : 400 }}>
+                  {label}
+                </span>
               </Link>
             )
           })}
@@ -65,7 +67,7 @@ export default function BottomNav() {
         <button
           type="button"
           onClick={openPhoto}
-          className="flex items-center justify-center -mt-7 active:scale-95 transition-transform"
+          className="flex items-center justify-center -mt-5 active:scale-95 transition-transform shrink-0"
           style={{
             width: BB_V2.nav.fabSize,
             height: BB_V2.nav.fabSize,
@@ -76,7 +78,7 @@ export default function BottomNav() {
           }}
           aria-label="拍照記錄"
         >
-          <Plus className="h-7 w-7" strokeWidth={2.5} />
+          <Plus className="h-6 w-6" strokeWidth={2.5} />
         </button>
 
         <div className="flex flex-1 justify-around">
@@ -87,11 +89,13 @@ export default function BottomNav() {
                 key={href}
                 href={href}
                 onClick={e => navigateTab(href, e)}
-                className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-2"
+                className="flex flex-col items-center justify-center gap-0.5 min-w-[52px]"
                 style={{ color: active ? BB_V2.accent.orange : BB_V2.text.secondary }}
               >
-                <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.2 : BB_V2.iconStroke} />
-                <span className="text-[10px]" style={{ fontWeight: active ? 600 : 400 }}>{label}</span>
+                <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : BB_V2.iconStroke} />
+                <span className="text-[10px] leading-none" style={{ fontWeight: active ? 600 : 400 }}>
+                  {label}
+                </span>
               </Link>
             )
           })}

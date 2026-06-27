@@ -16,16 +16,8 @@ function readEnvInset(side: 'Top' | 'Bottom' | 'Left' | 'Right'): number {
 
 function applySafeAreaVariables(): void {
   const html = document.documentElement
-  let top = readEnvInset('Top')
-  let bottom = readEnvInset('Bottom')
-
-  const vv = window.visualViewport
-  if (vv) {
-    if (top <= 0) top = Math.max(0, Math.round(vv.offsetTop))
-    if (bottom <= 0) {
-      bottom = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop))
-    }
-  }
+  const top = Math.min(readEnvInset('Top'), 59)
+  const bottom = Math.min(readEnvInset('Bottom'), 40)
 
   html.style.setProperty('--app-safe-top', `${top}px`)
   html.style.setProperty('--app-safe-bottom', `${bottom}px`)

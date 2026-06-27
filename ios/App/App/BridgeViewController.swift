@@ -22,6 +22,10 @@ class BridgeViewController: CAPBridgeViewController {
         applyWebViewShellSettings()
     }
 
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .darkContent
+    }
+
     private func applyWebViewShellSettings() {
         guard let webView = webView else { return }
 
@@ -41,6 +45,12 @@ class BridgeViewController: CAPBridgeViewController {
         scrollView.scrollIndicatorInsets = .zero
         if #available(iOS 13.0, *) {
             scrollView.automaticallyAdjustsScrollIndicatorInsets = false
+        }
+
+        if #available(iOS 11.0, *) {
+            let insets = view.safeAreaInsets
+            scrollView.contentInset = UIEdgeInsets(top: -insets.top, left: 0, bottom: -insets.bottom, right: 0)
+            scrollView.scrollIndicatorInsets = scrollView.contentInset
         }
     }
 }
