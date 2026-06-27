@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { X, ChevronDown, ChevronUp, Search } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { searchNutritionV2Client } from '@/lib/nutrition/search-v2/search-client'
+import { PHOTO_MANUAL_SEARCH_LIMIT } from '@/lib/nutrition/photo-display-limits'
 import {
   FOOD_CATEGORIES,
   inferCategoryFromText,
@@ -111,7 +112,7 @@ export default function ManualPhotoCorrectionSheet({
   }, [searchQuery, category])
 
   const searchCandidates = useMemo(
-    () => searchOutcome?.candidates.filter(c => c.source_tier !== 'unknown').slice(0, 5) ?? [],
+    () => searchOutcome?.candidates.filter(c => c.source_tier !== 'unknown').slice(0, PHOTO_MANUAL_SEARCH_LIMIT) ?? [],
     [searchOutcome]
   )
 

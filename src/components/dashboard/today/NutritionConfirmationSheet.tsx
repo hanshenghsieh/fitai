@@ -32,7 +32,7 @@ export default function NutritionConfirmationSheet({
   const [pendingHit, setPendingHit] = useState<MenuLookupHit | null>(null)
 
   const similar = useMemo(
-    () => (log ? findSimilarVerifiedItems(log.name, 6) : []),
+    () => (log ? findSimilarVerifiedItems(log.name, 10) : []),
     [log?.name, log]
   )
 

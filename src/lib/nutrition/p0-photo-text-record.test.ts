@@ -25,6 +25,7 @@ import {
   isNutritionPendingConfirmation,
 } from '@/lib/nutrition/food-log-display'
 import type { FoodLogEntry } from '@/lib/banks/types'
+import { PHOTO_UI_CANDIDATE_LIMIT } from '@/lib/nutrition/photo-display-limits'
 import { clearUnknownPhotoQueueForTests } from '@/lib/nutrition/search-v2/unknown-photo-queue'
 import { clearUnknownQueueForTests } from '@/lib/nutrition/search-v2/unknown-queue'
 
@@ -438,5 +439,9 @@ describe('P0 — Text record label preservation', () => {
       }),
       true
     )
+  })
+
+  it('36. photo UI shows up to 10 candidates not 3', () => {
+    assert.equal(PHOTO_UI_CANDIDATE_LIMIT, 10)
   })
 })

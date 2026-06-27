@@ -22,6 +22,7 @@ import { explainConfidence } from '@/lib/nutrition/search-v2/confidence'
 import { buildPhotoVisualParse, type PhotoVisualParse } from '@/lib/nutrition/photo-visual-parse'
 import { collectClientCandidates } from '@/lib/nutrition/search-v2/matcher-core'
 import type { PhotoAiMeta } from '@/lib/banks/types'
+import { PHOTO_UI_CANDIDATE_LIMIT } from '@/lib/nutrition/photo-display-limits'
 
 export interface PhotoV2State {
   detected_label: string
@@ -188,9 +189,24 @@ export function resolvePhotoV2Outcome(state: PhotoV2State): SearchV2Outcome {
   return state.outcome
 }
 
+/** User-selected or auto-resolved verified candidate. */
+export function resolvePhotoOfficialRecord(state: PhotoV2State): SearchV2Candidate | undefined {
+  const resolved = resolvePhotoV2Outcome(state)
+  if (state.selected_candidate_id) {
+    const picked = resolved.candidates.find(c => c.id === state.selected_candidate_id)
+    if (picked && picked.source_tier !== 'unknown') return picked
+  }
+  return resolved.official_record
+}
+
 /** Photo cannot be looser than text search — Level A only without confirm */
 export function photoV2ReadyForLog(state: PhotoV2State): boolean {
   const resolved = resolvePhotoV2Outcome(state)
+  const picked = resolvePhotoOfficialRecord(state)
+
+  if (state.user_confirmed && picked && state.selected_candidate_id) {
+    return true
+  }
 
   if (resolved.action === 'create_official' && resolved.level === 'A') {
     return Boolean(resolved.official_record)
@@ -224,7 +240,7 @@ export function photoV2UiMessage(state: PhotoV2State): string {
 
 export function photoV2DisplayCandidates(state: PhotoV2State): SearchV2Candidate[] {
   const resolved = resolvePhotoV2Outcome(state)
-  return resolved.candidates.filter(c => c.source_tier !== 'unknown').slice(0, 3)
+  return resolved.candidates.filter(c => c.source_tier !== 'unknown').slice(0, PHOTO_UI_CANDIDATE_LIMIT)
 }
 
 function candidateToMacros(c: SearchV2Candidate): NutritionMacros {
@@ -282,7 +298,7 @@ export function finalizePhotoV2ToFoodLogPayload(
     }
   }
 
-  const official = resolved.official_record
+  const official = resolvePhotoOfficialRecord(state)
   if (!official) return null
 
   const macros = candidateToMacros(official)

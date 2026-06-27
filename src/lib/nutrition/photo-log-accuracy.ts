@@ -8,10 +8,12 @@ import {
   photoV2DisplayCandidates,
   photoV2ReadyForLog,
   photoV2UiMessage,
+  resolvePhotoOfficialRecord,
   resolvePhotoV2Outcome,
   updatePhotoV2State,
   type PhotoV2State,
 } from '@/lib/nutrition/search-v2/photo-pipeline'
+import { PHOTO_UI_CANDIDATE_LIMIT } from '@/lib/nutrition/photo-display-limits'
 
 export type { PhotoV2State }
 
@@ -23,7 +25,7 @@ export interface PhotoAccuracyState {
   visual_parse: PhotoVisualParse
   photo_ai_original_candidates: string[]
   v2: PhotoV2State
-  /** Mapped for PhotoLogSheet — Search V2 candidates (max 3) */
+  /** Mapped for PhotoLogSheet — Search V2 candidates */
   candidates: Array<{ id: string; display_name: string; confidence: number }>
   /** Mapped clarification questions from Search V2 */
   confirmation_questions: ConfirmationQuestion[]
@@ -53,7 +55,7 @@ function mapClarificationQuestions(session: ClarificationSession | null): Confir
 }
 
 function mapCandidates(candidates: SearchV2Candidate[]) {
-  return candidates.slice(0, 3).map(c => ({
+  return candidates.slice(0, PHOTO_UI_CANDIDATE_LIMIT).map(c => ({
     id: c.id,
     display_name: c.store ? `${c.store} · ${c.name}` : c.name,
     confidence: c.match_score / 100,
@@ -66,6 +68,7 @@ function buildPhotoAccuracyStateFromV2(v2: PhotoV2State): PhotoAccuracyState {
   const levelA = resolved.level === 'A' && resolved.action === 'create_official'
   const needsConfirm = resolved.action === 'clarify' || resolved.level === 'B'
   const confirmed = v2.user_confirmed
+  const picked = resolvePhotoOfficialRecord(v2)
 
   return {
     label: v2.detected_label,
@@ -84,7 +87,7 @@ function buildPhotoAccuracyStateFromV2(v2: PhotoV2State): PhotoAccuracyState {
     },
     ready_for_food_log: photoV2ReadyForLog(v2),
     ui_message: photoV2UiMessage(v2),
-    show_macros: !unknown && (levelA || (needsConfirm && confirmed)),
+    show_macros: !unknown && (levelA || (confirmed && Boolean(picked))),
     nutrition_status: unknown ? 'unknown' : 'official',
   }
 }
@@ -137,7 +140,7 @@ export function photoAccuracyDisplayMacros(state: PhotoAccuracyState): {
   if (!state.show_macros) {
     return { calories: null, protein_g: null, carbs_g: null, fat_g: null }
   }
-  const official = resolvePhotoV2Outcome(state.v2).official_record
+  const official = resolvePhotoOfficialRecord(state.v2)
   if (!official) {
     return { calories: null, protein_g: null, carbs_g: null, fat_g: null }
   }
@@ -151,7 +154,7 @@ export function photoAccuracyDisplayMacros(state: PhotoAccuracyState): {
 
 export function buildNutritionAccuracyLogMeta(state: PhotoAccuracyState): NutritionAccuracyLogMeta {
   const resolved = resolvePhotoV2Outcome(state.v2)
-  const official = resolved.official_record
+  const official = resolvePhotoOfficialRecord(state.v2)
   return {
     accuracy_level:
       resolved.level === 'A' ? 'A' : resolved.level === 'B' ? 'B' : resolved.level === 'C' ? 'Unknown' : 'Unknown',

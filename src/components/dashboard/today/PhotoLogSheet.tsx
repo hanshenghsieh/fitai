@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { ArrowLeft, Camera, Loader2, X } from 'lucide-react'
+import { ArrowLeft, Camera, Loader2, Search, X } from 'lucide-react'
 import { TODAY } from '@/lib/today-design'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import BBCard from '@/components/ui/BBCard'
@@ -223,7 +223,7 @@ function AccuracyConfirmSection({
               border: `1.5px solid ${TODAY.mocha}`,
             }}
           >
-            都不是，我要自己輸入
+            搜尋全部菜品 / 手動更改
           </button>
         )}
       </div>
@@ -240,33 +240,55 @@ function AccuracyConfirmSection({
           我想先確認一下
         </p>
         <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-          這餐看起來像：
+          這餐看起來像（僅最相近 {accuracy.candidates.length} 筆，資料庫還有更多）：
         </p>
       </div>
 
       {accuracy.candidates.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {accuracy.candidates.map(c => {
-            const active = c.id === selectedId
-            return (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => onAccuracyChange({ selected_candidate_id: c.id, user_confirmed: false })}
-                className="px-4 py-2.5 text-[14px] active:opacity-85"
-                style={{
-                  borderRadius: 20,
-                  backgroundColor: active ? TODAY.pillActiveBg : TODAY.card,
-                  color: active ? TODAY.pillActiveText : TODAY.text,
-                  fontWeight: active ? 600 : 500,
-                  border: active ? 'none' : `1.5px solid ${TODAY.pillBg}`,
-                }}
-              >
-                {c.display_name}
-              </button>
-            )
-          })}
+        <div
+          className="max-h-[220px] overflow-y-auto overscroll-contain -mx-1 px-1"
+        >
+          <div className="flex flex-wrap gap-2">
+            {accuracy.candidates.map(c => {
+              const active = c.id === selectedId
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => onAccuracyChange({ selected_candidate_id: c.id, user_confirmed: false })}
+                  className="px-4 py-2.5 text-[14px] active:opacity-85 text-left"
+                  style={{
+                    borderRadius: 20,
+                    backgroundColor: active ? TODAY.pillActiveBg : TODAY.card,
+                    color: active ? TODAY.pillActiveText : TODAY.text,
+                    fontWeight: active ? 600 : 500,
+                    border: active ? 'none' : `1.5px solid ${TODAY.pillBg}`,
+                    maxWidth: '100%',
+                  }}
+                >
+                  {c.display_name}
+                </button>
+              )
+            })}
+          </div>
         </div>
+      )}
+
+      {onOpenManualCorrection && (
+        <button
+          type="button"
+          onClick={onOpenManualCorrection}
+          className="w-full h-12 text-[15px] flex items-center justify-center gap-2 active:opacity-90"
+          style={{
+            borderRadius: 22,
+            backgroundColor: TODAY.pillBg,
+            color: TODAY.mocha,
+            fontWeight: 600,
+          }}
+        >
+          <Search className="h-4 w-4" strokeWidth={ICON_STROKE} />
+          搜尋全部菜品
+        </button>
       )}
 
       {questions.map(q => (
@@ -334,7 +356,7 @@ function AccuracyConfirmSection({
             border: `1.5px solid rgba(142, 131, 120, 0.35)`,
           }}
         >
-          都不是，我要自己輸入
+          都不是？搜尋全部或手動更改
         </button>
       )}
     </div>

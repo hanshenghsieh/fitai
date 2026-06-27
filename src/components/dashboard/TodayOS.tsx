@@ -21,6 +21,7 @@ import {
   photoAccuracyReadyForLog,
   updatePhotoAccuracyState,
 } from '@/lib/nutrition/photo-log-accuracy'
+import { resolvePhotoOfficialRecord } from '@/lib/nutrition/search-v2/photo-pipeline'
 import type { UserConfirmationAnswers } from '@/lib/nutrition/types'
 import { buildUserBanks } from '@/lib/banks/build-banks'
 import { formatPostureLine } from '@/lib/copy/zaijian'
@@ -679,11 +680,11 @@ export default function TodayOS({
     setPhotoDraft(prev => {
       if (!prev?.accuracy) return prev
       const accuracy = updatePhotoAccuracyState(prev.accuracy, patch)
-      const resolved = accuracy.v2.outcome.official_record
+      const picked = resolvePhotoOfficialRecord(accuracy.v2)
       const display = photoAccuracyDisplayMacros(accuracy)
       return {
         ...prev,
-        name: resolved?.name ?? accuracy.label,
+        name: picked?.name ?? accuracy.label,
         calories: display.calories,
         protein_g: display.protein_g,
         carbs_g: display.carbs_g,
