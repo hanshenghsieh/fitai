@@ -9,6 +9,8 @@ export default function AppRouteShell({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('betterbit:route-change', { detail: { pathname } }))
+    const scrollRoot = document.getElementById('app-scroll-root')
+    scrollRoot?.scrollTo(0, 0)
     window.scrollTo(0, 0)
     document.documentElement.scrollTop = 0
     document.body.scrollTop = 0

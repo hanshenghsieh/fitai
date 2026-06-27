@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Home, CalendarDays, LineChart, User, Plus } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
+import { isCapacitorNative } from '@/lib/capacitor-native'
 
 const sideItems = [
   { href: '/dashboard', label: '今日', icon: Home, match: (p: string) => p === '/dashboard' },
@@ -23,7 +24,18 @@ export default function BottomNav() {
       window.dispatchEvent(new CustomEvent('betterbit:open-photo'))
       return
     }
+    if (isCapacitorNative()) {
+      window.location.href = '/dashboard?photo=1'
+      return
+    }
     router.push('/dashboard?photo=1')
+  }
+
+  function navigateTab(href: string, event: React.MouseEvent<HTMLAnchorElement>) {
+    if (pathname === href) return
+    if (!isCapacitorNative()) return
+    event.preventDefault()
+    window.location.assign(href)
   }
 
   const left = sideItems.slice(0, 2)
@@ -48,6 +60,7 @@ export default function BottomNav() {
               <Link
                 key={href}
                 href={href}
+                onClick={e => navigateTab(href, e)}
                 className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-2"
                 style={{ color: active ? BB_V2.accent.orange : BB_V2.text.secondary }}
               >
@@ -82,6 +95,7 @@ export default function BottomNav() {
               <Link
                 key={href}
                 href={href}
+                onClick={e => navigateTab(href, e)}
                 className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-2"
                 style={{ color: active ? BB_V2.accent.orange : BB_V2.text.secondary }}
               >

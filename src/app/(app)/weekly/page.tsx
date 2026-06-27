@@ -76,7 +76,7 @@ async function WeekContent() {
 
 export default function WeeklyPage() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: BB_V2.bg.canvas }}>
+    <div className="max-w-lg mx-auto" style={{ backgroundColor: BB_V2.bg.canvas }}>
       <Suspense fallback={<WeekScreenSkeleton />}>
         <WeekContent />
       </Suspense>

@@ -96,7 +96,7 @@ async function DashboardContent() {
   }).length
 
   return (
-    <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: colors.bg.canvas }}>
+    <div className="max-w-lg mx-auto" style={{ backgroundColor: colors.bg.canvas }}>
       <NotificationPrompt />
 
       {weeklyPlan?.generation_status === 'generating' && <ZaiJianPanel moment="loading" />}

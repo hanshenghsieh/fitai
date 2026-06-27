@@ -146,10 +146,14 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    background-color: #fff9f2;
+    overscroll-behavior-y: none;
+  }
+  body {
+    @apply text-foreground;
+    background-color: #fff9f2;
+    overscroll-behavior-y: none;
   }
 }

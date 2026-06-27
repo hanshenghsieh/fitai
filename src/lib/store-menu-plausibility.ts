@@ -52,6 +52,41 @@ function hasSavoryBulkSuffix(name: string): boolean {
   return /\s*·\s*(微辣|少油|少鹽|加蛋|加菜)$/.test(name)
 }
 
+/** 品項只屬於特定品牌（bulk 誤標） */
+const DISH_EXCLUSIVE_STORE: { pattern: RegExp; stores: Set<string> }[] = [
+  { pattern: /^酸辣湯$|鍋貼套餐.*酸辣湯/, stores: new Set(['八方雲集', '鼎泰豐', '非常泰', '泰愛泰']) },
+  { pattern: /^鍋貼（\d+顆）$|^水餃（\d+顆）$/, stores: new Set(['八方雲集', '八方雲集 Dumplings', '三商巧福']) },
+]
+
+/** 品牌專屬禁止品項（官方菜單沒有、bulk 模板誤植） */
+const BRAND_DENY_PATTERNS: Record<string, RegExp[]> = {
+  肯德基: [
+    /香雞飯|雞腿飯|原味雞腿飯|卡洛卡羅|牛肉麵|排骨飯|滷肉飯|麻醬|炸醬|水餃|鍋貼|粥|丼|拉麵|親子丼|咖哩|炸豬排|紅燒/,
+  ],
+  三商巧福: [
+    /酸辣湯|漢堡|咔啦|蛋塔|薯條|雞塊|上校|麥克|披薩|握壽司|壽司拼盤|海鮮丼|夏威夷|親子丼|咖哩豬排|炸豬排定食|可樂（中杯）|拿鐵（中杯）/,
+  ],
+  麥當勞: [/牛肉麵|排骨飯|滷肉飯|麻醬|炸醬|水餃|鍋貼|拉麵|親子丼|咖哩豬排|紅燒牛肉麵/],
+  摩斯漢堡: [/牛肉麵|排骨飯|滷肉飯|麻醬|炸醬|水餃|鍋貼|拉麵|親子丼|香雞飯/],
+}
+
+const FASTFOOD_RICE_NOODLE =
+  /香雞飯|雞腿飯|牛肉麵|排骨飯|滷肉飯|麻醬麵|炸醬麵|水餃|鍋貼|皮蛋瘦肉粥|雞肉粥|燒餅油條|親子丼|牛丼|咖哩豬排|炸豬排定食|紅燒牛肉麵/
+
+function rejectsExclusiveStore(name: string, store: string): boolean {
+  for (const rule of DISH_EXCLUSIVE_STORE) {
+    if (!rule.pattern.test(name)) continue
+    return !rule.stores.has(store)
+  }
+  return false
+}
+
+function rejectsBrandDenylist(name: string, store: string): boolean {
+  const patterns = BRAND_DENY_PATTERNS[store]
+  if (!patterns?.length) return false
+  return patterns.some(re => re.test(name))
+}
+
 function rejectsCafeteriaArchetype(name: string, kb: string): boolean {
   if (!CAFETERIA_SIDE.test(name)) return false
   if (kb === 'bento' || kb === 'chinese' || kb === 'convenience' || kb === 'supermarket') return false
@@ -68,6 +103,11 @@ export function isPlausibleBrandItem(item: ConvenienceItem): boolean {
   if (!kb) return true
 
   const name = item.name
+
+  if (rejectsExclusiveStore(name, item.store)) return false
+  if (rejectsBrandDenylist(name, item.store)) return false
+
+  if (kb === 'fastfood' && FASTFOOD_RICE_NOODLE.test(name)) return false
 
   if (TONKATSU_BRANDS.has(item.store) && !isTonkatsuPlausibleName(name)) return false
 
