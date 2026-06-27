@@ -43,26 +43,24 @@ export default function SettingsAccountSection({
 
   async function handleSaveBody() {
     setLoading(true)
-    const supabase = createClient()
     try {
-      const newWeight = parseFloat(weight) || null
-      const newBf = parseFloat(bodyFat) || null
+      const newWeight = parseFloat(weight)
+      if (!Number.isFinite(newWeight) || newWeight <= 0) {
+        toast.error('請輸入有效體重')
+        return
+      }
+      const newBf = bodyFat.trim() ? parseFloat(bodyFat) : null
       const bodyChanged = newWeight !== profile?.weight_kg || newBf !== profile?.body_fat_pct
 
-      if (bodyChanged && newWeight) {
+      if (bodyChanged) {
         const res = await fetch('/api/measurements', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ weight_kg: newWeight, body_fat_pct: newBf }),
         })
-        if (!res.ok) throw new Error((await res.json()).error)
+        const json = (await res.json().catch(() => ({}))) as { error?: string }
+        if (!res.ok) throw new Error(json.error ?? GENTLE_ERROR_MESSAGE)
       }
-
-      const { error } = await supabase.from('user_profiles').update({
-        weight_kg: newWeight,
-        body_fat_pct: newBf,
-      }).eq('id', profile?.id ?? '')
-      if (error) throw error
 
       toast.message('記下了')
       setExpanded(false)
