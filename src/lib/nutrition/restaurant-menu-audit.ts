@@ -1,9 +1,12 @@
 import type { ConvenienceItem } from '@/lib/convenience-store-menu'
 
 export interface AllowlistEntry {
+  rank?: number
   canonical_name: string
   search_aliases?: string[]
   slug?: string
+  seed_priority?: string
+  confidence_level?: string
 }
 
 export interface AllowlistFile {

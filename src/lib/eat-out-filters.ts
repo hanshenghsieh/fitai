@@ -85,9 +85,9 @@ export function filterByStorePrefs(
   items: ConvenienceItem[],
   prefs?: EatOutPreferences
 ): ConvenienceItem[] {
-  const avoided = new Set(prefs?.avoided_brands ?? [])
+  const avoided = new Set((prefs?.avoided_brands ?? []).map(canonicalDiceStore))
   if (!avoided.size) return items
-  const filtered = items.filter(i => !avoided.has(i.store))
+  const filtered = items.filter(i => !avoided.has(canonicalDiceStore(i.store)))
   return filtered.length ? filtered : items
 }
 

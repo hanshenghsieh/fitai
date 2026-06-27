@@ -7,7 +7,7 @@ import type { MealType } from './checkin-utils'
 import type { UserProfile } from '@/types'
 import type { UserMemoryState } from './meal-engine-types'
 import { isBeverage, isFullMealName, isSolidFood, isStarchMain } from './eat-out-builder'
-import { diceStoreMatches } from './dice-store-aliases'
+import { diceStoreMatches, rebuildDiceStoreVariantIndex } from './dice-store-aliases'
 
 /** 手搖飲 / 咖啡品牌（動態對齊 brand-registry） */
 export { DRINK_STORE_NAMES, isDrinkStore } from './drink-stores'
@@ -29,7 +29,7 @@ export function lookupDiceMenuItem(id: string): ConvenienceItem | undefined {
   return getMenuIdIndex(getDiceMenuSource()).get(id)
 }
 
-const DICE_POOL_CACHE_VERSION = 4
+const DICE_POOL_CACHE_VERSION = 5
 
 function dicePoolCacheKey(
   mealType: MealType,
@@ -73,7 +73,9 @@ function mergeDiceMenus(bulk: ConvenienceItem[]): ConvenienceItem[] {
       description: '梁社漢 品牌公開資料 · 雞腿飯',
     },
   ].filter(i => !seen.has(i.id))
-  return [...eatOutMenu, ...extra, ...runtimeChainMains]
+  const merged = [...eatOutMenu, ...extra, ...runtimeChainMains]
+  rebuildDiceStoreVariantIndex(merged)
+  return merged
 }
 
 /** 動態載入 bulk JSON（獨立 chunk，避免塞進主 bundle） */
@@ -94,7 +96,9 @@ export function isDiceMenuBulkReady(): boolean {
 
 /** 核心菜單 + bulk 變體（去重 id）；bulk 未載入時先回核心菜單 */
 export function getDiceMenuSource(): ConvenienceItem[] {
-  return diceMenuSource ?? eatOutMenu
+  const src = diceMenuSource ?? eatOutMenu
+  if (!diceMenuSource) rebuildDiceStoreVariantIndex(src)
+  return src
 }
 
 /** 可當骰子「主餐」的單品（含新擴充連鎖） */
