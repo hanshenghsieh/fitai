@@ -8,7 +8,7 @@ interface Props {
 
 export default function ProgressHeader({ posture }: Props) {
   return (
-    <header className="px-5 pt-12 pb-4 space-y-2">
+    <header className="px-5 app-page-top pb-4 space-y-2">
       <h1 className="text-[22px] font-medium tracking-tight" style={{ color: colors.text.primary }}>
         進度
       </h1>

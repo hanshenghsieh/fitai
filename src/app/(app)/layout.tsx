@@ -10,10 +10,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!profile?.onboarding_completed) redirect('/onboarding')
 
   return (
-    <div className="app-shell fixed inset-0 flex flex-col" style={{ backgroundColor: TODAY.bg }}>
+    <div className="app-shell" style={{ backgroundColor: TODAY.bg }}>
       <main
         id="app-scroll-root"
-        className="app-scroll-with-nav flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-none"
+        className="app-scroll-with-nav overflow-y-auto overflow-x-hidden overscroll-y-none"
         style={{ WebkitOverflowScrolling: 'touch', backgroundColor: TODAY.bg }}
       >
         <AppRouteShell>{children}</AppRouteShell>

@@ -10,7 +10,7 @@ interface Props {
 export default function TodayHeader({ trialDaysLeft }: Props) {
   return (
     <header
-      className="px-5 pt-11 pb-1 max-w-[640px] mx-auto"
+      className="px-5 app-page-top pb-1 max-w-[640px] mx-auto"
       style={{ fontFamily: TODAY.font }}
     >
       <div>

@@ -32,7 +32,7 @@ export default function WeekScreen({ summary, error }: Props) {
 
   if (error) {
     return (
-      <div className="px-5 pt-12 text-center" style={{ fontFamily: BB_V2.font }}>
+      <div className="px-5 app-page-top text-center" style={{ fontFamily: BB_V2.font }}>
         <p className="text-[16px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
           暫時無法載入本週資料
         </p>
@@ -45,7 +45,7 @@ export default function WeekScreen({ summary, error }: Props) {
 
   if (summary.insufficient_data) {
     return (
-      <div className="px-5 pt-4 pb-8 space-y-6" style={{ fontFamily: BB_V2.font }}>
+      <div className="px-5 app-page-top pb-8 space-y-6" style={{ fontFamily: BB_V2.font }}>
         <header>
           <h1 className="text-[34px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
             本週
@@ -71,7 +71,7 @@ export default function WeekScreen({ summary, error }: Props) {
   }
 
   return (
-    <div className="px-5 pt-4 pb-8 space-y-5 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
+    <div className="px-5 app-page-top pb-8 space-y-5 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
       <header>
         <h1 className="text-[34px] leading-tight" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
           本週

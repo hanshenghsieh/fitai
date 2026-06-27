@@ -42,18 +42,8 @@ export default function BottomNav() {
   const right = sideItems.slice(2)
 
   return (
-    <nav
-      className="app-bottom-nav fixed bottom-0 left-0 right-0 z-40 safe-area-pb"
-      style={{
-        minHeight: BB_V2.nav.height,
-        boxSizing: 'border-box',
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        borderTop: `1px solid ${BB_V2.divider}`,
-      }}
-    >
-      <div className="flex items-end justify-between max-w-[640px] mx-auto px-6 h-full pb-2">
+    <nav className="app-bottom-nav" style={{ borderTop: `1px solid ${BB_V2.divider}` }}>
+      <div className="flex items-end justify-between max-w-[640px] mx-auto px-6 h-[84px] pb-2">
         <div className="flex flex-1 justify-around">
           {left.map(({ href, label, icon: Icon, match }) => {
             const active = match(pathname)

@@ -73,7 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh-TW" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${notoSansTC.variable} min-h-screen antialiased`}
+        className={`${inter.variable} ${notoSansTC.variable} h-full antialiased`}
         style={{
           backgroundColor: colors.bg.canvas,
           fontFamily: 'var(--font-noto-tc), var(--font-inter), system-ui, sans-serif',
