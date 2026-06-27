@@ -107,7 +107,7 @@ export default function TodayFoodMore({
 
   const handleCreate = () => {
     if (!trimmed || !onCreateFreeText) return
-    onCreateFreeText(trimmed, noSearchHits ? { forceUnknown: true } : undefined)
+    onCreateFreeText(trimmed, { forceUnknown: true })
   }
 
   return (

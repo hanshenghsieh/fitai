@@ -19,12 +19,17 @@ import {
 } from '@/lib/nutrition/search-v2/clarification'
 import { enqueueUnknownPhoto } from '@/lib/nutrition/search-v2/unknown-photo-queue'
 import { explainConfidence } from '@/lib/nutrition/search-v2/confidence'
+import { buildPhotoVisualParse, type PhotoVisualParse } from '@/lib/nutrition/photo-visual-parse'
+import { collectClientCandidates } from '@/lib/nutrition/search-v2/matcher-core'
+import type { PhotoAiMeta } from '@/lib/banks/types'
 
 export interface PhotoV2State {
   detected_label: string
   store?: string
   photo_id?: string
   image_hash?: string
+  visual_parse: PhotoVisualParse
+  photo_ai_original_candidates: string[]
   outcome: SearchV2Outcome
   clarification: ClarificationSession | null
   answers: Record<string, string>
@@ -35,6 +40,11 @@ export interface PhotoV2State {
 export interface PhotoV2FoodLogPayload {
   id: string
   name: string
+  display_label?: string
+  user_input_label?: string
+  matched_item_label?: string
+  matched_restaurant?: string
+  match_type?: string
   store?: string
   calories: number | null
   protein_g: number | null
@@ -54,6 +64,7 @@ export interface PhotoV2FoodLogPayload {
   photo_data_url?: string
   /** Never ai_photo_only when writing nutrition — only verified sources */
   nutrition_source?: string
+  photo_ai_meta?: PhotoAiMeta
 }
 
 const UNRECOGNIZED_LABELS = /^(未知食物|無法辨識|不清楚|unknown)$/i
@@ -70,12 +81,24 @@ export function createPhotoV2State(
     photo_id?: string
     image_hash?: string
     ctx?: SearchV2Context
+    visual_parse?: PhotoVisualParse
   }
 ): PhotoV2State {
   const label = detectedLabel.trim() || '未知食物'
+  const visual_parse = opts?.visual_parse ?? buildPhotoVisualParse(label)
+  const searchCtx: SearchV2Context = {
+    ...opts?.ctx,
+    visual_category: visual_parse.visual_category,
+    photo_mode: true,
+  }
+  const allCandidates = collectClientCandidates(label, opts?.ctx)
+  const photo_ai_original_candidates = allCandidates.slice(0, 5).map(c =>
+    c.store ? `${c.store} · ${c.name}` : c.name
+  )
+
   const outcome = isUnrecognizablePhotoLabel(label)
     ? buildPhotoUnknownOutcome(label, [])
-    : searchNutritionV2(label, opts?.ctx)
+    : searchNutritionV2(label, searchCtx)
 
   if (outcome.action === 'create_unknown') {
     enqueueUnknownPhoto({
@@ -92,6 +115,8 @@ export function createPhotoV2State(
     store: opts?.store,
     photo_id: opts?.photo_id,
     image_hash: opts?.image_hash,
+    visual_parse,
+    photo_ai_original_candidates,
     outcome,
     clarification: outcome.clarification ?? null,
     answers: {},
@@ -214,6 +239,12 @@ export function finalizePhotoV2ToFoodLogPayload(
 
   const resolved = resolvePhotoV2Outcome(state)
   const logged_at = opts.logged_at ?? new Date().toISOString()
+  const photo_ai_meta: PhotoAiMeta = {
+    photo_ai_original_candidates: state.photo_ai_original_candidates,
+    photo_ai_detected_label: state.visual_parse.detected_label,
+    photo_ai_visual_category: state.visual_parse.visual_category,
+    photo_ai_category_confidence: state.visual_parse.category_confidence,
+  }
 
   if (resolved.action === 'create_unknown' || resolved.level === 'C') {
     const unknown = resolved.unknown_record
@@ -228,6 +259,8 @@ export function finalizePhotoV2ToFoodLogPayload(
     return {
       id: opts.id,
       name: unknown?.food_name ?? state.detected_label,
+      display_label: state.detected_label,
+      user_input_label: state.detected_label,
       store: state.store,
       ...NULL_MACROS,
       protein_g: null,
@@ -245,6 +278,7 @@ export function finalizePhotoV2ToFoodLogPayload(
       explanation: resolved.explanation,
       ui_message: unknown?.ui_message,
       photo_data_url: opts.photo_data_url,
+      photo_ai_meta,
     }
   }
 
@@ -258,6 +292,11 @@ export function finalizePhotoV2ToFoodLogPayload(
   return {
     id: opts.id,
     name: official.name,
+    display_label: official.name,
+    user_input_label: state.detected_label,
+    matched_item_label: official.name,
+    matched_restaurant: official.store,
+    match_type: state.user_confirmed ? 'user_selected_verified_item' : 'photo_verified_match',
     store: official.store ?? state.store,
     calories: macros.calories,
     protein_g: macros.protein,
@@ -275,6 +314,7 @@ export function finalizePhotoV2ToFoodLogPayload(
     explanation: explainConfidence(confidence, official.nutrition_source),
     nutrition_source: official.nutrition_source,
     photo_data_url: opts.photo_data_url,
+    photo_ai_meta,
   }
 }
 

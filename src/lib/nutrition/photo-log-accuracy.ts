@@ -1,5 +1,7 @@
 import type { ClarificationSession, SearchV2Candidate } from '@/lib/nutrition/search-v2/types'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
+import type { PhotoVisualParse } from '@/lib/nutrition/photo-visual-parse'
+import { buildPhotoVisualParse } from '@/lib/nutrition/photo-visual-parse'
 import {
   createPhotoV2State,
   finalizePhotoV2ToFoodLogPayload,
@@ -18,6 +20,8 @@ export interface PhotoAccuracyState {
   store?: string
   photo_id?: string
   image_hash?: string
+  visual_parse: PhotoVisualParse
+  photo_ai_original_candidates: string[]
   v2: PhotoV2State
   /** Mapped for PhotoLogSheet — Search V2 candidates (max 3) */
   candidates: Array<{ id: string; display_name: string; confidence: number }>
@@ -68,6 +72,8 @@ function buildPhotoAccuracyStateFromV2(v2: PhotoV2State): PhotoAccuracyState {
     store: v2.store,
     photo_id: v2.photo_id,
     image_hash: v2.image_hash,
+    visual_parse: v2.visual_parse,
+    photo_ai_original_candidates: v2.photo_ai_original_candidates,
     v2,
     candidates: mapCandidates(photoV2DisplayCandidates(v2)),
     confirmation_questions: mapClarificationQuestions(v2.clarification),
@@ -89,9 +95,10 @@ export function buildPhotoAccuracyInput(label: string, opts?: { store?: string }
 
 export function createPhotoAccuracyState(
   label: string,
-  opts?: { store?: string; photo_id?: string; image_hash?: string }
+  opts?: { store?: string; photo_id?: string; image_hash?: string; visual_parse?: PhotoVisualParse }
 ): PhotoAccuracyState {
-  const v2 = createPhotoV2State(label, opts)
+  const visual_parse = opts?.visual_parse ?? buildPhotoVisualParse(label)
+  const v2 = createPhotoV2State(label, { ...opts, visual_parse })
   return buildPhotoAccuracyStateFromV2(v2)
 }
 

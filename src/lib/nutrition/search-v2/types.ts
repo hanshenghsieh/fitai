@@ -144,4 +144,7 @@ export interface UnknownAnalytics {
 export interface SearchV2Context {
   recentFoods?: Array<{ id: string; name: string; store?: string }>
   favorites?: Array<{ id: string; name: string; store?: string }>
+  /** Photo pipeline — guard candidates by visual category */
+  visual_category?: import('@/lib/nutrition/food-category-guard').FoodCategory
+  photo_mode?: boolean
 }

@@ -18,10 +18,12 @@ describe('food-estimate Search V2', () => {
     assert.equal(est.nutrition_status, 'unknown')
   })
 
-  it('resolves known kb item instead of meal-target', () => {
+  it('711 prefix alias does not fuzzy auto-commit without exact label (P0)', () => {
     const est = resolveOrEstimateFreeTextMeal('711竹筍排骨湯', 632, 34)
-    assert.equal(est.estimated, false)
-    assert.equal(est.calories, 103)
+    assert.equal(est.estimated, true)
+    assert.equal(est.nutrition_status, 'unknown')
+    assert.equal(est.calories, null)
+    assert.equal(est.display_label, '711竹筍排骨湯')
     assert.notEqual(est.calories, 632)
   })
 

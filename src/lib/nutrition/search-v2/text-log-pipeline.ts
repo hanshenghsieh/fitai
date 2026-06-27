@@ -9,6 +9,12 @@ import { confidenceFromLevel } from '@/lib/nutrition/search-v2/confidence'
 export interface TextFoodLogPayload {
   id: string
   name: string
+  display_label?: string
+  user_input_label?: string
+  matched_item_label?: string
+  matched_restaurant?: string
+  match_type?: string
+  possible_matches?: string[]
   store?: string
   calories: number | null
   protein_g: number | null

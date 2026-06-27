@@ -1,5 +1,12 @@
 import type { FoodLogEntry, FoodNutritionStatus } from '@/lib/banks/types'
 
+export function getFoodLogDisplayLabel(
+  log: Pick<FoodLogEntry, 'name' | 'display_label'>
+): string {
+  const display = log.display_label?.trim()
+  return display || log.name
+}
+
 export const NUTRITION_PENDING_LABEL = '營養待確認'
 export const USER_ENTERED_LABEL = '使用者輸入'
 

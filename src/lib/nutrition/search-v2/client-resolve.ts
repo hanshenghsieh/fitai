@@ -3,6 +3,7 @@
  * Full Search V2 with ONR: `text-log-pipeline.ts` (Node / tests).
  */
 import { resolveMenuFromQuery, searchFoodMenuExtended } from '@/lib/food-menu-lookup'
+import { userLabelMatchesVerified } from '@/lib/nutrition/food-category-guard'
 import { NULL_MACROS } from '@/lib/nutrition/search-v2/types'
 import { isClearlyUnknownQuery, hasClarificationPattern } from '@/lib/nutrition/search-v2/query-patterns'
 import type { TextFoodLogPayload, TextMealResolveResult } from '@/lib/nutrition/search-v2/text-log-pipeline'
@@ -12,11 +13,17 @@ function newTextLogId(): string {
 }
 
 function officialFromKb(
-  hit: NonNullable<ReturnType<typeof resolveMenuFromQuery>>
+  hit: NonNullable<ReturnType<typeof resolveMenuFromQuery>>,
+  userInput: string
 ): TextFoodLogPayload {
   return {
     id: hit.id,
     name: hit.name,
+    display_label: hit.name,
+    user_input_label: userInput,
+    matched_item_label: hit.name,
+    matched_restaurant: hit.store,
+    match_type: 'exact_kb_match',
     store: hit.store,
     calories: hit.calories,
     protein_g: hit.protein_g,
@@ -30,10 +37,17 @@ function officialFromKb(
   }
 }
 
-function unknownPayload(name: string, explanation: string): TextFoodLogPayload {
+function unknownPayload(
+  name: string,
+  explanation: string,
+  extras?: Partial<TextFoodLogPayload>
+): TextFoodLogPayload {
+  const trimmed = name.trim()
   return {
     id: newTextLogId(),
-    name: name.trim(),
+    name: trimmed,
+    display_label: trimmed,
+    user_input_label: trimmed,
     ...NULL_MACROS,
     protein_g: null,
     carbs_g: null,
@@ -43,6 +57,7 @@ function unknownPayload(name: string, explanation: string): TextFoodLogPayload {
     capture_status: 'photo_only',
     source: 'free_text',
     explanation,
+    ...extras,
   }
 }
 
@@ -57,18 +72,15 @@ export function resolveFreeTextMealClient(query: string): TextMealResolveResult 
   }
 
   const kb = resolveMenuFromQuery(trimmed)
-  if (kb) {
-    return { can_commit: true, action: 'create_official', payload: officialFromKb(kb) }
+  if (kb && userLabelMatchesVerified(trimmed, kb.name)) {
+    return { can_commit: true, action: 'create_official', payload: officialFromKb(kb, trimmed) }
   }
 
   if (isClearlyUnknownQuery(trimmed)) {
     return {
       can_commit: true,
       action: 'create_unknown',
-      payload: unknownPayload(
-        trimmed,
-        '完全沒有可信營養資料，建立 Text Only Record。'
-      ),
+      payload: unknownPayload(trimmed, '完全沒有可信營養資料，建立 Text Only Record。'),
     }
   }
 
@@ -89,28 +101,7 @@ export function resolveFreeTextMealClient(query: string): TextMealResolveResult 
   }
 
   const hits = searchFoodMenuExtended(trimmed, 5)
-  const strong = hits.filter(h => h.confidence >= 0.85)
-  if (strong.length === 1) {
-    const h = strong[0]!
-    return {
-      can_commit: true,
-      action: 'create_official',
-      payload: {
-        id: h.id,
-        name: h.name,
-        store: h.store,
-        calories: h.calories,
-        protein_g: h.protein_g,
-        carbs_g: h.carbs_g,
-        fat_g: h.fat_g,
-        nutrition_status: 'official',
-        nutrition_confidence: 'A',
-        capture_status: 'resolved',
-        source: 'free_text',
-        explanation: `搜尋匹配：${h.name}`,
-      },
-    }
-  }
+  const possible = hits.slice(0, 3).map(h => h.name)
 
   if (hits.length >= 2 && hits[0]!.confidence - hits[1]!.confidence < 0.08) {
     return {
@@ -127,42 +118,41 @@ export function resolveFreeTextMealClient(query: string): TextMealResolveResult 
     }
   }
 
-  if (hits[0] && hits[0].confidence >= 0.72) {
-    const h = hits[0]
+  const top = hits[0]
+  if (top && userLabelMatchesVerified(trimmed, top.name) && top.confidence >= 0.99) {
     return {
       can_commit: true,
       action: 'create_official',
       payload: {
-        id: h.id,
-        name: h.name,
-        store: h.store,
-        calories: h.calories,
-        protein_g: h.protein_g,
-        carbs_g: h.carbs_g,
-        fat_g: h.fat_g,
+        id: top.id,
+        name: top.name,
+        display_label: top.name,
+        user_input_label: trimmed,
+        matched_item_label: top.name,
+        matched_restaurant: top.store,
+        match_type: 'exact_search_match',
+        store: top.store,
+        calories: top.calories,
+        protein_g: top.protein_g,
+        carbs_g: top.carbs_g,
+        fat_g: top.fat_g,
         nutrition_status: 'official',
-        nutrition_confidence: 'B',
+        nutrition_confidence: 'A',
         capture_status: 'resolved',
         source: 'free_text',
-        explanation: `搜尋匹配：${h.name}`,
+        explanation: `搜尋匹配：${top.name}`,
       },
-    }
-  }
-
-  if (hits.length === 0 || isClearlyUnknownQuery(trimmed)) {
-    return {
-      can_commit: true,
-      action: 'create_unknown',
-      payload: unknownPayload(
-        trimmed,
-        '完全沒有可信營養資料，建立 Text Only Record。'
-      ),
     }
   }
 
   return {
     can_commit: true,
     action: 'create_unknown',
-    payload: unknownPayload(trimmed, '完全沒有可信營養資料，建立 Text Only Record。'),
+    payload: unknownPayload(trimmed, '完全沒有可信營養資料，建立 Text Only Record。', {
+      matched_item_label: top?.name,
+      matched_restaurant: top?.store,
+      match_type: top ? 'possible_match' : undefined,
+      possible_matches: possible,
+    }),
   }
 }

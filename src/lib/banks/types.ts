@@ -63,9 +63,29 @@ export interface UserNutritionMeta {
   sodium_mg?: number
 }
 
+export interface PhotoAiMeta {
+  photo_ai_original_candidates: string[]
+  photo_ai_detected_label: string
+  photo_ai_visual_category: string
+  photo_ai_category_confidence: string
+}
+
+export interface PhotoCorrectionMeta {
+  user_corrected_label: string
+  user_corrected_restaurant?: string
+  user_corrected_category: string
+  correction_source: 'manual_photo_correction'
+}
+
 export interface FoodLogEntry {
   id: string
   name: string
+  /** User-facing label — preserved from original input when fuzzy match exists */
+  display_label?: string
+  user_input_label?: string
+  matched_item_label?: string
+  matched_restaurant?: string
+  match_type?: string
   store?: string
   calories: number | null
   protein_g: number | null
@@ -78,6 +98,8 @@ export interface FoodLogEntry {
   source: 'search' | 'dice' | 'plan' | 'free_text' | 'photo' | 'frequent'
   /** User-captured meal photo (data URL) */
   photo_data_url?: string
+  photo_ai_meta?: PhotoAiMeta
+  photo_correction_meta?: PhotoCorrectionMeta
   /** Background AI still processing */
   learning?: boolean
   /** AI confidence too low — name-only fallback */

@@ -13,6 +13,7 @@ import BBCard from '@/components/ui/BBCard'
 import {
   formatLogCaloriesLine,
   formatLogProteinLine,
+  getFoodLogDisplayLabel,
   isNutritionPendingConfirmation,
   nutritionStatusBadge,
 } from '@/lib/nutrition/food-log-display'
@@ -65,7 +66,7 @@ export default function MealLogCard({ log, onDelete, onConfirmNutrition }: Props
       )}
       <div className="flex-1 min-w-0">
         <p className="text-[16px] truncate" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-          {log.name}
+          {getFoodLogDisplayLabel(log)}
         </p>
         <p className="text-[13px] mt-0.5" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
           {time && <span>{time}</span>}

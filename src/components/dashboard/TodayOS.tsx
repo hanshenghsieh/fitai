@@ -62,6 +62,11 @@ import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems }
 import DiceMealPreview, { type MealPreviewItem } from '@/components/dashboard/DiceMealPreview'
 import TodayFoodMore from '@/components/dashboard/today/TodayFoodMore'
 import PhotoLogSheet, { type PhotoLogDraft } from '@/components/dashboard/today/PhotoLogSheet'
+import ManualPhotoCorrectionSheet from '@/components/dashboard/today/ManualPhotoCorrectionSheet'
+import {
+  buildFoodLogFromManualPhotoCorrection,
+  type ManualPhotoCorrectionResult,
+} from '@/lib/nutrition/photo-manual-correction'
 import { isNutritionPendingConfirmation } from '@/lib/nutrition/food-log-display'
 import { enqueueUnknownFromLog } from '@/lib/nutrition/unknown-food-flow'
 import {
@@ -368,6 +373,7 @@ export default function TodayOS({
   const [photoOpen, setPhotoOpen] = useState(false)
   const [photoDraft, setPhotoDraft] = useState<PhotoLogDraft | null>(null)
   const [photoSaving, setPhotoSaving] = useState(false)
+  const [manualPhotoOpen, setManualPhotoOpen] = useState(false)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const foodLogsRef = useRef(foodLogs)
@@ -704,7 +710,12 @@ export default function TodayOS({
       }
       commitLog({
         id: payload.id,
-        name: payload.name,
+        name: payload.display_label ?? payload.name,
+        display_label: payload.display_label ?? payload.name,
+        user_input_label: payload.user_input_label,
+        matched_item_label: payload.matched_item_label,
+        matched_restaurant: payload.matched_restaurant,
+        match_type: payload.match_type,
         store: payload.store,
         calories: payload.calories,
         protein_g: payload.protein_g,
@@ -712,6 +723,7 @@ export default function TodayOS({
         fat_g: payload.fat_g ?? undefined,
         source: 'photo',
         photo_data_url: url,
+        photo_ai_meta: payload.photo_ai_meta,
         capture_status: payload.capture_status,
         nutrition_status: payload.nutrition_status,
         nutrition_confidence: payload.nutrition_confidence,
@@ -734,6 +746,57 @@ export default function TodayOS({
     }
     finish(dataUrl)
   }, [photoDraft, photoSaving, commitLog, closePhotoSheet])
+
+  const handleManualPhotoCorrection = useCallback(
+    (result: ManualPhotoCorrectionResult) => {
+      if (!photoDraft) return
+      setPhotoSaving(true)
+      const logId = `photo-${Date.now()}`
+      const finish = (url: string) => {
+        const entry = buildFoodLogFromManualPhotoCorrection(result, {
+          id: logId,
+          photo_data_url: url,
+          slot: activeSlot,
+        })
+        commitLog({
+          id: entry.id,
+          name: entry.display_label ?? entry.name,
+          display_label: entry.display_label ?? entry.name,
+          user_input_label: entry.user_input_label,
+          matched_item_label: entry.matched_item_label,
+          matched_restaurant: entry.matched_restaurant,
+          match_type: entry.match_type,
+          store: entry.store,
+          calories: entry.calories,
+          protein_g: entry.protein_g,
+          carbs_g: entry.carbs_g,
+          fat_g: entry.fat_g,
+          source: entry.source,
+          photo_data_url: entry.photo_data_url,
+          photo_ai_meta: entry.photo_ai_meta,
+          photo_correction_meta: entry.photo_correction_meta,
+          capture_status: entry.capture_status,
+          nutrition_status: entry.nutrition_status,
+          nutrition_confidence: entry.nutrition_confidence,
+          user_nutrition_meta: entry.user_nutrition_meta,
+        })
+        setManualPhotoOpen(false)
+        closePhotoSheet()
+        setPhotoSaving(false)
+        if (entry.nutrition_status === 'unknown') {
+          enqueueUnknownFromLog(entry)
+          onOpenNutritionConfirmation?.(entry)
+        }
+      }
+      const dataUrl = photoDraft.dataUrl
+      if (!dataUrl) {
+        void fileToDataUrl(photoDraft.file).then(finish)
+        return
+      }
+      finish(dataUrl)
+    },
+    [photoDraft, commitLog, activeSlot, closePhotoSheet, onOpenNutritionConfirmation]
+  )
 
   const rollDice = useCallback(() => {
     if (!dayStateRef.current.allowDiceAndSuggest || rollingRef.current) return
@@ -924,18 +987,29 @@ export default function TodayOS({
   )
   const handlePickSearch = useCallback(
     (item: { id: string; name: string; store?: string; calories: number; protein_g: number; carbs_g?: number; fat_g?: number }) => {
+      const trimmedQuery = query.trim()
       commitLog({
         id: item.id,
         name: item.name,
+        display_label: item.name,
+        user_input_label: trimmedQuery || item.name,
+        matched_item_label: item.name,
+        matched_restaurant: item.store,
+        match_type: 'user_selected_verified_item',
         store: item.store,
         calories: item.calories,
         protein_g: item.protein_g,
         carbs_g: item.carbs_g,
         fat_g: item.fat_g,
         source: 'search',
+        nutrition_status: 'official',
+        nutrition_confidence: 'A',
+        capture_status: 'resolved',
       })
+      setQuery('')
+      closeMore()
     },
-    [commitLog]
+    [commitLog, query, closeMore]
   )
   const handleCreateFreeText = useCallback(
     (name: string, options?: { forceUnknown?: boolean }) => {
@@ -950,9 +1024,15 @@ export default function TodayOS({
         })
         return
       }
+      const displayLabel = est.display_label ?? est.name
       const pending: Omit<FoodLogEntry, 'logged_at' | 'user_declared'> = {
         id: est.id,
-        name: est.name,
+        name: displayLabel,
+        display_label: displayLabel,
+        user_input_label: est.user_input_label ?? trimmed,
+        matched_item_label: est.matched_item_label,
+        matched_restaurant: est.matched_restaurant,
+        match_type: est.match_type,
         store: est.store,
         calories: est.calories,
         protein_g: est.protein_g,
@@ -964,6 +1044,8 @@ export default function TodayOS({
         capture_status: est.capture_status,
       }
       commitLog(pending)
+      setQuery('')
+      closeMore()
       if (est.nutrition_status === 'unknown') {
         const full: FoodLogEntry = enrichFoodLog({
           ...pending,
@@ -975,7 +1057,7 @@ export default function TodayOS({
         onOpenNutritionConfirmation?.(full)
       }
     },
-    [commitLog, activeSlot, onOpenNutritionConfirmation]
+    [commitLog, activeSlot, onOpenNutritionConfirmation, closeMore]
   )
   const handleCommitFrequent = useCallback(
     (frequentId?: string) => {
@@ -1110,8 +1192,21 @@ export default function TodayOS({
         onAccuracyChange={handleAccuracyChange}
         onSave={savePhotoDraft}
         onBackToCapture={() => setPhotoDraft(null)}
+        onOpenManualCorrection={() => setManualPhotoOpen(true)}
         saving={photoSaving}
       />
+
+      {photoDraft?.accuracy && (
+        <ManualPhotoCorrectionSheet
+          open={manualPhotoOpen}
+          initialLabel={photoDraft.accuracy.label}
+          initialRestaurant={photoDraft.accuracy.store}
+          visualParse={photoDraft.accuracy.visual_parse}
+          originalCandidates={photoDraft.accuracy.photo_ai_original_candidates}
+          onClose={() => setManualPhotoOpen(false)}
+          onCommit={handleManualPhotoCorrection}
+        />
+      )}
 
       {deleteConfirmId && (
         <div

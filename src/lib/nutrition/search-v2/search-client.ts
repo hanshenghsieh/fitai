@@ -13,6 +13,10 @@ import {
 import { enqueueUnknownFood } from './unknown-queue'
 import { explainConfidence } from './confidence'
 import { rankSearchCandidates } from './search-ranking'
+import {
+  filterByVisualCategory,
+  categoryGuardMessage,
+} from '@/lib/nutrition/food-category-guard'
 
 function buildUnknownOutcome(
   query: string,
@@ -49,7 +53,29 @@ export function searchNutritionV2Client(query: string, ctx?: SearchV2Context): S
     }
   }
 
-  const candidates = collectClientCandidates(trimmed, ctx)
+  const rawCandidates = collectClientCandidates(trimmed, ctx)
+  let candidates = rawCandidates
+  if (ctx?.visual_category && ctx.visual_category !== 'unknown') {
+    const filtered = filterByVisualCategory(rawCandidates, ctx.visual_category)
+    if (filtered.length === 0 && rawCandidates.length > 0) {
+      return {
+        level: 'C',
+        action: 'create_unknown',
+        query: trimmed,
+        explanation: categoryGuardMessage(ctx.visual_category),
+        candidates: [],
+        unknown_record: {
+          food_name: trimmed,
+          restaurant: null,
+          nutrition_status: 'unknown',
+          nutrition_confidence: 'Unknown',
+          macros: NULL_MACROS,
+          ui_message: categoryGuardMessage(ctx.visual_category),
+        },
+      }
+    }
+    candidates = filtered
+  }
   const { level, best, ambiguous } = classifyClientMatchLevel(trimmed, candidates)
 
   if (isClearlyUnknownQuery(trimmed)) {

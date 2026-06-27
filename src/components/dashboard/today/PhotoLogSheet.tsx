@@ -37,6 +37,7 @@ interface Props {
   onSave: () => void
   saving?: boolean
   onBackToCapture?: () => void
+  onOpenManualCorrection?: () => void
 }
 
 function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void; onClose: () => void }) {
@@ -186,9 +187,11 @@ function FoodTag({ label, style }: { label: string; style?: React.CSSProperties 
 function AccuracyConfirmSection({
   accuracy,
   onAccuracyChange,
+  onOpenManualCorrection,
 }: {
   accuracy: PhotoAccuracyState
   onAccuracyChange: NonNullable<Props['onAccuracyChange']>
+  onOpenManualCorrection?: () => void
 }) {
   const selectedId = accuracy.answers.selected_candidate_id ?? accuracy.candidates[0]?.id
   const questions = accuracy.confirmation_questions.slice(0, 3)
@@ -207,6 +210,22 @@ function AccuracyConfirmSection({
         <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
           {accuracy.ui_message}
         </p>
+        {onOpenManualCorrection && (
+          <button
+            type="button"
+            onClick={onOpenManualCorrection}
+            className="w-full h-12 text-[15px] active:opacity-90"
+            style={{
+              borderRadius: 22,
+              backgroundColor: TODAY.card,
+              color: TODAY.mocha,
+              fontWeight: 600,
+              border: `1.5px solid ${TODAY.mocha}`,
+            }}
+          >
+            都不是，我要自己輸入
+          </button>
+        )}
       </div>
     )
   }
@@ -301,6 +320,23 @@ function AccuracyConfirmSection({
           好，我記下來了。營養資料來自官方資料庫。
         </p>
       )}
+
+      {onOpenManualCorrection && (
+        <button
+          type="button"
+          onClick={onOpenManualCorrection}
+          className="w-full h-12 text-[15px] active:opacity-90"
+          style={{
+            borderRadius: 22,
+            backgroundColor: TODAY.card,
+            color: TODAY.mocha,
+            fontWeight: 600,
+            border: `1.5px solid rgba(142, 131, 120, 0.35)`,
+          }}
+        >
+          都不是，我要自己輸入
+        </button>
+      )}
     </div>
   )
 }
@@ -314,6 +350,7 @@ function ReviewStep({
   onAccuracyChange,
   onSave,
   saving,
+  onOpenManualCorrection,
 }: {
   draft: PhotoLogDraft
   accuracyEnabled?: boolean
@@ -323,6 +360,7 @@ function ReviewStep({
   onAccuracyChange?: Props['onAccuracyChange']
   onSave: () => void
   saving?: boolean
+  onOpenManualCorrection?: () => void
 }) {
   const accuracyMode = accuracyEnabled && !!draft.accuracy
   const readyForLog = !accuracyMode || draft.accuracy!.ready_for_food_log
@@ -381,7 +419,11 @@ function ReviewStep({
             正在辨識…
           </p>
         ) : accuracyMode && draft.accuracy && onAccuracyChange ? (
-          <AccuracyConfirmSection accuracy={draft.accuracy} onAccuracyChange={onAccuracyChange} />
+          <AccuracyConfirmSection
+            accuracy={draft.accuracy}
+            onAccuracyChange={onAccuracyChange}
+            onOpenManualCorrection={onOpenManualCorrection}
+          />
         ) : (
           <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             辨識不準也沒關係，你可以改一下。
@@ -519,6 +561,7 @@ export default function PhotoLogSheet({
   onSave,
   saving,
   onBackToCapture,
+  onOpenManualCorrection,
 }: Props) {
   useEffect(() => {
     if (!open) return
@@ -560,6 +603,7 @@ export default function PhotoLogSheet({
             onAccuracyChange={onAccuracyChange}
             onSave={onSave}
             saving={saving}
+            onOpenManualCorrection={onOpenManualCorrection}
           />
         ) : (
           <CaptureStep onPickFile={onPickFile} onClose={onClose} />

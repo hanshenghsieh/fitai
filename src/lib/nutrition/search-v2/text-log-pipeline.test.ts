@@ -18,10 +18,12 @@ describe('Text Log V2 — Level A', () => {
     }
   })
 
-  it('T2: resolveOrEstimate uses kb before v2', () => {
+  it('T2: resolveOrEstimate does not fuzzy auto-commit alias (P0)', () => {
     const est = resolveOrEstimateFreeTextMeal('711竹筍排骨湯')
-    assert.equal(est.estimated, false)
-    assert.equal(est.calories, 103)
+    assert.equal(est.estimated, true)
+    assert.equal(est.nutrition_status, 'unknown')
+    assert.equal(est.calories, null)
+    assert.equal(est.display_label, '711竹筍排骨湯')
   })
 })
 
