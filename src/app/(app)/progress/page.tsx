@@ -48,7 +48,7 @@ async function ProgressContent() {
     bundle.measurements[bundle.measurements.length - 1]?.weight_kg ?? bundle.profileWeightKg ?? null
 
   return (
-    <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: BB_V2.bg.canvas }}>
+    <div className="max-w-lg mx-auto pb-6" style={{ backgroundColor: BB_V2.bg.canvas }}>
       <AnalyticsScreen
         measurements={bundle.measurements}
         checkins={bundle.checkins}

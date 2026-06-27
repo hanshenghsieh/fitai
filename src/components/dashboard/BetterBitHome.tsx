@@ -488,9 +488,6 @@ export default function BetterBitHome({
         onDeleteLog={handleDeleteLog}
         onConfirmNutrition={openNutritionConfirmation}
         onOpenPendingQueue={() => setPendingQueueOpen(true)}
-        showMealActions={onDashboard && !intakeSummary.overTarget}
-        onRollDice={() => window.dispatchEvent(new CustomEvent('betterbit:roll-dice'))}
-        onOpenTextLog={() => window.dispatchEvent(new CustomEvent('betterbit:open-text-log'))}
       />
 
       {onDashboard ? (
@@ -502,6 +499,33 @@ export default function BetterBitHome({
             onSetTotal={handleSetWater}
             onReset={handleResetWater}
           />
+        </div>
+      ) : null}
+
+      {onDashboard && !intakeSummary.overTarget ? (
+        <div
+          className="flex items-center justify-center gap-5 px-5 pb-4 max-w-[640px] mx-auto"
+          style={{ fontFamily: TODAY.font }}
+        >
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('betterbit:roll-dice'))}
+            className="text-[14px] active:opacity-70"
+            style={{ color: TODAY.text, fontWeight: 500 }}
+          >
+            換一個
+          </button>
+          <span style={{ color: 'rgba(0,0,0,0.12)' }} aria-hidden>
+            ·
+          </span>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('betterbit:open-text-log'))}
+            className="text-[14px] active:opacity-70"
+            style={{ color: TODAY.text, fontWeight: 500 }}
+          >
+            文字紀錄
+          </button>
         </div>
       ) : null}
 

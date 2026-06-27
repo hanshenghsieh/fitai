@@ -41,7 +41,7 @@ export default async function SettingsPage() {
   const initialEatingContext = memory.eating_context ?? 'solo'
 
   return (
-    <div className="max-w-lg mx-auto min-h-screen" style={{ backgroundColor: colors.bg.canvas }}>
+    <div className="max-w-lg mx-auto pb-6" style={{ backgroundColor: colors.bg.canvas }}>
       <SettingsScreen
         profile={profile}
         email={user.email ?? ''}
