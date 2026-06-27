@@ -487,7 +487,7 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
 
   // 路徑 A：單品僅在主餐本身已達標該餐營養缺口時
   const soloMains = getDiceMainPool(ctx.meal_type, ctx.profile, ctx.memory)
-  const soloSample = shuffledBySeed(soloMains, (ctx.seed ?? 0) + 17, fast ? 60 : 200)
+  const soloSample = shuffledBySeed(soloMains, (ctx.seed ?? 0) + 17, fast ? 180 : 200)
   for (const item of soloSample) {
     for (const line of tryPortionVariants(item, targets, ctx.meal_type, relaxed)) {
       const totals = linesToTotals([line])
@@ -627,6 +627,9 @@ function hashStoreSeed(store: string, seed: number): number {
 
 const sessionDicePools = new Map<string, MealSuggestion[]>()
 
+/** Minimum filtered candidates before we expand the dice pool again. */
+export const DICE_MIN_AVAILABLE_CANDIDATES = 40
+
 function diceSessionPoolKey(ctx: SuggestContext): string {
   const ds = ctx.day_state
   return [
@@ -636,6 +639,8 @@ function diceSessionPoolKey(ctx: SuggestContext): string {
     ds?.effectiveMealProteinTarget ?? 0,
     ctx.profile?.is_vegetarian ? 'v' : '',
     ctx.profile?.is_vegan ? 'vg' : '',
+    ctx.rolls_used ?? 0,
+    ctx.seed ?? 0,
   ].join(':')
 }
 
@@ -653,27 +658,48 @@ function mergeCandidateLists(...lists: MealSuggestion[][]): MealSuggestion[] {
 }
 
 function buildFastCandidatePool(ctx: SuggestContext): MealSuggestion[] {
+  const baseSeed = ctx.seed ?? Date.now()
   const fastCtx = { ...ctx, fast_dice: true }
   let candidates = generateCandidates(fastCtx, false)
-  if (candidates.length < 12) {
-    candidates = mergeCandidateLists(candidates, generateCandidates(fastCtx, true))
+  candidates = mergeCandidateLists(
+    candidates,
+    generateCandidates({ ...fastCtx, seed: baseSeed + 9001 }, true)
+  )
+  if (candidates.length < 80) {
+    candidates = mergeCandidateLists(
+      candidates,
+      generateCandidates({ ...fastCtx, seed: baseSeed + 18001 }, true),
+      generateCandidates({ ...fastCtx, seed: baseSeed + 27001 }, false)
+    )
   }
   return candidates
+}
+
+export function clearSessionDicePoolsForTests(): void {
+  sessionDicePools.clear()
 }
 
 function filterCandidatesForRoll(pool: MealSuggestion[], ctx: SuggestContext): MealSuggestion[] {
   const excludeIds = new Set(ctx.exclude_ids ?? [])
   const excludeNames = [...(ctx.exclude_names ?? [])]
-  const excludeStores = new Set(ctx.exclude_stores ?? [])
   const reroll = ctx.rolls_used ?? 0
+  // Only avoid the immediately previous store — not entire session history (was shrinking pool to ~4).
+  const recentStores = new Set(
+    reroll > 0 ? (ctx.exclude_stores ?? []).slice(-1) : []
+  )
 
   return pool.filter(c => {
     if (excludeIds.has(c.id)) return false
     if (isExcludedByName(c.lines, excludeNames)) return false
-    if (reroll > 0 && c.stores[0] && excludeStores.has(c.stores[0])) return false
+    if (reroll > 0 && c.stores[0] && recentStores.has(c.stores[0])) return false
     if (!validateMealLines(c.lines, ctx).valid) return false
     return true
   })
+}
+
+/** @internal test hook */
+export function filterDiceCandidatesForRoll(pool: MealSuggestion[], ctx: SuggestContext): MealSuggestion[] {
+  return filterCandidatesForRoll(pool, ctx)
 }
 
 function finalizeSuggestionPick(
@@ -835,13 +861,12 @@ function suggestNextMealFromPool(
   }
 
   let available = filterCandidatesForRoll(pool, ctx)
-  if (available.length < 4) {
+  if (available.length < DICE_MIN_AVAILABLE_CANDIDATES) {
     const extra = buildFastCandidatePool({
       ...ctx,
-      seed: (ctx.seed ?? Date.now()) + (ctx.rolls_used ?? 0) * 131 + pool.length,
+      seed: (ctx.seed ?? Date.now()) + (ctx.rolls_used ?? 0) * 131 + pool.length + 4242,
     })
     pool = mergeCandidateLists(pool, extra)
-    sessionDicePools.set(key, pool)
     available = filterCandidatesForRoll(pool, ctx)
   }
 

@@ -826,7 +826,6 @@ export default function TodayOS({
           ...storesInText(l.name),
         ].filter(Boolean)) as string[]
         const excludeStores = [...new Set([
-          ...session.stores,
           preview?.stores[0],
           ...loggedStores,
         ].filter(Boolean))]
