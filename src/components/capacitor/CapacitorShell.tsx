@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { App } from '@capacitor/app'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { isCapacitorNative } from '@/lib/capacitor-native'
-import { installCapacitorIOSShell } from '@/lib/capacitor-ios-shell'
+import { installCapacitorIOSShell, remeasureCapacitorSafeAreas } from '@/lib/capacitor-ios-shell'
 
 export default function CapacitorShell() {
   useEffect(() => {
@@ -12,8 +12,16 @@ export default function CapacitorShell() {
 
     const removeIOSShell = installCapacitorIOSShell()
 
-    void StatusBar.setStyle({ style: Style.Dark }).catch(() => {})
-    void StatusBar.setBackgroundColor({ color: '#FFF9F2' }).catch(() => {})
+    void (async () => {
+      try {
+        await StatusBar.setOverlaysWebView({ overlay: true })
+        await StatusBar.setStyle({ style: Style.Dark })
+        await StatusBar.setBackgroundColor({ color: '#FFF9F2' })
+      } catch {
+        /* native plugin optional */
+      }
+      remeasureCapacitorSafeAreas()
+    })()
 
     let removeBackListener: (() => void) | undefined
 
