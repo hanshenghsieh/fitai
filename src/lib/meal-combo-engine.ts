@@ -1,3 +1,4 @@
+import { diceStoreMatches } from './dice-store-aliases'
 import { eatOutMenu, type ConvenienceItem } from './convenience-store-menu'
 import { isBeverage, isSolidFood, isSoupLike, normalizeDishKey } from './eat-out-builder'
 import {
@@ -259,7 +260,9 @@ export function enumerateStoreComboVariants(
   }
 
   const mains = seededShuffle(
-    menuItems.filter(i => i.store === store && isDiceMainCandidate(i, category) && !excludeNames.has(i.name)),
+    menuItems.filter(
+      i => diceStoreMatches(i.store, store) && isDiceMainCandidate(i, category) && !excludeNames.has(i.name)
+    ),
     storeSeed + 3
   )
 
@@ -283,7 +286,7 @@ export function sidesForMain(main: ConvenienceItem, uniqueItems: ConvenienceItem
   sides: ConvenienceItem[]
   beverages: ConvenienceItem[]
 } {
-  const sameStore = uniqueItems.filter(i => i.store === main.store && i.id !== main.id)
+  const sameStore = uniqueItems.filter(i => diceStoreMatches(i.store, main.store) && i.id !== main.id)
   return {
     sides: sameStore.filter(i => isDiceSideCandidate(i, main)),
     beverages: sameStore.filter(i => isDiceDrinkCandidate(i, main)),

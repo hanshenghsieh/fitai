@@ -6,7 +6,10 @@ import { recentDiceExcludeIds, rollMealSuggestion } from '@/lib/meal-engine'
 import {
   DICE_MIN_AVAILABLE_CANDIDATES,
   clearSessionDicePoolsForTests,
+  generateCandidates,
 } from '@/lib/meal-suggest'
+import { mainsForStore } from '@/lib/dice-menu-pool'
+import { buildSuggestContext } from '@/lib/meal-engine'
 
 describe('Dice diversity — reroll pool policy', () => {
   it('expands pool when fewer than 40 candidates remain', () => {
@@ -67,6 +70,36 @@ describe('Dice diversity — reroll pool policy', () => {
 
     assert.ok(stores.size > 4, `expected >4 stores, got ${stores.size}: ${[...stores].join(', ')}`)
     assert.ok(labels.size > 4, `expected >4 labels, got ${labels.size}`)
+  })
+
+  it('梁社漢 dice pool lists classic mains and generates multiple candidates', async () => {
+    await preloadDiceMenuBulk()
+    clearSessionDicePoolsForTests()
+
+    const dayState = computeTodayMealState({
+      todayFoodLogs: [],
+      normalTargetKcal: 1680,
+      proteinTargetG: 100,
+      mealSlot: 'lunch',
+      hourOfDay: 12,
+    })
+
+    const mains = mainsForStore('梁社漢', 'lunch')
+    const classicNames = mains
+      .map(m => m.name)
+      .filter(n => /排骨|雞腿|雞排|腿庫|焢肉/.test(n))
+    assert.ok(classicNames.length >= 4, `expected classic mains, got: ${classicNames.join(', ')}`)
+
+    const ctx = buildSuggestContext({
+      meal_type: 'lunch',
+      daily_targets: { calories: 1680, protein_g: 100, carbs_g: 200, fat_g: 55 },
+      day_state: dayState,
+      seed: 42,
+      fast_dice: true,
+    })
+    const candidates = generateCandidates({ ...ctx, fast_dice: true }, true).filter(c => c.stores[0] === '梁社漢')
+    const dishNames = new Set(candidates.flatMap(c => c.lines.map(l => l.item.name)))
+    assert.ok(dishNames.size >= 4, `expected 4+ 梁社漢 candidates, got: ${[...dishNames].join(', ')}`)
   })
 
   it('clearSessionDicePoolsForTests resets cache', () => {

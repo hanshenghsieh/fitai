@@ -5,7 +5,23 @@ import type { EatOutPreferences, UserMemoryState } from './meal-engine-types'
 import { budgetMaxForMeal } from './meal-engine-types'
 import { isSanitizedMenuItem } from './meal-combo-validity'
 import { isPlausibleBrandItem } from './store-menu-plausibility'
+import { canonicalDiceStore } from './dice-store-aliases'
 import { passesMenuAccessGate, type MenuAccessMode } from './nutrition/menu-confidence-runtime'
+
+function mealCategoryOk(
+  item: ConvenienceItem,
+  mealType: MealType,
+  mode: MenuAccessMode
+): boolean {
+  if (item.category === mealType) return true
+  if (mode !== 'dice') return false
+  if (item.source !== 'chain' && item.source !== 'delivery') return false
+  if (mealType === 'breakfast') return false
+  return (
+    (mealType === 'lunch' && item.category === 'dinner') ||
+    (mealType === 'dinner' && item.category === 'lunch')
+  )
+}
 
 const MEAT_KEYWORDS = ['雞', '鴨', '肉', '蝦', '鮪', '牛', '豬', '魚', '蛤', '蚵', '鮭', '培根', '香腸']
 const DAIRY_KEYWORDS = ['蛋', '乳', '奶', '起司', '優格']
@@ -94,7 +110,7 @@ export function getFilteredMenu(
   const mode = opts?.mode ?? 'recommend'
   let items = (opts?.source ?? eatOutMenu).filter(
     i =>
-      i.category === mealType &&
+      mealCategoryOk(i, mealType, mode) &&
       isSanitizedMenuItem(i, { allowBeverages: opts?.includeBeverages }) &&
       isPlausibleBrandItem(i) &&
       passesMenuAccessGate(i, mode)
@@ -102,6 +118,9 @@ export function getFilteredMenu(
   items = filterByProfile(items, profile)
   items = filterByBudget(items, mealType, profile, memory?.eat_out_prefs)
   items = filterByStorePrefs(items, memory?.eat_out_prefs)
+  if (mode === 'dice') {
+    items = items.map(i => ({ ...i, store: canonicalDiceStore(i.store) }))
+  }
   return items
 }
 

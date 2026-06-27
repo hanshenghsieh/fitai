@@ -3,6 +3,7 @@ import { describe, it } from 'node:test'
 import type { ConvenienceItem } from '@/lib/convenience-store-menu'
 import {
   evaluateMenuItemConfidence,
+  isDiceRecommendable,
   isRuntimeRecommendable,
   isRuntimeSearchable,
 } from './menu-confidence-runtime'
@@ -54,14 +55,19 @@ describe('menu-confidence-runtime', () => {
     assert.equal(isRuntimeRecommendable(ok), true)
   })
 
-  it('marks estimated pending as C (search only)', () => {
-    const pending = item({
-      id: 'est-1',
-      name: '測試餐',
-      store: '7-11',
-      description: '測試 · 估計營養（待交叉驗證）',
+  it('allows verified chain mains for dice even when macro QA is D', () => {
+    const ribs = item({
+      id: '梁社漢-排骨飯',
+      name: '排骨飯',
+      store: '梁社漢',
+      calories: 750,
+      protein_g: 30,
+      carbs_g: 85,
+      fat_g: 32,
+      description: '排骨便當連鎖',
     })
-    assert.equal(evaluateMenuItemConfidence(pending), 'D')
+    assert.equal(isRuntimeRecommendable(ribs), false)
+    assert.equal(isDiceRecommendable(ribs), true)
   })
 })
 

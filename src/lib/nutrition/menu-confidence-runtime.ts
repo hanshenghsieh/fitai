@@ -18,7 +18,7 @@ import {
 } from './menu-confidence-core'
 import allowlistJson from '../../../data/food-kb/food-source-allowlist.json'
 
-export type MenuAccessMode = 'recommend' | 'search'
+export type MenuAccessMode = 'recommend' | 'search' | 'dice'
 
 export { isPlaceholderMenuItem } from './menu-confidence-core'
 
@@ -109,6 +109,21 @@ export function isRuntimeSearchable(item: ConvenienceItem): boolean {
   return evaluateMenuItemConfidence(item) !== 'D'
 }
 
+export function isDiceRecommendable(item: ConvenienceItem): boolean {
+  if (isRuntimeRecommendable(item)) return true
+  const store = (item.store ?? '').trim()
+  if (store === '自助餐組件') return true
+  if (!hasCompleteNutrition(item)) return false
+  if (isPlaceholderMenuItem(item)) return false
+  if (item.source !== 'chain' && item.source !== 'delivery') return false
+
+  const reg = getRestaurantMenuRegistry()
+  const canonical = store ? canonicalStoreName(store, reg.allowlistIndex) : null
+  if (!canonical || !reg.allowlistedStores.has(canonical)) return false
+  return energyBalanceOk(item.calories, item.protein_g, item.carbs_g, item.fat_g)
+}
+
 export function passesMenuAccessGate(item: ConvenienceItem, mode: MenuAccessMode): boolean {
+  if (mode === 'dice') return isDiceRecommendable(item)
   return mode === 'recommend' ? isRuntimeRecommendable(item) : isRuntimeSearchable(item)
 }

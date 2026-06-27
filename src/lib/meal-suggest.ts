@@ -1,3 +1,4 @@
+import { canonicalDiceStore, diceStoreMatches } from './dice-store-aliases'
 import { buildMealCombination, enumerateStoreCombos, enumerateStoreComboVariants, buildComboForMain, sidesForMain } from './meal-combo-engine'
 import { applyPortion, type PortionId, isSolidFood, isBeverage } from './eat-out-builder'
 import { getFilteredMenu, preferredBrandBoost } from './eat-out-filters'
@@ -462,7 +463,7 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
       : gate(totals.calories, totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type)
     if (!passes) return
     seen.add(id)
-    const store = lines[0]!.item.store
+    const store = canonicalDiceStore(lines[0]!.item.store)
     const place =
       ctx.user_lat != null && ctx.user_lng != null
         ? nearestPlaceForBrand(ctx.user_lat, ctx.user_lng, store)
@@ -476,7 +477,7 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
       totals,
       highlight: text,
       highlight_key: key,
-      stores: [...new Set(lines.map(l => l.item.store))],
+      stores: [store],
       restaurant_name: restaurant_name ?? place?.name,
       distance_m: dist,
       walk_minutes: place?.walk_minutes,
@@ -549,15 +550,16 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
     menuByStore.set(i.store, list)
   }
   const mainsByStore = new Map<string, ReturnType<typeof getDiceMainPool>>()
-  for (const main of soloSample.slice(0, fast ? 25 : 80)) {
-    const list = mainsByStore.get(main.store) ?? []
+  for (const main of soloMains) {
+    const canon = canonicalDiceStore(main.store)
+    const list = mainsByStore.get(canon) ?? []
     list.push(main)
-    mainsByStore.set(main.store, list)
+    mainsByStore.set(canon, list)
   }
   for (const [, mains] of mainsByStore) {
-    const storeItems = menuByStore.get(mains[0]!.store) ?? []
+    const storeItems = menu.filter(i => diceStoreMatches(i.store, mains[0]!.store))
     const sides = storeItems.filter(i => isDiceSideCandidate(i, mains[0]!))
-    for (const main of mains.slice(0, fast ? 3 : 6)) {
+    for (const main of shuffledBySeed(mains, (ctx.seed ?? 0) + hashStoreSeed(mains[0]!.store, 0), fast ? 10 : 6)) {
       for (const side of sides.slice(0, fast ? 3 : 5)) {
         if (side.id === main.id) continue
         addLines([
@@ -596,11 +598,21 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
     }
   }
 
-  // 路徑 F：全品牌輪替（每店至少一組候選）
-  const allStores = [...new Set(soloMains.map(m => m.store))]
+  // 路徑 F：全品牌輪替（每店多主餐 + 組合）
+  const allStores = [...new Set(soloMains.map(m => canonicalDiceStore(m.store)))]
   const storeOrder = shuffledBySeed(allStores, (ctx.seed ?? 0) + 99, allStores.length)
   const comboSeed = (ctx.seed ?? 0) + (ctx.rolls_used ?? 0) * 53 + 99
-  for (const store of storeOrder.slice(0, fast ? 18 : 80)) {
+  for (const store of storeOrder.slice(0, fast ? 24 : 80)) {
+    const storeMains = shuffledBySeed(
+      soloMains.filter(m => canonicalDiceStore(m.store) === store),
+      comboSeed + hashStoreSeed(store, 0),
+      fast ? 10 : 16
+    )
+    for (const main of storeMains) {
+      for (const line of tryPortionVariants(main, targets, ctx.meal_type, relaxed)) {
+        addLines([line])
+      }
+    }
     const variants = enumerateStoreComboVariants(
       store,
       ctx.meal_type,
@@ -609,7 +621,7 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
       targets.protein_g,
       comboSeed + hashStoreSeed(store, ctx.seed ?? 0),
       excludeNames,
-      fast ? 2 : 5
+      fast ? 8 : 5
     )
     for (const combo of variants) {
       if (combo.items.length >= 2) addLines(comboToLines(combo))
@@ -661,9 +673,10 @@ function buildFastCandidatePool(ctx: SuggestContext): MealSuggestion[] {
   const baseSeed = ctx.seed ?? Date.now()
   const fastCtx = { ...ctx, fast_dice: true }
   const reroll = ctx.rolls_used ?? 0
-  let candidates = generateCandidates(fastCtx, reroll > 0)
+  let candidates = generateCandidates(fastCtx, true)
   candidates = mergeCandidateLists(
     candidates,
+    generateCandidates(fastCtx, reroll === 0),
     generateCandidates({ ...fastCtx, seed: baseSeed + 9001 }, true)
   )
   if (candidates.length < 80) {

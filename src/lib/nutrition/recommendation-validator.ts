@@ -74,12 +74,13 @@ export function validateMenuItem(
 
 export function validateMealLines(lines: MealLine[], ctx: SuggestContext): ValidationResult {
   if (!lines.length) return { valid: false, reasons: ['無餐點'] }
+  const mode: MenuAccessMode = ctx.fast_dice ? 'dice' : 'recommend'
   const reasons: string[] = []
   const stores = uniqueStores(lines)
   const nonCafeteria = stores.filter(s => s !== '自助餐組件')
   if (nonCafeteria.length > 1) reasons.push('不可跨店混搭')
   for (const line of lines) {
-    const result = validateMenuItem(line.item)
+    const result = validateMenuItem(line.item, undefined, mode)
     if (!result.valid) reasons.push(...result.reasons)
   }
   const totals = lines.reduce(

@@ -7,6 +7,7 @@ import type { MealType } from './checkin-utils'
 import type { UserProfile } from '@/types'
 import type { UserMemoryState } from './meal-engine-types'
 import { isBeverage, isFullMealName, isSolidFood, isStarchMain } from './eat-out-builder'
+import { diceStoreMatches } from './dice-store-aliases'
 
 /** 手搖飲 / 咖啡品牌（動態對齊 brand-registry） */
 export { DRINK_STORE_NAMES, isDrinkStore } from './drink-stores'
@@ -53,7 +54,26 @@ function dicePoolCacheKey(
 function mergeDiceMenus(bulk: ConvenienceItem[]): ConvenienceItem[] {
   const seen = new Set(eatOutMenu.map(i => i.id))
   const extra = bulk.filter(i => i.id && !seen.has(i.id))
-  return [...eatOutMenu, ...extra]
+  const runtimeChainMains: ConvenienceItem[] = [
+    {
+      id: '梁社漢-雞腿飯',
+      name: '雞腿飯',
+      store: '梁社漢',
+      source: 'chain',
+      category: 'lunch',
+      role: 'combo',
+      portionable: true,
+      tags: ['rice'],
+      calories: 603,
+      protein_g: 33,
+      carbs_g: 68,
+      fat_g: 24,
+      price: 125,
+      photo_url: '',
+      description: '梁社漢 品牌公開資料 · 雞腿飯',
+    },
+  ].filter(i => !seen.has(i.id))
+  return [...eatOutMenu, ...extra, ...runtimeChainMains]
 }
 
 /** 動態載入 bulk JSON（獨立 chunk，避免塞進主 bundle） */
@@ -103,20 +123,20 @@ export function isDiceSideCandidate(item: ConvenienceItem, main: ConvenienceItem
   if (isBeverage(item) || isDiceMainCandidate(item, main.category)) return false
   if (item.calories > 280) return false
   if (main.source === 'chain' || main.source === 'delivery') {
-    return item.store === main.store && (item.protein_g >= 3 || item.calories < 200)
+    return diceStoreMatches(item.store, main.store) && (item.protein_g >= 3 || item.calories < 200)
   }
-  return item.source === 'convenience' && item.store === main.store
+  return item.source === 'convenience' && diceStoreMatches(item.store, main.store)
 }
 
 export function isDiceDrinkCandidate(item: ConvenienceItem, main: ConvenienceItem): boolean {
   if (!isBeverage(item)) {
     return (
-      item.store === main.store &&
+      diceStoreMatches(item.store, main.store) &&
       (/豆漿|湯|飲/.test(item.name) || item.role === 'drink') &&
       item.calories < 200
     )
   }
-  return item.store === main.store || (main.source === 'convenience' && item.source === 'convenience')
+  return diceStoreMatches(item.store, main.store) || (main.source === 'convenience' && item.source === 'convenience')
 }
 
 export function getDiceMenuPool(
@@ -130,6 +150,7 @@ export function getDiceMenuPool(
   const pool = getFilteredMenu(mealType, profile, memory, {
     includeBeverages: true,
     source: getDiceMenuSource(),
+    mode: 'dice',
   })
   dicePoolCache.set(key, pool)
   return pool
@@ -172,7 +193,7 @@ export function mainsForStore(
   profile?: UserProfile | null,
   memory?: UserMemoryState
 ): ConvenienceItem[] {
-  return getDiceMainPool(mealType, profile, memory).filter(i => i.store === store)
+  return getDiceMainPool(mealType, profile, memory).filter(i => diceStoreMatches(i.store, store))
 }
 
 export function diceMenuStats(): { items: number; stores: number } {
