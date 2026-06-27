@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { saveBodyMeasurementForUser } from '@/lib/body-measurement-save'
+import { saveBodyMeasurementForUser, validateBodyMetrics } from '@/lib/body-measurement-save'
 import { toast } from 'sonner'
 import { Loader2, LogOut } from 'lucide-react'
 import type { UserProfile } from '@/types'
@@ -47,18 +47,23 @@ export default function SettingsAccountSection({
     const supabase = createClient()
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Unauthorized')
+        data: { session },
+      } = await supabase.auth.getSession()
+      const userId = profile?.id ?? session?.user?.id
+      if (!userId || !session) throw new Error('Unauthorized')
 
       const newWeight = parseFloat(weight)
-      if (!Number.isFinite(newWeight) || newWeight <= 0) {
-        toast.error('請輸入有效體重')
+      const newBf = bodyFat.trim() ? parseFloat(bodyFat) : null
+      const validation = validateBodyMetrics(
+        newWeight,
+        Number.isFinite(newBf as number) ? newBf : null
+      )
+      if (validation) {
+        toast.error(validation)
         return
       }
-      const newBf = bodyFat.trim() ? parseFloat(bodyFat) : null
 
-      const { error } = await saveBodyMeasurementForUser(supabase, user.id, {
+      const { error } = await saveBodyMeasurementForUser(supabase, userId, {
         weight_kg: newWeight,
         body_fat_pct: Number.isFinite(newBf as number) ? newBf : null,
       })
