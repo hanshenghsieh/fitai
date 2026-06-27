@@ -3,7 +3,7 @@ import Capacitor
 
 /// WKWebView shell: match app canvas, disable pinch / double-tap zoom.
 class BridgeViewController: CAPBridgeViewController {
-    private let canvasColor = UIColor(red: 244 / 255, green: 242 / 255, blue: 238 / 255, alpha: 1)
+    private let canvasColor = UIColor(red: 255 / 255, green: 249 / 255, blue: 242 / 255, alpha: 1)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +26,8 @@ class BridgeViewController: CAPBridgeViewController {
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = 1.0
         scrollView.bouncesZoom = false
-        scrollView.contentInsetAdjustmentBehavior = .automatic
+        scrollView.bounces = false
+        scrollView.alwaysBounceVertical = false
+        scrollView.contentInsetAdjustmentBehavior = .never
     }
 }

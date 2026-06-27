@@ -13,7 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="fixed inset-0 flex flex-col" style={{ backgroundColor: TODAY.bg }}>
       <main
         id="app-scroll-root"
-        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-none pb-[92px]"
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-none"
         style={{ WebkitOverflowScrolling: 'touch', backgroundColor: TODAY.bg }}
       >
         <AppRouteShell>{children}</AppRouteShell>

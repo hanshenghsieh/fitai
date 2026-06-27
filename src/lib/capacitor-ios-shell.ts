@@ -11,7 +11,11 @@ export function installCapacitorIOSShell(): () => void {
   const html = document.documentElement
   html.classList.add('capacitor-ios')
   html.style.backgroundColor = CANVAS
+  html.style.height = '100%'
+  html.style.overflow = 'hidden'
   document.body.style.backgroundColor = CANVAS
+  document.body.style.height = '100%'
+  document.body.style.overflow = 'hidden'
 
   let meta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]')
   if (!meta) {
@@ -28,6 +32,10 @@ export function installCapacitorIOSShell(): () => void {
 
   return () => {
     html.classList.remove('capacitor-ios')
+    html.style.height = ''
+    html.style.overflow = ''
+    document.body.style.height = ''
+    document.body.style.overflow = ''
     document.removeEventListener('gesturestart', blockGesture)
     document.removeEventListener('gesturechange', blockGesture)
     document.removeEventListener('gestureend', blockGesture)

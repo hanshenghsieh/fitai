@@ -30,8 +30,8 @@ const config: CapacitorConfig = {
     ],
   },
   ios: {
-    contentInset: 'automatic',
-    scrollEnabled: true,
+    contentInset: 'never',
+    scrollEnabled: false,
     allowsLinkPreview: false,
   },
   plugins: {
