@@ -7,6 +7,7 @@ import type { WeekSummary } from '@/lib/analytics/week-summary'
 import { useReveal } from '@/components/motion/useReveal'
 import WeekHeroCard from './WeekHeroCard'
 import WeekDailyPerformance from './WeekDailyPerformance'
+import WeekCoachInsights from './WeekCoachInsights'
 import WeekChallengeGrid from './WeekChallengeGrid'
 import WeekStrategyRow from './WeekStrategyRow'
 import WeekBestWorst from './WeekBestWorst'
@@ -55,7 +56,7 @@ export default function WeekScreen({ summary, error }: Props) {
         </header>
         <BBCard className="text-center py-12">
           <p className="text-[18px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-            {summary.insufficient_reason ?? '再記錄 3 餐，我就能幫你看出趨勢'}
+            {summary.insufficient_reason ?? '再記錄幾餐，我就能幫你看出本週狀態。'}
           </p>
           <Link
             href="/dashboard"
@@ -94,18 +95,24 @@ export default function WeekScreen({ summary, error }: Props) {
         />
       </RevealSection>
 
-      <RevealSection index={2}>
+      {summary.insights.length > 0 && (
+        <RevealSection index={2}>
+          <WeekCoachInsights insights={summary.insights} />
+        </RevealSection>
+      )}
+
+      <RevealSection index={3}>
         <WeekChallengeGrid challenges={summary.challenges} />
       </RevealSection>
 
-      <RevealSection index={3}>
+      <RevealSection index={4}>
         <WeekStrategyRow
           mealStrategy={summary.mealStrategy}
           workoutStrategy={summary.workoutStrategy}
         />
       </RevealSection>
 
-      <RevealSection index={4}>
+      <RevealSection index={5}>
         <WeekBestWorst bestDay={summary.bestDay} worstDay={summary.worstDay} />
       </RevealSection>
     </div>
