@@ -815,20 +815,10 @@ export default function TodayOS({
       try {
         const excludeIds = [...new Set([
           ...seenIdsForMeal(dailyRolls, slot),
-          ...(dailyRolls.seen_suggestion_ids ?? []),
-          ...session.ids,
           preview?.id,
         ].filter(Boolean))]
-        const previewNames = preview ? linesToDisplayItems(preview.lines).map(i => i.name) : []
-        const excludeNames = [...new Set([...allItemNamesFromLogs(foodLogs), ...previewNames])]
-        const loggedStores = foodLogs.flatMap(l => [
-          l.store,
-          ...storesInText(l.name),
-        ].filter(Boolean)) as string[]
-        const excludeStores = [...new Set([
-          preview?.stores[0],
-          ...loggedStores,
-        ].filter(Boolean))]
+        const excludeNames = allItemNamesFromLogs(foodLogs)
+        const excludeStores = preview?.stores[0] ? [preview.stores[0]] : []
 
         const result = rollMealSuggestion({
           meal_type: slot,

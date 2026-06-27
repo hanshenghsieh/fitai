@@ -660,7 +660,8 @@ function mergeCandidateLists(...lists: MealSuggestion[][]): MealSuggestion[] {
 function buildFastCandidatePool(ctx: SuggestContext): MealSuggestion[] {
   const baseSeed = ctx.seed ?? Date.now()
   const fastCtx = { ...ctx, fast_dice: true }
-  let candidates = generateCandidates(fastCtx, false)
+  const reroll = ctx.rolls_used ?? 0
+  let candidates = generateCandidates(fastCtx, reroll > 0)
   candidates = mergeCandidateLists(
     candidates,
     generateCandidates({ ...fastCtx, seed: baseSeed + 9001 }, true)
@@ -679,14 +680,18 @@ export function clearSessionDicePoolsForTests(): void {
   sessionDicePools.clear()
 }
 
+function diceExcludeStoresForRoll(excludeStores: string[] | undefined, reroll: number): string[] {
+  if (!excludeStores?.length) return []
+  return reroll > 0 ? excludeStores.slice(-1) : excludeStores
+}
+
 function filterCandidatesForRoll(pool: MealSuggestion[], ctx: SuggestContext): MealSuggestion[] {
-  const excludeIds = new Set(ctx.exclude_ids ?? [])
-  const excludeNames = [...(ctx.exclude_names ?? [])]
   const reroll = ctx.rolls_used ?? 0
-  // Only avoid the immediately previous store — not entire session history (was shrinking pool to ~4).
-  const recentStores = new Set(
-    reroll > 0 ? (ctx.exclude_stores ?? []).slice(-1) : []
+  const excludeIds = new Set(
+    reroll > 0 ? (ctx.exclude_ids ?? []).slice(-2) : (ctx.exclude_ids ?? [])
   )
+  const excludeNames = reroll > 0 ? (ctx.exclude_names ?? []).slice(-6) : (ctx.exclude_names ?? [])
+  const recentStores = new Set(diceExcludeStoresForRoll(ctx.exclude_stores, reroll))
 
   return pool.filter(c => {
     if (excludeIds.has(c.id)) return false
@@ -732,7 +737,8 @@ function finalizeSuggestionPick(
   const comboStoreCount = uniqueStoreCount(comboPreferred)
   const comboFirstStoreCount = uniqueStoreCount(comboFirst)
   const fullStoreCount = uniqueStoreCount(candidates)
-  if (comboPreferred.length >= 1) {
+  const rerollStores = diceExcludeStoresForRoll(ctx.exclude_stores, reroll)
+  if (reroll === 0 && comboPreferred.length >= 1) {
     const allowComboOnly =
       reroll === 0 &&
       comboStoreCount >= 8 &&
@@ -767,7 +773,7 @@ function finalizeSuggestionPick(
           ctx.memory,
           c.stores[0] ?? '',
           reroll,
-          ctx.exclude_stores
+          rerollStores
         )
       : scoreCandidate(
           c.totals,
@@ -781,7 +787,7 @@ function finalizeSuggestionPick(
           primaryItemNames(c.lines),
           ctx.exclude_names,
           c.lines.length,
-          ctx.exclude_stores,
+          rerollStores,
           reroll,
           ctx.adherence,
           ctx.calorie_bank
@@ -794,7 +800,7 @@ function finalizeSuggestionPick(
     (ctx.exclude_ids?.length ?? 0) * 17 +
     (ctx.exclude_names?.length ?? 0) * 31 +
     (ctx.exclude_stores?.length ?? 0) * 53
-  const picked = stratifiedStorePick(scored, seed, reroll, ctx.exclude_stores ?? [])
+  const picked = stratifiedStorePick(scored, seed, reroll, rerollStores)
   if (!picked) return { suggestion: null, pool_exhausted: true }
 
   const { score: _s, ...base } = picked

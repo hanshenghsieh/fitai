@@ -62,6 +62,12 @@ export function buildSuggestContext(params: {
   return { ...params, nearby_brands: brands }
 }
 
+/** Dice reroll should only block the last 1–2 picks, not entire session history. */
+export function recentDiceExcludeIds(seenIds: string[], rollsUsed: number): string[] {
+  if (!seenIds.length) return []
+  return rollsUsed > 0 ? seenIds.slice(-2) : seenIds.slice(-1)
+}
+
 export function rollMealSuggestion(params: {
   meal_type: MealType
   daily_targets: SuggestContext['daily_targets']
@@ -82,9 +88,12 @@ export function rollMealSuggestion(params: {
   rolls_used: number
   pool_exhausted: boolean
 } {
-  const seenNames = namesFromSeenIds(params.seen_ids)
+  const recentIds = recentDiceExcludeIds(params.seen_ids, params.rolls_used)
+  const seenNames = namesFromSeenIds(recentIds)
   const excludeNames = [...new Set([...seenNames, ...(params.exclude_names ?? [])])]
   const mealSeed = params.meal_type.charCodeAt(0) * 131
+  const rerollStores =
+    params.rolls_used > 0 ? (params.exclude_stores ?? []).slice(-1) : (params.exclude_stores ?? [])
 
   const ctx = buildSuggestContext({
     meal_type: params.meal_type,
@@ -92,9 +101,9 @@ export function rollMealSuggestion(params: {
     profile: params.profile,
     memory: params.memory,
     day_index: params.day_index,
-    exclude_ids: params.seen_ids,
+    exclude_ids: recentIds,
     exclude_names: excludeNames,
-    exclude_stores: params.exclude_stores,
+    exclude_stores: rerollStores,
     rolls_used: params.rolls_used,
     user_lat: params.user_lat,
     user_lng: params.user_lng,
