@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { saveBodyMeasurementForUser } from '@/lib/body-measurement-save'
 import { toast } from 'sonner'
 import { Loader2, LogOut } from 'lucide-react'
 import type { UserProfile } from '@/types'
@@ -43,24 +44,25 @@ export default function SettingsAccountSection({
 
   async function handleSaveBody() {
     setLoading(true)
+    const supabase = createClient()
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) throw new Error('Unauthorized')
+
       const newWeight = parseFloat(weight)
       if (!Number.isFinite(newWeight) || newWeight <= 0) {
         toast.error('請輸入有效體重')
         return
       }
       const newBf = bodyFat.trim() ? parseFloat(bodyFat) : null
-      const bodyChanged = newWeight !== profile?.weight_kg || newBf !== profile?.body_fat_pct
 
-      if (bodyChanged) {
-        const res = await fetch('/api/measurements', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ weight_kg: newWeight, body_fat_pct: newBf }),
-        })
-        const json = (await res.json().catch(() => ({}))) as { error?: string }
-        if (!res.ok) throw new Error(json.error ?? GENTLE_ERROR_MESSAGE)
-      }
+      const { error } = await saveBodyMeasurementForUser(supabase, user.id, {
+        weight_kg: newWeight,
+        body_fat_pct: Number.isFinite(newBf as number) ? newBf : null,
+      })
+      if (error) throw error
 
       toast.message('記下了')
       setExpanded(false)
