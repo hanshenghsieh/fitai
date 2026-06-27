@@ -134,7 +134,7 @@ export function buildWeekSummary(input: WeekSummaryInput): WeekSummary {
       })
 
   const insights = generateWeeklyInsights(analysis)
-  const challenges = generateWeeklyChallenges(analysis, weeklyMetrics)
+  const challenges = generateWeeklyChallenges(analysis, weeklyMetrics, input.targets.water_ml)
   const mealStrategy = generateMealStrategy(analysis)
   const workoutStrategy = generateWorkoutStrategy(analysis)
 

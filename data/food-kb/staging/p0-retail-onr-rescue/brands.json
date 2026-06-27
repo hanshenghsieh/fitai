@@ -1,0 +1,97 @@
+{
+  "sprint": "p0-retail-onr-rescue",
+  "theme": "P0 零售 ONR Rescue",
+  "generated_at": "2026-06-27T15:32:45.071Z",
+  "policy": "zero_hallucination",
+  "brands": [
+    {
+      "canonical_name": "萊爾富",
+      "store_aliases": [
+        "萊爾富",
+        "Hi-Life",
+        "hilife"
+      ],
+      "group": "p0_retail_onr_rescue",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.hilife.com.tw/productInfo_food.aspx",
+          "source_name": "萊爾富 官方鮮食/熟食",
+          "observed_at": "2026-06-27T15:32:45.069Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_mall",
+          "source_url": "https://www.hilife.com.tw/productInfo_food.aspx",
+          "source_name": "萊爾富 ONR",
+          "observed_at": "2026-06-27T15:32:45.071Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.hilife.com.tw/productInfo_food.aspx",
+      "target_items": 20,
+      "sprint": "p0-retail-onr-rescue",
+      "status": "draft"
+    },
+    {
+      "canonical_name": "OK mart",
+      "store_aliases": [
+        "OK mart",
+        "OK",
+        "OK超商",
+        "okmart"
+      ],
+      "group": "p0_retail_onr_rescue",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.okmart.com.tw/hotProducts_purchase?ID=4",
+          "source_name": "OK mart 官方鮮食/熟食",
+          "observed_at": "2026-06-27T15:32:45.071Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_mall",
+          "source_url": "https://www.okmart.com.tw/hotProducts_purchase?ID=4",
+          "source_name": "OK mart ONR",
+          "observed_at": "2026-06-27T15:32:45.071Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.okmart.com.tw/hotProducts_purchase?ID=4",
+      "target_items": 20,
+      "sprint": "p0-retail-onr-rescue",
+      "status": "draft"
+    },
+    {
+      "canonical_name": "全聯",
+      "store_aliases": [
+        "全聯",
+        "全聯福利中心",
+        "pxmart",
+        "PX Mart"
+      ],
+      "group": "p0_retail_onr_rescue",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82",
+          "source_name": "全聯 官方鮮食/熟食",
+          "observed_at": "2026-06-27T15:32:45.071Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_mall",
+          "source_url": "https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82",
+          "source_name": "全聯 ONR",
+          "observed_at": "2026-06-27T15:32:45.071Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82",
+      "target_items": 20,
+      "sprint": "p0-retail-onr-rescue",
+      "status": "draft"
+    }
+  ]
+}

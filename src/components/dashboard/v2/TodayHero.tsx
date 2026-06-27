@@ -22,6 +22,9 @@ interface Props {
   onDeleteLog?: (id: string) => void
   onConfirmNutrition?: (log: FoodLogEntry) => void
   onOpenPendingQueue?: () => void
+  onRollDice?: () => void
+  onOpenTextLog?: () => void
+  showMealActions?: boolean
 }
 
 export default function TodayHero({
@@ -36,6 +39,9 @@ export default function TodayHero({
   onDeleteLog,
   onConfirmNutrition,
   onOpenPendingQueue,
+  onRollDice,
+  onOpenTextLog,
+  showMealActions = false,
 }: Props) {
   const carbsLogged = sumLoggedCarbs(foodLogs)
   const fatLogged = sumLoggedFat(foodLogs)
@@ -66,6 +72,30 @@ export default function TodayHero({
         <p className="text-[13px] text-center px-4 leading-relaxed" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
           今天營養量已經很足夠了
         </p>
+      )}
+
+      {showMealActions && onRollDice && onOpenTextLog && (
+        <div className="flex items-center justify-center gap-5 px-1">
+          <button
+            type="button"
+            onClick={onRollDice}
+            className="text-[14px] active:opacity-70"
+            style={{ color: BB_V2.text.primary, fontWeight: 500 }}
+          >
+            換一個
+          </button>
+          <span style={{ color: BB_V2.divider }} aria-hidden>
+            ·
+          </span>
+          <button
+            type="button"
+            onClick={onOpenTextLog}
+            className="text-[14px] active:opacity-70"
+            style={{ color: BB_V2.text.primary, fontWeight: 500 }}
+          >
+            文字紀錄
+          </button>
+        </div>
       )}
 
       {sortedLogs.length > 0 && (

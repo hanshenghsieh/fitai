@@ -1,0 +1,91 @@
+{
+  "policy": "zero_hallucination",
+  "sprint": "p0-retail-onr-rescue",
+  "generated_at": "2026-06-27T00:00:00.000Z",
+  "note": "Founder-approved entries only. No AI estimates. No bulk placeholder.",
+  "brands": [
+    { "brand_id": "hilife", "items": [] },
+    { "brand_id": "okmart", "items": [] },
+    { "brand_id": "pxmart", "items": [] }
+  ],
+  "blocked": [
+    {
+      "brand_id": "hilife",
+      "name": "茶葉蛋",
+      "category": "protein",
+      "status": "blocked_by_missing_official_nutrition",
+      "reason": "官網 SPA 無 per-item 營養；Puppeteer 0 筆完整四宏量",
+      "attempted_sources": [
+        "https://www.hilife.com.tw/productInfo_food.aspx",
+        "https://www.hilife.com.tw/productInfo_foodList.aspx?cateid=15"
+      ]
+    },
+    {
+      "brand_id": "hilife",
+      "name": "御飯糰系列",
+      "category": "rice_ball",
+      "status": "blocked_by_missing_official_nutrition",
+      "reason": "官網無數位化營養表；僅包裝標示",
+      "attempted_sources": ["https://www.hilife.com.tw/productInfo_foodList.aspx?cateid=15"]
+    },
+    {
+      "brand_id": "hilife",
+      "name": "能量主餐/便當",
+      "category": "bento",
+      "status": "blocked_by_missing_official_nutrition",
+      "reason": "官網無 per-item 熱量蛋白脂肪碳水",
+      "attempted_sources": ["https://www.hilife.com.tw/productInfo_foodList.aspx?cateid=13"]
+    },
+    {
+      "brand_id": "okmart",
+      "name": "哈燒熱點/便當",
+      "category": "bento",
+      "status": "blocked_by_missing_official_nutrition",
+      "reason": "hotProducts_purchase 頁面無 server-render 營養",
+      "attempted_sources": [
+        "https://www.okmart.com.tw/hotProducts_purchase?ID=15",
+        "https://www.okmart.com.tw/hotProducts_purchase?ID=55"
+      ]
+    },
+    {
+      "brand_id": "okmart",
+      "name": "飯糰/手捲",
+      "category": "rice_ball",
+      "status": "blocked_by_missing_official_nutrition",
+      "reason": "官網無完整四宏量數位來源",
+      "attempted_sources": ["https://www.okmart.com.tw/hotProducts_purchase?ID=20"]
+    },
+    {
+      "brand_id": "pxmart",
+      "name": "美味堂 幸福餐盒",
+      "category": "bento",
+      "status": "blocked_by_missing_official_nutrition",
+      "reason": "品牌頁僅規格/描述，無完整四宏量",
+      "attempted_sources": ["https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82"]
+    },
+    {
+      "brand_id": "pxmart",
+      "name": "美味堂 阿薩姆茶葉蛋",
+      "category": "protein",
+      "status": "blocked_by_missing_official_nutrition",
+      "reason": "官網僅 350g/包 規格，無 per-serving 四宏量",
+      "attempted_sources": ["https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82"]
+    },
+    {
+      "brand_id": "pxmart",
+      "name": "美味堂 輕食沙拉胸",
+      "category": "salad",
+      "status": "blocked_by_missing_official_nutrition",
+      "reason": "官網僅 100g/包 規格，無完整營養標示頁",
+      "attempted_sources": ["https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82"]
+    },
+    {
+      "brand_id": "pxmart",
+      "name": "美味堂 浩克爸爸照燒雞腿排",
+      "category": "protein",
+      "status": "blocked_by_missing_official_nutrition",
+      "reason": "官網僅標示 54.8g 蛋白質/380g，缺 calories/fat/carbs",
+      "attempted_sources": ["https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82"]
+    }
+  ]
+}

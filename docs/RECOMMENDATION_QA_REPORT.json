@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-26T15:47:32.737Z",
+  "generated_at": "2026-06-27T15:34:04.176Z",
   "scope": "offline_qa",
   "menu_scope": "core",
   "restaurant_coverage": {
@@ -1483,55 +1483,55 @@
     {
       "scenario": "protein_gap_high",
       "meal_type": "lunch",
-      "suggestion_id": "sprint1-鬍鬚張-雞腿飯:full",
+      "suggestion_id": "sub-chips:full|sub-footlong-turkey:full",
       "valid": true,
       "confidence": "A",
       "recommendable": true,
       "explainability_ok": true,
-      "explanation": "今天蛋白質還少約 102g，所以推薦高蛋白組合 推薦：鬍鬚張 · 雞腿飯 此餐 +38g 蛋白質、+700 kcal，脂肪 26g、碳水 80g。 營養來源：官方（鬍鬚張 官方營養參考） · 2 來源交叉驗證 · confidence B · 驗證 2026-06-25 · 複核 2026-06-25",
+      "explanation": "今天蛋白質還少約 102g，所以推薦高蛋白組合 推薦：Subway · 火雞胸潛艇堡（12吋·全麥·不加醬）、洋芋片（小包） 此餐 +50g 蛋白質、+710 kcal，脂肪 16g、碳水 94g。 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D",
       "issues": [],
       "totals": {
-        "calories": 700,
-        "protein_g": 38,
-        "carbs_g": 80,
-        "fat_g": 26,
-        "price": 135
+        "calories": 710,
+        "protein_g": 50,
+        "carbs_g": 94,
+        "fat_g": 16,
+        "price": 205
       }
     },
     {
       "scenario": "fat_near_limit",
       "meal_type": "dinner",
-      "suggestion_id": "sprint1-7-11-dinner-23:full",
+      "suggestion_id": "sub-chips:full|sub-cookie-oatmeal:full|subway-雞胸沙拉碗:full",
       "valid": true,
       "confidence": "A",
       "recommendable": true,
       "explainability_ok": true,
-      "explanation": "今天蛋白質還少約 60g，所以推薦高蛋白組合 推薦：7-11 · 椰香綠咖哩嫩雞飯 此餐 +42g 蛋白質、+668 kcal，脂肪 22g、碳水 75g。 營養來源：官方（7-11 鮮食官網） · 2 來源交叉驗證 · confidence B · 驗證 2026-06-25 · 複核 2026-06-25",
+      "explanation": "今天蛋白質還少約 60g，所以推薦高蛋白組合 推薦：Subway · 雞胸沙拉碗、洋芋片（小包）、燕麥葡萄乾餅乾（1片） 此餐 +37g 蛋白質、+630 kcal，脂肪 22g、碳水 66g。 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence A 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D",
       "issues": [],
       "totals": {
-        "calories": 668,
-        "protein_g": 42,
-        "carbs_g": 75,
+        "calories": 630,
+        "protein_g": 37,
+        "carbs_g": 66,
         "fat_g": 22,
-        "price": 99
+        "price": 190
       }
     },
     {
       "scenario": "carb_near_limit",
       "meal_type": "lunch",
-      "suggestion_id": "sprint1-鬍鬚張-雞腿飯:full",
+      "suggestion_id": "sub-chips:full|sub-footlong-turkey:full",
       "valid": true,
       "confidence": "A",
       "recommendable": true,
       "explainability_ok": true,
-      "explanation": "今天蛋白質還少約 96g，所以推薦高蛋白組合 推薦：鬍鬚張 · 雞腿飯 此餐 +38g 蛋白質、+700 kcal，脂肪 26g、碳水 80g。 營養來源：官方（鬍鬚張 官方營養參考） · 2 來源交叉驗證 · confidence B · 驗證 2026-06-25 · 複核 2026-06-25",
+      "explanation": "今天蛋白質還少約 96g，所以推薦高蛋白組合 推薦：Subway · 火雞胸潛艇堡（12吋·全麥·不加醬）、洋芋片（小包） 此餐 +50g 蛋白質、+710 kcal，脂肪 16g、碳水 94g。 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D",
       "issues": [],
       "totals": {
-        "calories": 700,
-        "protein_g": 38,
-        "carbs_g": 80,
-        "fat_g": 26,
-        "price": 135
+        "calories": 710,
+        "protein_g": 50,
+        "carbs_g": 94,
+        "fat_g": 16,
+        "price": 205
       }
     },
     {

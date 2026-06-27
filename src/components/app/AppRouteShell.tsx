@@ -8,8 +8,15 @@ export default function AppRouteShell({ children }: { children: React.ReactNode 
   const pathname = usePathname()
 
   useEffect(() => {
+    window.dispatchEvent(new CustomEvent('betterbit:route-change', { detail: { pathname } }))
     window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
   }, [pathname])
 
-  return <div key={pathname}>{children}</div>
+  return (
+    <div key={pathname} className="relative isolate min-h-0 overflow-x-hidden">
+      {children}
+    </div>
+  )
 }

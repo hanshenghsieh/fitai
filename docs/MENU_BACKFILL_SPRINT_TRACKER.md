@@ -75,18 +75,14 @@ Sprint N 完成 → QA 全通過 → Founder Review → 核准 → Promote to Ru
 | **3** | 50 | 130 | ✅ build + Founder 核准 Promotion | 燒肉 · 拉麵 · 韓式 |
 | **4** | 50 | 180 | ⏸ ONR 待補 | 火鍋 · 麻辣（0 品項 — 無官方營養） |
 | **5** | 50 | 230 | 🔄 進行中 | 牛排 · 西餐 |
-| 5 | 50 | 230 | ⏳ | P0 牛排／西餐 |
-| 6 | 50 | 280 | ⏳ | P0 泰式／咖啡甜點 |
-| 7 | 50 | 330 | ⏳ | P0/P1 便當／麵食 |
-| 8 | 50 | 380 | ⏳ | P1 牛肉麵／小吃 |
-| 9 | 50 | 430 | ⏳ | P1 鐵板／牛排館 |
-| 10 | 50 | 480 | ⏳ | P1 港式／日式 |
-| 11 | 50 | 530 | ⏳ | P1 韓式／炸雞 |
-| 12 | 50 | 580 | ⏳ | P1 夜市／商圈（精選攤位） |
-| 13 | 50 | 630 | ⏳ | Allowlist 殘餘 + 擴充池 |
-| 14–24 | 50×11 | 1,180 | ⏳ | 擴充池 601–1,180 |
-| 25–39 | 50×15 | 1,930 | ⏳ | 擴充池 1,181–1,930 |
-| 40 | 70 | **2,000** | ⏳ | 最終補齊 |
+| **6** | 50 | 280 | ⏸ **停止 bulk** | P0 partial — 改走 **P0 Retail ONR Rescue** |
+| **7** | — | — | 🛑 **Founder 停止 scaffold** | 不再批量 draft；先補 ONR verified 主餐 |
+| **8–11** | 50×4 | 506 | ⏳ | **P0 missing**（169 家） |
+| **12** | 24 | 530 | ⏳ | **P1 partial** |
+| **13–17** | 50×5 | 780 | ⏳ | **P1 missing**（275 家） |
+| 18+ | 50 | — | ⏳ | Allowlist 擴充池 601+ |
+
+> **Dice 優先序（2026-06）：** 114 partial 含 P1；**P0 partial ~76** → **P0 missing 169** → P1。佇列：`npm run backfill:generate-queue` → `data/food-kb/staging/dice-backfill-queue.json`
 
 > **備註：** Allowlist 目前 600 家；Sprint 13 起需同步擴充 `food-source-allowlist.json` v3（rank 601–2,000），每批候選須先通過 Restaurant Verification 再納入。
 

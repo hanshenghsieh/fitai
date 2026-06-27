@@ -1,63 +1,9 @@
 {
   "version": "1.0.0",
-  "generated_at": "2026-06-25T15:00:31.927Z",
+  "generated_at": "2026-06-27T15:32:36.443Z",
   "policy": "official_nutrition_reference",
-  "brand_count": 17,
+  "brand_count": 20,
   "brands": [
-    {
-      "brand_id": "mcdonald",
-      "canonical_name": "麥當勞",
-      "file": "mcdonald.json",
-      "menu_count": 13
-    },
-    {
-      "brand_id": "kfc",
-      "canonical_name": "肯德基",
-      "file": "kfc.json",
-      "menu_count": 6
-    },
-    {
-      "brand_id": "mos",
-      "canonical_name": "摩斯漢堡",
-      "file": "mos.json",
-      "menu_count": 5
-    },
-    {
-      "brand_id": "subway",
-      "canonical_name": "Subway",
-      "file": "subway.json",
-      "menu_count": 3
-    },
-    {
-      "brand_id": "sunright",
-      "canonical_name": "三商巧福",
-      "file": "sunright.json",
-      "menu_count": 12
-    },
-    {
-      "brand_id": "huzhang",
-      "canonical_name": "鬍鬚張",
-      "file": "huzhang.json",
-      "menu_count": 9
-    },
-    {
-      "brand_id": "yoshinoya",
-      "canonical_name": "吉野家",
-      "file": "yoshinoya.json",
-      "menu_count": 2
-    },
-    {
-      "brand_id": "sukiya",
-      "canonical_name": "Sukiya",
-      "file": "sukiya.json",
-      "menu_count": 3
-    },
-    {
-      "brand_id": "marugame",
-      "canonical_name": "丸龜製麵",
-      "file": "marugame.json",
-      "menu_count": 5
-    },
     {
       "brand_id": "7eleven",
       "canonical_name": "7-11",
@@ -65,22 +11,10 @@
       "menu_count": 24
     },
     {
-      "brand_id": "familymart",
-      "canonical_name": "全家",
-      "file": "familymart.json",
-      "menu_count": 24
-    },
-    {
-      "brand_id": "starbucks",
-      "canonical_name": "星巴克",
-      "file": "starbucks.json",
-      "menu_count": 7
-    },
-    {
-      "brand_id": "louisa",
-      "canonical_name": "路易莎",
-      "file": "louisa.json",
-      "menu_count": 7
+      "brand_id": "85c",
+      "canonical_name": "85度C",
+      "file": "85c.json",
+      "menu_count": 5
     },
     {
       "brand_id": "cama",
@@ -95,9 +29,51 @@
       "menu_count": 2
     },
     {
-      "brand_id": "85c",
-      "canonical_name": "85度C",
-      "file": "85c.json",
+      "brand_id": "familymart",
+      "canonical_name": "全家",
+      "file": "familymart.json",
+      "menu_count": 24
+    },
+    {
+      "brand_id": "hilife",
+      "canonical_name": "萊爾富",
+      "file": "hilife.json",
+      "menu_count": 0
+    },
+    {
+      "brand_id": "huzhang",
+      "canonical_name": "鬍鬚張",
+      "file": "huzhang.json",
+      "menu_count": 9
+    },
+    {
+      "brand_id": "kfc",
+      "canonical_name": "肯德基",
+      "file": "kfc.json",
+      "menu_count": 6
+    },
+    {
+      "brand_id": "louisa",
+      "canonical_name": "路易莎",
+      "file": "louisa.json",
+      "menu_count": 7
+    },
+    {
+      "brand_id": "marugame",
+      "canonical_name": "丸龜製麵",
+      "file": "marugame.json",
+      "menu_count": 5
+    },
+    {
+      "brand_id": "mcdonald",
+      "canonical_name": "麥當勞",
+      "file": "mcdonald.json",
+      "menu_count": 13
+    },
+    {
+      "brand_id": "mos",
+      "canonical_name": "摩斯漢堡",
+      "file": "mos.json",
       "menu_count": 5
     },
     {
@@ -105,6 +81,48 @@
       "canonical_name": "伯朗咖啡",
       "file": "mrbrown.json",
       "menu_count": 3
+    },
+    {
+      "brand_id": "okmart",
+      "canonical_name": "OK mart",
+      "file": "okmart.json",
+      "menu_count": 0
+    },
+    {
+      "brand_id": "pxmart",
+      "canonical_name": "全聯",
+      "file": "pxmart.json",
+      "menu_count": 0
+    },
+    {
+      "brand_id": "starbucks",
+      "canonical_name": "星巴克",
+      "file": "starbucks.json",
+      "menu_count": 7
+    },
+    {
+      "brand_id": "subway",
+      "canonical_name": "Subway",
+      "file": "subway.json",
+      "menu_count": 3
+    },
+    {
+      "brand_id": "sukiya",
+      "canonical_name": "Sukiya",
+      "file": "sukiya.json",
+      "menu_count": 3
+    },
+    {
+      "brand_id": "sunright",
+      "canonical_name": "三商巧福",
+      "file": "sunright.json",
+      "menu_count": 12
+    },
+    {
+      "brand_id": "yoshinoya",
+      "canonical_name": "吉野家",
+      "file": "yoshinoya.json",
+      "menu_count": 2
     }
   ]
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition, useCallback, useEffect, useRef, useMemo } from 'react'
+import { usePathname } from 'next/navigation'
 import { CheckCircle2, Circle, ChevronDown, ChevronUp, Play } from 'lucide-react'
 import {
   buildCheckinPayload,
@@ -40,7 +41,9 @@ import { foodLogsNeedSync, reconcileFoodLogsToday } from '@/lib/food-log-reconci
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
 import { getNutritionDayKey } from '@/lib/timezone'
+import { addWaterMl, resetWaterMl, resolveDailyWaterGoalMl, setWaterMl } from '@/lib/water-log'
 import { TODAY } from '@/lib/today-design'
+import TodayWaterLog from '@/components/dashboard/today/TodayWaterLog'
 import BBCard from '@/components/ui/BBCard'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import { zaijian } from '@/lib/copy/zaijian'
@@ -93,6 +96,8 @@ export default function BetterBitHome({
   trialDaysLeft,
   initialFoodLogs = [],
 }: Props) {
+  const pathname = usePathname()
+  const onDashboard = pathname === '/dashboard'
   const [isPending, startTransition] = useTransition()
   const [expandedWorkout, setExpandedWorkout] = useState(false)
   const [workoutItems, setWorkoutItems] = useState<WorkoutCheckinItem[]>(() =>
@@ -132,6 +137,8 @@ export default function BetterBitHome({
     [userMemory, displayFoodLogs]
   )
   const [postureLine, setPostureLine] = useState('最近忙嗎？回來就好。今天照常。')
+  const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
+  const [trackedDayKey, setTrackedDayKey] = useState(() => getNutritionDayKey())
   const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(null)
   const calorieBankSyncedRef = useRef(false)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -141,12 +148,15 @@ export default function BetterBitHome({
     dailyRolls?: DailyRollState
     mealSuggest?: Partial<Record<MealType, MealSuggestState>>
     customEatOut?: Partial<Record<MealType, CustomEatOutSelection[]>>
+    waterMl?: number
   }>({})
   const userMemoryRef = useRef(userMemory)
   const customEatOutRef = useRef(customEatOut)
   const dailyRollsRef = useRef(dailyRolls)
   const mealSuggestRef = useRef(mealSuggest)
   const workoutItemsRef = useRef(workoutItems)
+  const waterMlRef = useRef(waterMl)
+  waterMlRef.current = waterMl
   userMemoryRef.current = userMemory
   customEatOutRef.current = customEatOut
   dailyRollsRef.current = dailyRolls
@@ -190,6 +200,26 @@ export default function BetterBitHome({
     }
   }, [])
 
+  const waterTargetMl = useMemo(
+    () =>
+      resolveDailyWaterGoalMl({
+        planWaterMl: todayPlan.daily_targets.water_ml,
+        profileWaterMlTarget: profile?.water_ml_target,
+      }),
+    [todayPlan.daily_targets.water_ml, profile?.water_ml_target]
+  )
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      const today = getNutritionDayKey()
+      if (today === trackedDayKey) return
+      setTrackedDayKey(today)
+      waterMlRef.current = 0
+      setWaterMl(0)
+    }, 60_000)
+    return () => window.clearInterval(interval)
+  }, [trackedDayKey])
+
   const intakeSummary = useMemo(() => {
     const caloriesLogged = sumLoggedCalories(displayFoodLogs)
     const proteinLogged = sumLoggedProtein(displayFoodLogs)
@@ -229,7 +259,7 @@ export default function BetterBitHome({
     const state = {
       dietItems: checkin?.diet_items ?? [],
       workoutItems: patch.workoutItems ?? workoutItemsRef.current,
-      waterMl: checkin?.water_ml ?? 0,
+      waterMl: patch.waterMl ?? waterMlRef.current,
       mealModes,
       customEatOut: patch.customEatOut ?? customEatOutRef.current,
       dailyRolls: patch.dailyRolls ?? dailyRollsRef.current,
@@ -257,6 +287,7 @@ export default function BetterBitHome({
       dailyRolls?: DailyRollState
       mealSuggest?: Partial<Record<MealType, MealSuggestState>>
       customEatOut?: Partial<Record<MealType, CustomEatOutSelection[]>>
+      waterMl?: number
     }) => {
       persistPatchRef.current = { ...persistPatchRef.current, ...patch }
       if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
@@ -267,6 +298,43 @@ export default function BetterBitHome({
     },
     [flushPersist]
   )
+
+  const commitWaterMl = useCallback(
+    (nextMl: number) => {
+      waterMlRef.current = nextMl
+      startTransition(() => setWaterMl(nextMl))
+      persist({ waterMl: nextMl })
+    },
+    [persist]
+  )
+
+  const handleAddWater = useCallback(
+    (deltaMl: number) => {
+      const result = addWaterMl(waterMlRef.current, deltaMl)
+      if (!result.ok) {
+        toast.message('喝水量不能為負數')
+        return
+      }
+      commitWaterMl(result.value)
+    },
+    [commitWaterMl]
+  )
+
+  const handleSetWater = useCallback(
+    (totalMl: number) => {
+      const result = setWaterMl(totalMl)
+      if (!result.ok) {
+        toast.message('喝水量不能為負數')
+        return
+      }
+      commitWaterMl(result.value)
+    },
+    [commitWaterMl]
+  )
+
+  const handleResetWater = useCallback(() => {
+    commitWaterMl(resetWaterMl())
+  }, [commitWaterMl])
 
   const handleLogFood = useCallback((logs: FoodLogEntry[], nextMemory: UserMemoryMeta) => {
     userMemoryRef.current = nextMemory
@@ -420,9 +488,25 @@ export default function BetterBitHome({
         onDeleteLog={handleDeleteLog}
         onConfirmNutrition={openNutritionConfirmation}
         onOpenPendingQueue={() => setPendingQueueOpen(true)}
+        showMealActions={onDashboard && !intakeSummary.overTarget}
+        onRollDice={() => window.dispatchEvent(new CustomEvent('betterbit:roll-dice'))}
+        onOpenTextLog={() => window.dispatchEvent(new CustomEvent('betterbit:open-text-log'))}
       />
 
-      <div className="px-5 pb-32 max-w-[640px] mx-auto space-y-6" style={{ fontFamily: TODAY.font }}>
+      {onDashboard ? (
+        <div className="px-5 pb-2 max-w-[640px] mx-auto">
+          <TodayWaterLog
+            loggedMl={waterMl}
+            targetMl={waterTargetMl}
+            onAdd={handleAddWater}
+            onSetTotal={handleSetWater}
+            onReset={handleResetWater}
+          />
+        </div>
+      ) : null}
+
+      {onDashboard ? (
+      <div className="px-5 pb-6 max-w-[640px] mx-auto space-y-6" style={{ fontFamily: TODAY.font }}>
         <TodayOS
           todayPlan={todayPlan}
           profile={profile}
@@ -588,6 +672,7 @@ export default function BetterBitHome({
           </BBCard>
         ) : null}
       </div>
+      ) : null}
 
       <PendingNutritionQueueSheet
         open={pendingQueueOpen}

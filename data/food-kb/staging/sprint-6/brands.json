@@ -1,0 +1,1595 @@
+{
+  "sprint": 6,
+  "batch_id": "sprint-6",
+  "phase": "p0_partial",
+  "theme": "P0 partial upgrade",
+  "generated_at": "2026-06-27T15:21:28.736Z",
+  "policy": "zero_hallucination",
+  "brands": [
+    {
+      "canonical_name": "萊爾富",
+      "store_aliases": [
+        "萊爾富",
+        "Hi-Life",
+        "hilife"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 3,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.hilife.com.tw/",
+          "source_name": "萊爾富 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.729Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%90%8A%E7%88%BE%E5%AF%8C",
+          "source_name": "Google Maps 萊爾富",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.hilife.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "OK超商",
+      "store_aliases": [
+        "OK超商",
+        "OK mart",
+        "OK Mart",
+        "okmart"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 4,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.okmart.com.tw/",
+          "source_name": "OK超商 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/OK%E8%B6%85%E5%95%86",
+          "source_name": "Google Maps OK超商",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.okmart.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "全聯",
+      "store_aliases": [
+        "全聯",
+        "全聯福利中心",
+        "PX Mart",
+        "pxmart"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 5,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.pxmart.com.tw/",
+          "source_name": "全聯 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%85%A8%E8%81%AF",
+          "source_name": "Google Maps 全聯",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.pxmart.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "家樂福",
+      "store_aliases": [
+        "家樂福",
+        "Carrefour",
+        "carrefour"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 6,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.carrefour.com.tw/",
+          "source_name": "家樂福 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%AE%B6%E6%A8%82%E7%A6%8F",
+          "source_name": "Google Maps 家樂福",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.carrefour.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "Costco",
+      "store_aliases": [
+        "Costco",
+        "好市多",
+        "好市多熟食"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 7,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.costco.com.tw/",
+          "source_name": "Costco 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/Costco",
+          "source_name": "Google Maps Costco",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.costco.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "愛買",
+      "store_aliases": [
+        "愛買"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 8,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.a-mart.com.tw/",
+          "source_name": "愛買 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E6%84%9B%E8%B2%B7",
+          "source_name": "Google Maps 愛買",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.a-mart.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "大潤發",
+      "store_aliases": [
+        "大潤發"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 9,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.rt-mart.com.tw/",
+          "source_name": "大潤發 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%A4%A7%E6%BD%A4%E7%99%BC",
+          "source_name": "Google Maps 大潤發",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.rt-mart.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "漢堡王",
+      "store_aliases": [
+        "漢堡王",
+        "Burger King",
+        "必艾客"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 13,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.burgerking.com.tw/menu",
+          "source_name": "漢堡王 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E6%BC%A2%E5%A0%A1%E7%8E%8B",
+          "source_name": "Google Maps 漢堡王",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.burgerking.com.tw/menu",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "丹丹漢堡",
+      "store_aliases": [
+        "丹丹漢堡",
+        "丹丹漢堡七賢店"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 16,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 3,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E4%B8%B9%E4%B8%B9%E6%BC%A2%E5%A0%A1%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "丹丹漢堡 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E4%B8%B9%E4%B8%B9%E6%BC%A2%E5%A0%A1",
+          "source_name": "Google Maps 丹丹漢堡",
+          "observed_at": "2026-06-27T15:21:28.734Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.google.com/search?q=%E4%B8%B9%E4%B8%B9%E6%BC%A2%E5%A0%A1%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "頂呱呱",
+      "store_aliases": [
+        "頂呱呱"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 17,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.tkkinc.com.tw/",
+          "source_name": "頂呱呱 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%A0%82%E5%91%B1%E5%91%B1",
+          "source_name": "Google Maps 頂呱呱",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.tkkinc.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "拿坡里",
+      "store_aliases": [
+        "拿坡里"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 18,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.napoli.com.tw/",
+          "source_name": "拿坡里 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E6%8B%BF%E5%9D%A1%E9%87%8C",
+          "source_name": "Google Maps 拿坡里",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.napoli.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "必勝客",
+      "store_aliases": [
+        "必勝客"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 19,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.pizzahut.com.tw/menu",
+          "source_name": "必勝客 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%BF%85%E5%8B%9D%E5%AE%A2",
+          "source_name": "Google Maps 必勝客",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.pizzahut.com.tw/menu",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "達美樂",
+      "store_aliases": [
+        "達美樂"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 20,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.dominos.com.tw/",
+          "source_name": "達美樂 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%81%94%E7%BE%8E%E6%A8%82",
+          "source_name": "Google Maps 達美樂",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.dominos.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "四海遊龍",
+      "store_aliases": [
+        "四海遊龍"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 22,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.seafooddragon.com.tw/",
+          "source_name": "四海遊龍 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%9B%9B%E6%B5%B7%E9%81%8A%E9%BE%8D",
+          "source_name": "Google Maps 四海遊龍",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.seafooddragon.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "YAYOI彌生軒",
+      "store_aliases": [
+        "YAYOI彌生軒",
+        "彌生軒",
+        "YAYOI"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 28,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.yayoik.com.tw/",
+          "source_name": "YAYOI彌生軒 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/YAYOI%E5%BD%8C%E7%94%9F%E8%BB%92",
+          "source_name": "Google Maps YAYOI彌生軒",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.yayoik.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "丸龜製麵",
+      "store_aliases": [
+        "丸龜製麵"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 30,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.marugame-seimen.com.tw/",
+          "source_name": "丸龜製麵 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E4%B8%B8%E9%BE%9C%E8%A3%BD%E9%BA%B5",
+          "source_name": "Google Maps 丸龜製麵",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.marugame-seimen.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "藏壽司",
+      "store_aliases": [
+        "藏壽司"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 31,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.kurasushi.com.tw/",
+          "source_name": "藏壽司 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%97%8F%E5%A3%BD%E5%8F%B8",
+          "source_name": "Google Maps 藏壽司",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.kurasushi.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "壽司郎",
+      "store_aliases": [
+        "壽司郎"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 32,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 1,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.sushiro.com.tw/",
+          "source_name": "壽司郎 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%A3%BD%E5%8F%B8%E9%83%8E",
+          "source_name": "Google Maps 壽司郎",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.sushiro.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "乾杯",
+      "store_aliases": [
+        "乾杯"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 36,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.kanpai.com.tw/",
+          "source_name": "乾杯 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E4%B9%BE%E6%9D%AF",
+          "source_name": "Google Maps 乾杯",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.kanpai.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "老乾杯",
+      "store_aliases": [
+        "老乾杯"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 37,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.wowprime.com/",
+          "source_name": "老乾杯 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%80%81%E4%B9%BE%E6%9D%AF",
+          "source_name": "Google Maps 老乾杯",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.wowprime.com/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "茶六燒肉堂",
+      "store_aliases": [
+        "茶六燒肉堂",
+        "茶六公益店",
+        "茶六"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 40,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E8%8C%B6%E5%85%AD%E7%87%92%E8%82%89%E5%A0%82%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "茶六燒肉堂 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%8C%B6%E5%85%AD%E7%87%92%E8%82%89%E5%A0%82",
+          "source_name": "Google Maps 茶六燒肉堂",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.google.com/search?q=%E8%8C%B6%E5%85%AD%E7%87%92%E8%82%89%E5%A0%82%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "築間",
+      "store_aliases": [
+        "築間"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 41,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.zhujian.com.tw/",
+          "source_name": "築間 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E7%AF%89%E9%96%93",
+          "source_name": "Google Maps 築間",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.zhujian.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "12MINI",
+      "store_aliases": [
+        "12MINI"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 43,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 3,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.12mini.com.tw/",
+          "source_name": "12MINI 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/12MINI",
+          "source_name": "Google Maps 12MINI",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.12mini.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "肉多多",
+      "store_aliases": [
+        "肉多多"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 45,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.rododo.com.tw/",
+          "source_name": "肉多多 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%82%89%E5%A4%9A%E5%A4%9A",
+          "source_name": "Google Maps 肉多多",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.rododo.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "西堤牛排",
+      "store_aliases": [
+        "西堤牛排",
+        "西堤"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 52,
+      "backfill_status": "sparse",
+      "dice_recommendable_main_count": 2,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E8%A5%BF%E5%A0%A4%E7%89%9B%E6%8E%92%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "西堤牛排 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%A5%BF%E5%A0%A4%E7%89%9B%E6%8E%92",
+          "source_name": "Google Maps 西堤牛排",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.google.com/search?q=%E8%A5%BF%E5%A0%A4%E7%89%9B%E6%8E%92%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "陶板屋",
+      "store_aliases": [
+        "陶板屋"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 53,
+      "backfill_status": "sparse",
+      "dice_recommendable_main_count": 2,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E9%99%B6%E6%9D%BF%E5%B1%8B%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "陶板屋 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%99%B6%E6%9D%BF%E5%B1%8B",
+          "source_name": "Google Maps 陶板屋",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.google.com/search?q=%E9%99%B6%E6%9D%BF%E5%B1%8B%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "夏慕尼",
+      "store_aliases": [
+        "夏慕尼"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 54,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 2,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.chamonix.com.tw/",
+          "source_name": "夏慕尼 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%A4%8F%E6%85%95%E5%B0%BC",
+          "source_name": "Google Maps 夏慕尼",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.chamonix.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "聚北海道鍋物",
+      "store_aliases": [
+        "聚北海道鍋物"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 57,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.jpot.com.tw/",
+          "source_name": "聚北海道鍋物 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%81%9A%E5%8C%97%E6%B5%B7%E9%81%93%E9%8D%8B%E7%89%A9",
+          "source_name": "Google Maps 聚北海道鍋物",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.jpot.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "非常泰",
+      "store_aliases": [
+        "非常泰"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 62,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.wangroup.com.tw/",
+          "source_name": "非常泰 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%9D%9E%E5%B8%B8%E6%B3%B0",
+          "source_name": "Google Maps 非常泰",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.wangroup.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "饗泰多",
+      "store_aliases": [
+        "饗泰多"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 66,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.wangroup.com.tw/",
+          "source_name": "饗泰多 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%A5%97%E6%B3%B0%E5%A4%9A",
+          "source_name": "Google Maps 饗泰多",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.wangroup.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "大心",
+      "store_aliases": [
+        "大心"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 67,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.wangroup.com.tw/",
+          "source_name": "大心 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%A4%A7%E5%BF%83",
+          "source_name": "Google Maps 大心",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.wangroup.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "TGI Fridays",
+      "store_aliases": [
+        "TGI Fridays",
+        "TGI FRIDAYS"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 69,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.tgifridays.com.tw/",
+          "source_name": "TGI Fridays 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/TGI%20Fridays",
+          "source_name": "Google Maps TGI Fridays",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.tgifridays.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "Chili's",
+      "store_aliases": [
+        "Chili's",
+        "Chilis"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 70,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.chilis.com.tw/",
+          "source_name": "Chili's 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/Chili's",
+          "source_name": "Google Maps Chili's",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.chilis.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "丹堤咖啡",
+      "store_aliases": [
+        "丹堤咖啡"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 76,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.dante.com.tw/",
+          "source_name": "丹堤咖啡 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E4%B8%B9%E5%A0%A4%E5%92%96%E5%95%A1",
+          "source_name": "Google Maps 丹堤咖啡",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.dante.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "五十嵐",
+      "store_aliases": [
+        "五十嵐",
+        "50嵐"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 81,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.50lan.com/",
+          "source_name": "五十嵐 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E4%BA%94%E5%8D%81%E5%B5%90",
+          "source_name": "Google Maps 五十嵐",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.50lan.com/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "清心福全",
+      "store_aliases": [
+        "清心福全",
+        "清心"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 82,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.chingshin.com.tw/",
+          "source_name": "清心福全 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E6%B8%85%E5%BF%83%E7%A6%8F%E5%85%A8",
+          "source_name": "Google Maps 清心福全",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.chingshin.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "CoCo都可",
+      "store_aliases": [
+        "CoCo都可",
+        "CoCo",
+        "coco"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 83,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.coco-tea.com.tw/",
+          "source_name": "CoCo都可 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/CoCo%E9%83%BD%E5%8F%AF",
+          "source_name": "Google Maps CoCo都可",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.coco-tea.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "可不可",
+      "store_aliases": [
+        "可不可",
+        "可不可熟成紅茶",
+        "可不可熟成紅茶台北南陽店"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 84,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E5%8F%AF%E4%B8%8D%E5%8F%AF%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "可不可 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%8F%AF%E4%B8%8D%E5%8F%AF",
+          "source_name": "Google Maps 可不可",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.google.com/search?q=%E5%8F%AF%E4%B8%8D%E5%8F%AF%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "迷客夏",
+      "store_aliases": [
+        "迷客夏"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 85,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.milkshop.com.tw/",
+          "source_name": "迷客夏 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%BF%B7%E5%AE%A2%E5%A4%8F",
+          "source_name": "Google Maps 迷客夏",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.milkshop.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "萬波",
+      "store_aliases": [
+        "萬波",
+        "萬波島嶼紅茶"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 87,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E8%90%AC%E6%B3%A2%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "萬波 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%90%AC%E6%B3%A2",
+          "source_name": "Google Maps 萬波",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.google.com/search?q=%E8%90%AC%E6%B3%A2%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "龜記",
+      "store_aliases": [
+        "龜記"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 88,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.guiche.com.tw/",
+          "source_name": "龜記 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%BE%9C%E8%A8%98",
+          "source_name": "Google Maps 龜記",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.guiche.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "麻古茶坊",
+      "store_aliases": [
+        "麻古茶坊"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 89,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.macu.com.tw/",
+          "source_name": "麻古茶坊 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%BA%BB%E5%8F%A4%E8%8C%B6%E5%9D%8A",
+          "source_name": "Google Maps 麻古茶坊",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.macu.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "珍煮丹",
+      "store_aliases": [
+        "珍煮丹",
+        "珍煮丹黑糖飲品"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 90,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E7%8F%8D%E7%85%AE%E4%B8%B9%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "珍煮丹 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E7%8F%8D%E7%85%AE%E4%B8%B9",
+          "source_name": "Google Maps 珍煮丹",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.google.com/search?q=%E7%8F%8D%E7%85%AE%E4%B8%B9%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "春水堂",
+      "store_aliases": [
+        "春水堂",
+        "春水堂創始店"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 91,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E6%98%A5%E6%B0%B4%E5%A0%82%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "春水堂 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E6%98%A5%E6%B0%B4%E5%A0%82",
+          "source_name": "Google Maps 春水堂",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.google.com/search?q=%E6%98%A5%E6%B0%B4%E5%A0%82%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "COMEBUY",
+      "store_aliases": [
+        "COMEBUY"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 93,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.combuy.com.tw/",
+          "source_name": "COMEBUY 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/COMEBUY",
+          "source_name": "Google Maps COMEBUY",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.combuy.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "茶湯會",
+      "store_aliases": [
+        "茶湯會",
+        "TEA TOP"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 94,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E8%8C%B6%E6%B9%AF%E6%9C%83%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "茶湯會 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%8C%B6%E6%B9%AF%E6%9C%83",
+          "source_name": "Google Maps 茶湯會",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.google.com/search?q=%E8%8C%B6%E6%B9%AF%E6%9C%83%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "再睡五分鐘",
+      "store_aliases": [
+        "再睡五分鐘",
+        "再睡5分鐘",
+        "滴妹再睡5分鐘"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 95,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E5%86%8D%E7%9D%A1%E4%BA%94%E5%88%86%E9%90%98%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "再睡五分鐘 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%86%8D%E7%9D%A1%E4%BA%94%E5%88%86%E9%90%98",
+          "source_name": "Google Maps 再睡五分鐘",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.google.com/search?q=%E5%86%8D%E7%9D%A1%E4%BA%94%E5%88%86%E9%90%98%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "得正",
+      "store_aliases": [
+        "得正"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 96,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.dejheng.com/",
+          "source_name": "得正 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%BE%97%E6%AD%A3",
+          "source_name": "Google Maps 得正",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.dejheng.com/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "大苑子",
+      "store_aliases": [
+        "大苑子"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 97,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.yuancha.com.tw/",
+          "source_name": "大苑子 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%A4%A7%E8%8B%91%E5%AD%90",
+          "source_name": "Google Maps 大苑子",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.yuancha.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    },
+    {
+      "canonical_name": "老賴茶棧",
+      "store_aliases": [
+        "老賴茶棧",
+        "老賴紅茶"
+      ],
+      "group": "p0_partial",
+      "sprint6_theme": "P0 partial upgrade",
+      "allowlist_rank": 98,
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.lai-cha.com.tw/",
+          "source_name": "老賴茶棧 官網/營養",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%80%81%E8%B3%B4%E8%8C%B6%E6%A3%A7",
+          "source_name": "Google Maps 老賴茶棧",
+          "observed_at": "2026-06-27T15:21:28.735Z"
+        }
+      ],
+      "nutrition_source_url": "https://www.lai-cha.com.tw/",
+      "target_items": 20,
+      "sprint": 6,
+      "status": "draft"
+    }
+  ]
+}

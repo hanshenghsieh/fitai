@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "brand_id": "pxmart",
+    "canonical_name": "全聯",
+    "store_aliases": [
+      "全聯",
+      "全聯福利中心",
+      "pxmart",
+      "PX Mart"
+    ],
+    "nutrition_source_url": "https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82",
+    "last_verified": "2026-06-27T15:32:36.423Z",
+    "official_version": "1.0.0-p0-retail-rescue",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": []
+}

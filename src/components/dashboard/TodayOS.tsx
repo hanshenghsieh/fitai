@@ -1,7 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ClipboardList, Loader2, RefreshCw, Camera } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { RefreshCw } from 'lucide-react'
 import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu } from '@/lib/food-search'
 import {
@@ -295,6 +296,8 @@ export default function TodayOS({
   registerDeleteLog,
   onOpenNutritionConfirmation,
 }: Props) {
+  const pathname = usePathname()
+  const onDashboard = pathname === '/dashboard'
   const coords = useGeolocation(userMemory.eat_out_prefs?.work_location)
   const memory = memoryFromCheckinMeta({ user_memory: userMemory })
 
@@ -968,7 +971,18 @@ export default function TodayOS({
 
   const openMore = useCallback(() => setMoreOpen(true), [])
   const closeMore = useCallback(() => setMoreOpen(false), [])
-  const openPhoto = useCallback(() => setPhotoOpen(true), [])
+  const closeAllOverlays = useCallback(() => {
+    setMoreOpen(false)
+    setPhotoOpen(false)
+    setManualPhotoOpen(false)
+    setDeleteConfirmId(null)
+    setPhotoDraft(null)
+    setPhotoSaving(false)
+    if (photoPreviewUrlRef.current) {
+      URL.revokeObjectURL(photoPreviewUrlRef.current)
+      photoPreviewUrlRef.current = null
+    }
+  }, [])
   const handleDraftChange = useCallback(
     (patch: Partial<Pick<PhotoLogDraft, 'name' | 'calories' | 'protein_g'>>) => {
       setPhotoDraft(prev => (prev ? { ...prev, ...patch } : prev))
@@ -1063,7 +1077,17 @@ export default function TodayOS({
 
   useEffect(() => {
     const openPhoto = () => setPhotoOpen(true)
+    const openTextLog = () => setMoreOpen(true)
+    const handleRollDice = () => {
+      if (onDashboard) rollDice()
+    }
+    const handleRouteChange = () => closeAllOverlays()
+
     window.addEventListener('betterbit:open-photo', openPhoto)
+    window.addEventListener('betterbit:open-text-log', openTextLog)
+    window.addEventListener('betterbit:roll-dice', handleRollDice)
+    window.addEventListener('betterbit:route-change', handleRouteChange)
+
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       if (params.get('photo') === '1') {
@@ -1071,91 +1095,83 @@ export default function TodayOS({
         window.history.replaceState({}, '', '/dashboard')
       }
     }
-    return () => window.removeEventListener('betterbit:open-photo', openPhoto)
-  }, [])
+
+    return () => {
+      window.removeEventListener('betterbit:open-photo', openPhoto)
+      window.removeEventListener('betterbit:open-text-log', openTextLog)
+      window.removeEventListener('betterbit:roll-dice', handleRollDice)
+      window.removeEventListener('betterbit:route-change', handleRouteChange)
+      closeAllOverlays()
+    }
+  }, [closeAllOverlays, onDashboard, rollDice])
+
+  useEffect(() => {
+    if (!onDashboard) closeAllOverlays()
+  }, [onDashboard, closeAllOverlays])
+
+  const showDiceCard = displayItems.length > 0 || rolling
+
+  if (!onDashboard) return null
 
   return (
-    <div className="pb-2 space-y-8 max-w-[640px] mx-auto" style={{ fontFamily: TODAY.font }}>
-      <BBCard className="space-y-5">
-        {rolling && !dicePreview && displayItems.length === 0 ? (
-          <div className="py-14 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            想一下…
-          </div>
-        ) : displayItems.length > 0 ? (
-          <>
-            {(showingConfirmedSelection || showingLoggedOnly) && (
-              <p className="text-[12px] px-0.5" style={{ color: TODAY.mocha, fontWeight: 500 }}>
-                {showingConfirmedSelection ? '這餐已選' : '這餐已記錄'}
-              </p>
-            )}
-            <DiceMealPreview
-              items={displayItems}
-              mealType={mealSlotLegacy}
-              schedule={userMemory.work_schedule ?? 'standard'}
-              lifeEvent={inferredTrustEvent}
-              prefersCook={profile?.cooking_time_mins != null && profile.cooking_time_mins >= 20}
-              highlightKey={highlightKey}
-              highlightPriceMeta={dicePreview?.highlight_price_meta}
-              debugReason={dicePreview?.recommendation_debug_reason}
-            />
-            {showingConfirmedSelection && slotMealSuggest?.current_highlight && (
-              <p className="text-[13px] px-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-                {slotMealSuggest.current_highlight}
-              </p>
-            )}
-          </>
-        ) : (
-          <div className="py-10 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            點下方換一個，或從文字紀錄
-          </div>
-        )}
+    <div className="pb-2 space-y-4 max-w-[640px] mx-auto" style={{ fontFamily: TODAY.font }}>
+      {showDiceCard && (
+        <BBCard className="space-y-4">
+          {rolling && !dicePreview && displayItems.length === 0 ? (
+            <div className="py-10 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+              想一下…
+            </div>
+          ) : displayItems.length > 0 ? (
+            <>
+              {(showingConfirmedSelection || showingLoggedOnly) && (
+                <p className="text-[12px] px-0.5" style={{ color: TODAY.mocha, fontWeight: 500 }}>
+                  {showingConfirmedSelection ? '這餐已選' : '這餐已記錄'}
+                </p>
+              )}
+              <DiceMealPreview
+                items={displayItems}
+                mealType={mealSlotLegacy}
+                schedule={userMemory.work_schedule ?? 'standard'}
+                lifeEvent={inferredTrustEvent}
+                prefersCook={profile?.cooking_time_mins != null && profile.cooking_time_mins >= 20}
+                highlightKey={highlightKey}
+                highlightPriceMeta={dicePreview?.highlight_price_meta}
+                debugReason={dicePreview?.recommendation_debug_reason}
+              />
+              {showingConfirmedSelection && slotMealSuggest?.current_highlight && (
+                <p className="text-[13px] px-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+                  {slotMealSuggest.current_highlight}
+                </p>
+              )}
+            </>
+          ) : null}
 
-        <div className="space-y-3 pt-1">
           {dicePreview && dayState.allowDiceAndSuggest && (
             <button
               type="button"
               disabled={rolling || confirming}
               onClick={confirmDice}
-              className="w-full h-16 rounded-[24px] text-[18px] disabled:opacity-40"
+              className="w-full h-14 rounded-[22px] text-[16px] disabled:opacity-40"
               style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
             >
               {confirming ? '記錄中…' : '就決定是它了'}
             </button>
           )}
 
-          <div className="flex gap-3">
+          {dicePreview && dayState.allowDiceAndSuggest && (
             <button
               type="button"
-              disabled={rolling || !dayState.allowDiceAndSuggest}
+              disabled={rolling}
               onClick={rollDice}
-              className="flex-1 h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2 disabled:opacity-40"
+              className="w-full h-12 rounded-[20px] text-[14px] flex items-center justify-center gap-2 disabled:opacity-40"
               style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
             >
               <RefreshCw className={`h-[16px] w-[16px] ${rolling ? 'animate-spin' : ''}`} strokeWidth={TODAY.iconStroke} />
               {rolling ? '想一下…' : '換一個'}
             </button>
-            <button
-              type="button"
-              onClick={openMore}
-              className="flex-[1.12] h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2"
-              style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
-            >
-              <ClipboardList className="h-[16px] w-[16px]" strokeWidth={TODAY.iconStroke} />
-              文字紀錄
-            </button>
-          </div>
-
-          <button
-            type="button"
-            onClick={openPhoto}
-            className="w-full h-12 rounded-[20px] text-[14px] flex items-center justify-center gap-2 active:opacity-90"
-            style={{ backgroundColor: TODAY.surface, color: TODAY.mocha, fontWeight: 500 }}
-          >
-            <Camera className="h-[16px] w-[16px]" strokeWidth={TODAY.iconStroke} />
-            拍今天吃的
-          </button>
-        </div>
-      </BBCard>
+          )}
+        </BBCard>
+      )}
 
       <TodayFoodMore
         open={moreOpen}

@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "brand_id": "hilife",
+    "canonical_name": "萊爾富",
+    "store_aliases": [
+      "萊爾富",
+      "Hi-Life",
+      "hilife"
+    ],
+    "nutrition_source_url": "https://www.hilife.com.tw/productInfo_food.aspx",
+    "last_verified": "2026-06-27T15:32:36.419Z",
+    "official_version": "1.0.0-p0-retail-rescue",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": []
+}

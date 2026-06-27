@@ -1,6 +1,6 @@
 # BetterBit Recommendation QA Report
 
-Generated: 2026-06-26T15:47:32.737Z
+Generated: 2026-06-27T15:34:04.176Z
 
 > **Offline QA only** — does not modify Production or runtime database.
 > Awaiting Founder approval before any data or recommendation policy changes.
@@ -68,7 +68,7 @@ Confidence A/B: 75%
 - Confidence: **A**
 - Recommendable: yes
 - Explainability: ✅
-- Why: 今天蛋白質還少約 102g，所以推薦高蛋白組合 推薦：鬍鬚張 · 雞腿飯 此餐 +38g 蛋白質、+700 kcal，脂肪 26g、碳水 80g。 營養來源：官方（鬍鬚張 官方營養參考） · 2 來源交叉驗證 · confidence B · 驗證 2026-06-25 · 複核 2026-06-25
+- Why: 今天蛋白質還少約 102g，所以推薦高蛋白組合 推薦：Subway · 火雞胸潛艇堡（12吋·全麥·不加醬）、洋芋片（小包） 此餐 +50g 蛋白質、+710 kcal，脂肪 16g、碳水 94g。 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D
 - Issues: none
 
 ### fat_near_limit (dinner)
@@ -76,7 +76,7 @@ Confidence A/B: 75%
 - Confidence: **A**
 - Recommendable: yes
 - Explainability: ✅
-- Why: 今天蛋白質還少約 60g，所以推薦高蛋白組合 推薦：7-11 · 椰香綠咖哩嫩雞飯 此餐 +42g 蛋白質、+668 kcal，脂肪 22g、碳水 75g。 營養來源：官方（7-11 鮮食官網） · 2 來源交叉驗證 · confidence B · 驗證 2026-06-25 · 複核 2026-06-25
+- Why: 今天蛋白質還少約 60g，所以推薦高蛋白組合 推薦：Subway · 雞胸沙拉碗、洋芋片（小包）、燕麥葡萄乾餅乾（1片） 此餐 +37g 蛋白質、+630 kcal，脂肪 22g、碳水 66g。 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence A 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D
 - Issues: none
 
 ### carb_near_limit (lunch)
@@ -84,7 +84,7 @@ Confidence A/B: 75%
 - Confidence: **A**
 - Recommendable: yes
 - Explainability: ✅
-- Why: 今天蛋白質還少約 96g，所以推薦高蛋白組合 推薦：鬍鬚張 · 雞腿飯 此餐 +38g 蛋白質、+700 kcal，脂肪 26g、碳水 80g。 營養來源：官方（鬍鬚張 官方營養參考） · 2 來源交叉驗證 · confidence B · 驗證 2026-06-25 · 複核 2026-06-25
+- Why: 今天蛋白質還少約 96g，所以推薦高蛋白組合 推薦：Subway · 火雞胸潛艇堡（12吋·全麥·不加醬）、洋芋片（小包） 此餐 +50g 蛋白質、+710 kcal，脂肪 16g、碳水 94g。 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D 營養來源：品牌公開（Subway 品牌公開資料） · 1 來源 · confidence D
 - Issues: none
 
 ### calories_over_target (dinner)

@@ -1,4 +1,5 @@
 import type { AnalysisSummary } from './analysis-summary'
+import { weeklyWaterTargetLiters } from '@/lib/water-log'
 
 export interface WeeklyMetrics {
   calorieMetDays: number
@@ -24,9 +25,12 @@ export interface WeeklyChallengeItem {
 
 export function generateWeeklyChallenges(
   summary: AnalysisSummary,
-  metrics: WeeklyMetrics
+  metrics: WeeklyMetrics,
+  dailyWaterGoalMl = 2000
 ): WeeklyChallengeItem[] {
   if (summary.insufficient_data) return []
+
+  const weeklyWaterTargetL = weeklyWaterTargetLiters(dailyWaterGoalMl)
 
   return [
     {
@@ -39,11 +43,11 @@ export function generateWeeklyChallenges(
     },
     {
       id: 'water-14l',
-      label: '喝水 14L',
+      label: `喝水 ${weeklyWaterTargetL}L`,
       current: metrics.waterTotalLiters,
-      target: 14,
+      target: weeklyWaterTargetL,
       unit: 'L',
-      done: metrics.waterTotalLiters >= 14,
+      done: metrics.waterTotalLiters >= weeklyWaterTargetL,
     },
     {
       id: 'workout-4',

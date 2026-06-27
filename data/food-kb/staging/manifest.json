@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0-sprint-5",
-  "generated_at": "2026-06-25T16:36:06.943Z",
+  "version": "1.0.0-p0-retail-onr-rescue",
+  "generated_at": "2026-06-27T15:32:49.516Z",
   "policy": "zero_hallucination",
   "restaurants": [
     {
@@ -3215,346 +3215,6 @@
       "qa_passed_at": "2026-06-25T00:00:00.000Z",
       "promoted_at": "2026-06-25T16:18:45.056Z",
       "promoted_item_count": 3
-    },
-    {
-      "canonical_name": "丸龜製麵",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.marugame.com.tw/",
-          "source_name": "丸龜製麵台灣官網"
-        },
-        {
-          "priority": "B",
-          "source_type": "ubereats",
-          "source_url": "https://www.ubereats.com/tw/store/marugame-udon",
-          "source_name": "Uber Eats 丸龜製麵"
-        }
-      ],
-      "items": [
-        {
-          "id": "sprint1-丸龜製麵-釜玉烏龍",
-          "name": "釜玉烏龍",
-          "store": "丸龜製麵",
-          "source": "chain",
-          "category": "lunch",
-          "role": "combo",
-          "portionable": false,
-          "tags": [],
-          "calories": 480,
-          "protein_g": 16,
-          "carbs_g": 72,
-          "fat_g": 12,
-          "price": 99,
-          "photo_url": "",
-          "description": "丸龜製麵 官方營養參考 · 釜玉烏龍 · Sprint1 verified",
-          "nutrition_trace": {
-            "source_type": "official",
-            "source_name": "丸龜製麵 官方營養參考",
-            "verified_at": "2026-06-25T00:00:00.000Z",
-            "verification_count": 2,
-            "confidence": "B",
-            "last_reviewed": "2026-06-25T00:00:00.000Z",
-            "nutrition_conflict_status": "none"
-          },
-          "verification": {
-            "sources": [
-              {
-                "priority": "A",
-                "source_type": "official_website",
-                "source_url": "https://www.marugame.com.tw/",
-                "source_name": "丸龜製麵台灣官網",
-                "observed_at": "2026-06-25T00:00:00.000Z",
-                "nutrition": {
-                  "calories": 480,
-                  "protein_g": 16,
-                  "carbs_g": 72,
-                  "fat_g": 12
-                }
-              },
-              {
-                "priority": "B",
-                "source_type": "ubereats",
-                "source_url": "https://www.ubereats.com/tw/store/marugame-udon",
-                "source_name": "Uber Eats 丸龜製麵",
-                "observed_at": "2026-06-25T00:00:00.000Z",
-                "nutrition": {
-                  "calories": 480,
-                  "protein_g": 16,
-                  "carbs_g": 72,
-                  "fat_g": 12
-                }
-              }
-            ],
-            "source": "丸龜製麵 官方營養參考",
-            "source_url": "https://www.marugame.com.tw/",
-            "verified_at": "2026-06-25T00:00:00.000Z",
-            "verified_by": "menu-backfill-sprint-1",
-            "verification_count": 2,
-            "confidence": "B",
-            "conflict_status": "none"
-          }
-        },
-        {
-          "id": "sprint1-丸龜製麵-牛肉烏龍",
-          "name": "牛肉烏龍",
-          "store": "丸龜製麵",
-          "source": "chain",
-          "category": "lunch",
-          "role": "combo",
-          "portionable": false,
-          "tags": [],
-          "calories": 550,
-          "protein_g": 24,
-          "carbs_g": 68,
-          "fat_g": 18,
-          "price": 129,
-          "photo_url": "",
-          "description": "丸龜製麵 官方營養參考 · 牛肉烏龍 · Sprint1 verified",
-          "nutrition_trace": {
-            "source_type": "official",
-            "source_name": "丸龜製麵 官方營養參考",
-            "verified_at": "2026-06-25T00:00:00.000Z",
-            "verification_count": 2,
-            "confidence": "B",
-            "last_reviewed": "2026-06-25T00:00:00.000Z",
-            "nutrition_conflict_status": "none"
-          },
-          "verification": {
-            "sources": [
-              {
-                "priority": "A",
-                "source_type": "official_website",
-                "source_url": "https://www.marugame.com.tw/",
-                "source_name": "丸龜製麵台灣官網",
-                "observed_at": "2026-06-25T00:00:00.000Z",
-                "nutrition": {
-                  "calories": 550,
-                  "protein_g": 24,
-                  "carbs_g": 68,
-                  "fat_g": 18
-                }
-              },
-              {
-                "priority": "B",
-                "source_type": "ubereats",
-                "source_url": "https://www.ubereats.com/tw/store/marugame-udon",
-                "source_name": "Uber Eats 丸龜製麵",
-                "observed_at": "2026-06-25T00:00:00.000Z",
-                "nutrition": {
-                  "calories": 550,
-                  "protein_g": 24,
-                  "carbs_g": 68,
-                  "fat_g": 18
-                }
-              }
-            ],
-            "source": "丸龜製麵 官方營養參考",
-            "source_url": "https://www.marugame.com.tw/",
-            "verified_at": "2026-06-25T00:00:00.000Z",
-            "verified_by": "menu-backfill-sprint-1",
-            "verification_count": 2,
-            "confidence": "B",
-            "conflict_status": "none"
-          }
-        },
-        {
-          "id": "sprint1-丸龜製麵-天婦羅烏龍",
-          "name": "天婦羅烏龍",
-          "store": "丸龜製麵",
-          "source": "chain",
-          "category": "lunch",
-          "role": "combo",
-          "portionable": false,
-          "tags": [],
-          "calories": 620,
-          "protein_g": 14,
-          "carbs_g": 78,
-          "fat_g": 24,
-          "price": 139,
-          "photo_url": "",
-          "description": "丸龜製麵 官方營養參考 · 天婦羅烏龍 · Sprint1 verified",
-          "nutrition_trace": {
-            "source_type": "official",
-            "source_name": "丸龜製麵 官方營養參考",
-            "verified_at": "2026-06-25T00:00:00.000Z",
-            "verification_count": 2,
-            "confidence": "B",
-            "last_reviewed": "2026-06-25T00:00:00.000Z",
-            "nutrition_conflict_status": "none"
-          },
-          "verification": {
-            "sources": [
-              {
-                "priority": "A",
-                "source_type": "official_website",
-                "source_url": "https://www.marugame.com.tw/",
-                "source_name": "丸龜製麵台灣官網",
-                "observed_at": "2026-06-25T00:00:00.000Z",
-                "nutrition": {
-                  "calories": 620,
-                  "protein_g": 14,
-                  "carbs_g": 78,
-                  "fat_g": 24
-                }
-              },
-              {
-                "priority": "B",
-                "source_type": "ubereats",
-                "source_url": "https://www.ubereats.com/tw/store/marugame-udon",
-                "source_name": "Uber Eats 丸龜製麵",
-                "observed_at": "2026-06-25T00:00:00.000Z",
-                "nutrition": {
-                  "calories": 620,
-                  "protein_g": 14,
-                  "carbs_g": 78,
-                  "fat_g": 24
-                }
-              }
-            ],
-            "source": "丸龜製麵 官方營養參考",
-            "source_url": "https://www.marugame.com.tw/",
-            "verified_at": "2026-06-25T00:00:00.000Z",
-            "verified_by": "menu-backfill-sprint-1",
-            "verification_count": 2,
-            "confidence": "B",
-            "conflict_status": "none"
-          }
-        },
-        {
-          "id": "sprint1-丸龜製麵-明太子烏龍",
-          "name": "明太子烏龍",
-          "store": "丸龜製麵",
-          "source": "chain",
-          "category": "dinner",
-          "role": "combo",
-          "portionable": false,
-          "tags": [],
-          "calories": 520,
-          "protein_g": 18,
-          "carbs_g": 70,
-          "fat_g": 16,
-          "price": 119,
-          "photo_url": "",
-          "description": "丸龜製麵 官方營養參考 · 明太子烏龍 · Sprint1 verified",
-          "nutrition_trace": {
-            "source_type": "official",
-            "source_name": "丸龜製麵 官方營養參考",
-            "verified_at": "2026-06-25T00:00:00.000Z",
-            "verification_count": 2,
-            "confidence": "B",
-            "last_reviewed": "2026-06-25T00:00:00.000Z",
-            "nutrition_conflict_status": "none"
-          },
-          "verification": {
-            "sources": [
-              {
-                "priority": "A",
-                "source_type": "official_website",
-                "source_url": "https://www.marugame.com.tw/",
-                "source_name": "丸龜製麵台灣官網",
-                "observed_at": "2026-06-25T00:00:00.000Z",
-                "nutrition": {
-                  "calories": 520,
-                  "protein_g": 18,
-                  "carbs_g": 70,
-                  "fat_g": 16
-                }
-              },
-              {
-                "priority": "B",
-                "source_type": "ubereats",
-                "source_url": "https://www.ubereats.com/tw/store/marugame-udon",
-                "source_name": "Uber Eats 丸龜製麵",
-                "observed_at": "2026-06-25T00:00:00.000Z",
-                "nutrition": {
-                  "calories": 520,
-                  "protein_g": 18,
-                  "carbs_g": 70,
-                  "fat_g": 16
-                }
-              }
-            ],
-            "source": "丸龜製麵 官方營養參考",
-            "source_url": "https://www.marugame.com.tw/",
-            "verified_at": "2026-06-25T00:00:00.000Z",
-            "verified_by": "menu-backfill-sprint-1",
-            "verification_count": 2,
-            "confidence": "B",
-            "conflict_status": "none"
-          }
-        },
-        {
-          "id": "sprint1-丸龜製麵-咖哩烏龍",
-          "name": "咖哩烏龍",
-          "store": "丸龜製麵",
-          "source": "chain",
-          "category": "dinner",
-          "role": "combo",
-          "portionable": false,
-          "tags": [],
-          "calories": 580,
-          "protein_g": 16,
-          "carbs_g": 82,
-          "fat_g": 18,
-          "price": 109,
-          "photo_url": "",
-          "description": "丸龜製麵 官方營養參考 · 咖哩烏龍 · Sprint1 verified",
-          "nutrition_trace": {
-            "source_type": "official",
-            "source_name": "丸龜製麵 官方營養參考",
-            "verified_at": "2026-06-25T00:00:00.000Z",
-            "verification_count": 2,
-            "confidence": "B",
-            "last_reviewed": "2026-06-25T00:00:00.000Z",
-            "nutrition_conflict_status": "none"
-          },
-          "verification": {
-            "sources": [
-              {
-                "priority": "A",
-                "source_type": "official_website",
-                "source_url": "https://www.marugame.com.tw/",
-                "source_name": "丸龜製麵台灣官網",
-                "observed_at": "2026-06-25T00:00:00.000Z",
-                "nutrition": {
-                  "calories": 580,
-                  "protein_g": 16,
-                  "carbs_g": 82,
-                  "fat_g": 18
-                }
-              },
-              {
-                "priority": "B",
-                "source_type": "ubereats",
-                "source_url": "https://www.ubereats.com/tw/store/marugame-udon",
-                "source_name": "Uber Eats 丸龜製麵",
-                "observed_at": "2026-06-25T00:00:00.000Z",
-                "nutrition": {
-                  "calories": 580,
-                  "protein_g": 16,
-                  "carbs_g": 82,
-                  "fat_g": 18
-                }
-              }
-            ],
-            "source": "丸龜製麵 官方營養參考",
-            "source_url": "https://www.marugame.com.tw/",
-            "verified_at": "2026-06-25T00:00:00.000Z",
-            "verified_by": "menu-backfill-sprint-1",
-            "verification_count": 2,
-            "confidence": "B",
-            "conflict_status": "none"
-          }
-        }
-      ],
-      "status": "promoted",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": [],
-      "qa_passed_at": "2026-06-25T00:00:00.000Z",
-      "promoted_at": "2026-06-25T16:18:45.056Z",
-      "promoted_item_count": 5
     },
     {
       "canonical_name": "7-11",
@@ -7800,75 +7460,6 @@
       "qa_notes": []
     },
     {
-      "canonical_name": "迷客夏",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.milkshop.com.tw/",
-          "source_name": "迷客夏官網",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "foodpanda",
-          "source_url": "https://www.foodpanda.com.tw/restaurant/milkshop",
-          "source_name": "foodpanda 迷客夏",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "愛買",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.a-mart.com.tw/",
-          "source_name": "愛買官網",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E6%84%9B%E8%B2%B7",
-          "source_name": "Google Maps 愛買",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "大潤發",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.rt-mart.com.tw/",
-          "source_name": "大潤發官網",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E5%A4%A7%E6%BD%A4%E7%99%BC",
-          "source_name": "Google Maps 大潤發",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
       "canonical_name": "美廉社",
       "restaurant_sources": [
         {
@@ -7883,182 +7474,6 @@
           "source_type": "google_maps",
           "source_url": "https://www.google.com/maps/search/%E7%BE%8E%E5%BB%89%E7%A4%BE",
           "source_name": "Google Maps 美廉社",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "丹丹漢堡",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.ddburger.com.tw/",
-          "source_name": "丹丹漢堡官網",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "foodpanda",
-          "source_url": "https://www.foodpanda.com.tw/restaurant/dd-burger",
-          "source_name": "foodpanda 丹丹漢堡",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        }
-      ],
-      "items": [
-        {
-          "id": "sprint2-丹丹漢堡-炸雞腿堡",
-          "name": "炸雞腿堡",
-          "store": "丹丹漢堡",
-          "source": "chain",
-          "category": "lunch",
-          "role": "combo",
-          "portionable": false,
-          "tags": [],
-          "calories": 520,
-          "protein_g": 24,
-          "carbs_g": 42,
-          "fat_g": 28,
-          "price": 0,
-          "photo_url": "",
-          "description": "ONR 丹丹漢堡 · 炸雞腿堡 · Sprint2 verified",
-          "nutrition_trace": {
-            "source_type": "official",
-            "source_name": "ONR 丹丹漢堡",
-            "verified_at": "2026-06-25T16:18:25.108Z",
-            "verification_count": 2,
-            "confidence": "A",
-            "last_reviewed": "2026-06-25T16:18:25.108Z",
-            "nutrition_conflict_status": "none"
-          },
-          "verification": {
-            "sources": [
-              {
-                "priority": "A",
-                "source_type": "official_website",
-                "source_url": "https://www.ddburger.com.tw/",
-                "source_name": "丹丹漢堡官網",
-                "observed_at": "2026-06-25T16:18:25.108Z",
-                "nutrition": {
-                  "calories": 520,
-                  "protein_g": 24,
-                  "carbs_g": 42,
-                  "fat_g": 28
-                }
-              },
-              {
-                "priority": "B",
-                "source_type": "foodpanda",
-                "source_url": "https://www.foodpanda.com.tw/restaurant/dd-burger",
-                "source_name": "foodpanda 丹丹漢堡",
-                "observed_at": "2026-06-25T16:18:25.108Z",
-                "nutrition": {
-                  "calories": 520,
-                  "protein_g": 24,
-                  "carbs_g": 42,
-                  "fat_g": 28
-                }
-              }
-            ],
-            "source": "ONR 丹丹漢堡",
-            "source_url": "https://www.ddburger.com.tw/",
-            "verified_at": "2026-06-25T16:18:25.108Z",
-            "verified_by": "menu-backfill-sprint-2",
-            "verification_count": 2,
-            "confidence": "A",
-            "conflict_status": "none"
-          }
-        },
-        {
-          "id": "sprint2-丹丹漢堡-招牌麵線",
-          "name": "招牌麵線",
-          "store": "丹丹漢堡",
-          "source": "chain",
-          "category": "lunch",
-          "role": "combo",
-          "portionable": false,
-          "tags": [],
-          "calories": 380,
-          "protein_g": 12,
-          "carbs_g": 52,
-          "fat_g": 14,
-          "price": 0,
-          "photo_url": "",
-          "description": "ONR 丹丹漢堡 · 招牌麵線 · Sprint2 verified",
-          "nutrition_trace": {
-            "source_type": "official",
-            "source_name": "ONR 丹丹漢堡",
-            "verified_at": "2026-06-25T16:18:25.108Z",
-            "verification_count": 2,
-            "confidence": "A",
-            "last_reviewed": "2026-06-25T16:18:25.108Z",
-            "nutrition_conflict_status": "none"
-          },
-          "verification": {
-            "sources": [
-              {
-                "priority": "A",
-                "source_type": "official_website",
-                "source_url": "https://www.ddburger.com.tw/",
-                "source_name": "丹丹漢堡官網",
-                "observed_at": "2026-06-25T16:18:25.108Z",
-                "nutrition": {
-                  "calories": 380,
-                  "protein_g": 12,
-                  "carbs_g": 52,
-                  "fat_g": 14
-                }
-              },
-              {
-                "priority": "B",
-                "source_type": "foodpanda",
-                "source_url": "https://www.foodpanda.com.tw/restaurant/dd-burger",
-                "source_name": "foodpanda 丹丹漢堡",
-                "observed_at": "2026-06-25T16:18:25.108Z",
-                "nutrition": {
-                  "calories": 380,
-                  "protein_g": 12,
-                  "carbs_g": 52,
-                  "fat_g": 14
-                }
-              }
-            ],
-            "source": "ONR 丹丹漢堡",
-            "source_url": "https://www.ddburger.com.tw/",
-            "verified_at": "2026-06-25T16:18:25.108Z",
-            "verified_by": "menu-backfill-sprint-2",
-            "verification_count": 2,
-            "confidence": "A",
-            "conflict_status": "none"
-          }
-        }
-      ],
-      "status": "promoted",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": [],
-      "qa_passed_at": "2026-06-25T16:18:25.108Z",
-      "promoted_at": "2026-06-25T16:18:45.056Z",
-      "promoted_item_count": 2
-    },
-    {
-      "canonical_name": "12MINI",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.wowprime.com/",
-          "source_name": "王品集團官網（12MINI）",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "foodpanda",
-          "source_url": "https://www.foodpanda.com.tw/restaurant/12mini",
-          "source_name": "foodpanda 12MINI",
           "observed_at": "2026-06-25T16:18:25.108Z"
         }
       ],
@@ -8649,52 +8064,6 @@
       "qa_notes": []
     },
     {
-      "canonical_name": "饗泰多",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.thaitown.com.tw/",
-          "source_name": "瓦城泰統集團官網（饗泰多）",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "foodpanda",
-          "source_url": "https://www.foodpanda.com.tw/restaurant/siam-more",
-          "source_name": "foodpanda 饗泰多",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "非常泰",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.thaitown.com.tw/",
-          "source_name": "瓦城泰統集團官網（非常泰）",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "foodpanda",
-          "source_url": "https://www.foodpanda.com.tw/restaurant/very-thai",
-          "source_name": "foodpanda 非常泰",
-          "observed_at": "2026-06-25T16:18:25.108Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
       "canonical_name": "燒肉同話",
       "restaurant_sources": [
         {
@@ -8732,29 +8101,6 @@
           "source_type": "google_maps",
           "source_url": "https://www.google.com/maps/search/%E8%83%A1%E5%90%8C%E7%87%92%E8%82%89",
           "source_name": "Google Maps 胡同燒肉",
-          "observed_at": "2026-06-25T16:18:32.632Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "茶六燒肉堂",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.tea6.com.tw/",
-          "source_name": "茶六燒肉堂 官網",
-          "observed_at": "2026-06-25T16:18:32.632Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E8%8C%B6%E5%85%AD%E7%87%92%E8%82%89%E5%A0%82",
-          "source_name": "Google Maps 茶六燒肉堂",
           "observed_at": "2026-06-25T16:18:32.632Z"
         }
       ],
@@ -8824,29 +8170,6 @@
           "source_type": "google_maps",
           "source_url": "https://www.google.com/maps/search/%E7%87%92%E8%82%89%E7%9C%BE",
           "source_name": "Google Maps 燒肉眾",
-          "observed_at": "2026-06-25T16:18:32.632Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "築間",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.zhujian.com.tw/",
-          "source_name": "築間 官網",
-          "observed_at": "2026-06-25T16:18:32.632Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E7%AF%89%E9%96%93",
-          "source_name": "Google Maps 築間",
           "observed_at": "2026-06-25T16:18:32.632Z"
         }
       ],
@@ -9796,98 +9119,6 @@
       "promoted_item_count": 5
     },
     {
-      "canonical_name": "老乾杯",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.wowprime.com/",
-          "source_name": "老乾杯 官網",
-          "observed_at": "2026-06-25T16:18:54.436Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E8%80%81%E4%B9%BE%E6%9D%AF",
-          "source_name": "Google Maps 老乾杯",
-          "observed_at": "2026-06-25T16:18:54.436Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "全聯",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.pxmart.com.tw/",
-          "source_name": "全聯 官網",
-          "observed_at": "2026-06-25T16:18:54.436Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E5%85%A8%E8%81%AF",
-          "source_name": "Google Maps 全聯",
-          "observed_at": "2026-06-25T16:18:54.436Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "家樂福",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.carrefour.com.tw/",
-          "source_name": "家樂福 官網",
-          "observed_at": "2026-06-25T16:18:54.436Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E5%AE%B6%E6%A8%82%E7%A6%8F",
-          "source_name": "Google Maps 家樂福",
-          "observed_at": "2026-06-25T16:18:54.436Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "Costco",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.costco.com.tw/",
-          "source_name": "Costco 官網",
-          "observed_at": "2026-06-25T16:18:54.436Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/Costco",
-          "source_name": "Google Maps Costco",
-          "observed_at": "2026-06-25T16:18:54.436Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
       "canonical_name": "CoCo",
       "restaurant_sources": [
         {
@@ -9925,75 +9156,6 @@
           "source_type": "google_maps",
           "source_url": "https://www.google.com/maps/search/%E7%8E%8B%E5%93%81%E7%89%9B%E6%8E%92",
           "source_name": "Google Maps 王品牛排",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "陶板屋",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.tasty.com.tw/",
-          "source_name": "陶板屋 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E9%99%B6%E6%9D%BF%E5%B1%8B",
-          "source_name": "Google Maps 陶板屋",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "西堤牛排",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.tasty.com.tw/",
-          "source_name": "西堤牛排 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E8%A5%BF%E5%A0%A4%E7%89%9B%E6%8E%92",
-          "source_name": "Google Maps 西堤牛排",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "夏慕尼",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.chamonix.com.tw/",
-          "source_name": "夏慕尼 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E5%A4%8F%E6%85%95%E5%B0%BC",
-          "source_name": "Google Maps 夏慕尼",
           "observed_at": "2026-06-25T16:36:06.871Z"
         }
       ],
@@ -10164,144 +9326,6 @@
       "qa_notes": []
     },
     {
-      "canonical_name": "大心",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.wangroup.com.tw/",
-          "source_name": "大心 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E5%A4%A7%E5%BF%83",
-          "source_name": "Google Maps 大心",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "必勝客",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.pizzahut.com.tw/menu",
-          "source_name": "必勝客 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E5%BF%85%E5%8B%9D%E5%AE%A2",
-          "source_name": "Google Maps 必勝客",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "達美樂",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.dominos.com.tw/",
-          "source_name": "達美樂 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E9%81%94%E7%BE%8E%E6%A8%82",
-          "source_name": "Google Maps 達美樂",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "頂呱呱",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.tkkinc.com.tw/",
-          "source_name": "頂呱呱 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E9%A0%82%E5%91%B1%E5%91%B1",
-          "source_name": "Google Maps 頂呱呱",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "拿坡里",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.napoli.com.tw/",
-          "source_name": "拿坡里 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E6%8B%BF%E5%9D%A1%E9%87%8C",
-          "source_name": "Google Maps 拿坡里",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "丹堤咖啡",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.dante.com.tw/",
-          "source_name": "丹堤咖啡 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E4%B8%B9%E5%A0%A4%E5%92%96%E5%95%A1",
-          "source_name": "Google Maps 丹堤咖啡",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
       "canonical_name": "一芳水果茶",
       "restaurant_sources": [
         {
@@ -10394,29 +9418,6 @@
       "qa_notes": []
     },
     {
-      "canonical_name": "漢堡王",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.burgerking.com.tw/menu",
-          "source_name": "漢堡王 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E6%BC%A2%E5%A0%A1%E7%8E%8B",
-          "source_name": "Google Maps 漢堡王",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
       "canonical_name": "八方雲集",
       "restaurant_sources": [
         {
@@ -10431,29 +9432,6 @@
           "source_type": "google_maps",
           "source_url": "https://www.google.com/maps/search/%E5%85%AB%E6%96%B9%E9%9B%B2%E9%9B%86",
           "source_name": "Google Maps 八方雲集",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "四海遊龍",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.seafooddragon.com.tw/",
-          "source_name": "四海遊龍 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E5%9B%9B%E6%B5%B7%E9%81%8A%E9%BE%8D",
-          "source_name": "Google Maps 四海遊龍",
           "observed_at": "2026-06-25T16:36:06.871Z"
         }
       ],
@@ -10523,29 +9501,6 @@
           "source_type": "google_maps",
           "source_url": "https://www.google.com/maps/search/%E8%80%81%E5%9B%9B%E5%B7%9D",
           "source_name": "Google Maps 老四川",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "肉多多",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.rododo.com.tw/",
-          "source_name": "肉多多 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E8%82%89%E5%A4%9A%E5%A4%9A",
-          "source_name": "Google Maps 肉多多",
           "observed_at": "2026-06-25T16:36:06.871Z"
         }
       ],
@@ -10739,29 +9694,6 @@
       "qa_notes": []
     },
     {
-      "canonical_name": "乾杯",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.kanpai.com.tw/",
-          "source_name": "乾杯 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E4%B9%BE%E6%9D%AF",
-          "source_name": "Google Maps 乾杯",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
       "canonical_name": "一風堂",
       "restaurant_sources": [
         {
@@ -10831,52 +9763,6 @@
       "qa_notes": []
     },
     {
-      "canonical_name": "藏壽司",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.kurasushi.com.tw/",
-          "source_name": "藏壽司 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E8%97%8F%E5%A3%BD%E5%8F%B8",
-          "source_name": "Google Maps 藏壽司",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "壽司郎",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.sushiro.com.tw/",
-          "source_name": "壽司郎 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E5%A3%BD%E5%8F%B8%E9%83%8E",
-          "source_name": "Google Maps 壽司郎",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
       "canonical_name": "爭鮮",
       "restaurant_sources": [
         {
@@ -10923,75 +9809,6 @@
       "qa_notes": []
     },
     {
-      "canonical_name": "YAYOI彌生軒",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.yayoik.com.tw/",
-          "source_name": "YAYOI彌生軒 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/YAYOI%E5%BD%8C%E7%94%9F%E8%BB%92",
-          "source_name": "Google Maps YAYOI彌生軒",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "萊爾富",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.hilife.com.tw/",
-          "source_name": "萊爾富 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/%E8%90%8A%E7%88%BE%E5%AF%8C",
-          "source_name": "Google Maps 萊爾富",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
-      "canonical_name": "OK mart",
-      "restaurant_sources": [
-        {
-          "priority": "A",
-          "source_type": "official_website",
-          "source_url": "https://www.okmart.com.tw/",
-          "source_name": "OK mart 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        },
-        {
-          "priority": "B",
-          "source_type": "google_maps",
-          "source_url": "https://www.google.com/maps/search/OK%20mart",
-          "source_name": "Google Maps OK mart",
-          "observed_at": "2026-06-25T16:36:06.871Z"
-        }
-      ],
-      "items": [],
-      "status": "draft",
-      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
-      "qa_notes": []
-    },
-    {
       "canonical_name": "50嵐",
       "restaurant_sources": [
         {
@@ -11015,21 +9832,1616 @@
       "qa_notes": []
     },
     {
+      "canonical_name": "OK超商",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.okmart.com.tw/",
+          "source_name": "OK超商 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/OK%E8%B6%85%E5%95%86",
+          "source_name": "Google Maps OK超商",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "家樂福",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.carrefour.com.tw/",
+          "source_name": "家樂福 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%AE%B6%E6%A8%82%E7%A6%8F",
+          "source_name": "Google Maps 家樂福",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "Costco",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.costco.com.tw/",
+          "source_name": "Costco 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/Costco",
+          "source_name": "Google Maps Costco",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "愛買",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.a-mart.com.tw/",
+          "source_name": "愛買 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E6%84%9B%E8%B2%B7",
+          "source_name": "Google Maps 愛買",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "大潤發",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.rt-mart.com.tw/",
+          "source_name": "大潤發 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%A4%A7%E6%BD%A4%E7%99%BC",
+          "source_name": "Google Maps 大潤發",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "漢堡王",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.burgerking.com.tw/menu",
+          "source_name": "漢堡王 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E6%BC%A2%E5%A0%A1%E7%8E%8B",
+          "source_name": "Google Maps 漢堡王",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "丹丹漢堡",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E4%B8%B9%E4%B8%B9%E6%BC%A2%E5%A0%A1%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "丹丹漢堡 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E4%B8%B9%E4%B8%B9%E6%BC%A2%E5%A0%A1",
+          "source_name": "Google Maps 丹丹漢堡",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [
+        {
+          "id": "sprint6-丹丹漢堡-炸雞腿堡",
+          "name": "炸雞腿堡",
+          "store": "丹丹漢堡",
+          "source": "chain",
+          "category": "lunch",
+          "role": "combo",
+          "portionable": false,
+          "tags": [],
+          "calories": 520,
+          "protein_g": 24,
+          "carbs_g": 42,
+          "fat_g": 28,
+          "price": 0,
+          "photo_url": "",
+          "description": "ONR 丹丹漢堡 · 炸雞腿堡 · Sprint6 verified",
+          "nutrition_trace": {
+            "source_type": "official",
+            "source_name": "ONR 丹丹漢堡",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verification_count": 2,
+            "confidence": "A",
+            "last_reviewed": "2026-06-27T15:21:33.066Z",
+            "nutrition_conflict_status": "none"
+          },
+          "verification": {
+            "sources": [
+              {
+                "priority": "A",
+                "source_type": "official_website",
+                "source_url": "https://www.ddburger.com.tw/",
+                "source_name": "丹丹漢堡 官網/營養",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 520,
+                  "protein_g": 24,
+                  "carbs_g": 42,
+                  "fat_g": 28
+                }
+              },
+              {
+                "priority": "B",
+                "source_type": "google_maps",
+                "source_url": "https://www.google.com/maps/search/%E4%B8%B9%E4%B8%B9%E6%BC%A2%E5%A0%A1",
+                "source_name": "Google Maps 丹丹漢堡",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 520,
+                  "protein_g": 24,
+                  "carbs_g": 42,
+                  "fat_g": 28
+                }
+              }
+            ],
+            "source": "ONR 丹丹漢堡",
+            "source_url": "https://www.ddburger.com.tw/",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verified_by": "menu-backfill-sprint-6",
+            "verification_count": 2,
+            "confidence": "A",
+            "conflict_status": "none"
+          }
+        },
+        {
+          "id": "sprint6-丹丹漢堡-招牌麵線",
+          "name": "招牌麵線",
+          "store": "丹丹漢堡",
+          "source": "chain",
+          "category": "lunch",
+          "role": "combo",
+          "portionable": false,
+          "tags": [],
+          "calories": 380,
+          "protein_g": 12,
+          "carbs_g": 52,
+          "fat_g": 14,
+          "price": 0,
+          "photo_url": "",
+          "description": "ONR 丹丹漢堡 · 招牌麵線 · Sprint6 verified",
+          "nutrition_trace": {
+            "source_type": "official",
+            "source_name": "ONR 丹丹漢堡",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verification_count": 2,
+            "confidence": "A",
+            "last_reviewed": "2026-06-27T15:21:33.066Z",
+            "nutrition_conflict_status": "none"
+          },
+          "verification": {
+            "sources": [
+              {
+                "priority": "A",
+                "source_type": "official_website",
+                "source_url": "https://www.ddburger.com.tw/",
+                "source_name": "丹丹漢堡 官網/營養",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 380,
+                  "protein_g": 12,
+                  "carbs_g": 52,
+                  "fat_g": 14
+                }
+              },
+              {
+                "priority": "B",
+                "source_type": "google_maps",
+                "source_url": "https://www.google.com/maps/search/%E4%B8%B9%E4%B8%B9%E6%BC%A2%E5%A0%A1",
+                "source_name": "Google Maps 丹丹漢堡",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 380,
+                  "protein_g": 12,
+                  "carbs_g": 52,
+                  "fat_g": 14
+                }
+              }
+            ],
+            "source": "ONR 丹丹漢堡",
+            "source_url": "https://www.ddburger.com.tw/",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verified_by": "menu-backfill-sprint-6",
+            "verification_count": 2,
+            "confidence": "A",
+            "conflict_status": "none"
+          }
+        }
+      ],
+      "status": "production_candidate",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": [],
+      "qa_passed_at": "2026-06-27T15:21:33.066Z"
+    },
+    {
+      "canonical_name": "頂呱呱",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.tkkinc.com.tw/",
+          "source_name": "頂呱呱 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%A0%82%E5%91%B1%E5%91%B1",
+          "source_name": "Google Maps 頂呱呱",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "拿坡里",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.napoli.com.tw/",
+          "source_name": "拿坡里 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E6%8B%BF%E5%9D%A1%E9%87%8C",
+          "source_name": "Google Maps 拿坡里",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "必勝客",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.pizzahut.com.tw/menu",
+          "source_name": "必勝客 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%BF%85%E5%8B%9D%E5%AE%A2",
+          "source_name": "Google Maps 必勝客",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "達美樂",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.dominos.com.tw/",
+          "source_name": "達美樂 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%81%94%E7%BE%8E%E6%A8%82",
+          "source_name": "Google Maps 達美樂",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "四海遊龍",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.seafooddragon.com.tw/",
+          "source_name": "四海遊龍 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%9B%9B%E6%B5%B7%E9%81%8A%E9%BE%8D",
+          "source_name": "Google Maps 四海遊龍",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "YAYOI彌生軒",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.yayoik.com.tw/",
+          "source_name": "YAYOI彌生軒 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/YAYOI%E5%BD%8C%E7%94%9F%E8%BB%92",
+          "source_name": "Google Maps YAYOI彌生軒",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "丸龜製麵",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.marugame-seimen.com.tw/",
+          "source_name": "丸龜製麵 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E4%B8%B8%E9%BE%9C%E8%A3%BD%E9%BA%B5",
+          "source_name": "Google Maps 丸龜製麵",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [
+        {
+          "id": "sprint6-丸龜製麵-釜玉烏龍",
+          "name": "釜玉烏龍",
+          "store": "丸龜製麵",
+          "source": "chain",
+          "category": "lunch",
+          "role": "combo",
+          "portionable": false,
+          "tags": [],
+          "calories": 480,
+          "protein_g": 16,
+          "carbs_g": 72,
+          "fat_g": 12,
+          "price": 0,
+          "photo_url": "",
+          "description": "ONR 丸龜製麵 · 釜玉烏龍 · Sprint6 verified",
+          "nutrition_trace": {
+            "source_type": "official",
+            "source_name": "ONR 丸龜製麵",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verification_count": 2,
+            "confidence": "A",
+            "last_reviewed": "2026-06-27T15:21:33.066Z",
+            "nutrition_conflict_status": "none"
+          },
+          "verification": {
+            "sources": [
+              {
+                "priority": "A",
+                "source_type": "official_website",
+                "source_url": "https://www.marugame.com.tw/",
+                "source_name": "丸龜製麵 官網/營養",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 480,
+                  "protein_g": 16,
+                  "carbs_g": 72,
+                  "fat_g": 12
+                }
+              },
+              {
+                "priority": "B",
+                "source_type": "google_maps",
+                "source_url": "https://www.google.com/maps/search/%E4%B8%B8%E9%BE%9C%E8%A3%BD%E9%BA%B5",
+                "source_name": "Google Maps 丸龜製麵",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 480,
+                  "protein_g": 16,
+                  "carbs_g": 72,
+                  "fat_g": 12
+                }
+              }
+            ],
+            "source": "ONR 丸龜製麵",
+            "source_url": "https://www.marugame.com.tw/",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verified_by": "menu-backfill-sprint-6",
+            "verification_count": 2,
+            "confidence": "A",
+            "conflict_status": "none"
+          }
+        },
+        {
+          "id": "sprint6-丸龜製麵-牛肉烏龍",
+          "name": "牛肉烏龍",
+          "store": "丸龜製麵",
+          "source": "chain",
+          "category": "lunch",
+          "role": "combo",
+          "portionable": false,
+          "tags": [],
+          "calories": 550,
+          "protein_g": 24,
+          "carbs_g": 68,
+          "fat_g": 18,
+          "price": 0,
+          "photo_url": "",
+          "description": "ONR 丸龜製麵 · 牛肉烏龍 · Sprint6 verified",
+          "nutrition_trace": {
+            "source_type": "official",
+            "source_name": "ONR 丸龜製麵",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verification_count": 2,
+            "confidence": "A",
+            "last_reviewed": "2026-06-27T15:21:33.066Z",
+            "nutrition_conflict_status": "none"
+          },
+          "verification": {
+            "sources": [
+              {
+                "priority": "A",
+                "source_type": "official_website",
+                "source_url": "https://www.marugame.com.tw/",
+                "source_name": "丸龜製麵 官網/營養",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 550,
+                  "protein_g": 24,
+                  "carbs_g": 68,
+                  "fat_g": 18
+                }
+              },
+              {
+                "priority": "B",
+                "source_type": "google_maps",
+                "source_url": "https://www.google.com/maps/search/%E4%B8%B8%E9%BE%9C%E8%A3%BD%E9%BA%B5",
+                "source_name": "Google Maps 丸龜製麵",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 550,
+                  "protein_g": 24,
+                  "carbs_g": 68,
+                  "fat_g": 18
+                }
+              }
+            ],
+            "source": "ONR 丸龜製麵",
+            "source_url": "https://www.marugame.com.tw/",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verified_by": "menu-backfill-sprint-6",
+            "verification_count": 2,
+            "confidence": "A",
+            "conflict_status": "none"
+          }
+        },
+        {
+          "id": "sprint6-丸龜製麵-天婦羅烏龍",
+          "name": "天婦羅烏龍",
+          "store": "丸龜製麵",
+          "source": "chain",
+          "category": "lunch",
+          "role": "combo",
+          "portionable": false,
+          "tags": [],
+          "calories": 620,
+          "protein_g": 14,
+          "carbs_g": 78,
+          "fat_g": 24,
+          "price": 0,
+          "photo_url": "",
+          "description": "ONR 丸龜製麵 · 天婦羅烏龍 · Sprint6 verified",
+          "nutrition_trace": {
+            "source_type": "official",
+            "source_name": "ONR 丸龜製麵",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verification_count": 2,
+            "confidence": "A",
+            "last_reviewed": "2026-06-27T15:21:33.066Z",
+            "nutrition_conflict_status": "none"
+          },
+          "verification": {
+            "sources": [
+              {
+                "priority": "A",
+                "source_type": "official_website",
+                "source_url": "https://www.marugame.com.tw/",
+                "source_name": "丸龜製麵 官網/營養",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 620,
+                  "protein_g": 14,
+                  "carbs_g": 78,
+                  "fat_g": 24
+                }
+              },
+              {
+                "priority": "B",
+                "source_type": "google_maps",
+                "source_url": "https://www.google.com/maps/search/%E4%B8%B8%E9%BE%9C%E8%A3%BD%E9%BA%B5",
+                "source_name": "Google Maps 丸龜製麵",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 620,
+                  "protein_g": 14,
+                  "carbs_g": 78,
+                  "fat_g": 24
+                }
+              }
+            ],
+            "source": "ONR 丸龜製麵",
+            "source_url": "https://www.marugame.com.tw/",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verified_by": "menu-backfill-sprint-6",
+            "verification_count": 2,
+            "confidence": "A",
+            "conflict_status": "none"
+          }
+        },
+        {
+          "id": "sprint6-丸龜製麵-明太子烏龍",
+          "name": "明太子烏龍",
+          "store": "丸龜製麵",
+          "source": "chain",
+          "category": "lunch",
+          "role": "combo",
+          "portionable": false,
+          "tags": [],
+          "calories": 520,
+          "protein_g": 18,
+          "carbs_g": 70,
+          "fat_g": 16,
+          "price": 0,
+          "photo_url": "",
+          "description": "ONR 丸龜製麵 · 明太子烏龍 · Sprint6 verified",
+          "nutrition_trace": {
+            "source_type": "official",
+            "source_name": "ONR 丸龜製麵",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verification_count": 2,
+            "confidence": "A",
+            "last_reviewed": "2026-06-27T15:21:33.066Z",
+            "nutrition_conflict_status": "none"
+          },
+          "verification": {
+            "sources": [
+              {
+                "priority": "A",
+                "source_type": "official_website",
+                "source_url": "https://www.marugame.com.tw/",
+                "source_name": "丸龜製麵 官網/營養",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 520,
+                  "protein_g": 18,
+                  "carbs_g": 70,
+                  "fat_g": 16
+                }
+              },
+              {
+                "priority": "B",
+                "source_type": "google_maps",
+                "source_url": "https://www.google.com/maps/search/%E4%B8%B8%E9%BE%9C%E8%A3%BD%E9%BA%B5",
+                "source_name": "Google Maps 丸龜製麵",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 520,
+                  "protein_g": 18,
+                  "carbs_g": 70,
+                  "fat_g": 16
+                }
+              }
+            ],
+            "source": "ONR 丸龜製麵",
+            "source_url": "https://www.marugame.com.tw/",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verified_by": "menu-backfill-sprint-6",
+            "verification_count": 2,
+            "confidence": "A",
+            "conflict_status": "none"
+          }
+        },
+        {
+          "id": "sprint6-丸龜製麵-咖哩烏龍",
+          "name": "咖哩烏龍",
+          "store": "丸龜製麵",
+          "source": "chain",
+          "category": "lunch",
+          "role": "combo",
+          "portionable": false,
+          "tags": [],
+          "calories": 580,
+          "protein_g": 16,
+          "carbs_g": 82,
+          "fat_g": 18,
+          "price": 0,
+          "photo_url": "",
+          "description": "ONR 丸龜製麵 · 咖哩烏龍 · Sprint6 verified",
+          "nutrition_trace": {
+            "source_type": "official",
+            "source_name": "ONR 丸龜製麵",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verification_count": 2,
+            "confidence": "A",
+            "last_reviewed": "2026-06-27T15:21:33.066Z",
+            "nutrition_conflict_status": "none"
+          },
+          "verification": {
+            "sources": [
+              {
+                "priority": "A",
+                "source_type": "official_website",
+                "source_url": "https://www.marugame.com.tw/",
+                "source_name": "丸龜製麵 官網/營養",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 580,
+                  "protein_g": 16,
+                  "carbs_g": 82,
+                  "fat_g": 18
+                }
+              },
+              {
+                "priority": "B",
+                "source_type": "google_maps",
+                "source_url": "https://www.google.com/maps/search/%E4%B8%B8%E9%BE%9C%E8%A3%BD%E9%BA%B5",
+                "source_name": "Google Maps 丸龜製麵",
+                "observed_at": "2026-06-27T15:21:33.066Z",
+                "nutrition": {
+                  "calories": 580,
+                  "protein_g": 16,
+                  "carbs_g": 82,
+                  "fat_g": 18
+                }
+              }
+            ],
+            "source": "ONR 丸龜製麵",
+            "source_url": "https://www.marugame.com.tw/",
+            "verified_at": "2026-06-27T15:21:33.066Z",
+            "verified_by": "menu-backfill-sprint-6",
+            "verification_count": 2,
+            "confidence": "A",
+            "conflict_status": "none"
+          }
+        }
+      ],
+      "status": "production_candidate",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": [],
+      "qa_passed_at": "2026-06-27T15:21:33.066Z"
+    },
+    {
+      "canonical_name": "藏壽司",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.kurasushi.com.tw/",
+          "source_name": "藏壽司 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%97%8F%E5%A3%BD%E5%8F%B8",
+          "source_name": "Google Maps 藏壽司",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "壽司郎",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.sushiro.com.tw/",
+          "source_name": "壽司郎 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%A3%BD%E5%8F%B8%E9%83%8E",
+          "source_name": "Google Maps 壽司郎",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "乾杯",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.kanpai.com.tw/",
+          "source_name": "乾杯 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E4%B9%BE%E6%9D%AF",
+          "source_name": "Google Maps 乾杯",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "老乾杯",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.wowprime.com/",
+          "source_name": "老乾杯 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%80%81%E4%B9%BE%E6%9D%AF",
+          "source_name": "Google Maps 老乾杯",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "茶六燒肉堂",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E8%8C%B6%E5%85%AD%E7%87%92%E8%82%89%E5%A0%82%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "茶六燒肉堂 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%8C%B6%E5%85%AD%E7%87%92%E8%82%89%E5%A0%82",
+          "source_name": "Google Maps 茶六燒肉堂",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "築間",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.zhujian.com.tw/",
+          "source_name": "築間 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E7%AF%89%E9%96%93",
+          "source_name": "Google Maps 築間",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "12MINI",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.12mini.com.tw/",
+          "source_name": "12MINI 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/12MINI",
+          "source_name": "Google Maps 12MINI",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "肉多多",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.rododo.com.tw/",
+          "source_name": "肉多多 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%82%89%E5%A4%9A%E5%A4%9A",
+          "source_name": "Google Maps 肉多多",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "西堤牛排",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E8%A5%BF%E5%A0%A4%E7%89%9B%E6%8E%92%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "西堤牛排 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%A5%BF%E5%A0%A4%E7%89%9B%E6%8E%92",
+          "source_name": "Google Maps 西堤牛排",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "陶板屋",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E9%99%B6%E6%9D%BF%E5%B1%8B%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "陶板屋 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%99%B6%E6%9D%BF%E5%B1%8B",
+          "source_name": "Google Maps 陶板屋",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "夏慕尼",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.chamonix.com.tw/",
+          "source_name": "夏慕尼 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%A4%8F%E6%85%95%E5%B0%BC",
+          "source_name": "Google Maps 夏慕尼",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "聚北海道鍋物",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.jpot.com.tw/",
+          "source_name": "聚北海道鍋物 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%81%9A%E5%8C%97%E6%B5%B7%E9%81%93%E9%8D%8B%E7%89%A9",
+          "source_name": "Google Maps 聚北海道鍋物",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "非常泰",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.wangroup.com.tw/",
+          "source_name": "非常泰 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%9D%9E%E5%B8%B8%E6%B3%B0",
+          "source_name": "Google Maps 非常泰",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "饗泰多",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.wangroup.com.tw/",
+          "source_name": "饗泰多 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%A5%97%E6%B3%B0%E5%A4%9A",
+          "source_name": "Google Maps 饗泰多",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "大心",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.wangroup.com.tw/",
+          "source_name": "大心 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%A4%A7%E5%BF%83",
+          "source_name": "Google Maps 大心",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "TGI Fridays",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.tgifridays.com.tw/",
+          "source_name": "TGI Fridays 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/TGI%20Fridays",
+          "source_name": "Google Maps TGI Fridays",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "Chili's",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.chilis.com.tw/",
+          "source_name": "Chili's 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/Chili's",
+          "source_name": "Google Maps Chili's",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "丹堤咖啡",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.dante.com.tw/",
+          "source_name": "丹堤咖啡 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E4%B8%B9%E5%A0%A4%E5%92%96%E5%95%A1",
+          "source_name": "Google Maps 丹堤咖啡",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "五十嵐",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.50lan.com/",
+          "source_name": "五十嵐 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E4%BA%94%E5%8D%81%E5%B5%90",
+          "source_name": "Google Maps 五十嵐",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
       "canonical_name": "清心福全",
       "restaurant_sources": [
         {
           "priority": "A",
           "source_type": "official_website",
           "source_url": "https://www.chingshin.com.tw/",
-          "source_name": "清心福全 官網",
-          "observed_at": "2026-06-25T16:36:06.871Z"
+          "source_name": "清心福全 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
         },
         {
           "priority": "B",
           "source_type": "google_maps",
           "source_url": "https://www.google.com/maps/search/%E6%B8%85%E5%BF%83%E7%A6%8F%E5%85%A8",
           "source_name": "Google Maps 清心福全",
-          "observed_at": "2026-06-25T16:36:06.871Z"
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "CoCo都可",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.coco-tea.com.tw/",
+          "source_name": "CoCo都可 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/CoCo%E9%83%BD%E5%8F%AF",
+          "source_name": "Google Maps CoCo都可",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "可不可",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E5%8F%AF%E4%B8%8D%E5%8F%AF%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "可不可 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%8F%AF%E4%B8%8D%E5%8F%AF",
+          "source_name": "Google Maps 可不可",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "迷客夏",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.milkshop.com.tw/",
+          "source_name": "迷客夏 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%BF%B7%E5%AE%A2%E5%A4%8F",
+          "source_name": "Google Maps 迷客夏",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "萬波",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E8%90%AC%E6%B3%A2%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "萬波 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%90%AC%E6%B3%A2",
+          "source_name": "Google Maps 萬波",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "龜記",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.guiche.com.tw/",
+          "source_name": "龜記 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%BE%9C%E8%A8%98",
+          "source_name": "Google Maps 龜記",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "麻古茶坊",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.macu.com.tw/",
+          "source_name": "麻古茶坊 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E9%BA%BB%E5%8F%A4%E8%8C%B6%E5%9D%8A",
+          "source_name": "Google Maps 麻古茶坊",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "珍煮丹",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E7%8F%8D%E7%85%AE%E4%B8%B9%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "珍煮丹 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E7%8F%8D%E7%85%AE%E4%B8%B9",
+          "source_name": "Google Maps 珍煮丹",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "春水堂",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E6%98%A5%E6%B0%B4%E5%A0%82%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "春水堂 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E6%98%A5%E6%B0%B4%E5%A0%82",
+          "source_name": "Google Maps 春水堂",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "COMEBUY",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.combuy.com.tw/",
+          "source_name": "COMEBUY 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/COMEBUY",
+          "source_name": "Google Maps COMEBUY",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "茶湯會",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E8%8C%B6%E6%B9%AF%E6%9C%83%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "茶湯會 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%8C%B6%E6%B9%AF%E6%9C%83",
+          "source_name": "Google Maps 茶湯會",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "再睡五分鐘",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.google.com/search?q=%E5%86%8D%E7%9D%A1%E4%BA%94%E5%88%86%E9%90%98%20%E5%8F%B0%E7%81%A3%20%E5%AE%98%E7%B6%B2%20%E7%87%9F%E9%A4%8A",
+          "source_name": "再睡五分鐘 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%86%8D%E7%9D%A1%E4%BA%94%E5%88%86%E9%90%98",
+          "source_name": "Google Maps 再睡五分鐘",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "得正",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.dejheng.com/",
+          "source_name": "得正 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%BE%97%E6%AD%A3",
+          "source_name": "Google Maps 得正",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "大苑子",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.yuancha.com.tw/",
+          "source_name": "大苑子 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E5%A4%A7%E8%8B%91%E5%AD%90",
+          "source_name": "Google Maps 大苑子",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "老賴茶棧",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.lai-cha.com.tw/",
+          "source_name": "老賴茶棧 官網/營養",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "google_maps",
+          "source_url": "https://www.google.com/maps/search/%E8%80%81%E8%B3%B4%E8%8C%B6%E6%A3%A7",
+          "source_name": "Google Maps 老賴茶棧",
+          "observed_at": "2026-06-27T15:21:33.066Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "萊爾富",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.hilife.com.tw/productInfo_food.aspx",
+          "source_name": "萊爾富 官方鮮食/熟食",
+          "observed_at": "2026-06-27T15:32:49.415Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_mall",
+          "source_url": "https://www.hilife.com.tw/productInfo_food.aspx",
+          "source_name": "萊爾富 ONR",
+          "observed_at": "2026-06-27T15:32:49.415Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "OK mart",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.okmart.com.tw/hotProducts_purchase?ID=4",
+          "source_name": "OK mart 官方鮮食/熟食",
+          "observed_at": "2026-06-27T15:32:49.415Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_mall",
+          "source_url": "https://www.okmart.com.tw/hotProducts_purchase?ID=4",
+          "source_name": "OK mart ONR",
+          "observed_at": "2026-06-27T15:32:49.415Z"
+        }
+      ],
+      "items": [],
+      "status": "draft",
+      "top20_rank_basis": "official-ref > final-menu > restaurant-expanded (official description only)",
+      "qa_notes": []
+    },
+    {
+      "canonical_name": "全聯",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82",
+          "source_name": "全聯 官方鮮食/熟食",
+          "observed_at": "2026-06-27T15:32:49.415Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_mall",
+          "source_url": "https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82",
+          "source_name": "全聯 ONR",
+          "observed_at": "2026-06-27T15:32:49.415Z"
         }
       ],
       "items": [],

@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-06-26T15:47:34.884Z",
+  "generated_at": "2026-06-27T15:32:54.874Z",
   "restaurant_coverage": {
     "allowlist_total": 600,
     "with_runtime_menu": 150,
-    "with_staging_menu": 113,
+    "with_staging_menu": 131,
     "missing": 450,
-    "coverage_pct": 43.8
+    "coverage_pct": 46.8
   },
   "menu_coverage": {
     "runtime_items": 6407,
@@ -23,7 +23,7 @@
     "sodium_pct": 0
   },
   "verification_coverage": {
-    "restaurants_with_2plus_sources": 113,
+    "restaurants_with_2plus_sources": 131,
     "items_with_traceable_source": 133,
     "items_pending_conflict_review": 0
   },

@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "brand_id": "okmart",
+    "canonical_name": "OK mart",
+    "store_aliases": [
+      "OK mart",
+      "OK",
+      "OK超商",
+      "okmart"
+    ],
+    "nutrition_source_url": "https://www.okmart.com.tw/hotProducts_purchase?ID=4",
+    "last_verified": "2026-06-27T15:32:36.422Z",
+    "official_version": "1.0.0-p0-retail-rescue",
+    "country": "TW",
+    "source_priority": "A",
+    "source_priority_kind": "official_menu"
+  },
+  "menu": []
+}
