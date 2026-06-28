@@ -42,8 +42,7 @@
 }
 
 html[data-app-overlay='open'] .app-bottom-nav {
-  visibility: hidden;
-  pointer-events: none;
+  display: none;
 }
 
 .app-overlay-backdrop {
@@ -52,9 +51,38 @@ html[data-app-overlay='open'] .app-bottom-nav {
   z-index: 200;
   display: flex;
   flex-direction: column;
+  pointer-events: none;
+}
+
+.app-overlay-scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  pointer-events: auto;
   background-color: rgba(47, 36, 29, 0.22);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: default;
+}
+
+.app-overlay-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  pointer-events: auto;
+  flex-shrink: 0;
+}
+
+.app-overlay-panel button,
+.app-overlay-panel [role='button'] {
+  touch-action: manipulation;
+  cursor: pointer;
 }
 
 .app-overlay-backdrop--sheet {

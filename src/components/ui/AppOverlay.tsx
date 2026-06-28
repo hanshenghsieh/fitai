@@ -31,11 +31,11 @@ export default function AppOverlay({ open, onClose, children, variant = 'sheet' 
   return createPortal(
     <div
       className={`app-overlay-backdrop app-overlay-backdrop--${variant}`}
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
     >
-      {children}
+      <button type="button" className="app-overlay-scrim" onClick={onClose} aria-label="關閉" tabIndex={-1} />
+      <div className="app-overlay-panel">{children}</div>
     </div>,
     document.body
   )

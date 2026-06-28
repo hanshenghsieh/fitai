@@ -9,6 +9,7 @@ import BBCard from '@/components/ui/BBCard'
 import { isNativeIOS } from '@/lib/capacitor-native'
 import AppOverlay from '@/components/ui/AppOverlay'
 import { captureFoodPhotoFromCamera, pickFoodPhotoFromGallery } from '@/lib/native-camera'
+import { toast } from 'sonner'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
 
@@ -57,8 +58,16 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
     if (useNativeCamera) {
       setPicking(true)
       try {
-        const file = await captureFoodPhotoFromCamera()
-        if (file) onPickFile(file)
+        const result = await captureFoodPhotoFromCamera()
+        if (result.ok) {
+          onPickFile(result.file)
+          return
+        }
+        if (result.reason === 'denied') {
+          toast.error('無法使用相機', { description: '請到 iPhone 設定 → 再健一點，允許相機權限' })
+        } else if (result.reason === 'unavailable') {
+          toast.error('相機無法開啟', { description: '請稍後再試一次' })
+        }
       } finally {
         setPicking(false)
       }
@@ -71,8 +80,16 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
     if (useNativeCamera) {
       setPicking(true)
       try {
-        const file = await pickFoodPhotoFromGallery()
-        if (file) onPickFile(file)
+        const result = await pickFoodPhotoFromGallery()
+        if (result.ok) {
+          onPickFile(result.file)
+          return
+        }
+        if (result.reason === 'denied') {
+          toast.error('無法存取相簿', { description: '請到 iPhone 設定 → 再健一點，允許照片權限' })
+        } else if (result.reason === 'unavailable') {
+          toast.error('相簿無法開啟', { description: '請稍後再試一次' })
+        }
       } finally {
         setPicking(false)
       }
@@ -122,7 +139,7 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
           type="button"
           disabled={picking}
           onClick={() => void openCamera()}
-          className="w-full max-w-xs flex flex-col items-center gap-3 py-6 rounded-[28px] active:opacity-85"
+          className="w-full max-w-xs flex flex-col items-center gap-3 py-6 rounded-[28px] active:opacity-85 touch-manipulation"
           style={{ backgroundColor: TODAY.surface }}
         >
           <span
@@ -145,7 +162,7 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
           type="button"
           disabled={picking}
           onClick={() => void openGallery()}
-          className="w-full max-w-xs h-14 rounded-[22px] text-[15px] active:opacity-90"
+          className="w-full max-w-xs h-14 rounded-[22px] text-[15px] active:opacity-90 touch-manipulation"
           style={{
             backgroundColor: TODAY.card,
             color: TODAY.mocha,

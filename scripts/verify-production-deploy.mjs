@@ -22,7 +22,7 @@ async function main() {
   const cssOk =
     (css.includes('pointer-events:auto') || css.includes('pointer-events: auto')) &&
     /\.app-bottom-nav[^}]*z-index:\s*50/.test(css) &&
-    css.includes('app-overlay-backdrop') &&
+    css.includes('app-overlay-scrim') &&
     css.includes('data-app-overlay')
 
   let navigateTab = false
@@ -36,7 +36,7 @@ async function main() {
 
   const ok = cssOk && !navigateTab
   console.log({
-    commit: '959361f',
+    commit: 'dd8e5bd',
     cssOk,
     navigateTabRemoved: !navigateTab,
     jsChunksScanned: jsPaths.size,
