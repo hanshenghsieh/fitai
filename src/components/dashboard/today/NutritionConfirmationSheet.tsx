@@ -7,6 +7,7 @@ import type { FoodLogEntry } from '@/lib/banks/types'
 import type { MenuLookupHit } from '@/lib/food-menu-lookup'
 import { findSimilarVerifiedItems, type ManualNutritionInput } from '@/lib/nutrition/unknown-food-flow'
 import ManualNutritionSheet from '@/components/dashboard/today/ManualNutritionSheet'
+import AppOverlay from '@/components/ui/AppOverlay'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
 const ICON_STROKE = 1.8
@@ -43,19 +44,11 @@ export default function NutritionConfirmationSheet({
     }
   }, [open, log?.id])
 
-  if (!open || !log) return null
+  if (!log) return null
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-[55] flex flex-col justify-end"
-        style={{
-          backgroundColor: 'rgba(47, 36, 29, 0.22)',
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
-        }}
-        onClick={onClose}
-      >
+      <AppOverlay open={open} onClose={onClose} variant="sheet">
         <div
           className="ios-bottom-sheet max-w-lg mx-auto w-full"
           style={{
@@ -197,7 +190,7 @@ export default function NutritionConfirmationSheet({
             )}
           </div>
         </div>
-      </div>
+      </AppOverlay>
 
       <ManualNutritionSheet
         open={manualOpen}

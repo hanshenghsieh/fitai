@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { X, ChevronDown, ChevronUp } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { ManualNutritionInput } from '@/lib/nutrition/unknown-food-flow'
+import AppOverlay from '@/components/ui/AppOverlay'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
 const ICON_STROKE = 1.8
@@ -51,8 +52,6 @@ export default function ManualNutritionSheet({ open, foodName, onClose, onCancel
     setAdvancedOpen(false)
   }, [open, foodName])
 
-  if (!open) return null
-
   const handleSave = () => {
     onSave({
       calories: parseNum(calories),
@@ -95,14 +94,7 @@ export default function ManualNutritionSheet({ open, foodName, onClose, onCancel
   )
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex flex-col justify-end"
-      style={{
-        backgroundColor: 'rgba(47, 36, 29, 0.28)',
-        backdropFilter: 'blur(6px)',
-      }}
-      onClick={onCancel}
-    >
+    <AppOverlay open={open} onClose={onCancel} variant="sheet">
       <div
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
@@ -204,6 +196,6 @@ export default function ManualNutritionSheet({ open, foodName, onClose, onCancel
           </button>
         </div>
       </div>
-    </div>
+    </AppOverlay>
   )
 }

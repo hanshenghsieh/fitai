@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import { formatLogCaloriesLine, NUTRITION_PENDING_LABEL } from '@/lib/nutrition/food-log-display'
+import AppOverlay from '@/components/ui/AppOverlay'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
 const ICON_STROKE = 1.8
@@ -16,18 +17,8 @@ interface Props {
 }
 
 export default function PendingNutritionQueueSheet({ open, logs, onClose, onSelectLog }: Props) {
-  if (!open) return null
-
   return (
-    <div
-      className="fixed inset-0 z-[54] flex flex-col justify-end"
-      style={{
-        backgroundColor: 'rgba(47, 36, 29, 0.22)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
-      }}
-      onClick={onClose}
-    >
+    <AppOverlay open={open} onClose={onClose} variant="sheet">
       <div
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
@@ -75,6 +66,6 @@ export default function PendingNutritionQueueSheet({ open, logs, onClose, onSele
           ))}
         </ul>
       </div>
-    </div>
+    </AppOverlay>
   )
 }

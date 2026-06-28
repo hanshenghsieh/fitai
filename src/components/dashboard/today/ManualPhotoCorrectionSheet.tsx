@@ -15,6 +15,7 @@ import type { ManualNutritionInput } from '@/lib/nutrition/unknown-food-flow'
 import type { SearchV2Candidate } from '@/lib/nutrition/search-v2/types'
 import type { ManualPhotoCorrectionResult } from '@/lib/nutrition/photo-manual-correction'
 import { buildPhotoAiMeta } from '@/lib/nutrition/photo-manual-correction'
+import AppOverlay from '@/components/ui/AppOverlay'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
 const ICON_STROKE = 1.8
@@ -180,8 +181,6 @@ export default function ManualPhotoCorrectionSheet({
     }
   }
 
-  if (!open) return null
-
   const field = (title: string, value: string, onChange: (v: string) => void, unit: string) => (
     <label className="block">
       <span className="text-[13px] mb-1.5 block" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
@@ -204,18 +203,13 @@ export default function ManualPhotoCorrectionSheet({
   )
 
   return (
-    <div
-      className="fixed inset-0 z-[70] flex flex-col justify-end"
-      style={{ backgroundColor: 'rgba(47, 36, 29, 0.28)', backdropFilter: 'blur(6px)' }}
-      onClick={onClose}
-    >
+    <AppOverlay open={open} onClose={onClose} variant="sheet">
       <div
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
           fontFamily: font,
           backgroundColor: BB_V2.bg.card,
           borderRadius: '28px 28px 0 0',
-          maxHeight: '92vh',
         }}
         onClick={e => e.stopPropagation()}
       >
@@ -409,6 +403,6 @@ export default function ManualPhotoCorrectionSheet({
           </button>
         </div>
       </div>
-    </div>
+    </AppOverlay>
   )
 }

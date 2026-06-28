@@ -6,7 +6,7 @@ import type { FrequentFood } from '@/lib/food-memory'
 import { primaryFoodLabel } from '@/lib/food-photography'
 import type { FoodSlot } from '@/lib/food-slots'
 import { isNativeIOS } from '@/lib/capacitor-native'
-import { setAppScrollLocked } from '@/lib/today-actions'
+import AppOverlay from '@/components/ui/AppOverlay'
 
 import { BB_V2 } from '@/lib/betterbit-v2'
 
@@ -83,14 +83,12 @@ export default function TodayFoodMore({
       setShowAllFrequent(false)
       return
     }
-    setAppScrollLocked(true)
     // Auto-focus triggers iOS keyboard zoom on <16px inputs; skip on native shell.
     let t: number | undefined
     if (!isNativeIOS()) {
       t = window.setTimeout(() => inputRef.current?.focus(), 120)
     }
     return () => {
-      setAppScrollLocked(false)
       if (t !== undefined) window.clearTimeout(t)
     }
   }, [open])
@@ -98,8 +96,6 @@ export default function TodayFoodMore({
   useEffect(() => {
     if (open && scrollRef.current) scrollRef.current.scrollTop = 0
   }, [open])
-
-  if (!open) return null
 
   const topFrequent = frequentList.find(f => f.id === selectedFrequentId) ?? frequentList[0] ?? null
   const trimmed = query.trim()
@@ -112,15 +108,7 @@ export default function TodayFoodMore({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col justify-end"
-      style={{
-        backgroundColor: 'rgba(47, 36, 29, 0.22)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
-      }}
-      onClick={onClose}
-    >
+    <AppOverlay open={open} onClose={onClose} variant="sheet">
       <div
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
@@ -271,6 +259,6 @@ export default function TodayFoodMore({
           每一餐，都是照顧自己的練習
         </p>
       </div>
-    </div>
+    </AppOverlay>
   )
 }

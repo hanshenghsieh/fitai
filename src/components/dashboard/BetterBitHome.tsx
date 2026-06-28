@@ -24,6 +24,7 @@ import TodayHero, { filterPendingNutritionLogs } from '@/components/dashboard/v2
 import TodayOS from '@/components/dashboard/TodayOS'
 import NutritionConfirmationSheet from '@/components/dashboard/today/NutritionConfirmationSheet'
 import PendingNutritionQueueSheet from '@/components/dashboard/today/PendingNutritionQueueSheet'
+import AppOverlay from '@/components/ui/AppOverlay'
 import { enrichFoodLog } from '@/lib/food-log-macros'
 import {
   applyManualNutritionToLog,
@@ -693,46 +694,44 @@ export default function BetterBitHome({
         onKeepTextRecord={handleKeepTextRecord}
       />
 
-      {deleteConfirmId && (
+      <AppOverlay
+        open={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        variant="dialog"
+      >
         <div
-          className="fixed inset-0 z-[100] flex items-end justify-center px-5 pb-8"
-          style={{ backgroundColor: 'rgba(47, 36, 29, 0.22)', backdropFilter: 'blur(4px)' }}
-          onClick={() => setDeleteConfirmId(null)}
+          className="app-overlay-dialog-card p-6 space-y-5"
+          style={{
+            backgroundColor: TODAY.card,
+            borderRadius: TODAY.radiusCard,
+            boxShadow: TODAY.cardShadow,
+            fontFamily: TODAY.font,
+          }}
+          onClick={e => e.stopPropagation()}
         >
-          <div
-            className="w-full max-w-md p-6 space-y-5"
-            style={{
-              backgroundColor: TODAY.card,
-              borderRadius: TODAY.radiusCard,
-              boxShadow: TODAY.cardShadow,
-              fontFamily: TODAY.font,
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <p className="text-[16px] leading-relaxed" style={{ color: TODAY.text, fontWeight: 500 }}>
-              要移除這筆紀錄嗎？
-            </p>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 h-12 rounded-[20px] text-[14px]"
-                style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
-              >
-                先留著
-              </button>
-              <button
-                type="button"
-                onClick={confirmDeleteLog}
-                className="flex-1 h-12 rounded-[20px] text-[14px]"
-                style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
-              >
-                移除
-              </button>
-            </div>
+          <p className="text-[16px] leading-relaxed" style={{ color: TODAY.text, fontWeight: 500 }}>
+            要移除這筆紀錄嗎？
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setDeleteConfirmId(null)}
+              className="flex-1 h-12 rounded-[20px] text-[14px]"
+              style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
+            >
+              先留著
+            </button>
+            <button
+              type="button"
+              onClick={confirmDeleteLog}
+              className="flex-1 h-12 rounded-[20px] text-[14px]"
+              style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
+            >
+              移除
+            </button>
           </div>
         </div>
-      )}
+      </AppOverlay>
     </>
   )
 }

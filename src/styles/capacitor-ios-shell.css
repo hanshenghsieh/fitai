@@ -41,6 +41,38 @@
   overscroll-behavior-y: none;
 }
 
+html[data-app-overlay='open'] .app-bottom-nav {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.app-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(47, 36, 29, 0.22);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.app-overlay-backdrop--sheet {
+  justify-content: flex-end;
+}
+
+.app-overlay-backdrop--dialog {
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 20px;
+  padding-bottom: max(var(--app-safe-bottom), 20px);
+}
+
+.app-overlay-dialog-card {
+  width: 100%;
+  max-width: 28rem;
+}
+
 .app-bottom-nav {
   position: fixed;
   left: 0;
@@ -128,8 +160,8 @@ html.capacitor-ios .auth-page-shell {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  max-height: min(80dvh, 80vh);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  max-height: min(94dvh, calc(100dvh - var(--app-safe-top) - 8px));
+  padding-bottom: max(var(--app-safe-bottom), 12px);
 }
 
 .ios-bottom-sheet__scroll {

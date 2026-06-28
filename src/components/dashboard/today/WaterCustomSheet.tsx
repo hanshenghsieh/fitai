@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
+import AppOverlay from '@/components/ui/AppOverlay'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
 const ICON_STROKE = 1.8
@@ -22,8 +23,6 @@ export default function WaterCustomSheet({ open, currentMl, onClose, onSaveTotal
     if (open) setValue(String(currentMl))
   }, [open, currentMl])
 
-  if (!open) return null
-
   function handleSave() {
     const parsed = Number(value)
     if (!Number.isFinite(parsed)) return
@@ -31,15 +30,7 @@ export default function WaterCustomSheet({ open, currentMl, onClose, onSaveTotal
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[55] flex flex-col justify-end"
-      style={{
-        backgroundColor: 'rgba(47, 36, 29, 0.22)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
-      }}
-      onClick={onClose}
-    >
+    <AppOverlay open={open} onClose={onClose} variant="sheet">
       <div
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
@@ -104,6 +95,6 @@ export default function WaterCustomSheet({ open, currentMl, onClose, onSaveTotal
           </div>
         </div>
       </div>
-    </div>
+    </AppOverlay>
   )
 }

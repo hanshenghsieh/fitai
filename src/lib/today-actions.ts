@@ -31,6 +31,8 @@ export function dispatchOpenTextLogSheet(): void {
   window.dispatchEvent(new CustomEvent(TODAY_OPEN_TEXT_LOG_EVENT))
 }
 
+let appOverlayDepth = 0
+
 export function setAppScrollLocked(locked: boolean): void {
   if (typeof document === 'undefined') return
   const root = document.getElementById('app-scroll-root')
@@ -38,4 +40,13 @@ export function setAppScrollLocked(locked: boolean): void {
     root.style.overflow = locked ? 'hidden' : ''
   }
   document.body.style.overflow = locked ? 'hidden' : ''
+}
+
+/** Lock scroll and hide bottom nav while a full-screen overlay is open. Ref-counted for nested sheets. */
+export function setAppOverlayOpen(open: boolean): void {
+  if (typeof document === 'undefined') return
+  appOverlayDepth = Math.max(0, appOverlayDepth + (open ? 1 : -1))
+  const active = appOverlayDepth > 0
+  document.documentElement.toggleAttribute('data-app-overlay', active)
+  setAppScrollLocked(active)
 }

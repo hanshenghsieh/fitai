@@ -7,7 +7,7 @@ import { TODAY } from '@/lib/today-design'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import BBCard from '@/components/ui/BBCard'
 import { isNativeIOS } from '@/lib/capacitor-native'
-import { setAppScrollLocked } from '@/lib/today-actions'
+import AppOverlay from '@/components/ui/AppOverlay'
 import { captureFoodPhotoFromCamera, pickFoodPhotoFromGallery } from '@/lib/native-camera'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
@@ -586,26 +586,8 @@ export default function PhotoLogSheet({
   onBackToCapture,
   onOpenManualCorrection,
 }: Props) {
-  useEffect(() => {
-    if (!open) return
-    setAppScrollLocked(true)
-    return () => {
-      setAppScrollLocked(false)
-    }
-  }, [open])
-
-  if (!open) return null
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col justify-end"
-      style={{
-        backgroundColor: 'rgba(47, 36, 29, 0.22)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
-      }}
-      onClick={onClose}
-    >
+    <AppOverlay open={open} onClose={onClose} variant="sheet">
       <div
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
@@ -632,6 +614,6 @@ export default function PhotoLogSheet({
           <CaptureStep onPickFile={onPickFile} onClose={onClose} />
         )}
       </div>
-    </div>
+    </AppOverlay>
   )
 }
