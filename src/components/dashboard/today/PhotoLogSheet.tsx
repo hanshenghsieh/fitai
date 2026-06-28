@@ -7,12 +7,6 @@ import { TODAY } from '@/lib/today-design'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import BBCard from '@/components/ui/BBCard'
 import AppOverlay from '@/components/ui/AppOverlay'
-import {
-  captureFoodPhotoFromCamera,
-  isCapacitorCameraUsable,
-  pickFoodPhotoFromGallery,
-} from '@/lib/native-camera'
-import { toast } from 'sonner'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
 
@@ -50,51 +44,26 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
   const galleryRef = useRef<HTMLInputElement>(null)
   const [picking, setPicking] = useState(false)
 
+  useEffect(() => {
+    const clearPicking = () => setPicking(false)
+    window.addEventListener('focus', clearPicking)
+    return () => window.removeEventListener('focus', clearPicking)
+  }, [])
+
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPicking(false)
     const f = e.target.files?.[0]
     if (f) onPickFile(f)
     e.target.value = ''
   }
 
-  async function openCamera() {
-    if (isCapacitorCameraUsable()) {
-      setPicking(true)
-      try {
-        const result = await captureFoodPhotoFromCamera()
-        if (result.ok) {
-          onPickFile(result.file)
-          return
-        }
-        if (result.reason === 'cancelled') return
-        if (result.reason === 'denied') {
-          toast.error('無法使用相機', { description: '請到 iPhone 設定 → 再健一點，允許相機權限' })
-          return
-        }
-      } finally {
-        setPicking(false)
-      }
-    }
+  function openCamera() {
+    setPicking(true)
     cameraRef.current?.click()
   }
 
-  async function openGallery() {
-    if (isCapacitorCameraUsable()) {
-      setPicking(true)
-      try {
-        const result = await pickFoodPhotoFromGallery()
-        if (result.ok) {
-          onPickFile(result.file)
-          return
-        }
-        if (result.reason === 'cancelled') return
-        if (result.reason === 'denied') {
-          toast.error('無法存取相簿', { description: '請到 iPhone 設定 → 再健一點，允許照片權限' })
-          return
-        }
-      } finally {
-        setPicking(false)
-      }
-    }
+  function openGallery() {
+    setPicking(true)
     galleryRef.current?.click()
   }
 
@@ -134,7 +103,7 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
         <button
           type="button"
           disabled={picking}
-          onClick={() => void openCamera()}
+          onClick={openCamera}
           className="w-full max-w-xs flex flex-col items-center gap-3 py-6 rounded-[28px] active:opacity-85 touch-manipulation"
           style={{ backgroundColor: TODAY.surface }}
         >
@@ -157,7 +126,7 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
         <button
           type="button"
           disabled={picking}
-          onClick={() => void openGallery()}
+          onClick={openGallery}
           className="w-full max-w-xs h-14 rounded-[22px] text-[15px] active:opacity-90 touch-manipulation"
           style={{
             backgroundColor: TODAY.card,

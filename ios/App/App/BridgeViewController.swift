@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import WebKit
 
 /// WKWebView shell: edge-to-edge canvas, disable pinch / double-tap zoom.
 class BridgeViewController: CAPBridgeViewController {
@@ -24,6 +25,11 @@ class BridgeViewController: CAPBridgeViewController {
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .darkContent
+    }
+
+    override func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        super.webViewWebContentProcessDidTerminate(webView)
+        webView.reload()
     }
 
     private func applyWebViewShellSettings() {

@@ -1,9 +1,9 @@
 import type { FoodDna, FrequentFood } from '@/lib/food-memory'
+import { isNativeIOS } from '@/lib/capacitor-native'
 
-const PHOTO_UPLOAD_MAX_EDGE = 1280
-const PHOTO_UPLOAD_QUALITY = 0.82
+const PHOTO_UPLOAD_MAX_EDGE = 1024
+const PHOTO_UPLOAD_QUALITY = 0.78
 const PHOTO_PARSE_TIMEOUT_MS = 45_000
-const PHOTO_SKIP_COMPRESS_BYTES = 900_000
 
 export function confidenceToPct(confidence: 'high' | 'medium' | 'low'): number {
   if (confidence === 'high') return 85
@@ -33,16 +33,43 @@ function scaleDimensions(width: number, height: number, maxEdge: number) {
   }
 }
 
-function loadImageFromDataUrl(dataUrl: string): Promise<HTMLImageElement> {
+function canvasToJpegBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = () => reject(new Error('無法讀取照片'))
-    img.src = dataUrl
+    canvas.toBlob(
+      blob => (blob ? resolve(blob) : reject(new Error('無法壓縮照片'))),
+      'image/jpeg',
+      PHOTO_UPLOAD_QUALITY
+    )
   })
 }
 
-/** Resize/compress before upload — avoids iOS WebView OOM and API timeouts on large camera photos. */
+function loadImageFromFile(file: File): Promise<HTMLImageElement> {
+  const url = URL.createObjectURL(file)
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      resolve(img)
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      reject(new Error('無法讀取照片'))
+    }
+    img.src = url
+  })
+}
+
+async function rasterizeToJpegBlob(source: CanvasImageSource, width: number, height: number): Promise<Blob> {
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('無法處理照片')
+  ctx.drawImage(source, 0, 0, width, height)
+  return canvasToJpegBlob(canvas)
+}
+
+/** Resize/compress before upload — keeps iOS WebView memory low. */
 export async function prepareFoodPhotoFile(file: File): Promise<{
   file: File
   dataUrl: string
@@ -53,50 +80,55 @@ export async function prepareFoodPhotoFile(file: File): Promise<{
     return { file, dataUrl, previewUrl: '' }
   }
 
-  const rawDataUrl = await fileToDataUrl(file)
-  const shouldCompress =
-    file.size > PHOTO_SKIP_COMPRESS_BYTES ||
+  const mustCompress =
+    isNativeIOS() ||
+    file.size > 400_000 ||
     file.type === 'image/png' ||
     file.type === 'image/heic' ||
     file.type === 'image/heif'
 
-  if (!shouldCompress) {
-    const img = await loadImageFromDataUrl(rawDataUrl)
+  if (!mustCompress) {
+    const previewUrl = URL.createObjectURL(file)
+    const dataUrl = await fileToDataUrl(file)
+    return { file, dataUrl, previewUrl }
+  }
+
+  let blob: Blob
+  if (typeof createImageBitmap !== 'undefined') {
+    try {
+      const probe = await createImageBitmap(file)
+      const { width, height } = scaleDimensions(probe.width, probe.height, PHOTO_UPLOAD_MAX_EDGE)
+      probe.close()
+      const bitmap = await createImageBitmap(file, {
+        resizeWidth: width,
+        resizeHeight: height,
+        resizeQuality: 'high',
+      })
+      blob = await rasterizeToJpegBlob(bitmap, width, height)
+      bitmap.close()
+    } catch {
+      const img = await loadImageFromFile(file)
+      const { width, height } = scaleDimensions(
+        img.naturalWidth || img.width,
+        img.naturalHeight || img.height,
+        PHOTO_UPLOAD_MAX_EDGE
+      )
+      blob = await rasterizeToJpegBlob(img, width, height)
+    }
+  } else {
+    const img = await loadImageFromFile(file)
     const { width, height } = scaleDimensions(
       img.naturalWidth || img.width,
       img.naturalHeight || img.height,
       PHOTO_UPLOAD_MAX_EDGE
     )
-    if (width === (img.naturalWidth || img.width) && height === (img.naturalHeight || img.height)) {
-      return {
-        file,
-        dataUrl: rawDataUrl,
-        previewUrl: URL.createObjectURL(file),
-      }
-    }
+    blob = await rasterizeToJpegBlob(img, width, height)
   }
 
-  const img = await loadImageFromDataUrl(rawDataUrl)
-  const { width, height } = scaleDimensions(
-    img.naturalWidth || img.width,
-    img.naturalHeight || img.height,
-    PHOTO_UPLOAD_MAX_EDGE
-  )
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext('2d')
-  if (!ctx) throw new Error('無法處理照片')
-  ctx.drawImage(img, 0, 0, width, height)
-
-  const dataUrl = canvas.toDataURL('image/jpeg', PHOTO_UPLOAD_QUALITY)
-  const blob = await fetch(dataUrl).then(r => r.blob())
   const outFile = new File([blob], `food-${Date.now()}.jpg`, { type: 'image/jpeg' })
-  return {
-    file: outFile,
-    dataUrl,
-    previewUrl: URL.createObjectURL(blob),
-  }
+  const previewUrl = URL.createObjectURL(blob)
+  const dataUrl = await fileToDataUrl(outFile)
+  return { file: outFile, dataUrl, previewUrl }
 }
 
 export interface PhotoParseResult {
@@ -122,7 +154,10 @@ export async function parseFoodPhotoDataUrl(
     res = await fetch('/api/food-photo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageBase64: base64, mimeType: mimeType.includes('jpeg') ? 'image/jpeg' : mimeType }),
+      body: JSON.stringify({
+        imageBase64: base64,
+        mimeType: mimeType.includes('jpeg') ? 'image/jpeg' : mimeType,
+      }),
       signal: controller.signal,
     })
   } catch (err) {

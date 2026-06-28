@@ -3,8 +3,19 @@
 import { useEffect } from 'react'
 import { App } from '@capacitor/app'
 import { StatusBar, Style } from '@capacitor/status-bar'
-import { isCapacitorNative } from '@/lib/capacitor-native'
+import { isCapacitorNative, isNativeIOS } from '@/lib/capacitor-native'
 import { installCapacitorIOSShell, remeasureCapacitorSafeAreas } from '@/lib/capacitor-ios-shell'
+
+function isWebViewLoadError(): boolean {
+  if (typeof document === 'undefined') return false
+  const text = document.body?.innerText ?? ''
+  return /couldn't load/i.test(text) || /Reload to try again/i.test(text)
+}
+
+function recoverWebViewIfNeeded() {
+  if (!isWebViewLoadError()) return
+  window.location.replace(`${window.location.origin}/dashboard`)
+}
 
 export default function CapacitorShell() {
   useEffect(() => {
@@ -24,6 +35,7 @@ export default function CapacitorShell() {
     })()
 
     let removeBackListener: (() => void) | undefined
+    let removeStateListener: (() => void) | undefined
 
     void App.addListener('backButton', ({ canGoBack }) => {
       if (canGoBack) {
@@ -35,8 +47,27 @@ export default function CapacitorShell() {
       removeBackListener = () => void handle.remove()
     })
 
+    const onResume = () => {
+      remeasureCapacitorSafeAreas()
+      window.setTimeout(recoverWebViewIfNeeded, 250)
+    }
+
+    if (isNativeIOS()) {
+      void App.addListener('appStateChange', ({ isActive }) => {
+        if (isActive) onResume()
+      }).then(handle => {
+        removeStateListener = () => void handle.remove()
+      })
+    }
+
+    document.addEventListener('visibilitychange', onResume)
+    window.addEventListener('pageshow', onResume)
+
     return () => {
       removeBackListener?.()
+      removeStateListener?.()
+      document.removeEventListener('visibilitychange', onResume)
+      window.removeEventListener('pageshow', onResume)
       removeIOSShell()
     }
   }, [])
