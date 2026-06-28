@@ -1,6 +1,10 @@
 /** Client-safe candidate collection — no ONR / fs */
 import { resolveMenuFromQuery, searchFoodMenuExtended, type MenuLookupHit } from '@/lib/food-menu-lookup'
-import { FOOD_DNA_TEMPLATES } from '@/lib/nutrition/food-dna-catalog'
+import {
+  FOOD_DNA_TEMPLATES,
+  getFoodDNATemplate,
+  resolveTemplateIdFromLabel,
+} from '@/lib/nutrition/food-dna-catalog'
 import { normalizeFoodName } from '@/lib/food-kb/normalize'
 import type {
   NutritionMacros,
@@ -29,36 +33,68 @@ function hitToMacros(hit: MenuLookupHit): NutritionMacros {
   }
 }
 
+function foodDnaCandidateFromTemplateId(templateId: string, matchScore: number): SearchV2Candidate | null {
+  const t = getFoodDNATemplate(templateId)
+  if (!t) return null
+  return {
+    id: `dna-${t.template_id}`,
+    name: t.canonical_food_name,
+    macros: {
+      calories: t.kcal,
+      protein: t.protein_g,
+      fat: t.fat_g,
+      carbs: t.carbs_g,
+      fiber: t.fiber_g ?? null,
+      sugar: null,
+      sodium: t.sodium_mg ?? null,
+    },
+    nutrition_status: 'official' as const,
+    nutrition_confidence: 'B' as const,
+    nutrition_source: 'Food DNA 餐型參考',
+    source_tier: 'food_dna' as SearchSourceTier,
+    match_score: matchScore,
+    explanation: `依餐型參考估算：${t.canonical_food_name}（選取後請確認）`,
+  }
+}
+
+function templateIdsFromLabel(label: string): string[] {
+  const ids = new Set<string>()
+  const root = resolveTemplateIdFromLabel(label)
+  if (root) ids.add(root)
+  for (const part of label.split(/[+＋、,，]/).map(s => s.trim()).filter(Boolean)) {
+    const tid = resolveTemplateIdFromLabel(part)
+    if (tid) ids.add(tid)
+  }
+  return [...ids]
+}
+
 function searchFoodDnaCandidates(query: string): SearchV2Candidate[] {
+  const out: SearchV2Candidate[] = []
+  const seen = new Set<string>()
+
+  for (const templateId of templateIdsFromLabel(query)) {
+    const hit = foodDnaCandidateFromTemplateId(templateId, 82)
+    if (hit && !seen.has(hit.id)) {
+      seen.add(hit.id)
+      out.push(hit)
+    }
+  }
+
   const q = normalizeFoodName(query)
-  return Object.values(FOOD_DNA_TEMPLATES)
-    .map(t => {
-      const n = normalizeFoodName(t.canonical_food_name)
-      let score = 0
-      if (n === q) score = 90
-      else if (n.includes(q) || q.includes(n)) score = 65
-      if (!score) return null
-      return {
-        id: `dna-${t.template_id}`,
-        name: t.canonical_food_name,
-        macros: {
-          calories: t.kcal,
-          protein: t.protein_g,
-          fat: t.fat_g,
-          carbs: t.carbs_g,
-          fiber: t.fiber_g ?? null,
-          sugar: null,
-          sodium: t.sodium_mg ?? null,
-        },
-        nutrition_status: 'official' as const,
-        nutrition_confidence: 'A' as const,
-        nutrition_source: 'Food DNA Template',
-        source_tier: 'food_dna' as SearchSourceTier,
-        match_score: score,
-        explanation: `Food DNA 模板：${t.canonical_food_name}`,
-      } satisfies SearchV2Candidate
-    })
-    .filter((x): x is SearchV2Candidate => x !== null)
+  for (const t of Object.values(FOOD_DNA_TEMPLATES)) {
+    const n = normalizeFoodName(t.canonical_food_name)
+    let score = 0
+    if (n === q) score = 90
+    else if (n.includes(q) || q.includes(n)) score = 65
+    if (!score) continue
+    const hit = foodDnaCandidateFromTemplateId(t.template_id, score)
+    if (hit && !seen.has(hit.id)) {
+      seen.add(hit.id)
+      out.push(hit)
+    }
+  }
+
+  return out
 }
 
 function contextCandidates(ctx: SearchV2Context | undefined): SearchV2Candidate[] {

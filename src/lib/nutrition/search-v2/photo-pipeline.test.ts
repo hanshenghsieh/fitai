@@ -3,6 +3,7 @@ import { describe, it, beforeEach } from 'node:test'
 import {
   createPhotoV2State,
   finalizePhotoV2ToFoodLogPayload,
+  photoV2DisplayCandidates,
   photoV2ReadyForLog,
   runPhotoSearchV2Pipeline,
   updatePhotoV2State,
@@ -115,6 +116,13 @@ describe('Photo Nutrition V2 — Level C unknown', () => {
     assert.equal(payload!.nutrition_status, 'unknown')
     assert.equal(payload!.nutrition_confidence, 'Unknown')
     assert.equal(payload!.capture_status, 'photo_only')
+  })
+
+  it('P28: compound curry photo label gets Food DNA template candidate', () => {
+    const label = '白飯 + 日式咖哩（雞肉咖哩） + 雞肉塊 + 紅蘿蔔'
+    const state = createPhotoV2State(label)
+    const names = photoV2DisplayCandidates(state).map(c => c.name)
+    assert.ok(names.includes('咖哩飯'), `expected 咖哩飯 in ${names.join(', ')}`)
   })
 })
 

@@ -58,23 +58,32 @@ export function searchNutritionV2Client(query: string, ctx?: SearchV2Context): S
   if (ctx?.visual_category && ctx.visual_category !== 'unknown') {
     const filtered = filterByVisualCategory(rawCandidates, ctx.visual_category)
     if (filtered.length === 0 && rawCandidates.length > 0) {
-      return {
-        level: 'C',
-        action: 'create_unknown',
-        query: trimmed,
-        explanation: categoryGuardMessage(ctx.visual_category),
-        candidates: [],
-        unknown_record: {
-          food_name: trimmed,
-          restaurant: null,
-          nutrition_status: 'unknown',
-          nutrition_confidence: 'Unknown',
-          macros: NULL_MACROS,
-          ui_message: categoryGuardMessage(ctx.visual_category),
-        },
+      const dnaFallback = filterByVisualCategory(
+        rawCandidates.filter(c => c.source_tier === 'food_dna'),
+        ctx.visual_category
+      )
+      if (dnaFallback.length > 0) {
+        candidates = dnaFallback
+      } else {
+        return {
+          level: 'C',
+          action: 'create_unknown',
+          query: trimmed,
+          explanation: categoryGuardMessage(ctx.visual_category),
+          candidates: [],
+          unknown_record: {
+            food_name: trimmed,
+            restaurant: null,
+            nutrition_status: 'unknown',
+            nutrition_confidence: 'Unknown',
+            macros: NULL_MACROS,
+            ui_message: categoryGuardMessage(ctx.visual_category),
+          },
+        }
       }
+    } else {
+      candidates = filtered
     }
-    candidates = filtered
   }
   const { level, best, ambiguous } = classifyClientMatchLevel(trimmed, candidates)
 

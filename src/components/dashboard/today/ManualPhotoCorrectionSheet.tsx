@@ -104,17 +104,32 @@ export default function ManualPhotoCorrectionSheet({
     setAdvancedOpen(false)
   }, [open, initialLabel, initialRestaurant, visualParse])
 
-  const searchOutcome = useMemo(() => {
-    if (!searchQuery.trim()) return null
-    return searchNutritionV2Client(searchQuery.trim(), {
-      visual_category: category,
-      photo_mode: true,
-    })
-  }, [searchQuery, category])
+  useEffect(() => {
+    if (!open || selectedCandidate || templateCandidates.length !== 1) return
+    setSelectedCandidate(templateCandidates[0]!)
+  }, [open, selectedCandidate, templateCandidates])
 
-  const searchCandidates = useMemo(
-    () => searchOutcome?.candidates.filter(c => c.source_tier !== 'unknown').slice(0, PHOTO_MANUAL_SEARCH_LIMIT) ?? [],
-    [searchOutcome]
+  const searchCandidates = useMemo(() => {
+    const queries = [...new Set([searchQuery.trim(), label.trim()].filter(Boolean))]
+    const seen = new Set<string>()
+    const merged: SearchV2Candidate[] = []
+    for (const q of queries) {
+      const outcome = searchNutritionV2Client(q, {
+        visual_category: category,
+        photo_mode: true,
+      })
+      for (const c of outcome.candidates.filter(c => c.source_tier !== 'unknown')) {
+        if (seen.has(c.id)) continue
+        seen.add(c.id)
+        merged.push(c)
+      }
+    }
+    return merged.slice(0, PHOTO_MANUAL_SEARCH_LIMIT)
+  }, [searchQuery, label, category])
+
+  const templateCandidates = useMemo(
+    () => searchCandidates.filter(c => c.source_tier === 'food_dna'),
+    [searchCandidates]
   )
 
   const photoAi = buildPhotoAiMeta(visualParse, originalCandidates)
@@ -309,7 +324,12 @@ export default function ManualPhotoCorrectionSheet({
               </div>
               {searchCandidates.length === 0 && searchQuery.trim() && (
                 <p className="text-[13px]" style={{ color: BB_V2.text.secondary }}>
-                  找不到相容的可信資料，可改用手動輸入或先保存照片。
+                  找不到品牌官方資料。可改用手動輸入營養，或先保存照片紀錄。
+                </p>
+              )}
+              {templateCandidates.length > 0 && (
+                <p className="text-[13px]" style={{ color: BB_V2.accent.orange, fontWeight: 500 }}>
+                  依辨識結果，找到餐型參考估算（選一個後可加入今天）
                 </p>
               )}
               {searchCandidates.map(c => {
@@ -329,6 +349,7 @@ export default function ManualPhotoCorrectionSheet({
                       {c.store ? `${c.store} · ${c.name}` : c.name}
                     </p>
                     <p className="text-[13px] mt-0.5" style={{ color: BB_V2.text.secondary }}>
+                      {c.source_tier === 'food_dna' ? '餐型參考 · ' : ''}
                       {c.macros.calories ?? '—'} kcal · 蛋白質 {c.macros.protein ?? '—'}g
                     </p>
                   </button>

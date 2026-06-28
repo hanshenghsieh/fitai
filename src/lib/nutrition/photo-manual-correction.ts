@@ -90,6 +90,7 @@ export function buildFoodLogFromManualPhotoCorrection(
 
   if (result.mode === 'verified') {
     const c = result.candidate
+    const isTemplate = c.source_tier === 'food_dna'
     return {
       ...base,
       name: c.name,
@@ -103,8 +104,8 @@ export function buildFoodLogFromManualPhotoCorrection(
       protein_g: c.macros.protein,
       carbs_g: c.macros.carbs,
       fat_g: c.macros.fat,
-      nutrition_status: 'official',
-      nutrition_confidence: 'B',
+      nutrition_status: isTemplate ? 'estimated_pending_confirmation' : 'official',
+      nutrition_confidence: isTemplate ? 'C' : 'B',
       capture_status: 'resolved',
     }
   }
