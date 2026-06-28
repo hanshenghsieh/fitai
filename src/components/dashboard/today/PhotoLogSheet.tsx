@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Camera, Loader2, Search, X } from 'lucide-react'
 import { TODAY } from '@/lib/today-design'
 import { BB_V2 } from '@/lib/betterbit-v2'
+import { isNativeIOS } from '@/lib/capacitor-native'
 import BBCard from '@/components/ui/BBCard'
 import AppOverlay from '@/components/ui/AppOverlay'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
@@ -401,12 +402,21 @@ function ReviewStep({
           className="relative w-full overflow-hidden"
           style={{ height: 360, borderRadius: BB_V2.radius.sheet, backgroundColor: BB_V2.bg.pill }}
         >
-          <img
-            src={draft.previewUrl}
-            alt=""
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
+          {draft.previewUrl && (!draft.loading || !isNativeIOS()) ? (
+            <img
+              src={draft.previewUrl}
+              alt=""
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-7 w-7 animate-spin" strokeWidth={ICON_STROKE} style={{ color: TODAY.mocha }} />
+              <p className="text-[13px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>
+                {draft.loading ? '正在辨識…' : '照片預覽'}
+              </p>
+            </div>
+          )}
           {!draft.loading && draft.name && !accuracyMode && (
             <div className="absolute inset-0 p-4 flex flex-wrap content-start gap-2 pointer-events-none">
               {guessFoodTags(draft.name).map((tag, i) => (

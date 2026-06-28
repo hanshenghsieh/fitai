@@ -19,6 +19,7 @@ import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
 import {
   buildPhotoLogCommitFromAccuracy,
   createPhotoAccuracyState,
+  photoAccuracyStateFromV2,
   photoAccuracyDisplayMacros,
   photoAccuracyReadyForLog,
   updatePhotoAccuracyState,
@@ -674,20 +675,12 @@ export default function TodayOS({
       const parsed = await uploadFoodPhotoFile(file)
       parsedName = parsed.name.trim() || '未知食物'
 
-      await new Promise<void>(resolve => {
-        setTimeout(resolve, 64)
-      })
-
-      const photoId = `photo-parse-${Date.now()}`
-      let accuracy
-      try {
-        accuracy = createPhotoAccuracyState(parsedName, {
-          store: storesInText(parsedName)?.[0],
-          photo_id: photoId,
-        })
-      } catch {
-        accuracy = createPhotoAccuracyState('未知食物', { photo_id: photoId })
-      }
+      const accuracy = parsed.photo_v2
+        ? photoAccuracyStateFromV2(parsed.photo_v2)
+        : createPhotoAccuracyState(parsedName, {
+            store: storesInText(parsedName)?.[0],
+            photo_id: `photo-parse-${Date.now()}`,
+          })
 
       const resolved = accuracy.v2.outcome.official_record
       const display = photoAccuracyDisplayMacros(accuracy)

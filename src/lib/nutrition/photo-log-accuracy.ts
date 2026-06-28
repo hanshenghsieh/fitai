@@ -105,6 +105,11 @@ export function createPhotoAccuracyState(
   return buildPhotoAccuracyStateFromV2(v2)
 }
 
+/** Hydrate UI state from server-built PhotoV2State (avoids heavy client-side search on iOS). */
+export function photoAccuracyStateFromV2(v2: PhotoV2State): PhotoAccuracyState {
+  return buildPhotoAccuracyStateFromV2(v2)
+}
+
 export function updatePhotoAccuracyState(
   state: PhotoAccuracyState,
   patch: Partial<UserConfirmationAnswers>

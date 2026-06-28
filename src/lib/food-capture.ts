@@ -1,5 +1,6 @@
 import type { FoodDna, FrequentFood } from '@/lib/food-memory'
 import { isNativeIOS } from '@/lib/capacitor-native'
+import type { PhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 
 const PHOTO_UPLOAD_MAX_EDGE = isNativeIOS() ? 512 : 1024
 const PHOTO_PREVIEW_MAX_EDGE = isNativeIOS() ? 384 : 640
@@ -128,11 +129,14 @@ export interface PhotoParseResult {
   confidence_pct: number
   /** AI must never supply nutrition — label only */
   ai_nutrition_suppressed: true
+  /** Built on server to avoid heavy client-side menu search in iOS WebView. */
+  photo_v2?: PhotoV2State
 }
 
 type PhotoApiJson = {
   error?: string
   data?: { items: Array<{ name: string; confidence: 'high' | 'medium' | 'low' }> }
+  photo_v2?: PhotoV2State
 }
 
 function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
@@ -153,6 +157,7 @@ function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
     confidence: worst,
     confidence_pct: confidenceToPct(worst),
     ai_nutrition_suppressed: true,
+    photo_v2: json.photo_v2,
   }
 }
 

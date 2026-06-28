@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { parseFoodImage } from '@/lib/claude/client'
+import { storesInText } from '@/lib/dice-store-names'
+import { createPhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 
 export const maxDuration = 60
 
@@ -33,6 +35,11 @@ async function readImageFromRequest(request: NextRequest): Promise<{ imageBase64
   return { imageBase64, mimeType: mimeType || 'image/jpeg' }
 }
 
+function labelFromParseItems(items: Array<{ name: string }>): string {
+  const names = items.map(item => item.name.trim()).filter(Boolean)
+  return names.length > 1 ? names.join(' + ') : names[0] ?? ''
+}
+
 export async function POST(request: NextRequest) {
   try {
     if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
@@ -46,7 +53,19 @@ export async function POST(request: NextRequest) {
     const { imageBase64, mimeType } = await readImageFromRequest(request)
     const { data } = await parseFoodImage(imageBase64, mimeType)
 
-    return NextResponse.json({ success: true, data })
+    const label = labelFromParseItems(data.items ?? [])
+    const photoId = `photo-api-${Date.now()}`
+    let photo_v2
+    try {
+      photo_v2 = createPhotoV2State(label || '未知食物', {
+        store: storesInText(label)?.[0],
+        photo_id: photoId,
+      })
+    } catch {
+      photo_v2 = createPhotoV2State('未知食物', { photo_id: photoId })
+    }
+
+    return NextResponse.json({ success: true, data, photo_v2 })
   } catch (err) {
     console.error('Food photo parse error:', err)
     const message = err instanceof Error ? err.message : '辨識失敗，改用搜尋或常吃？'
