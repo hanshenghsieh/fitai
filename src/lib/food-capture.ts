@@ -1,8 +1,9 @@
 import type { FoodDna, FrequentFood } from '@/lib/food-memory'
 import { isNativeIOS } from '@/lib/capacitor-native'
 
-const PHOTO_UPLOAD_MAX_EDGE = isNativeIOS() ? 768 : 1024
-const PHOTO_UPLOAD_QUALITY = isNativeIOS() ? 0.72 : 0.78
+const PHOTO_UPLOAD_MAX_EDGE = isNativeIOS() ? 512 : 1024
+const PHOTO_PREVIEW_MAX_EDGE = isNativeIOS() ? 384 : 640
+const PHOTO_UPLOAD_QUALITY = isNativeIOS() ? 0.68 : 0.78
 const PHOTO_PARSE_TIMEOUT_MS = 45_000
 
 export function confidenceToPct(confidence: 'high' | 'medium' | 'low'): number {
@@ -15,6 +16,12 @@ export function isLowConfidence(pct: number): boolean {
   return pct < 40
 }
 
+function yieldToMain(): Promise<void> {
+  return new Promise(resolve => {
+    requestAnimationFrame(() => setTimeout(resolve, 0))
+  })
+}
+
 export async function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -22,15 +29,6 @@ export async function fileToDataUrl(file: File): Promise<string> {
     reader.onerror = () => reject(new Error('無法讀取照片'))
     reader.readAsDataURL(file)
   })
-}
-
-function scaleDimensions(width: number, height: number, maxEdge: number) {
-  if (width <= maxEdge && height <= maxEdge) return { width, height }
-  const scale = maxEdge / Math.max(width, height)
-  return {
-    width: Math.max(1, Math.round(width * scale)),
-    height: Math.max(1, Math.round(height * scale)),
-  }
 }
 
 function canvasToJpegBlob(canvas: HTMLCanvasElement): Promise<Blob> {
@@ -43,22 +41,6 @@ function canvasToJpegBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   })
 }
 
-function loadImageFromFile(file: File): Promise<HTMLImageElement> {
-  const url = URL.createObjectURL(file)
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => {
-      URL.revokeObjectURL(url)
-      resolve(img)
-    }
-    img.onerror = () => {
-      URL.revokeObjectURL(url)
-      reject(new Error('無法讀取照片'))
-    }
-    img.src = url
-  })
-}
-
 async function rasterizeToJpegBlob(source: CanvasImageSource, width: number, height: number): Promise<Blob> {
   const canvas = document.createElement('canvas')
   canvas.width = width
@@ -66,7 +48,49 @@ async function rasterizeToJpegBlob(source: CanvasImageSource, width: number, hei
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('無法處理照片')
   ctx.drawImage(source, 0, 0, width, height)
-  return canvasToJpegBlob(canvas)
+  const blob = await canvasToJpegBlob(canvas)
+  canvas.width = 0
+  canvas.height = 0
+  return blob
+}
+
+/** Single-pass downscale — never decode full-resolution pixels on device. */
+async function downscaleFileToJpegBlob(file: File, maxEdge: number): Promise<Blob> {
+  if (typeof createImageBitmap !== 'undefined') {
+    const bitmap = await createImageBitmap(file, {
+      resizeWidth: maxEdge,
+      resizeQuality: isNativeIOS() ? 'medium' : 'high',
+    })
+    try {
+      return await rasterizeToJpegBlob(bitmap, bitmap.width, bitmap.height)
+    } finally {
+      bitmap.close()
+    }
+  }
+
+  const url = URL.createObjectURL(file)
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image()
+      el.onload = () => resolve(el)
+      el.onerror = () => reject(new Error('無法讀取照片'))
+      el.src = url
+    })
+    const scale = maxEdge / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height, 1)
+    const width = Math.max(1, Math.round((img.naturalWidth || img.width) * Math.min(1, scale)))
+    const height = Math.max(1, Math.round((img.naturalHeight || img.height) * Math.min(1, scale)))
+    return await rasterizeToJpegBlob(img, width, height)
+  } finally {
+    URL.revokeObjectURL(url)
+  }
+}
+
+async function previewBlobFromUploadBlob(uploadBlob: Blob): Promise<Blob> {
+  if (!isNativeIOS() || PHOTO_PREVIEW_MAX_EDGE >= PHOTO_UPLOAD_MAX_EDGE) {
+    return uploadBlob
+  }
+  const previewFile = new File([uploadBlob], 'preview.jpg', { type: 'image/jpeg' })
+  return downscaleFileToJpegBlob(previewFile, PHOTO_PREVIEW_MAX_EDGE)
 }
 
 /** Resize/compress before upload — no base64 on client (keeps iOS WebView memory low). */
@@ -89,40 +113,13 @@ export async function prepareFoodPhotoFile(file: File): Promise<{
     return { file, previewUrl: URL.createObjectURL(file) }
   }
 
-  let blob: Blob
-  if (typeof createImageBitmap !== 'undefined') {
-    try {
-      const probe = await createImageBitmap(file)
-      const { width, height } = scaleDimensions(probe.width, probe.height, PHOTO_UPLOAD_MAX_EDGE)
-      probe.close()
-      const bitmap = await createImageBitmap(file, {
-        resizeWidth: width,
-        resizeHeight: height,
-        resizeQuality: 'high',
-      })
-      blob = await rasterizeToJpegBlob(bitmap, width, height)
-      bitmap.close()
-    } catch {
-      const img = await loadImageFromFile(file)
-      const { width, height } = scaleDimensions(
-        img.naturalWidth || img.width,
-        img.naturalHeight || img.height,
-        PHOTO_UPLOAD_MAX_EDGE
-      )
-      blob = await rasterizeToJpegBlob(img, width, height)
-    }
-  } else {
-    const img = await loadImageFromFile(file)
-    const { width, height } = scaleDimensions(
-      img.naturalWidth || img.width,
-      img.naturalHeight || img.height,
-      PHOTO_UPLOAD_MAX_EDGE
-    )
-    blob = await rasterizeToJpegBlob(img, width, height)
-  }
+  await yieldToMain()
+  const uploadBlob = await downscaleFileToJpegBlob(file, PHOTO_UPLOAD_MAX_EDGE)
+  await yieldToMain()
+  const previewBlob = await previewBlobFromUploadBlob(uploadBlob)
 
-  const outFile = new File([blob], `food-${Date.now()}.jpg`, { type: 'image/jpeg' })
-  return { file: outFile, previewUrl: URL.createObjectURL(blob) }
+  const outFile = new File([uploadBlob], `food-${Date.now()}.jpg`, { type: 'image/jpeg' })
+  return { file: outFile, previewUrl: URL.createObjectURL(previewBlob) }
 }
 
 export interface PhotoParseResult {

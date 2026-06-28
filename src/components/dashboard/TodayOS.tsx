@@ -435,6 +435,7 @@ export default function TodayOS({
   const [moreOpen, setMoreOpen] = useState(false)
   const [photoOpen, setPhotoOpen] = useState(false)
   const [photoDraft, setPhotoDraft] = useState<PhotoLogDraft | null>(null)
+  const [photoProcessing, setPhotoProcessing] = useState(false)
   const [photoSaving, setPhotoSaving] = useState(false)
   const [manualPhotoOpen, setManualPhotoOpen] = useState(false)
 
@@ -673,6 +674,10 @@ export default function TodayOS({
       const parsed = await uploadFoodPhotoFile(file)
       parsedName = parsed.name.trim() || '未知食物'
 
+      await new Promise<void>(resolve => {
+        setTimeout(resolve, 64)
+      })
+
       const photoId = `photo-parse-${Date.now()}`
       let accuracy
       try {
@@ -728,41 +733,31 @@ export default function TodayOS({
       if (photoPreviewUrlRef.current) URL.revokeObjectURL(photoPreviewUrlRef.current)
       photoPreviewUrlRef.current = null
       setPhotoOpen(true)
-      setPhotoDraft({
-        file,
-        previewUrl: '',
-        name: '',
-        calories: null,
-        protein_g: null,
-        carbs_g: null,
-        fat_g: null,
-        loading: true,
-      })
+      setPhotoDraft(null)
+      setPhotoProcessing(true)
 
       void (async () => {
         try {
           const prepared = await prepareFoodPhotoFile(file)
           if (photoPreviewUrlRef.current) URL.revokeObjectURL(photoPreviewUrlRef.current)
           photoPreviewUrlRef.current = prepared.previewUrl
-          setPhotoDraft(prev =>
-            prev ? { ...prev, file: prepared.file, previewUrl: prepared.previewUrl } : prev
-          )
+          setPhotoProcessing(false)
+          setPhotoDraft({
+            file: prepared.file,
+            previewUrl: prepared.previewUrl,
+            name: '',
+            calories: null,
+            protein_g: null,
+            carbs_g: null,
+            fat_g: null,
+            loading: true,
+          })
           await parsePhotoDraft(prepared.file, prepared.previewUrl)
         } catch (err) {
+          setPhotoProcessing(false)
           const message = err instanceof Error ? err.message : '無法處理照片'
           toast.error('照片無法使用', { description: message })
-          setPhotoDraft(prev =>
-            prev
-              ? {
-                  ...prev,
-                  loading: false,
-                  name: '未知食物',
-                  accuracy: createPhotoAccuracyState('未知食物', {
-                    photo_id: `photo-parse-${Date.now()}`,
-                  }),
-                }
-              : prev
-          )
+          setPhotoDraft(null)
         }
       })()
     },
@@ -772,6 +767,7 @@ export default function TodayOS({
   const closePhotoSheet = useCallback(() => {
     setPhotoOpen(false)
     setPhotoDraft(null)
+    setPhotoProcessing(false)
     setPhotoSaving(false)
     if (photoPreviewUrlRef.current) {
       URL.revokeObjectURL(photoPreviewUrlRef.current)
@@ -1307,6 +1303,7 @@ export default function TodayOS({
       <PhotoLogSheet
         open={photoOpen}
         draft={photoDraft}
+        processing={photoProcessing}
         accuracyEnabled={isNutritionAccuracyV1()}
         onClose={closePhotoSheet}
         onPickFile={handlePhotoPick}

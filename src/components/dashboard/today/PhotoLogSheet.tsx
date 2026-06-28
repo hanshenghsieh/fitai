@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import { ArrowLeft, Camera, Loader2, Search, X } from 'lucide-react'
 import { TODAY } from '@/lib/today-design'
 import { BB_V2 } from '@/lib/betterbit-v2'
@@ -28,6 +27,7 @@ export interface PhotoLogDraft {
 interface Props {
   open: boolean
   draft: PhotoLogDraft | null
+  processing?: boolean
   accuracyEnabled?: boolean
   onClose: () => void
   onPickFile: (file: File) => void
@@ -401,7 +401,12 @@ function ReviewStep({
           className="relative w-full overflow-hidden"
           style={{ height: 360, borderRadius: BB_V2.radius.sheet, backgroundColor: BB_V2.bg.pill }}
         >
-          <Image src={draft.previewUrl} alt="" fill unoptimized className="object-cover" sizes="100vw" />
+          <img
+            src={draft.previewUrl}
+            alt=""
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
           {!draft.loading && draft.name && !accuracyMode && (
             <div className="absolute inset-0 p-4 flex flex-wrap content-start gap-2 pointer-events-none">
               {guessFoodTags(draft.name).map((tag, i) => (
@@ -421,7 +426,7 @@ function ReviewStep({
         {draft.loading ? (
           <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
-            {draft.previewUrl ? '正在辨識…' : '正在處理照片…'}
+            {draft.previewUrl ? '正在辨識…' : '正在準備照片…'}
           </p>
         ) : accuracyMode && draft.accuracy && onAccuracyChange ? (
           <AccuracyConfirmSection
@@ -555,9 +560,31 @@ function ReviewStep({
   )
 }
 
+function ProcessingStep({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="flex flex-col flex-1 min-h-[320px]">
+      <div className="shrink-0 px-5 pt-5 pb-3 flex items-center justify-end">
+        <button type="button" onClick={onClose} className="p-1.5" aria-label="關閉">
+          <X className="h-5 w-5" strokeWidth={ICON_STROKE} style={{ color: TODAY.textSecondary }} />
+        </button>
+      </div>
+      <div className="flex-1 px-5 flex flex-col items-center justify-center gap-4 pb-8">
+        <Loader2 className="h-8 w-8 animate-spin" strokeWidth={ICON_STROKE} style={{ color: TODAY.mocha }} />
+        <p className="text-[15px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>
+          正在準備照片…
+        </p>
+        <p className="text-[12px] text-center leading-relaxed max-w-xs" style={{ color: TODAY.textSecondary, opacity: 0.85 }}>
+          大圖會先壓縮再上傳，避免 App 當掉
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function PhotoLogSheet({
   open,
   draft,
+  processing = false,
   accuracyEnabled,
   onClose,
   onPickFile,
@@ -580,7 +607,9 @@ export default function PhotoLogSheet({
         }}
         onClick={e => e.stopPropagation()}
       >
-        {draft ? (
+        {processing ? (
+          <ProcessingStep onClose={onClose} />
+        ) : draft ? (
           <ReviewStep
             draft={draft}
             accuracyEnabled={accuracyEnabled}
