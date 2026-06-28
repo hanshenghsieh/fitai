@@ -452,7 +452,7 @@ function ReviewStep({
         {draft.loading ? (
           <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
-            正在辨識…
+            {draft.previewUrl ? '正在辨識…' : '正在處理照片…'}
           </p>
         ) : accuracyMode && draft.accuracy && onAccuracyChange ? (
           <AccuracyConfirmSection

@@ -12,6 +12,7 @@ import {
 import { enrichFoodLog, sumItemMacros } from '@/lib/food-log-macros'
 import {
   fileToDataUrl,
+  prepareFoodPhotoFile,
   parseFoodPhotoDataUrl,
 } from '@/lib/food-capture'
 import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
@@ -664,34 +665,60 @@ export default function TodayOS({
         fat_g: null,
         loading: true,
       })
+
+      let parsedName = ''
       try {
         const parsed = await parseFoodPhotoDataUrl(dataUrl, file.type || 'image/jpeg')
-        const photoId = `photo-parse-${Date.now()}`
-        const accuracy = createPhotoAccuracyState(parsed.name || '', {
-          store: storesInText(parsed.name)?.[0],
-          photo_id: photoId,
-        })
-        const resolved = accuracy.v2.outcome.official_record
-        const display = photoAccuracyDisplayMacros(accuracy)
-        setPhotoDraft({
-          file,
-          previewUrl,
-          dataUrl,
-          name: resolved?.name ?? accuracy.label,
-          calories: display.calories,
-          protein_g: display.protein_g,
-          carbs_g: display.carbs_g,
-          fat_g: display.fat_g,
-          loading: false,
-          accuracy,
-        })
-      } catch {
-        const accuracy = createPhotoAccuracyState('未知食物', { photo_id: `photo-parse-${Date.now()}` })
+        parsedName = parsed.name.trim() || '未知食物'
+
         setPhotoDraft(prev =>
           prev
             ? {
                 ...prev,
-                name: accuracy.label,
+                name: parsedName,
+                loading: false,
+              }
+            : prev
+        )
+
+        const photoId = `photo-parse-${Date.now()}`
+        let accuracy
+        try {
+          accuracy = createPhotoAccuracyState(parsedName, {
+            store: storesInText(parsedName)?.[0],
+            photo_id: photoId,
+          })
+        } catch {
+          accuracy = createPhotoAccuracyState('未知食物', { photo_id: photoId })
+        }
+
+        const resolved = accuracy.v2.outcome.official_record
+        const display = photoAccuracyDisplayMacros(accuracy)
+        setPhotoDraft(prev =>
+          prev
+            ? {
+                ...prev,
+                name: resolved?.name ?? accuracy.label,
+                calories: display.calories,
+                protein_g: display.protein_g,
+                carbs_g: display.carbs_g,
+                fat_g: display.fat_g,
+                loading: false,
+                accuracy,
+              }
+            : prev
+        )
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '辨識失敗，請稍後再試'
+        toast.error('無法完成辨識', { description: message })
+        const accuracy = createPhotoAccuracyState(parsedName || '未知食物', {
+          photo_id: `photo-parse-${Date.now()}`,
+        })
+        setPhotoDraft(prev =>
+          prev
+            ? {
+                ...prev,
+                name: parsedName || accuracy.label,
                 calories: null,
                 protein_g: null,
                 carbs_g: null,
@@ -709,10 +736,42 @@ export default function TodayOS({
   const handlePhotoPick = useCallback(
     (file: File) => {
       if (photoPreviewUrlRef.current) URL.revokeObjectURL(photoPreviewUrlRef.current)
-      const previewUrl = URL.createObjectURL(file)
-      photoPreviewUrlRef.current = previewUrl
+      photoPreviewUrlRef.current = null
       setPhotoOpen(true)
-      void fileToDataUrl(file).then(dataUrl => parsePhotoDraft(file, previewUrl, dataUrl))
+      setPhotoDraft({
+        file,
+        previewUrl: '',
+        name: '',
+        calories: null,
+        protein_g: null,
+        carbs_g: null,
+        fat_g: null,
+        loading: true,
+      })
+
+      void (async () => {
+        try {
+          const prepared = await prepareFoodPhotoFile(file)
+          if (photoPreviewUrlRef.current) URL.revokeObjectURL(photoPreviewUrlRef.current)
+          photoPreviewUrlRef.current = prepared.previewUrl
+          await parsePhotoDraft(prepared.file, prepared.previewUrl, prepared.dataUrl)
+        } catch (err) {
+          const message = err instanceof Error ? err.message : '無法處理照片'
+          toast.error('照片無法使用', { description: message })
+          setPhotoDraft(prev =>
+            prev
+              ? {
+                  ...prev,
+                  loading: false,
+                  name: '未知食物',
+                  accuracy: createPhotoAccuracyState('未知食物', {
+                    photo_id: `photo-parse-${Date.now()}`,
+                  }),
+                }
+              : prev
+          )
+        }
+      })()
     },
     [parsePhotoDraft]
   )
