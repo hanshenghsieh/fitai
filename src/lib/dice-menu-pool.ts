@@ -29,7 +29,7 @@ export function lookupDiceMenuItem(id: string): ConvenienceItem | undefined {
   return getMenuIdIndex(getDiceMenuSource()).get(id)
 }
 
-const DICE_POOL_CACHE_VERSION = 5
+const DICE_POOL_CACHE_VERSION = 6
 
 function dicePoolCacheKey(
   mealType: MealType,

@@ -51,7 +51,22 @@ export default function MealLogCard({ log, onDelete, onConfirmNutrition }: Props
 
   const proteinLine = formatLogProteinLine(log)
 
-  const inner = (
+  const deleteButton = onDelete ? (
+    <button
+      type="button"
+      onClick={e => {
+        e.preventDefault()
+        e.stopPropagation()
+        onDelete()
+      }}
+      className="p-2 rounded-full active:opacity-70"
+      aria-label="移除"
+    >
+      <Trash2 className="h-4 w-4" strokeWidth={BB_V2.iconStroke} style={{ color: BB_V2.text.secondary }} />
+    </button>
+  ) : null
+
+  const card = (
     <BBCard padding="16px 20px" className="flex items-center gap-4">
       {hasPhoto && log.photo_data_url ? (
         <FoodPhotoThumb photo_url={log.photo_data_url} userUploadedPhoto={log.photo_data_url} size={56} radius={16} />
@@ -64,7 +79,23 @@ export default function MealLogCard({ log, onDelete, onConfirmNutrition }: Props
           <BBIcon name="meal" size={24} tone="muted" />
         </div>
       )}
-      <div className="flex-1 min-w-0">
+      <div
+        className={`flex-1 min-w-0${clickable ? ' cursor-pointer active:opacity-90' : ''}`}
+        onClick={clickable ? () => onConfirmNutrition?.(log) : undefined}
+        onKeyDown={
+          clickable
+            ? e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onConfirmNutrition?.(log)
+                }
+              }
+            : undefined
+        }
+        role={clickable ? 'button' : undefined}
+        tabIndex={clickable ? 0 : undefined}
+        aria-label={clickable ? `${log.name}，${formatLogCaloriesLine(log)}，點擊確認營養` : undefined}
+      >
         <p className="text-[16px] truncate" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
           {getFoodLogDisplayLabel(log)}
         </p>
@@ -119,35 +150,10 @@ export default function MealLogCard({ log, onDelete, onConfirmNutrition }: Props
         {clickable && (
           <ChevronRight className="h-4 w-4 shrink-0" strokeWidth={BB_V2.iconStroke} style={{ color: BB_V2.accent.orange }} />
         )}
-        {onDelete && (
-          <button
-            type="button"
-            onClick={e => {
-              e.stopPropagation()
-              onDelete()
-            }}
-            className="p-2 rounded-full active:opacity-70"
-            aria-label="移除"
-          >
-            <Trash2 className="h-4 w-4" strokeWidth={BB_V2.iconStroke} style={{ color: BB_V2.text.secondary }} />
-          </button>
-        )}
+        {deleteButton}
       </div>
     </BBCard>
   )
 
-  if (clickable) {
-    return (
-      <button
-        type="button"
-        onClick={() => onConfirmNutrition(log)}
-        className="w-full text-left active:opacity-90"
-        aria-label={`${log.name}，${formatLogCaloriesLine(log)}，點擊確認營養`}
-      >
-        {inner}
-      </button>
-    )
-  }
-
-  return inner
+  return card
 }

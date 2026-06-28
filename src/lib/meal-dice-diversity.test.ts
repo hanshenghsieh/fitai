@@ -5,8 +5,11 @@ import { recentDiceExcludeIds, rollMealSuggestion } from '@/lib/meal-engine'
 import {
   DICE_MIN_AVAILABLE_CANDIDATES,
   clearSessionDicePoolsForTests,
+  linesToDisplayItems,
 } from '@/lib/meal-suggest'
-import { mainsForStore, preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
+import { lookupDiceMenuItem, mainsForStore, preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
+import { isPlausibleBrandItem } from '@/lib/store-menu-plausibility'
+import type { ConvenienceItem } from '@/lib/convenience-store-menu'
 
 describe('Dice diversity — reroll pool policy', () => {
   it('expands pool when fewer than 40 candidates remain', () => {
@@ -27,7 +30,7 @@ describe('Dice diversity — reroll pool policy', () => {
     assert.equal(excludeIds.length, 2)
   })
 
-  it('15 rerolls yield more than four unique stores (TodayOS-like excludes)', async () => {
+  it('15 rerolls yield more than four unique labels without store exclusion', async () => {
     await preloadDiceMenuBulk()
     clearSessionDicePoolsForTests()
 
@@ -46,14 +49,15 @@ describe('Dice diversity — reroll pool policy', () => {
     for (let i = 0; i < 15; i++) {
       clearSessionDicePoolsForTests()
       const excludeIds = preview?.id ? [preview.id] : []
-      const excludeStores = preview?.stores[0] ? [preview.stores[0]] : []
+      const excludeNames = preview ? preview.lines.map(l => l.item.name) : []
 
       const result = rollMealSuggestion({
         meal_type: 'lunch',
         daily_targets: { calories: 1680, protein_g: 100, carbs_g: 200, fat_g: 55 },
         day_state: dayState,
         seen_ids: excludeIds,
-        exclude_stores: excludeStores,
+        exclude_names: excludeNames,
+        exclude_stores: [],
         rolls_used: i,
       })
 
@@ -65,8 +69,84 @@ describe('Dice diversity — reroll pool policy', () => {
       preview = result.suggestion
     }
 
-    assert.ok(stores.size > 4, `expected >4 stores, got ${stores.size}: ${[...stores].join(', ')}`)
     assert.ok(labels.size > 4, `expected >4 labels, got ${labels.size}`)
+  })
+
+  it('same-store reroll yields different combos at Subway', async () => {
+    await preloadDiceMenuBulk()
+    clearSessionDicePoolsForTests()
+
+    const dayState = computeTodayMealState({
+      todayFoodLogs: [],
+      normalTargetKcal: 1680,
+      proteinTargetG: 100,
+      mealSlot: 'lunch',
+      hourOfDay: 12,
+    })
+
+    let preview: import('@/lib/meal-engine-types').MealSuggestion | null = null
+    const subwayLabels = new Set<string>()
+
+    for (let i = 0; i < 24 && subwayLabels.size < 3; i++) {
+      clearSessionDicePoolsForTests()
+      const result = rollMealSuggestion({
+        meal_type: 'lunch',
+        daily_targets: { calories: 1680, protein_g: 100, carbs_g: 200, fat_g: 55 },
+        day_state: dayState,
+        seen_ids: preview?.id ? [preview.id] : [],
+        exclude_names: preview ? preview.lines.map(l => l.item.name) : [],
+        exclude_stores: [],
+        rolls_used: i,
+      })
+      preview = result.suggestion
+      if (result.suggestion?.stores[0] === 'Subway') {
+        subwayLabels.add(result.suggestion.lines.map(l => l.item.name).join('+'))
+      }
+    }
+
+    assert.ok(subwayLabels.size >= 2, `expected >=2 Subway combos, got ${subwayLabels.size}`)
+  })
+
+  it('Subway combo lines show distinct per-item macros', async () => {
+    await preloadDiceMenuBulk()
+    const main = lookupDiceMenuItem('subway-義式香腸潛艇堡-6吋')
+    const cookie = lookupDiceMenuItem('subway-燕麥葡萄乾餅乾-1片')
+    const chips = lookupDiceMenuItem('sub-chips')
+    assert.ok(main && cookie && chips)
+
+    const items = linesToDisplayItems([
+      { item: main, portion: 'full' },
+      { item: cookie, portion: 'full' },
+      { item: chips, portion: 'full' },
+    ])
+    const cals = items.map(i => i.calories)
+    assert.ok(new Set(cals).size >= 2, `expected distinct calories, got ${cals.join(',')}`)
+    assert.equal(items[0]!.calories, 420)
+    assert.equal(items[1]!.calories, 200)
+    assert.equal(items[2]!.calories, 150)
+  })
+
+  it('filters implausible Subway bulk items', () => {
+    const bad = (name: string): ConvenienceItem => ({
+      id: `x-${name}`,
+      name,
+      store: 'Subway',
+      source: 'chain',
+      category: 'lunch',
+      role: 'combo',
+      portionable: false,
+      tags: [],
+      calories: 400,
+      protein_g: 20,
+      carbs_g: 40,
+      fat_g: 10,
+      price: 100,
+      photo_url: '',
+      description: '',
+    })
+    assert.equal(isPlausibleBrandItem(bad('韓式炸雞（半份）')), false)
+    assert.equal(isPlausibleBrandItem(bad('個人麻辣鍋')), false)
+    assert.equal(isPlausibleBrandItem(bad('義式香腸潛艇堡（6吋）')), true)
   })
 
   it('梁社漢 dice pool lists classic mains and generates multiple candidates', async () => {

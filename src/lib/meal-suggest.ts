@@ -13,6 +13,7 @@ import {
   filterValidSuggestions,
   validateMealLines,
 } from './nutrition/recommendation-validator'
+import { computeNutritionGaps, passesNutritionGapFilter } from './nutrition/nutrition-gap-filter'
 import { nearestPlaceForBrand } from './nearby-engine'
 import type { ConvenienceItem } from './convenience-store-menu'
 import type { MealLine, MealSuggestion, SuggestContext, HighlightKey } from './meal-engine-types'
@@ -21,6 +22,7 @@ import {
   suggestionId,
   HIGHLIGHT_COPY,
 } from './meal-engine-types'
+import { lookupDiceMenuItem } from './dice-menu-pool'
 
 const PORTIONS: PortionId[] = ['full', 'three_quarter', 'half']
 
@@ -399,6 +401,41 @@ function isExcludedByName(lines: MealLine[], excludeNames?: string[]): boolean {
   return primaryItemNames(lines).some(n => blocked.has(n))
 }
 
+function hydrateLineItem(line: MealLine): MealLine {
+  const fresh = lookupDiceMenuItem(line.item.id)
+  return fresh ? { ...line, item: fresh } : line
+}
+
+function hydrateMealLines(lines: MealLine[]): MealLine[] {
+  return lines.map(hydrateLineItem)
+}
+
+/** Dice uses remaining daily gap when available; otherwise meal-slot targets. */
+function passesDiceNutritionGate(
+  totals: ReturnType<typeof linesToTotals>,
+  ctx: SuggestContext,
+  targetCal: number,
+  targetPro: number,
+  relaxed: boolean,
+  solo: boolean
+): boolean {
+  if (ctx.day_state) {
+    return passesNutritionGapFilter(totals, computeNutritionGaps(ctx), ctx).pass
+  }
+  if (solo) {
+    return satisfiesMealTargets(
+      totals.calories,
+      totals.protein_g,
+      targetCal,
+      targetPro,
+      ctx.meal_type,
+      relaxed
+    )
+  }
+  const gate = relaxed ? passesRelaxedGate : passesStrictGate
+  return gate(totals.calories, totals.protein_g, targetCal, targetPro, ctx.meal_type)
+}
+
 export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSuggestion[] {
   if (ctx.day_state?.overTargetProtection) return []
 
@@ -433,7 +470,6 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
   const menu = getDiceMenuPool(ctx.meal_type, ctx.profile, ctx.memory)
   const exclude = new Set(ctx.exclude_ids ?? [])
   const excludeNames = new Set(ctx.exclude_names ?? [])
-  const gate = relaxed ? passesRelaxedGate : passesStrictGate
   const budgetMax =
     ctx.meal_type === 'breakfast'
       ? ctx.memory?.eat_out_prefs?.breakfast_max_price ?? 120
@@ -450,20 +486,22 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
     restaurant_name?: string,
     maps_url?: string
   ) => {
-    if (!lines.length || friedCount(lines.map(l => l.item)) > 1) return
-    if (!isValidMealLines(lines)) return
-    if (!validateMealLines(lines, ctx).valid) return
-    if (isExcludedByName(lines, [...excludeNames])) return
-    const id = suggestionId(lines)
+    const hydrated = hydrateMealLines(lines)
+    if (!hydrated.length || friedCount(hydrated.map(l => l.item)) > 1) return
+    if (!isValidMealLines(hydrated)) return
+    if (!validateMealLines(hydrated, ctx).valid) return
+    if (isExcludedByName(hydrated, [...excludeNames])) return
+    const id = suggestionId(hydrated)
     if (seen.has(id) || exclude.has(id)) return
-    const totals = linesToTotals(lines)
-    const solo = !isComboSuggestion(lines)
-    const passes = solo
-      ? satisfiesMealTargets(totals.calories, totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type, relaxed)
-      : gate(totals.calories, totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type)
-    if (!passes) return
+    const totals = linesToTotals(hydrated)
+    const solo = !isComboSuggestion(hydrated)
+    if (
+      !passesDiceNutritionGate(totals, ctx, targets.calories, targets.protein_g, relaxed, solo)
+    ) {
+      return
+    }
     seen.add(id)
-    const store = canonicalDiceStore(lines[0]!.item.store)
+    const store = canonicalDiceStore(hydrated[0]!.item.store)
     const place =
       ctx.user_lat != null && ctx.user_lng != null
         ? nearestPlaceForBrand(ctx.user_lat, ctx.user_lng, store)
@@ -473,7 +511,7 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
     raw.push({
       id,
       meal_type: ctx.meal_type,
-      lines,
+      lines: hydrated,
       totals,
       highlight: text,
       highlight_key: key,
@@ -582,8 +620,10 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
     }
   }
 
-  // 路徑 E：各店 enumerate 組合（主餐 + 配菜 + 飲料）— fast 模式略過
-  if (!fast) {
+  // 路徑 E：各店 enumerate 組合（主餐 + 配菜 + 飲料）
+  {
+    const comboLimit = fast ? 120 : 240
+    let added = 0
     for (const combo of enumerateStoreCombos(
       ctx.meal_type,
       targets.calories,
@@ -595,6 +635,7 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
     )) {
       if (combo.items.length < 2) continue
       addLines(comboToLines(combo))
+      if (++added >= comboLimit) break
     }
   }
 
@@ -621,7 +662,7 @@ export function generateCandidates(ctx: SuggestContext, relaxed = false): MealSu
       targets.protein_g,
       comboSeed + hashStoreSeed(store, ctx.seed ?? 0),
       excludeNames,
-      fast ? 8 : 5
+      fast ? 48 : 24
     )
     for (const combo of variants) {
       if (combo.items.length >= 2) addLines(comboToLines(combo))
@@ -647,12 +688,12 @@ function diceSessionPoolKey(ctx: SuggestContext): string {
   return [
     ctx.meal_type,
     ds?.todayTarget ?? ctx.daily_targets.calories,
+    ds?.remainingCalories ?? ctx.daily_targets.calories,
+    ds?.proteinGap ?? ctx.daily_targets.protein_g,
     ds?.effectiveMealCalTarget ?? 0,
     ds?.effectiveMealProteinTarget ?? 0,
     ctx.profile?.is_vegetarian ? 'v' : '',
     ctx.profile?.is_vegan ? 'vg' : '',
-    ctx.rolls_used ?? 0,
-    ctx.seed ?? 0,
   ].join(':')
 }
 
@@ -701,18 +742,27 @@ function diceExcludeStoresForRoll(excludeStores: string[] | undefined, reroll: n
 function filterCandidatesForRoll(pool: MealSuggestion[], ctx: SuggestContext): MealSuggestion[] {
   const reroll = ctx.rolls_used ?? 0
   const excludeIds = new Set(
-    reroll > 0 ? (ctx.exclude_ids ?? []).slice(-2) : (ctx.exclude_ids ?? [])
+    reroll > 0 ? (ctx.exclude_ids ?? []).slice(-8) : (ctx.exclude_ids ?? []).slice(-2)
   )
-  const excludeNames = reroll > 0 ? (ctx.exclude_names ?? []).slice(-6) : (ctx.exclude_names ?? [])
-  const recentStores = new Set(diceExcludeStoresForRoll(ctx.exclude_stores, reroll))
+  const excludeNames = reroll > 0 ? (ctx.exclude_names ?? []).slice(-12) : (ctx.exclude_names ?? [])
 
   return pool.filter(c => {
     if (excludeIds.has(c.id)) return false
     if (isExcludedByName(c.lines, excludeNames)) return false
-    if (reroll > 0 && c.stores[0] && recentStores.has(c.stores[0])) return false
     if (!validateMealLines(c.lines, ctx).valid) return false
     return true
   })
+}
+
+function uniformDicePick(
+  pool: ScoredSuggestion[],
+  seed: number,
+  reroll: number
+): ScoredSuggestion | null {
+  if (!pool.length) return null
+  const shuffled = seededBySeed(pool, seed + reroll * 9973 + pool.length * 13)
+  const idx = Math.abs((seed + reroll * 4243) % shuffled.length)
+  return shuffled[idx] ?? shuffled[0]!
 }
 
 function finalizeSuggestionPick(
@@ -746,26 +796,7 @@ function finalizeSuggestionPick(
       isComboSuggestion(c.lines) ||
       satisfiesMealTargets(c.totals.calories, c.totals.protein_g, targets.calories, targets.protein_g, ctx.meal_type, false)
   )
-  const comboPreferred = comboFirst.filter(c => isComboSuggestion(c.lines))
-  const comboStoreCount = uniqueStoreCount(comboPreferred)
-  const comboFirstStoreCount = uniqueStoreCount(comboFirst)
-  const fullStoreCount = uniqueStoreCount(candidates)
-  const rerollStores = diceExcludeStoresForRoll(ctx.exclude_stores, reroll)
-  if (reroll === 0 && comboPreferred.length >= 1) {
-    const allowComboOnly =
-      reroll === 0 &&
-      comboStoreCount >= 8 &&
-      fullStoreCount <= comboStoreCount + 2
-    if (allowComboOnly) {
-      candidates = comboPreferred
-    } else if (reroll > 0 && fullStoreCount >= 6) {
-      // 換一個時優先完整池
-    } else if (comboStoreCount >= 6 && reroll === 0 && comboStoreCount >= 3) {
-      candidates = comboPreferred
-    } else if (comboFirst.length >= 3 && comboFirstStoreCount >= 4) {
-      candidates = comboFirst
-    }
-  } else if (comboFirst.length >= 3) {
+  if (comboFirst.length >= 3 && comboFirst.length < candidates.length) {
     candidates = comboFirst
   }
 
@@ -786,7 +817,7 @@ function finalizeSuggestionPick(
           ctx.memory,
           c.stores[0] ?? '',
           reroll,
-          rerollStores
+          ctx.exclude_stores
         )
       : scoreCandidate(
           c.totals,
@@ -800,7 +831,7 @@ function finalizeSuggestionPick(
           primaryItemNames(c.lines),
           ctx.exclude_names,
           c.lines.length,
-          rerollStores,
+          ctx.exclude_stores,
           reroll,
           ctx.adherence,
           ctx.calorie_bank
@@ -812,8 +843,8 @@ function finalizeSuggestionPick(
     (ctx.day_index ?? 0) * 7919 +
     (ctx.exclude_ids?.length ?? 0) * 17 +
     (ctx.exclude_names?.length ?? 0) * 31 +
-    (ctx.exclude_stores?.length ?? 0) * 53
-  const picked = stratifiedStorePick(scored, seed, reroll, rerollStores)
+    reroll * 4243
+  const picked = uniformDicePick(scored, seed, reroll)
   if (!picked) return { suggestion: null, pool_exhausted: true }
 
   const { score: _s, ...base } = picked
@@ -957,5 +988,5 @@ export function suggestionToCustomSelection(suggestion: MealSuggestion) {
 }
 
 export function linesToDisplayItems(lines: MealLine[]) {
-  return lines.map(l => applyPortion(l.item, l.portion))
+  return hydrateMealLines(lines).map(l => applyPortion(l.item, l.portion))
 }

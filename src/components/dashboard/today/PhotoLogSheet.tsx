@@ -7,6 +7,7 @@ import { TODAY } from '@/lib/today-design'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import BBCard from '@/components/ui/BBCard'
 import { isNativeIOS } from '@/lib/capacitor-native'
+import { setAppScrollLocked } from '@/lib/today-actions'
 import { captureFoodPhotoFromCamera, pickFoodPhotoFromGallery } from '@/lib/native-camera'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
@@ -587,9 +588,9 @@ export default function PhotoLogSheet({
 }: Props) {
   useEffect(() => {
     if (!open) return
-    document.body.style.overflow = 'hidden'
+    setAppScrollLocked(true)
     return () => {
-      document.body.style.overflow = ''
+      setAppScrollLocked(false)
     }
   }, [open])
 

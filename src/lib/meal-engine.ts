@@ -92,8 +92,6 @@ export function rollMealSuggestion(params: {
   const seenNames = namesFromSeenIds(recentIds)
   const excludeNames = [...new Set([...seenNames, ...(params.exclude_names ?? [])])]
   const mealSeed = params.meal_type.charCodeAt(0) * 131
-  const rerollStores =
-    params.rolls_used > 0 ? (params.exclude_stores ?? []).slice(-1) : (params.exclude_stores ?? [])
 
   const ctx = buildSuggestContext({
     meal_type: params.meal_type,
@@ -103,7 +101,7 @@ export function rollMealSuggestion(params: {
     day_index: params.day_index,
     exclude_ids: recentIds,
     exclude_names: excludeNames,
-    exclude_stores: rerollStores,
+    exclude_stores: [],
     rolls_used: params.rolls_used,
     user_lat: params.user_lat,
     user_lng: params.user_lng,
@@ -137,7 +135,7 @@ export function rollMealSuggestion(params: {
       ...params,
       exclude_ids: params.seen_ids.slice(-4),
       exclude_names: (params.exclude_names ?? []).slice(-4),
-      exclude_stores: params.exclude_stores?.slice(-4),
+      exclude_stores: [],
       rolls_used: params.rolls_used,
       seed: Date.now() + params.rolls_used * 53 + mealSeed + 2048,
       fast_dice: true,

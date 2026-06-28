@@ -46,7 +46,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 40;
+  z-index: 50;
+  pointer-events: auto;
   box-sizing: border-box;
   padding-bottom: var(--app-safe-bottom);
   background-color: rgba(255, 255, 255, 0.95);
@@ -55,6 +56,9 @@
 }
 
 .app-bottom-nav__row {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;

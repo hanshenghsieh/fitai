@@ -6,6 +6,7 @@ import type { FrequentFood } from '@/lib/food-memory'
 import { primaryFoodLabel } from '@/lib/food-photography'
 import type { FoodSlot } from '@/lib/food-slots'
 import { isNativeIOS } from '@/lib/capacitor-native'
+import { setAppScrollLocked } from '@/lib/today-actions'
 
 import { BB_V2 } from '@/lib/betterbit-v2'
 
@@ -82,14 +83,14 @@ export default function TodayFoodMore({
       setShowAllFrequent(false)
       return
     }
-    document.body.style.overflow = 'hidden'
+    setAppScrollLocked(true)
     // Auto-focus triggers iOS keyboard zoom on <16px inputs; skip on native shell.
     let t: number | undefined
     if (!isNativeIOS()) {
       t = window.setTimeout(() => inputRef.current?.focus(), 120)
     }
     return () => {
-      document.body.style.overflow = ''
+      setAppScrollLocked(false)
       if (t !== undefined) window.clearTimeout(t)
     }
   }, [open])

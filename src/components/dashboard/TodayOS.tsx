@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { Camera, ClipboardList, RefreshCw } from 'lucide-react'
 import { format, subDays, parseISO } from 'date-fns'
@@ -58,6 +58,13 @@ import {
   type MealSuggestion,
 } from '@/lib/meal-engine'
 import { preloadDiceMenuBulk, isDiceMenuBulkReady, getDiceMenuSource } from '@/lib/dice-menu-pool'
+import {
+  clearTodaySheetParams,
+  dispatchOpenPhotoSheet,
+  todaySheetFromSearch,
+  TODAY_OPEN_PHOTO_EVENT,
+  TODAY_OPEN_TEXT_LOG_EVENT,
+} from '@/lib/today-actions'
 import { storesInText } from '@/lib/dice-store-names'
 import { linesToDisplayItems } from '@/lib/meal-suggest'
 import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
@@ -96,8 +103,22 @@ interface GoalSnapshot {
   weeks_remaining?: number
 }
 
-function allItemNamesFromLogs(logs: FoodLogEntry[]): string[] {
-  return [...new Set(logs.flatMap(l => l.name.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean)))]
+
+function parseDiceLogSegment(segment: string): { store?: string; name: string } {
+  const trimmed = segment.trim()
+  const sep = trimmed.indexOf(' · ')
+  if (sep === -1) return { name: trimmed }
+  return { store: trimmed.slice(0, sep).trim(), name: trimmed.slice(sep + 3).trim() }
+}
+
+function lookupMenuItemForLog(name: string, store?: string) {
+  const menu = getDiceMenuSource()
+  const byName = menu.filter(i => i.name === name)
+  if (store && store !== '已記錄') {
+    const hit = byName.find(i => i.store === store)
+    if (hit) return hit
+  }
+  return byName[0]
 }
 
 function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
@@ -106,11 +127,24 @@ function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
   const store = log.store ?? '已記錄'
   const unknown = isNutritionPendingConfirmation(log)
   if (names.length === 1) {
+    const parsed = parseDiceLogSegment(names[0]!)
+    const menuHit = lookupMenuItemForLog(parsed.name, parsed.store ?? store)
+    if (menuHit && !unknown) {
+      return [
+        {
+          ...menuHit,
+          id: `${log.id}-0`,
+          calories: menuHit.calories,
+          protein_g: menuHit.protein_g,
+          nutrition_status: log.nutrition_status,
+        },
+      ]
+    }
     return [
       {
         id: `${log.id}-0`,
-        name: names[0]!,
-        store,
+        name: parsed.name,
+        store: parsed.store ?? store,
         source: 'convenience',
         category: 'lunch',
         role: 'main',
@@ -128,45 +162,69 @@ function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
     ]
   }
   if (unknown || log.calories == null || log.protein_g == null) {
-    return names.map((name, i) => ({
+    return names.map((segment, i) => {
+      const parsed = parseDiceLogSegment(segment)
+      return {
+        id: `${log.id}-${i}`,
+        name: parsed.name,
+        store: parsed.store ?? store,
+        source: 'convenience' as const,
+        category: 'lunch' as const,
+        role: 'main' as const,
+        portionable: false,
+        tags: [],
+        calories: null,
+        protein_g: null,
+        carbs_g: 0,
+        fat_g: 0,
+        price: 0,
+        photo_url: '',
+        description: '',
+        nutrition_status: log.nutrition_status,
+      }
+    })
+  }
+
+  const resolved = names.map((segment, i) => {
+    const parsed = parseDiceLogSegment(segment)
+    const menuHit = lookupMenuItemForLog(parsed.name, parsed.store ?? store)
+    if (menuHit) {
+      return {
+        ...menuHit,
+        id: `${log.id}-${i}`,
+        nutrition_status: log.nutrition_status,
+      } satisfies MealPreviewItem
+    }
+    return null
+  })
+
+  if (resolved.every(Boolean)) {
+    return resolved as MealPreviewItem[]
+  }
+
+  const perCal = Math.round(log.calories / names.length)
+  const perPro = Math.round(log.protein_g / names.length)
+  return names.map((segment, i) => {
+    const parsed = parseDiceLogSegment(segment)
+    return {
       id: `${log.id}-${i}`,
-      name,
-      store,
+      name: parsed.name,
+      store: parsed.store ?? store,
       source: 'convenience' as const,
       category: 'lunch' as const,
       role: 'main' as const,
       portionable: false,
       tags: [],
-      calories: null,
-      protein_g: null,
+      calories: perCal,
+      protein_g: perPro,
       carbs_g: 0,
       fat_g: 0,
       price: 0,
       photo_url: '',
       description: '',
       nutrition_status: log.nutrition_status,
-    }))
-  }
-  const perCal = Math.round(log.calories / names.length)
-  const perPro = Math.round(log.protein_g / names.length)
-  return names.map((name, i) => ({
-    id: `${log.id}-${i}`,
-    name,
-    store,
-    source: 'convenience' as const,
-    category: 'lunch' as const,
-    role: 'main' as const,
-    portionable: false,
-    tags: [],
-    calories: perCal,
-    protein_g: perPro,
-    carbs_g: 0,
-    fat_g: 0,
-    price: 0,
-    photo_url: '',
-    description: '',
-    nutrition_status: log.nutrition_status,
-  }))
+    }
+  })
 }
 
 function diceSessionKey(mealType: MealType): string {
@@ -378,7 +436,7 @@ export default function TodayOS({
   const [photoDraft, setPhotoDraft] = useState<PhotoLogDraft | null>(null)
   const [photoSaving, setPhotoSaving] = useState(false)
   const [manualPhotoOpen, setManualPhotoOpen] = useState(false)
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+
   const [query, setQuery] = useState('')
   const foodLogsRef = useRef(foodLogs)
   foodLogsRef.current = foodLogs
@@ -589,19 +647,9 @@ export default function TodayOS({
     [foodLogs, userMemory, schedulePostureLine, onLogFood, onClearMealSelection]
   )
 
-  const requestDeleteLog = useCallback((logId: string) => {
-    setDeleteConfirmId(logId)
-  }, [])
-
-  useEffect(() => {
-    registerDeleteLog?.(requestDeleteLog)
-  }, [registerDeleteLog, requestDeleteLog])
-
-  const confirmDeleteLog = useCallback(() => {
-    if (!deleteConfirmId) return
-    removeLogById(deleteConfirmId)
-    setDeleteConfirmId(null)
-  }, [deleteConfirmId, removeLogById])
+  useLayoutEffect(() => {
+    registerDeleteLog?.(removeLogById)
+  }, [registerDeleteLog, removeLogById])
 
   const parsePhotoDraft = useCallback(
     async (file: File, previewUrl: string, dataUrl: string) => {
@@ -820,8 +868,9 @@ export default function TodayOS({
           ...seenIdsForMeal(dailyRolls, slot),
           preview?.id,
         ].filter(Boolean))]
-        const excludeNames = allItemNamesFromLogs(foodLogs)
-        const excludeStores = preview?.stores[0] ? [preview.stores[0]] : []
+        const excludeNames = preview
+          ? [...new Set(preview.lines.map(l => l.item.name))]
+          : []
 
         const result = rollMealSuggestion({
           meal_type: slot,
@@ -831,7 +880,7 @@ export default function TodayOS({
           day_index: dayIndex,
           seen_ids: excludeIds,
           exclude_names: excludeNames,
-          exclude_stores: excludeStores,
+          exclude_stores: [],
           rolls_used: localDiceRolls,
           user_lat: coords?.lat,
           user_lng: coords?.lng,
@@ -975,7 +1024,6 @@ export default function TodayOS({
     setMoreOpen(false)
     setPhotoOpen(false)
     setManualPhotoOpen(false)
-    setDeleteConfirmId(null)
     setPhotoDraft(null)
     setPhotoSaving(false)
     if (photoPreviewUrlRef.current) {
@@ -1081,27 +1129,32 @@ export default function TodayOS({
     const handleRollDice = () => {
       if (onDashboard) rollDice()
     }
-    const handleRouteChange = () => closeAllOverlays()
+    const handleRouteChange = () => {
+      if (todaySheetFromSearch(window.location.search)) return
+      closeAllOverlays()
+    }
 
-    window.addEventListener('betterbit:open-photo', openPhoto)
-    window.addEventListener('betterbit:open-text-log', openTextLog)
+    window.addEventListener(TODAY_OPEN_PHOTO_EVENT, openPhoto)
+    window.addEventListener(TODAY_OPEN_TEXT_LOG_EVENT, openTextLog)
     window.addEventListener('betterbit:roll-dice', handleRollDice)
     window.addEventListener('betterbit:route-change', handleRouteChange)
 
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search)
-      if (params.get('photo') === '1') {
+    if (typeof window !== 'undefined' && onDashboard) {
+      const intent = todaySheetFromSearch(window.location.search)
+      if (intent === 'photo') {
         setPhotoOpen(true)
-        window.history.replaceState({}, '', '/dashboard')
+        clearTodaySheetParams()
+      } else if (intent === 'text') {
+        setMoreOpen(true)
+        clearTodaySheetParams()
       }
     }
 
     return () => {
-      window.removeEventListener('betterbit:open-photo', openPhoto)
-      window.removeEventListener('betterbit:open-text-log', openTextLog)
+      window.removeEventListener(TODAY_OPEN_PHOTO_EVENT, openPhoto)
+      window.removeEventListener(TODAY_OPEN_TEXT_LOG_EVENT, openTextLog)
       window.removeEventListener('betterbit:roll-dice', handleRollDice)
       window.removeEventListener('betterbit:route-change', handleRouteChange)
-      closeAllOverlays()
     }
   }, [closeAllOverlays, onDashboard, rollDice])
 
@@ -1147,13 +1200,13 @@ export default function TodayOS({
           </div>
         )}
 
-        <div className="space-y-3 pt-1">
+        <div className="space-y-3 pt-1 relative z-10">
           {dicePreview && dayState.allowDiceAndSuggest && (
             <button
               type="button"
               disabled={rolling || confirming}
               onClick={confirmDice}
-              className="w-full h-16 rounded-[24px] text-[18px] disabled:opacity-40"
+              className="w-full h-16 rounded-[24px] text-[18px] disabled:opacity-40 touch-manipulation"
               style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
             >
               {confirming ? '記錄中…' : '就決定是它了'}
@@ -1165,7 +1218,7 @@ export default function TodayOS({
               type="button"
               disabled={rolling || !dayState.allowDiceAndSuggest}
               onClick={rollDice}
-              className="flex-1 h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2 disabled:opacity-40"
+              className="flex-1 h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2 disabled:opacity-40 touch-manipulation"
               style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
             >
               <RefreshCw className={`h-[16px] w-[16px] ${rolling ? 'animate-spin' : ''}`} strokeWidth={TODAY.iconStroke} />
@@ -1174,7 +1227,7 @@ export default function TodayOS({
             <button
               type="button"
               onClick={openMore}
-              className="flex-[1.12] h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2"
+              className="flex-[1.12] h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2 touch-manipulation"
               style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
             >
               <ClipboardList className="h-[16px] w-[16px]" strokeWidth={TODAY.iconStroke} />
@@ -1184,8 +1237,8 @@ export default function TodayOS({
 
           <button
             type="button"
-            onClick={() => setPhotoOpen(true)}
-            className="w-full h-12 rounded-[20px] text-[14px] flex items-center justify-center gap-2 active:opacity-90"
+            onClick={() => dispatchOpenPhotoSheet()}
+            className="w-full h-12 rounded-[20px] text-[14px] flex items-center justify-center gap-2 active:opacity-90 touch-manipulation"
             style={{ backgroundColor: TODAY.surface, color: TODAY.mocha, fontWeight: 500 }}
           >
             <Camera className="h-[16px] w-[16px]" strokeWidth={TODAY.iconStroke} />
@@ -1235,46 +1288,6 @@ export default function TodayOS({
         />
       )}
 
-      {deleteConfirmId && (
-        <div
-          className="fixed inset-0 z-[60] flex items-end justify-center px-5 pb-8"
-          style={{ backgroundColor: 'rgba(47, 36, 29, 0.22)', backdropFilter: 'blur(4px)' }}
-          onClick={() => setDeleteConfirmId(null)}
-        >
-          <div
-            className="w-full max-w-md p-6 space-y-5"
-            style={{
-              backgroundColor: TODAY.card,
-              borderRadius: TODAY.radiusCard,
-              boxShadow: TODAY.cardShadow,
-              fontFamily: TODAY.font,
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <p className="text-[16px] leading-relaxed" style={{ color: TODAY.text, fontWeight: 500 }}>
-              要移除這筆紀錄嗎？
-            </p>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 h-12 rounded-[20px] text-[14px]"
-                style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
-              >
-                先留著
-              </button>
-              <button
-                type="button"
-                onClick={confirmDeleteLog}
-                className="flex-1 h-12 rounded-[20px] text-[14px]"
-                style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
-              >
-                移除
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
