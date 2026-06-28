@@ -14,6 +14,7 @@ import {
   fileToDataUrl,
   prepareFoodPhotoFile,
   uploadFoodPhotoFile,
+  fetchPhotoMatch,
 } from '@/lib/food-capture'
 import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
 import {
@@ -655,17 +656,6 @@ export default function TodayOS({
   }, [registerDeleteLog, removeLogById])
 
   const parsePhotoDraft = useCallback(async (file: File, previewUrl: string) => {
-    setPhotoDraft({
-      file,
-      previewUrl,
-      name: '',
-      calories: null,
-      protein_g: null,
-      carbs_g: null,
-      fat_g: null,
-      loading: true,
-    })
-
     let parsedName = ''
     try {
       await new Promise<void>(resolve => {
@@ -675,12 +665,24 @@ export default function TodayOS({
       const parsed = await uploadFoodPhotoFile(file)
       parsedName = parsed.name.trim() || '未知食物'
 
-      const accuracy = parsed.photo_v2
-        ? photoAccuracyStateFromV2(parsed.photo_v2)
-        : createPhotoAccuracyState(parsedName, {
-            store: storesInText(parsedName)?.[0],
-            photo_id: `photo-parse-${Date.now()}`,
-          })
+      setPhotoDraft(prev =>
+        prev
+          ? {
+              ...prev,
+              previewUrl,
+              file,
+              name: parsedName,
+              loading: true,
+            }
+          : prev
+      )
+
+      const photoId = `photo-parse-${Date.now()}`
+      const photoV2 = await fetchPhotoMatch(parsedName, {
+        store: storesInText(parsedName)?.[0],
+        photo_id: photoId,
+      })
+      const accuracy = photoAccuracyStateFromV2(photoV2)
 
       const resolved = accuracy.v2.outcome.official_record
       const display = photoAccuracyDisplayMacros(accuracy)

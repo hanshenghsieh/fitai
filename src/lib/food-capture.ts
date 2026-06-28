@@ -1,5 +1,6 @@
 import type { FoodDna, FrequentFood } from '@/lib/food-memory'
 import { isNativeIOS } from '@/lib/capacitor-native'
+import { appJsonPost } from '@/lib/native-http'
 import type { PhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 
 const PHOTO_UPLOAD_MAX_EDGE = isNativeIOS() ? 512 : 1024
@@ -30,6 +31,11 @@ export async function fileToDataUrl(file: File): Promise<string> {
     reader.onerror = () => reject(new Error('無法讀取照片'))
     reader.readAsDataURL(file)
   })
+}
+
+async function fileToBase64(file: File): Promise<string> {
+  const dataUrl = await fileToDataUrl(file)
+  return dataUrl.split(',')[1] ?? ''
 }
 
 function canvasToJpegBlob(canvas: HTMLCanvasElement): Promise<Blob> {
@@ -129,14 +135,11 @@ export interface PhotoParseResult {
   confidence_pct: number
   /** AI must never supply nutrition — label only */
   ai_nutrition_suppressed: true
-  /** Built on server to avoid heavy client-side menu search in iOS WebView. */
-  photo_v2?: PhotoV2State
 }
 
 type PhotoApiJson = {
   error?: string
   data?: { items: Array<{ name: string; confidence: 'high' | 'medium' | 'low' }> }
-  photo_v2?: PhotoV2State
 }
 
 function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
@@ -157,12 +160,25 @@ function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
     confidence: worst,
     confidence_pct: confidenceToPct(worst),
     ai_nutrition_suppressed: true,
-    photo_v2: json.photo_v2,
   }
 }
 
-/** Upload compressed file as multipart — avoids client-side base64 memory spike. */
+async function uploadFoodPhotoJson(file: File): Promise<PhotoParseResult> {
+  const base64 = await fileToBase64(file)
+  const { ok, body } = await appJsonPost<PhotoApiJson>('/api/food-photo', {
+    imageBase64: base64,
+    mimeType: file.type || 'image/jpeg',
+  })
+  if (!ok) throw new Error(body.error || '辨識失敗')
+  return parsePhotoApiResponse(body)
+}
+
+/** Upload compressed file — native HTTP on iOS to survive long AI waits. */
 export async function uploadFoodPhotoFile(file: File): Promise<PhotoParseResult> {
+  if (isNativeIOS()) {
+    return uploadFoodPhotoJson(file)
+  }
+
   const controller = new AbortController()
   const timer = window.setTimeout(() => controller.abort(), PHOTO_PARSE_TIMEOUT_MS)
 
@@ -195,6 +211,23 @@ export async function uploadFoodPhotoFile(file: File): Promise<PhotoParseResult>
   if (!res.ok) throw new Error(json.error || '辨識失敗')
 
   return parsePhotoApiResponse(json)
+}
+
+/** Server-side nutrition match — small JSON payload for iOS WebView. */
+export async function fetchPhotoMatch(
+  label: string,
+  opts?: { store?: string; photo_id?: string }
+): Promise<PhotoV2State> {
+  const { ok, body } = await appJsonPost<{ error?: string; photo_v2?: PhotoV2State }>(
+    '/api/food-photo/match',
+    {
+      label,
+      store: opts?.store,
+      photo_id: opts?.photo_id,
+    }
+  )
+  if (!ok || !body.photo_v2) throw new Error(body.error || '比對失敗')
+  return body.photo_v2
 }
 
 /** @deprecated Prefer uploadFoodPhotoFile — JSON base64 doubles memory on iOS. */
