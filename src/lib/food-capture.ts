@@ -1,8 +1,8 @@
 import type { FoodDna, FrequentFood } from '@/lib/food-memory'
 import { isNativeIOS } from '@/lib/capacitor-native'
 
-const PHOTO_UPLOAD_MAX_EDGE = 1024
-const PHOTO_UPLOAD_QUALITY = 0.78
+const PHOTO_UPLOAD_MAX_EDGE = isNativeIOS() ? 768 : 1024
+const PHOTO_UPLOAD_QUALITY = isNativeIOS() ? 0.72 : 0.78
 const PHOTO_PARSE_TIMEOUT_MS = 45_000
 
 export function confidenceToPct(confidence: 'high' | 'medium' | 'low'): number {
@@ -69,15 +69,13 @@ async function rasterizeToJpegBlob(source: CanvasImageSource, width: number, hei
   return canvasToJpegBlob(canvas)
 }
 
-/** Resize/compress before upload — keeps iOS WebView memory low. */
+/** Resize/compress before upload — no base64 on client (keeps iOS WebView memory low). */
 export async function prepareFoodPhotoFile(file: File): Promise<{
   file: File
-  dataUrl: string
   previewUrl: string
 }> {
   if (typeof document === 'undefined') {
-    const dataUrl = await fileToDataUrl(file)
-    return { file, dataUrl, previewUrl: '' }
+    return { file, previewUrl: '' }
   }
 
   const mustCompress =
@@ -88,9 +86,7 @@ export async function prepareFoodPhotoFile(file: File): Promise<{
     file.type === 'image/heif'
 
   if (!mustCompress) {
-    const previewUrl = URL.createObjectURL(file)
-    const dataUrl = await fileToDataUrl(file)
-    return { file, dataUrl, previewUrl }
+    return { file, previewUrl: URL.createObjectURL(file) }
   }
 
   let blob: Blob
@@ -126,9 +122,7 @@ export async function prepareFoodPhotoFile(file: File): Promise<{
   }
 
   const outFile = new File([blob], `food-${Date.now()}.jpg`, { type: 'image/jpeg' })
-  const previewUrl = URL.createObjectURL(blob)
-  const dataUrl = await fileToDataUrl(outFile)
-  return { file: outFile, dataUrl, previewUrl }
+  return { file: outFile, previewUrl: URL.createObjectURL(blob) }
 }
 
 export interface PhotoParseResult {
@@ -139,6 +133,69 @@ export interface PhotoParseResult {
   ai_nutrition_suppressed: true
 }
 
+type PhotoApiJson = {
+  error?: string
+  data?: { items: Array<{ name: string; confidence: 'high' | 'medium' | 'low' }> }
+}
+
+function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
+  const items = json.data?.items ?? []
+  const names = items.map(item => item.name.trim()).filter(Boolean)
+  const name = names.length > 1 ? names.join(' + ') : names[0] ?? ''
+
+  const worst = items.reduce<'high' | 'medium' | 'low'>(
+    (worstConf, item) => {
+      const order = { low: 0, medium: 1, high: 2 }
+      return order[item.confidence] < order[worstConf] ? item.confidence : worstConf
+    },
+    'high'
+  )
+
+  return {
+    name,
+    confidence: worst,
+    confidence_pct: confidenceToPct(worst),
+    ai_nutrition_suppressed: true,
+  }
+}
+
+/** Upload compressed file as multipart — avoids client-side base64 memory spike. */
+export async function uploadFoodPhotoFile(file: File): Promise<PhotoParseResult> {
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), PHOTO_PARSE_TIMEOUT_MS)
+
+  const formData = new FormData()
+  formData.append('image', file, file.name || 'food.jpg')
+
+  let res: Response
+  try {
+    res = await fetch('/api/food-photo', {
+      method: 'POST',
+      body: formData,
+      signal: controller.signal,
+    })
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('辨識逾時，請稍後再試或改用手動輸入')
+    }
+    throw new Error('網路連線失敗，請確認網路後再試')
+  } finally {
+    window.clearTimeout(timer)
+  }
+
+  let json: PhotoApiJson
+  try {
+    json = await res.json()
+  } catch {
+    throw new Error('辨識服務異常，請稍後再試')
+  }
+
+  if (!res.ok) throw new Error(json.error || '辨識失敗')
+
+  return parsePhotoApiResponse(json)
+}
+
+/** @deprecated Prefer uploadFoodPhotoFile — JSON base64 doubles memory on iOS. */
 export async function parseFoodPhotoDataUrl(
   dataUrl: string,
   mimeType = 'image/jpeg'
@@ -169,7 +226,7 @@ export async function parseFoodPhotoDataUrl(
     window.clearTimeout(timer)
   }
 
-  let json: { error?: string; data?: { items: Array<{ name: string; confidence: 'high' | 'medium' | 'low' }> } }
+  let json: PhotoApiJson
   try {
     json = await res.json()
   } catch {
@@ -178,29 +235,12 @@ export async function parseFoodPhotoDataUrl(
 
   if (!res.ok) throw new Error(json.error || '辨識失敗')
 
-  const items = json.data?.items ?? []
-  const names = items.map(item => item.name.trim()).filter(Boolean)
-  const name = names.length > 1 ? names.join(' + ') : names[0] ?? ''
-
-  const worst = items.reduce<'high' | 'medium' | 'low'>(
-    (worstConf, item) => {
-      const order = { low: 0, medium: 1, high: 2 }
-      return order[item.confidence] < order[worstConf] ? item.confidence : worstConf
-    },
-    'high'
-  )
-
-  return {
-    name,
-    confidence: worst,
-    confidence_pct: confidenceToPct(worst),
-    ai_nutrition_suppressed: true,
-  }
+  return parsePhotoApiResponse(json)
 }
 
 export async function parseFoodPhotoFile(file: File): Promise<PhotoParseResult> {
   const prepared = await prepareFoodPhotoFile(file)
-  return parseFoodPhotoDataUrl(prepared.dataUrl, prepared.file.type || 'image/jpeg')
+  return uploadFoodPhotoFile(prepared.file)
 }
 
 /** Community Food DNA — hero image / frequency only. Do NOT use for nutrition writes; use Search V2. */

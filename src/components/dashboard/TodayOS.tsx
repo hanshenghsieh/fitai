@@ -13,7 +13,7 @@ import { enrichFoodLog, sumItemMacros } from '@/lib/food-log-macros'
 import {
   fileToDataUrl,
   prepareFoodPhotoFile,
-  parseFoodPhotoDataUrl,
+  uploadFoodPhotoFile,
 } from '@/lib/food-capture'
 import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
 import {
@@ -652,86 +652,76 @@ export default function TodayOS({
     registerDeleteLog?.(removeLogById)
   }, [registerDeleteLog, removeLogById])
 
-  const parsePhotoDraft = useCallback(
-    async (file: File, previewUrl: string, dataUrl: string) => {
-      setPhotoDraft({
-        file,
-        previewUrl,
-        dataUrl,
-        name: '',
-        calories: null,
-        protein_g: null,
-        carbs_g: null,
-        fat_g: null,
-        loading: true,
+  const parsePhotoDraft = useCallback(async (file: File, previewUrl: string) => {
+    setPhotoDraft({
+      file,
+      previewUrl,
+      name: '',
+      calories: null,
+      protein_g: null,
+      carbs_g: null,
+      fat_g: null,
+      loading: true,
+    })
+
+    let parsedName = ''
+    try {
+      await new Promise<void>(resolve => {
+        requestAnimationFrame(() => resolve())
       })
 
-      let parsedName = ''
+      const parsed = await uploadFoodPhotoFile(file)
+      parsedName = parsed.name.trim() || '未知食物'
+
+      const photoId = `photo-parse-${Date.now()}`
+      let accuracy
       try {
-        const parsed = await parseFoodPhotoDataUrl(dataUrl, file.type || 'image/jpeg')
-        parsedName = parsed.name.trim() || '未知食物'
-
-        setPhotoDraft(prev =>
-          prev
-            ? {
-                ...prev,
-                name: parsedName,
-                loading: false,
-              }
-            : prev
-        )
-
-        const photoId = `photo-parse-${Date.now()}`
-        let accuracy
-        try {
-          accuracy = createPhotoAccuracyState(parsedName, {
-            store: storesInText(parsedName)?.[0],
-            photo_id: photoId,
-          })
-        } catch {
-          accuracy = createPhotoAccuracyState('未知食物', { photo_id: photoId })
-        }
-
-        const resolved = accuracy.v2.outcome.official_record
-        const display = photoAccuracyDisplayMacros(accuracy)
-        setPhotoDraft(prev =>
-          prev
-            ? {
-                ...prev,
-                name: resolved?.name ?? accuracy.label,
-                calories: display.calories,
-                protein_g: display.protein_g,
-                carbs_g: display.carbs_g,
-                fat_g: display.fat_g,
-                loading: false,
-                accuracy,
-              }
-            : prev
-        )
-      } catch (err) {
-        const message = err instanceof Error ? err.message : '辨識失敗，請稍後再試'
-        toast.error('無法完成辨識', { description: message })
-        const accuracy = createPhotoAccuracyState(parsedName || '未知食物', {
-          photo_id: `photo-parse-${Date.now()}`,
+        accuracy = createPhotoAccuracyState(parsedName, {
+          store: storesInText(parsedName)?.[0],
+          photo_id: photoId,
         })
-        setPhotoDraft(prev =>
-          prev
-            ? {
-                ...prev,
-                name: parsedName || accuracy.label,
-                calories: null,
-                protein_g: null,
-                carbs_g: null,
-                fat_g: null,
-                loading: false,
-                accuracy,
-              }
-            : prev
-        )
+      } catch {
+        accuracy = createPhotoAccuracyState('未知食物', { photo_id: photoId })
       }
-    },
-    []
-  )
+
+      const resolved = accuracy.v2.outcome.official_record
+      const display = photoAccuracyDisplayMacros(accuracy)
+      setPhotoDraft(prev =>
+        prev
+          ? {
+              ...prev,
+              name: resolved?.name ?? accuracy.label,
+              calories: display.calories,
+              protein_g: display.protein_g,
+              carbs_g: display.carbs_g,
+              fat_g: display.fat_g,
+              loading: false,
+              accuracy,
+            }
+          : prev
+      )
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '辨識失敗，請稍後再試'
+      toast.error('無法完成辨識', { description: message })
+      const accuracy = createPhotoAccuracyState(parsedName || '未知食物', {
+        photo_id: `photo-parse-${Date.now()}`,
+      })
+      setPhotoDraft(prev =>
+        prev
+          ? {
+              ...prev,
+              name: parsedName || accuracy.label,
+              calories: null,
+              protein_g: null,
+              carbs_g: null,
+              fat_g: null,
+              loading: false,
+              accuracy,
+            }
+          : prev
+      )
+    }
+  }, [])
 
   const handlePhotoPick = useCallback(
     (file: File) => {
@@ -754,7 +744,10 @@ export default function TodayOS({
           const prepared = await prepareFoodPhotoFile(file)
           if (photoPreviewUrlRef.current) URL.revokeObjectURL(photoPreviewUrlRef.current)
           photoPreviewUrlRef.current = prepared.previewUrl
-          await parsePhotoDraft(prepared.file, prepared.previewUrl, prepared.dataUrl)
+          setPhotoDraft(prev =>
+            prev ? { ...prev, file: prepared.file, previewUrl: prepared.previewUrl } : prev
+          )
+          await parsePhotoDraft(prepared.file, prepared.previewUrl)
         } catch (err) {
           const message = err instanceof Error ? err.message : '無法處理照片'
           toast.error('照片無法使用', { description: message })
@@ -850,12 +843,7 @@ export default function TodayOS({
       })
       closePhotoSheet()
     }
-    const dataUrl = photoDraft.dataUrl
-    if (!dataUrl) {
-      void fileToDataUrl(photoDraft.file).then(finish)
-      return
-    }
-    finish(dataUrl)
+    void fileToDataUrl(photoDraft.file).then(finish)
   }, [photoDraft, photoSaving, commitLog, closePhotoSheet])
 
   const handleManualPhotoCorrection = useCallback(
@@ -899,12 +887,7 @@ export default function TodayOS({
           onOpenNutritionConfirmation?.(entry)
         }
       }
-      const dataUrl = photoDraft.dataUrl
-      if (!dataUrl) {
-        void fileToDataUrl(photoDraft.file).then(finish)
-        return
-      }
-      finish(dataUrl)
+      void fileToDataUrl(photoDraft.file).then(finish)
     },
     [photoDraft, commitLog, activeSlot, closePhotoSheet, onOpenNutritionConfirmation]
   )
