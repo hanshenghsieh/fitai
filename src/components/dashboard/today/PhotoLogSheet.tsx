@@ -6,9 +6,12 @@ import { ArrowLeft, Camera, Loader2, Search, X } from 'lucide-react'
 import { TODAY } from '@/lib/today-design'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import BBCard from '@/components/ui/BBCard'
-import { isNativeIOS } from '@/lib/capacitor-native'
 import AppOverlay from '@/components/ui/AppOverlay'
-import { captureFoodPhotoFromCamera, pickFoodPhotoFromGallery } from '@/lib/native-camera'
+import {
+  captureFoodPhotoFromCamera,
+  isCapacitorCameraUsable,
+  pickFoodPhotoFromGallery,
+} from '@/lib/native-camera'
 import { toast } from 'sonner'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
@@ -46,7 +49,6 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
   const cameraRef = useRef<HTMLInputElement>(null)
   const galleryRef = useRef<HTMLInputElement>(null)
   const [picking, setPicking] = useState(false)
-  const useNativeCamera = isNativeIOS()
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]
@@ -55,7 +57,7 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
   }
 
   async function openCamera() {
-    if (useNativeCamera) {
+    if (isCapacitorCameraUsable()) {
       setPicking(true)
       try {
         const result = await captureFoodPhotoFromCamera()
@@ -63,21 +65,20 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
           onPickFile(result.file)
           return
         }
+        if (result.reason === 'cancelled') return
         if (result.reason === 'denied') {
           toast.error('無法使用相機', { description: '請到 iPhone 設定 → 再健一點，允許相機權限' })
-        } else if (result.reason === 'unavailable') {
-          toast.error('相機無法開啟', { description: '請稍後再試一次' })
+          return
         }
       } finally {
         setPicking(false)
       }
-      return
     }
     cameraRef.current?.click()
   }
 
   async function openGallery() {
-    if (useNativeCamera) {
+    if (isCapacitorCameraUsable()) {
       setPicking(true)
       try {
         const result = await pickFoodPhotoFromGallery()
@@ -85,15 +86,14 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
           onPickFile(result.file)
           return
         }
+        if (result.reason === 'cancelled') return
         if (result.reason === 'denied') {
           toast.error('無法存取相簿', { description: '請到 iPhone 設定 → 再健一點，允許照片權限' })
-        } else if (result.reason === 'unavailable') {
-          toast.error('相簿無法開啟', { description: '請稍後再試一次' })
+          return
         }
       } finally {
         setPicking(false)
       }
-      return
     }
     galleryRef.current?.click()
   }
@@ -115,25 +115,21 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
         </button>
       </div>
       <div className="flex-1 px-5 flex flex-col items-center justify-center gap-6 min-h-[240px] pb-4">
-        {!useNativeCamera && (
-          <>
-            <input
-              ref={cameraRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={handleFile}
-            />
-            <input
-              ref={galleryRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFile}
-            />
-          </>
-        )}
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleFile}
+        />
+        <input
+          ref={galleryRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFile}
+        />
 
         <button
           type="button"
