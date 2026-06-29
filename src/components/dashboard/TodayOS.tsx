@@ -17,7 +17,7 @@ import {
   fetchPhotoMatch,
 } from '@/lib/food-capture'
 import { storesInText } from '@/lib/dice-store-names'
-import { isNativeIOS } from '@/lib/capacitor-native'
+import { isCapacitorNative, isNativeIOS } from '@/lib/capacitor-native'
 import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
 import {
   buildPhotoLogCommitFromAccuracy,
@@ -111,6 +111,29 @@ interface GoalSnapshot {
   weeks_remaining?: number
 }
 
+
+function namesFromFoodLog(log: FoodLogEntry): string[] {
+  if (!log.name) return []
+  return log.name.split(/\s*\+\s*/).map(part => part.trim()).filter(Boolean)
+}
+
+function suggestionUsesOnlyNames(suggestion: MealSuggestion, blocked: Set<string>): boolean {
+  if (!blocked.size) return false
+  const names = suggestion.lines.map(line => line.item.name)
+  return names.length > 0 && names.every(name => blocked.has(name))
+}
+
+function scheduleDiceRoll(run: () => void) {
+  if (isCapacitorNative()) {
+    queueMicrotask(run)
+    return
+  }
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(run, { timeout: 80 })
+    return
+  }
+  requestAnimationFrame(run)
+}
 
 function parseDiceLogSegment(segment: string): { store?: string; name: string } {
   const trimmed = segment.trim()
@@ -463,6 +486,8 @@ export default function TodayOS({
   const [query, setQuery] = useState('')
   const foodLogsRef = useRef(foodLogs)
   foodLogsRef.current = foodLogs
+  const activeSlotRef = useRef(activeSlot)
+  activeSlotRef.current = activeSlot
   const dayStateRef = useRef(dayState)
   dayStateRef.current = dayState
 
@@ -1003,38 +1028,54 @@ export default function TodayOS({
     setRolling(true)
 
     const slot = mealSlotLegacy
-    const session = loadDiceSession(slot)
     const preview = dicePreviewByMeal[slot] ?? null
+    const slotLoggedNames = foodLogsRef.current
+      .filter(log => logMatchesFoodSlot(log, activeSlotRef.current))
+      .flatMap(namesFromFoodLog)
+    const blockedNames = new Set([
+      ...(preview ? preview.lines.map(line => line.item.name) : []),
+      ...slotLoggedNames,
+    ])
+    let session = loadDiceSession(slot)
+    if (!preview && slotLoggedNames.length > 0) {
+      session = { ...session, queue: undefined }
+    }
 
     const runRoll = () => {
       try {
-        const excludeIds = [...new Set([
-          ...seenIdsForMeal(dailyRolls, slot),
-          preview?.id,
-        ].filter(Boolean))]
-        const excludeNames = preview
-          ? [...new Set(preview.lines.map(l => l.item.name))]
-          : []
+        const buildRoll = (queueState: RecommendationQueueState | null | undefined, seedBump = 0) => {
+          const excludeIds = [...new Set([
+            ...seenIdsForMeal(dailyRolls, slot),
+            preview?.id,
+          ].filter(Boolean))]
+          return rollMealSuggestion({
+            meal_type: slot,
+            daily_targets: todayPlan.daily_targets,
+            profile,
+            memory,
+            day_index: dayIndex,
+            seen_ids: excludeIds,
+            exclude_names: [...blockedNames],
+            exclude_stores: [],
+            rolls_used: localDiceRolls + seedBump,
+            user_lat: coords?.lat,
+            user_lng: coords?.lng,
+            adherence: adherenceState,
+            calorie_bank: calorieBank,
+            day_state: dayStateRef.current,
+            today_food_logs: foodLogsRef.current,
+            queue_state: queueState,
+            seed: Date.now() + (localDiceRolls + seedBump) * 9973,
+          })
+        }
 
-        const result = rollMealSuggestion({
-          meal_type: slot,
-          daily_targets: todayPlan.daily_targets,
-          profile,
-          memory,
-          day_index: dayIndex,
-          seen_ids: excludeIds,
-          exclude_names: excludeNames,
-          exclude_stores: [],
-          rolls_used: localDiceRolls,
-          user_lat: coords?.lat,
-          user_lng: coords?.lng,
-          adherence: adherenceState,
-          calorie_bank: calorieBank,
-          day_state: dayStateRef.current,
-          today_food_logs: foodLogs,
-          queue_state: session.queue,
-          seed: Date.now() + localDiceRolls * 9973,
-        })
+        let result = buildRoll(session.queue)
+        if (
+          !result.suggestion ||
+          suggestionUsesOnlyNames(result.suggestion, blockedNames)
+        ) {
+          result = buildRoll(null, 1)
+        }
 
         setLocalDiceRolls(n => n + 1)
         if (!result.suggestion) {
@@ -1042,10 +1083,15 @@ export default function TodayOS({
           if (isNearDailyTarget(ds) || ds.skipMealRecommendation) {
             toast.message(nearTargetRollMessage(ds.remainingCalories))
           } else {
-            toast.message('暫時想不到別的')
+            toast.message('暫時想不到別的，試試文字紀錄或拍今天吃的')
           }
           return
         }
+        if (suggestionUsesOnlyNames(result.suggestion, blockedNames)) {
+          toast.message('暫時想不到別的，試試文字紀錄')
+          return
+        }
+
         const store = result.suggestion.stores[0]
         const id = result.suggestion.id
         const nextStores = store ? [...new Set([...session.stores, store])].slice(-20) : session.stores
@@ -1058,20 +1104,12 @@ export default function TodayOS({
       }
     }
 
-    const scheduleRoll = () => {
-      if (typeof requestIdleCallback === 'function') {
-        requestIdleCallback(() => runRoll(), { timeout: 80 })
-      } else {
-        requestAnimationFrame(() => runRoll())
-      }
-    }
-
     if (USE_RECOMMENDATION_V2) {
-      scheduleRoll()
+      scheduleDiceRoll(runRoll)
     } else if (isDiceMenuBulkReady()) {
-      scheduleRoll()
+      scheduleDiceRoll(runRoll)
     } else {
-      void preloadDiceMenuBulk().finally(scheduleRoll)
+      void preloadDiceMenuBulk().finally(() => scheduleDiceRoll(runRoll))
     }
   }, [mealSlotLegacy, dicePreviewByMeal, foodLogs, customEatOut, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, dailyRolls, adherenceState, calorieBank, onClearMealSelection])
 

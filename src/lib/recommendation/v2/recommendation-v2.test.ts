@@ -230,4 +230,44 @@ describe('recommendation v2 engine integration', () => {
       assert.notEqual(first.suggestion!.id, second.suggestion!.id)
     }
   })
+
+  it('exclude_names skips blocked meals on reroll', () => {
+    const dayState = computeTodayMealState({
+      todayFoodLogs: [],
+      normalTargetKcal: 1916,
+      proteinTargetG: 89,
+      mealSlot: 'dinner',
+      hourOfDay: 1,
+    })
+    const blockedState = {
+      ...dayState,
+      alreadyCalories: 1600,
+      remainingCalories: 316,
+      proteinGap: 14,
+      todayTarget: 1916,
+      effectiveMealCalTarget: 316,
+      allowDiceAndSuggest: true,
+      overTargetProtection: false,
+      skipMealRecommendation: false,
+    }
+    const first = rollRecommendationV2({
+      meal_type: 'dinner',
+      daily_targets: { calories: 1916, protein_g: 89, carbs_g: 262, fat_g: 68, water_ml: 2310 },
+      day_state: blockedState,
+      today_food_logs: [],
+      seed: 42,
+    })
+    assert.ok(first.suggestion)
+    const blockedName = first.suggestion!.lines[0]!.item.name
+    const second = rollRecommendationV2({
+      meal_type: 'dinner',
+      daily_targets: { calories: 1916, protein_g: 89, carbs_g: 262, fat_g: 68, water_ml: 2310 },
+      day_state: blockedState,
+      today_food_logs: [],
+      exclude_names: [blockedName],
+      seed: 43,
+    })
+    assert.ok(second.suggestion)
+    assert.notEqual(second.suggestion!.lines[0]!.item.name, blockedName)
+  })
 })

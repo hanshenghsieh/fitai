@@ -111,8 +111,38 @@ export function rollMealSuggestion(params: {
       day_state: params.day_state,
       today_food_logs: params.today_food_logs ?? [],
       queue_state: params.queue_state ?? null,
+      exclude_names: params.exclude_names,
       seed: params.seed ?? Date.now() + params.rolls_used * 9973,
     })
+    if (!v2.suggestion && params.day_state && !params.day_state.overTargetProtection) {
+      const lightCtx = buildSuggestContext({
+        meal_type: params.meal_type,
+        daily_targets: params.daily_targets,
+        profile: params.profile,
+        memory: params.memory,
+        day_index: params.day_index,
+        exclude_ids: params.seen_ids.slice(-4),
+        exclude_names: params.exclude_names ?? [],
+        exclude_stores: [],
+        rolls_used: params.rolls_used,
+        user_lat: params.user_lat,
+        user_lng: params.user_lng,
+        adherence: params.adherence,
+        calorie_bank: params.calorie_bank,
+        day_state: params.day_state,
+        seed: (params.seed ?? Date.now()) + params.rolls_used * 53 + 2048,
+        fast_dice: true,
+      })
+      const light = suggestLightSnack(lightCtx)
+      if (light) {
+        return {
+          suggestion: light,
+          rolls_used: params.rolls_used + 1,
+          pool_exhausted: v2.pool_exhausted,
+          queue_state: v2.queue_state,
+        }
+      }
+    }
     return {
       suggestion: v2.suggestion,
       rolls_used: params.rolls_used + 1,

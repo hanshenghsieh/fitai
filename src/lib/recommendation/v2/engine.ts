@@ -22,6 +22,7 @@ export function rollRecommendationV2(params: {
   day_state: TodayMealState
   today_food_logs: FoodLogEntry[]
   queue_state?: RecommendationQueueState | null
+  exclude_names?: string[]
   seed?: number
 }): {
   suggestion: MealSuggestion | null
@@ -33,6 +34,10 @@ export function rollRecommendationV2(params: {
   }
 
   const items = getRecommendationFoodsV2()
+  const blockedNames = new Set(params.exclude_names ?? [])
+  const pool = blockedNames.size
+    ? items.filter(item => !blockedNames.has(item.name))
+    : items
   const state = buildUserNutritionState({
     dayState: params.day_state,
     dailyTargets: params.daily_targets,
@@ -44,15 +49,15 @@ export function rollRecommendationV2(params: {
   const recentlyShown = queue?.recentlyShownIds ?? []
 
   if (shouldRegenerateQueue(queue, state)) {
-    queue = buildRecommendationQueue(items, state, recentlyShown, params.seed ?? Date.now())
+    queue = buildRecommendationQueue(pool, state, recentlyShown, params.seed ?? Date.now())
   }
 
   const nextId = peekQueueItemId(queue)
-  let result = pickRecommendationWithFallback(items, state, queue.recentlyShownIds, nextId)
+  let result = pickRecommendationWithFallback(pool, state, queue.recentlyShownIds, nextId)
 
   if (!result && getV2MainPool(params.meal_type).length > 0) {
-    result = pickRecommendationWithFallback(items, state, [], null)
-    queue = buildRecommendationQueue(items, state, [], (params.seed ?? Date.now()) + 17)
+    result = pickRecommendationWithFallback(pool, state, [], null)
+    queue = buildRecommendationQueue(pool, state, [], (params.seed ?? Date.now()) + 17)
   }
 
   if (!result) {
