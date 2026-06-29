@@ -25,6 +25,8 @@ export interface PhotoLogDraft {
   carbs_g?: number | null
   fat_g?: number | null
   loading: boolean
+  /** iOS: text-only nutrition match in flight after AI label returns. */
+  matchingNutrition?: boolean
   accuracy?: PhotoAccuracyState
   /** iOS: keep slim server snapshot; hydrate accuracy only on save. */
   photo_v2?: PhotoV2State
@@ -468,11 +470,12 @@ function ReviewStep({
   onOpenManualCorrection?: () => void
   onPhotoV2Select?: Props['onPhotoV2Select']
 }) {
-  const iosLiteMode =
-    isNativeIOS() && accuracyEnabled && !!draft.photo_v2 && !draft.accuracy
+  const iosLiteMode = isNativeIOS() && accuracyEnabled && !draft.accuracy
   const accuracyMode = accuracyEnabled && !!draft.accuracy
   const readyForLog = iosLiteMode
-    ? photoV2ReadyForLog(draft.photo_v2!)
+    ? draft.photo_v2
+      ? photoV2ReadyForLog(draft.photo_v2)
+      : false
     : !accuracyMode || draft.accuracy!.ready_for_food_log
   const showMacros = !accuracyMode || draft.accuracy!.show_macros
   const selectedV2Id = draft.photo_v2?.selected_candidate_id ?? draft.photo_v2?.outcome.candidates[0]?.id
@@ -519,11 +522,16 @@ function ReviewStep({
               className="absolute inset-0 h-full w-full object-cover"
             />
           ) : !draft.loading && draft.name && isNativeIOS() ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
-              <Camera className="h-8 w-8" strokeWidth={ICON_STROKE} style={{ color: TODAY.mocha }} />
-              <p className="text-[15px] leading-snug" style={{ color: TODAY.text, fontWeight: 600 }}>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 py-3 text-center">
+              <Camera className="h-7 w-7 shrink-0" strokeWidth={ICON_STROKE} style={{ color: TODAY.mocha }} />
+              <p className="text-[14px] leading-snug line-clamp-3" style={{ color: TODAY.text, fontWeight: 600 }}>
                 {draft.name}
               </p>
+              <div className="flex flex-wrap justify-center gap-1.5 max-w-full">
+                {guessFoodTags(draft.name).slice(0, 4).map(tag => (
+                  <FoodTag key={tag} label={tag} />
+                ))}
+              </div>
             </div>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
@@ -554,13 +562,40 @@ function ReviewStep({
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
             {draft.previewUrl ? '正在辨識…' : '正在準備照片…'}
           </p>
-        ) : iosLiteMode ? (
+        ) : iosLiteMode && draft.matchingNutrition ? (
+          <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
+            載入營養選項…
+          </p>
+        ) : iosLiteMode && draft.photo_v2 ? (
           <IosLiteConfirmSection
-            photoV2={draft.photo_v2!}
+            photoV2={draft.photo_v2}
             selectedId={selectedV2Id}
             onPhotoV2Select={onPhotoV2Select}
             onOpenManualCorrection={onOpenManualCorrection}
           />
+        ) : iosLiteMode ? (
+          <div className="space-y-3">
+            <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+              營養選項載入失敗，可手動搜尋菜品。
+            </p>
+            {onOpenManualCorrection && (
+              <button
+                type="button"
+                onClick={onOpenManualCorrection}
+                className="w-full h-12 text-[15px] active:opacity-90"
+                style={{
+                  borderRadius: 22,
+                  backgroundColor: TODAY.card,
+                  color: TODAY.mocha,
+                  fontWeight: 600,
+                  border: `1.5px solid ${TODAY.mocha}`,
+                }}
+              >
+                搜尋全部菜品
+              </button>
+            )}
+          </div>
         ) : accuracyMode && draft.accuracy && onAccuracyChange ? (
           <AccuracyConfirmSection
             accuracy={draft.accuracy}

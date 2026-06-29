@@ -22,24 +22,24 @@ export function isLowConfidence(pct: number): boolean {
   return pct < 40
 }
 
-/** After gallery/camera on iOS, wait until WebView is active again. */
+/** After gallery/camera on iOS, brief yield so WebView is active. */
 export async function waitForAppVisible(): Promise<void> {
-  if (typeof document === 'undefined') return
-  if (document.visibilityState === 'visible') {
+  if (typeof document === 'undefined' || !isNativeIOS()) return
+  if (document.visibilityState !== 'visible') {
     await new Promise<void>(resolve => {
-      setTimeout(resolve, 250)
+      const finish = () => {
+        document.removeEventListener('visibilitychange', onChange)
+        setTimeout(resolve, 80)
+      }
+      const onChange = () => {
+        if (document.visibilityState === 'visible') finish()
+      }
+      document.addEventListener('visibilitychange', onChange)
     })
     return
   }
   await new Promise<void>(resolve => {
-    const finish = () => {
-      document.removeEventListener('visibilitychange', onChange)
-      setTimeout(resolve, 250)
-    }
-    const onChange = () => {
-      if (document.visibilityState === 'visible') finish()
-    }
-    document.addEventListener('visibilitychange', onChange)
+    setTimeout(resolve, 80)
   })
 }
 
@@ -143,13 +143,11 @@ export interface PhotoParseResult {
   confidence: 'high' | 'medium' | 'low'
   confidence_pct: number
   ai_nutrition_suppressed: true
-  photo_v2?: PhotoV2State
 }
 
 type PhotoApiJson = {
   error?: string
   data?: { items: Array<{ name: string; confidence: 'high' | 'medium' | 'low' }> }
-  photo_v2?: PhotoV2State
 }
 
 function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
@@ -170,7 +168,6 @@ function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
     confidence: worst,
     confidence_pct: confidenceToPct(worst),
     ai_nutrition_suppressed: true,
-    photo_v2: json.photo_v2,
   }
 }
 

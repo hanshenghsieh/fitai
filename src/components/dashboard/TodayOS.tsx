@@ -14,7 +14,9 @@ import {
   fileToDataUrl,
   prepareFoodPhotoFile,
   uploadFoodPhotoFile,
+  fetchPhotoMatch,
 } from '@/lib/food-capture'
+import { storesInText } from '@/lib/dice-store-names'
 import { isNativeIOS } from '@/lib/capacitor-native'
 import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
 import {
@@ -429,6 +431,7 @@ export default function TodayOS({
   const autoRollKeyRef = useRef('')
   const lastPostureLineRef = useRef('')
   const photoPreviewUrlRef = useRef<string | null>(null)
+  const photoMatchGenRef = useRef(0)
   const [dicePreviewByMeal, setDicePreviewByMeal] = useState<Partial<Record<MealType, MealSuggestion>>>({})
   const dicePreview = dicePreviewByMeal[mealSlotLegacy] ?? null
   const [localDiceRolls, setLocalDiceRolls] = useState(0)
@@ -654,14 +657,12 @@ export default function TodayOS({
   }, [registerDeleteLog, removeLogById])
 
   const parsePhotoDraft = useCallback(async (file: File, previewUrl: string) => {
+    const matchGen = ++photoMatchGenRef.current
     let parsedName = ''
     try {
       const parsed = await uploadFoodPhotoFile(file)
       parsedName = parsed.name.trim() || '未知食物'
-
-      if (!parsed.photo_v2) {
-        throw new Error('辨識結果不完整，請再試一次')
-      }
+      const photoId = `photo-parse-${Date.now()}`
 
       if (isNativeIOS()) {
         setPhotoDraft(prev =>
@@ -676,22 +677,45 @@ export default function TodayOS({
                 carbs_g: null,
                 fat_g: null,
                 loading: false,
-                photo_v2: parsed.photo_v2,
+                matchingNutrition: true,
+                photo_v2: undefined,
                 accuracy: undefined,
               }
             : prev
         )
+
+        void fetchPhotoMatch(parsedName, {
+          store: storesInText(parsedName)?.[0],
+          photo_id: photoId,
+        })
+          .then(photo_v2 => {
+            if (photoMatchGenRef.current !== matchGen) return
+            setPhotoDraft(prev =>
+              prev
+                ? {
+                    ...prev,
+                    photo_v2,
+                    matchingNutrition: false,
+                  }
+                : prev
+            )
+          })
+          .catch(() => {
+            if (photoMatchGenRef.current !== matchGen) return
+            setPhotoDraft(prev =>
+              prev ? { ...prev, matchingNutrition: false } : prev
+            )
+          })
         return
       }
 
-      await new Promise<void>(resolve => {
-        setTimeout(resolve, 200)
+      const photo_v2 = await fetchPhotoMatch(parsedName, {
+        store: storesInText(parsedName)?.[0],
+        photo_id: photoId,
       })
-
-      const accuracy = photoAccuracyStateFromV2(parsed.photo_v2)
+      const accuracy = photoAccuracyStateFromV2(photo_v2)
       const resolved = accuracy.v2.outcome.official_record
       const display = photoAccuracyDisplayMacros(accuracy)
-      const displayName = resolved?.name ?? accuracy.label
 
       setPhotoDraft(prev =>
         prev
@@ -699,12 +723,13 @@ export default function TodayOS({
               ...prev,
               previewUrl,
               file,
-              name: displayName,
+              name: resolved?.name ?? accuracy.label,
               calories: display.calories,
               protein_g: display.protein_g,
               carbs_g: display.carbs_g,
               fat_g: display.fat_g,
               loading: false,
+              matchingNutrition: false,
               photo_v2: undefined,
               accuracy,
             }
@@ -767,6 +792,7 @@ export default function TodayOS({
   )
 
   const closePhotoSheet = useCallback(() => {
+    photoMatchGenRef.current += 1
     setPhotoOpen(false)
     setPhotoDraft(null)
     setPhotoProcessing(false)
