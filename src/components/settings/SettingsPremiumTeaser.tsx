@@ -25,15 +25,18 @@ export default function SettingsPremiumTeaser({ access }: Props) {
   const safeMode = isAppStoreSafeMode()
 
   return (
-    <SettingsSection title="會員" description={safeMode ? '即將開放。' : '邀請，不是付費牆。'}>
+    <SettingsSection
+      title="會員"
+      description={safeMode ? '即將開放。' : '管理方案與會員功能'}
+    >
       <SettingsRow
         label={safeMode ? 'BetterBit Premium' : isSubscribed ? '會員進行中' : 'BetterBit 會員'}
         detail={
           safeMode
-            ? '即將開放。先看看我們在準備什麼。'
+            ? '即將開放。'
             : isSubscribed
-              ? '計畫會持續跟上你'
-              : '這段路，想繼續一起走？'
+              ? '管理方案與帳單'
+              : '解鎖完整外食減脂工具'
         }
         onClick={() => router.push('/settings/premium')}
         last

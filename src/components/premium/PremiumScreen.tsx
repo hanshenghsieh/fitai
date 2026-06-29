@@ -10,15 +10,28 @@ import { colors } from '@/lib/design-system'
 import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 import { getStripePriceId } from '@/lib/stripe-config'
 import {
-  PREMIUM_STORY,
+  PREMIUM_BODY,
+  PREMIUM_FEATURES,
+  PREMIUM_SUBSCRIBED_BODY,
   premiumPosture,
-  premiumPriceLine,
   premiumTrialWhisper,
 } from '@/lib/premium-narrative'
 import LegalLinksRow from '@/components/legal/LegalLinksRow'
 
 interface Props {
   access: AccessStatus
+}
+
+function PremiumFeatureList() {
+  return (
+    <ul className="space-y-2">
+      {PREMIUM_FEATURES.map(feature => (
+        <li key={feature} className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
+          ・{feature}
+        </li>
+      ))}
+    </ul>
+  )
 }
 
 function PremiumSafeModeScreen() {
@@ -35,26 +48,21 @@ function PremiumSafeModeScreen() {
         </Link>
 
         <h1 className="text-[22px] font-medium tracking-tight" style={{ color: colors.text.primary }}>
-          BetterBit Premium
+          BetterBit 會員
         </h1>
         <p className="text-[15px] mt-3 leading-relaxed" style={{ color: colors.text.secondary }}>
-          BetterBit Premium 即將開放。
+          即將開放
         </p>
       </div>
 
       <div className="px-5 space-y-8">
-        <div className="space-y-4">
-          {PREMIUM_STORY.map(line => (
-            <p key={line} className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
-              {line}
-            </p>
-          ))}
-        </div>
-
+        <p className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
+          {PREMIUM_BODY}
+        </p>
+        <PremiumFeatureList />
         <LegalLinksRow className="pt-2" />
-
         <Link href="/dashboard" className="block text-[14px]" style={{ color: colors.text.tertiary }}>
-          先回去 Today
+          回到 Today
         </Link>
       </div>
     </div>
@@ -92,8 +100,8 @@ function PremiumStripeScreen({ access }: Props) {
   }, [])
 
   useEffect(() => {
-    if (searchParams.get('subscribed') === '1') toast.message('歡迎回來。我們會繼續照顧你的計畫。')
-    if (searchParams.get('canceled') === '1') toast.message('沒關係。你隨時可以再來。')
+    if (searchParams.get('subscribed') === '1') toast.message('訂閱成功，會員功能已啟用。')
+    if (searchParams.get('canceled') === '1') toast.message('尚未完成付款。')
   }, [searchParams])
 
   async function handleSubscribe() {
@@ -165,8 +173,9 @@ function PremiumStripeScreen({ access }: Props) {
         ) : isSubscribed ? (
           <div className="space-y-6">
             <p className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
-              謝謝你願意繼續。我們會安靜地跟上你的變化，你不用重來。
+              {PREMIUM_SUBSCRIBED_BODY}
             </p>
+            <PremiumFeatureList />
             {subscription?.current_period_end && (
               <p className="text-[13px]" style={{ color: colors.text.tertiary }}>
                 {subscription.cancel_at_period_end ? '本期結束後停止 · ' : ''}
@@ -183,20 +192,16 @@ function PremiumStripeScreen({ access }: Props) {
               {portalLoading ? '開啟中…' : '管理帳單'}
             </button>
             <LegalLinksRow />
+            <Link href="/dashboard" className="block text-[14px]" style={{ color: colors.text.tertiary }}>
+              回到 Today
+            </Link>
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="space-y-4">
-              {PREMIUM_STORY.map(line => (
-                <p key={line} className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
-                  {line}
-                </p>
-              ))}
-            </div>
-
-            <p className="text-[14px] leading-relaxed" style={{ color: colors.text.tertiary }}>
-              {premiumPriceLine()}
+            <p className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
+              {PREMIUM_BODY}
             </p>
+            <PremiumFeatureList />
 
             <div className="pt-2 space-y-4">
               <button
@@ -206,11 +211,11 @@ function PremiumStripeScreen({ access }: Props) {
                 className="text-[15px] font-medium disabled:opacity-40"
                 style={{ color: colors.accent.action }}
               >
-                {subscribing ? '前往付款…' : stripeReady ? '繼續一起走走' : '會員準備中'}
+                {subscribing ? '前往付款…' : stripeReady ? '立即升級' : '會員準備中'}
               </button>
               <LegalLinksRow />
               <Link href="/dashboard" className="block text-[14px]" style={{ color: colors.text.tertiary }}>
-                先回去 Today
+                回到 Today
               </Link>
             </div>
           </div>
