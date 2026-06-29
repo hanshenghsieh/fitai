@@ -13,6 +13,7 @@ import {
 } from '@/lib/goal-calculator'
 import { buildMealCombination, comboToSaved } from '@/lib/meal-combo-engine'
 import { getAccessStatus } from '@/lib/subscription-access'
+import { SUBSCRIPTION_ACCESS_FIELDS } from '@/lib/subscription-types'
 import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 import { applyWeeklyFeedback } from '@/lib/feedback-adjustments'
 import {
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
     const supabase = isCron ? await createServiceClient() : await createClient()
 
     let userId: string
+    let userEmail: string | null = null
     if (isCron) {
       userId = cronUserId!
     } else {
@@ -51,6 +53,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
       userId = user.id
+      userEmail = user.email ?? null
     }
 
     let profile: UserProfile | null = null
@@ -92,13 +95,13 @@ export async function POST(req: NextRequest) {
 
     const { data: subscription } = await supabase
       .from('subscriptions')
-      .select('status')
+      .select(SUBSCRIPTION_ACCESS_FIELDS)
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
       .single()
 
-    const access = getAccessStatus(profile.created_at, subscription)
+    const access = getAccessStatus(profile.created_at, subscription, { userEmail })
     if (!isAppStoreSafeMode() && !access.hasFullAccess) {
       return NextResponse.json(
         { error: '試用期已結束，請訂閱以繼續生成計畫', code: 'SUBSCRIPTION_REQUIRED' },

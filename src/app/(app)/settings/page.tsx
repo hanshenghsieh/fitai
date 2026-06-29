@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { colors } from '@/lib/design-system'
 import SettingsScreen from '@/components/settings/SettingsScreen'
 import { getAccessStatus } from '@/lib/subscription-access'
+import { SUBSCRIPTION_ACCESS_FIELDS } from '@/lib/subscription-types'
 import { getAppUser } from '@/lib/supabase/app-session'
 
 export const dynamic = 'force-dynamic'
@@ -17,14 +18,16 @@ export default async function SettingsPage() {
     supabase.from('user_profiles').select(PROFILE_FIELDS).eq('id', user.id).single(),
     supabase
       .from('subscriptions')
-      .select('status')
+      .select(SUBSCRIPTION_ACCESS_FIELDS)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
   ])
 
-  const access = getAccessStatus(profile?.created_at ?? new Date().toISOString(), subscription)
+  const access = getAccessStatus(profile?.created_at ?? new Date().toISOString(), subscription, {
+    userEmail: user.email,
+  })
 
   return (
     <div className="max-w-lg mx-auto pb-6" style={{ backgroundColor: colors.bg.canvas }}>

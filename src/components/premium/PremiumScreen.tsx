@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { ChevronLeft, Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
-import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
+import { shouldHideExternalPaymentsClient } from '@/lib/ios-payment-gate'
 import { getStripePriceId } from '@/lib/stripe-config'
 import {
   PREMIUM_BODY,
@@ -17,6 +17,7 @@ import {
   premiumTrialWhisper,
 } from '@/lib/premium-narrative'
 import LegalLinksRow from '@/components/legal/LegalLinksRow'
+import PremiumTestFlightScreen from '@/components/premium/PremiumTestFlightScreen'
 
 interface Props {
   access: AccessStatus
@@ -34,44 +35,15 @@ function PremiumFeatureList() {
   )
 }
 
-function PremiumSafeModeScreen() {
-  return (
-    <div className="min-h-screen pb-16" style={{ backgroundColor: colors.bg.canvas }}>
-      <div className="px-5 pt-12 pb-6">
-        <Link
-          href="/settings"
-          className="inline-flex items-center gap-1 text-[14px] mb-6"
-          style={{ color: colors.text.tertiary }}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          設定
-        </Link>
-
-        <h1 className="text-[22px] font-medium tracking-tight" style={{ color: colors.text.primary }}>
-          BetterBit 會員
-        </h1>
-        <p className="text-[15px] mt-3 leading-relaxed" style={{ color: colors.text.secondary }}>
-          即將開放
-        </p>
-      </div>
-
-      <div className="px-5 space-y-8">
-        <p className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
-          {PREMIUM_BODY}
-        </p>
-        <PremiumFeatureList />
-        <LegalLinksRow className="pt-2" />
-        <Link href="/dashboard" className="block text-[14px]" style={{ color: colors.text.tertiary }}>
-          回到 Today
-        </Link>
-      </div>
-    </div>
-  )
-}
-
 export default function PremiumScreen({ access }: Props) {
-  if (isAppStoreSafeMode()) {
-    return <PremiumSafeModeScreen />
+  const [hidePayments, setHidePayments] = useState(shouldHideExternalPaymentsClient())
+
+  useEffect(() => {
+    setHidePayments(shouldHideExternalPaymentsClient())
+  }, [])
+
+  if (hidePayments) {
+    return <PremiumTestFlightScreen />
   }
 
   return <PremiumStripeScreen access={access} />

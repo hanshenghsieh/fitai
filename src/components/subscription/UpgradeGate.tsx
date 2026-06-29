@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Lock } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
-import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
+import { shouldHideExternalPaymentsClient } from '@/lib/ios-payment-gate'
 
 interface Props {
   access: AccessStatus
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function UpgradeGate({ access, feature, children, preview }: Props) {
-  if (isAppStoreSafeMode() || access.hasFullAccess) return <>{children}</>
+  if (shouldHideExternalPaymentsClient() || access.hasFullAccess) return <>{children}</>
 
   if (preview) {
     return (

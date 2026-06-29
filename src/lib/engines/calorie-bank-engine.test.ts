@@ -110,9 +110,23 @@ describe('Calorie Bank Engine v1', () => {
     })
 
     const tick = tickRecoveryFromPrevious(row, TARGET, FLOOR)
-    assert.equal(tick.internal_target_kcal, TARGET)
+    assert.equal(tick.internal_target_kcal, 1600)
     assert.equal(tick.recovery_balance_kcal, 0)
     assert.equal(tick.spread_days_remaining, 0)
+  })
+
+  it('Case D2: window ends with balance left rolls into a new recovery window', () => {
+    const yesterday = baseRow({
+      recovery_balance_kcal: 300,
+      spread_days_remaining: 1,
+      daily_adjust_kcal: -100,
+    })
+
+    const tick = tickRecoveryFromPrevious(yesterday, TARGET, FLOOR)
+    assert.equal(tick.internal_target_kcal, 1600)
+    assert.equal(tick.recovery_balance_kcal, 200)
+    assert.equal(tick.spread_days_remaining, 2)
+    assert.equal(tick.daily_adjust_kcal, -100)
   })
 
   it('Case E: weekly targets ramp gently during recovery', () => {

@@ -6,6 +6,13 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import { isCapacitorNative, isNativeIOS } from '@/lib/capacitor-native'
 import { installCapacitorIOSShell, remeasureCapacitorSafeAreas } from '@/lib/capacitor-ios-shell'
 
+const IOS_PLATFORM_COOKIE = 'bb_native_ios=1; path=/; max-age=31536000; SameSite=Lax'
+
+function markNativeIosCookie() {
+  if (!isNativeIOS()) return
+  document.cookie = IOS_PLATFORM_COOKIE
+}
+
 function isWebViewLoadError(): boolean {
   if (typeof document === 'undefined') return false
   const text = document.body?.innerText ?? ''
@@ -21,6 +28,7 @@ export default function CapacitorShell() {
   useEffect(() => {
     if (!isCapacitorNative()) return
 
+    markNativeIosCookie()
     const removeIOSShell = installCapacitorIOSShell()
 
     void (async () => {

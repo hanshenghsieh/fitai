@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 import { getAppUrl } from '@/lib/app-url'
-import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
+import { shouldBlockExternalPaymentsOnServer } from '@/lib/ios-payment-gate'
 
-export async function POST() {
-  if (isAppStoreSafeMode()) {
+export async function POST(req: NextRequest) {
+  if (shouldBlockExternalPaymentsOnServer(req.headers)) {
     return NextResponse.json({ error: '訂閱即將開放' }, { status: 503 })
   }
 

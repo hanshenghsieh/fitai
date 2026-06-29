@@ -72,12 +72,23 @@ export function tickRecoveryFromPrevious(
   const nextSpread = Math.max(0, previous.spread_days_remaining - 1)
   const internal = Math.max(calorieFloor, normalTargetKcal + adjust)
 
-  if (nextBalance <= 0 || nextSpread <= 0) {
+  if (nextBalance <= 0) {
     return {
-      internal_target_kcal: normalTargetKcal,
+      internal_target_kcal: internal,
       recovery_balance_kcal: 0,
       spread_days_remaining: 0,
       daily_adjust_kcal: 0,
+    }
+  }
+
+  if (nextSpread <= 0) {
+    const window = computeRecoveryWindow(nextBalance)
+    const rolledAdjust = clampDailyAdjust(window.dailyAdjustKcal, normalTargetKcal, calorieFloor)
+    return {
+      internal_target_kcal: internal,
+      recovery_balance_kcal: nextBalance,
+      spread_days_remaining: window.spreadDays,
+      daily_adjust_kcal: rolledAdjust,
     }
   }
 

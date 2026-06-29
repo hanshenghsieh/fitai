@@ -22,6 +22,15 @@ export const PREMIUM_FEATURES = [
 export const PREMIUM_SUBSCRIBED_BODY =
   '您可使用完整的飲食追蹤、下一餐推薦、每週回顧與個人化建議。'
 
+export const PREMIUM_TESTFLIGHT_SUBTITLE = '封測期間開放完整功能'
+
+export const PREMIUM_TESTFLIGHT_BODY =
+  '此 TestFlight 版本已開放完整會員功能，供測試人員體驗飲食紀錄、下一餐推薦、熱量與蛋白質追蹤、每週回顧與個人化建議。'
+
+export const PREMIUM_TESTFLIGHT_FEATURES = PREMIUM_FEATURES
+
+export const PREMIUM_TESTFLIGHT_FOOTNOTE = '正式版本將支援 App Store 訂閱。'
+
 export function premiumTrialWhisper(access: AccessStatus): string | null {
   if (!access.isTrial || access.isSubscribed) return null
   return `試用中 · 剩餘 ${access.trialDaysLeft} 天`

@@ -14,6 +14,7 @@ import TodayDashboardSkeleton from '@/components/dashboard/TodayDashboardSkeleto
 import { buildFoodDnaFromCheckins, extractRecentFoodLogsFromCheckins } from '@/lib/food-memory'
 import { getNutritionDayKey } from '@/lib/timezone'
 import { getAccessStatus } from '@/lib/subscription-access'
+import { SUBSCRIPTION_ACCESS_FIELDS } from '@/lib/subscription-types'
 import { getAppUser } from '@/lib/supabase/app-session'
 import { userMemoryFromCheckin } from '@/lib/checkin-utils'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
@@ -68,7 +69,7 @@ async function DashboardContent() {
       .order('checkin_date', { ascending: true }),
     supabase
       .from('subscriptions')
-      .select('status')
+      .select(SUBSCRIPTION_ACCESS_FIELDS)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -80,7 +81,9 @@ async function DashboardContent() {
   const safeDayIndex = Math.min(Math.max(0, dayOfWeek), Math.max(0, (planData?.days?.length ?? 1) - 1))
   const todayPlan: DayPlan | null = planData?.days?.[safeDayIndex] ?? planData?.days?.[0] ?? null
   const profile = profileRow as UserProfile | null
-  const access = getAccessStatus(profile?.created_at ?? new Date().toISOString(), subscription)
+  const access = getAccessStatus(profile?.created_at ?? new Date().toISOString(), subscription, {
+    userEmail: user.email,
+  })
 
   const foodDna = buildFoodDnaFromCheckins(recentCheckins ?? [])
   const recentFoodLogs = extractRecentFoodLogsFromCheckins(recentCheckins ?? [])
