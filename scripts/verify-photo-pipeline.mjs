@@ -15,6 +15,7 @@ const CASES = [
   { label: '日式咖哩飯', expectMacros: true },
   { label: '雞腿便當', expectMacros: false },
   { label: '摩斯漢堡起司堡', expectMacros: true },
+  { label: '咖哩+白飯+紅蘿蔔', expectMacros: false },
 ]
 
 let ok = 0

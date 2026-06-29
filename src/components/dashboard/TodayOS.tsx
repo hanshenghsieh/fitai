@@ -14,11 +14,12 @@ import {
   fileToDataUrl,
   prepareFoodPhotoFile,
   uploadFoodPhotoFile,
+  fetchPhotoMatch,
 } from '@/lib/food-capture'
 import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
 import {
   buildPhotoLogCommitFromAccuracy,
-  createPhotoAccuracyState,
+  photoAccuracyStateFromV2,
   photoAccuracyDisplayMacros,
   photoAccuracyReadyForLog,
   updatePhotoAccuracyState,
@@ -658,7 +659,9 @@ export default function TodayOS({
     try {
       const parsed = await uploadFoodPhotoFile(file)
       parsedName = parsed.name.trim() || '未知食物'
+      const photoId = `photo-parse-${Date.now()}`
 
+      // Show AI label only — do NOT run client menu search (crashes iOS WebView).
       setPhotoDraft(prev =>
         prev
           ? {
@@ -667,21 +670,28 @@ export default function TodayOS({
               file,
               name: parsedName,
               loading: true,
+              accuracy: undefined,
             }
           : prev
       )
 
       await new Promise<void>(resolve => {
-        setTimeout(resolve, 100)
+        setTimeout(resolve, 150)
       })
 
-      const accuracy = createPhotoAccuracyState(parsedName, {
+      const photoV2 = await fetchPhotoMatch(parsedName, {
         store: storesInText(parsedName)?.[0],
-        photo_id: `photo-parse-${Date.now()}`,
+        photo_id: photoId,
       })
+      const accuracy = photoAccuracyStateFromV2(photoV2)
 
       const resolved = accuracy.v2.outcome.official_record
       const display = photoAccuracyDisplayMacros(accuracy)
+
+      await new Promise<void>(resolve => {
+        setTimeout(resolve, 100)
+      })
+
       setPhotoDraft(prev =>
         prev
           ? {
@@ -699,20 +709,17 @@ export default function TodayOS({
     } catch (err) {
       const message = err instanceof Error ? err.message : '辨識失敗，請稍後再試'
       toast.error('無法完成辨識', { description: message })
-      const accuracy = createPhotoAccuracyState(parsedName || '未知食物', {
-        photo_id: `photo-parse-${Date.now()}`,
-      })
       setPhotoDraft(prev =>
         prev
           ? {
               ...prev,
-              name: parsedName || accuracy.label,
+              name: parsedName || '未知食物',
               calories: null,
               protein_g: null,
               carbs_g: null,
               fat_g: null,
               loading: false,
-              accuracy,
+              accuracy: undefined,
             }
           : prev
       )

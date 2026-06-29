@@ -1,5 +1,6 @@
 import type { FoodDna, FrequentFood } from '@/lib/food-memory'
 import { isNativeIOS } from '@/lib/capacitor-native'
+import type { PhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 
 const PHOTO_PARSE_TIMEOUT_MS = 45_000
 
@@ -252,6 +253,41 @@ export async function parseFoodPhotoDataUrl(
   if (!res.ok) throw new Error(json.error || '辨識失敗')
 
   return parsePhotoApiResponse(json)
+}
+
+/** Server-side nutrition match — never run menu search in iOS WebView. */
+export async function fetchPhotoMatch(
+  label: string,
+  opts?: { store?: string; photo_id?: string }
+): Promise<PhotoV2State> {
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 20_000)
+
+  let res: Response
+  try {
+    res = await fetch('/api/food-photo/match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        label,
+        store: opts?.store,
+        photo_id: opts?.photo_id,
+      }),
+      signal: controller.signal,
+    })
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('營養比對逾時，請稍後再試')
+    }
+    throw new Error('營養比對失敗，請稍後再試')
+  } finally {
+    window.clearTimeout(timer)
+  }
+
+  const json = (await res.json()) as { error?: string; photo_v2?: PhotoV2State }
+  if (!res.ok || !json.photo_v2) throw new Error(json.error || '營養比對失敗')
+  return json.photo_v2
 }
 
 export async function parseFoodPhotoFile(file: File): Promise<PhotoParseResult> {

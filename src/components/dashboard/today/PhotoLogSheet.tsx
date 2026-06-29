@@ -400,15 +400,26 @@ function ReviewStep({
       <div className="ios-bottom-sheet__scroll flex-1 overflow-y-auto overscroll-contain px-5 pb-4 space-y-5 min-h-0">
         <div
           className="relative w-full overflow-hidden"
-          style={{ height: 360, borderRadius: BB_V2.radius.sheet, backgroundColor: BB_V2.bg.pill }}
+          style={{
+            height: isNativeIOS() ? 120 : 360,
+            borderRadius: BB_V2.radius.sheet,
+            backgroundColor: BB_V2.bg.pill,
+          }}
         >
-          {draft.previewUrl && (!draft.loading || !isNativeIOS()) ? (
+          {draft.previewUrl && !isNativeIOS() ? (
             <img
               src={draft.previewUrl}
               alt=""
               decoding="async"
               className="absolute inset-0 h-full w-full object-cover"
             />
+          ) : !draft.loading && draft.name && isNativeIOS() ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
+              <Camera className="h-8 w-8" strokeWidth={ICON_STROKE} style={{ color: TODAY.mocha }} />
+              <p className="text-[15px] leading-snug" style={{ color: TODAY.text, fontWeight: 600 }}>
+                {draft.name}
+              </p>
+            </div>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
               <Loader2 className="h-7 w-7 animate-spin" strokeWidth={ICON_STROKE} style={{ color: TODAY.mocha }} />
@@ -417,7 +428,7 @@ function ReviewStep({
               </p>
             </div>
           )}
-          {!draft.loading && draft.name && !accuracyMode && (
+          {!draft.loading && draft.name && !accuracyMode && !isNativeIOS() ? (
             <div className="absolute inset-0 p-4 flex flex-wrap content-start gap-2 pointer-events-none">
               {guessFoodTags(draft.name).map((tag, i) => (
                 <FoodTag
@@ -430,13 +441,24 @@ function ReviewStep({
                 />
               ))}
             </div>
-          )}
+          ) : null}
         </div>
 
         {draft.loading ? (
-          <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
-            {draft.previewUrl ? '正在辨識…' : '正在準備照片…'}
+          <p className="text-[14px] flex flex-col gap-1" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+            <span className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
+              {draft.previewUrl
+                ? draft.name
+                  ? '正在比對營養資料…'
+                  : '正在辨識…'
+                : '正在準備照片…'}
+            </span>
+            {draft.name ? (
+              <span className="text-[13px] pl-6" style={{ color: TODAY.text, fontWeight: 500 }}>
+                {draft.name}
+              </span>
+            ) : null}
           </p>
         ) : accuracyMode && draft.accuracy && onAccuracyChange ? (
           <AccuracyConfirmSection
