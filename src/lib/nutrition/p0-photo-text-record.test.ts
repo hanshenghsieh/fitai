@@ -21,6 +21,7 @@ import {
 import {
   countsTowardDailyTotals,
   formatLogCaloriesLine,
+  formatLogProteinLine,
   getFoodLogDisplayLabel,
   isNutritionPendingConfirmation,
 } from '@/lib/nutrition/food-log-display'
@@ -297,6 +298,35 @@ describe('P0 — Manual photo correction', () => {
     )
     assert.equal(log.photo_correction_meta?.user_corrected_label, '摩斯起司堡')
     assert.equal(log.photo_correction_meta?.user_corrected_restaurant, '摩斯')
+  })
+
+  it('21b. food_dna template selection counts as user-confirmed estimated nutrition', () => {
+    const log = buildFoodLogFromManualPhotoCorrection(
+      {
+        mode: 'verified',
+        label: '白飯 + 日式咖哩雞肉',
+        category: 'rice_bowl',
+        candidate: {
+          id: 'dna-curry',
+          name: '咖哩飯',
+          macros: { calories: 720, protein: 22, carbs: 95, fat: 18, fiber: null, sugar: null, sodium: null },
+          match_score: 88,
+          nutrition_status: 'estimated',
+          nutrition_source: 'food_dna',
+          nutrition_confidence: 'C',
+          source_tier: 'food_dna',
+          explanation: '餐型參考',
+        },
+        photoAi: photoAi(),
+      },
+      { id: 'p-manual-curry' }
+    )
+    assert.equal(log.nutrition_status, 'estimated')
+    assert.equal(log.calories, 720)
+    assert.equal(log.protein_g, 22)
+    assert.equal(countsTowardDailyTotals(log), true)
+    assert.equal(formatLogCaloriesLine(log), '720 kcal')
+    assert.equal(formatLogProteinLine(log), '蛋白質 22g')
   })
 })
 

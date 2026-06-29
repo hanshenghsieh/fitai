@@ -91,6 +91,12 @@ export function buildFoodLogFromManualPhotoCorrection(
   if (result.mode === 'verified') {
     const c = result.candidate
     const isTemplate = c.source_tier === 'food_dna'
+    // User explicitly picked this item in manual correction — nutrition is confirmed, not pending.
+    const nutrition_status = isTemplate
+      ? 'estimated'
+      : c.nutrition_status === 'verified'
+        ? 'verified'
+        : 'official'
     return {
       ...base,
       name: c.name,
@@ -104,8 +110,8 @@ export function buildFoodLogFromManualPhotoCorrection(
       protein_g: c.macros.protein,
       carbs_g: c.macros.carbs,
       fat_g: c.macros.fat,
-      nutrition_status: isTemplate ? 'estimated_pending_confirmation' : 'official',
-      nutrition_confidence: isTemplate ? 'C' : 'B',
+      nutrition_status,
+      nutrition_confidence: isTemplate ? 'C' : c.nutrition_confidence ?? 'B',
       capture_status: 'resolved',
     }
   }

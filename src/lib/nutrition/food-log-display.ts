@@ -93,6 +93,7 @@ export function nutritionStatusBadge(log: Pick<FoodLogEntry, 'nutrition_status'>
   if (log.nutrition_status === 'user_entered') return USER_ENTERED_LABEL
   if (log.nutrition_status === 'auto_resolved') return AUTO_RESOLVED_LABEL
   if (log.nutrition_status === 'estimated_pending_confirmation') return '待確認'
+  if (log.nutrition_status === 'estimated') return '餐型參考'
   if (log.nutrition_status === 'pending_review') return '待審核'
   return null
 }
