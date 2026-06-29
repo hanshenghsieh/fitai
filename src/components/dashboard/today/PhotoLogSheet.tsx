@@ -46,6 +46,7 @@ interface Props {
   onBackToCapture?: () => void
   onOpenManualCorrection?: () => void
   onPhotoV2Select?: (candidateId: string) => void
+  onSavePhotoOnly?: () => void
 }
 
 function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void; onClose: () => void }) {
@@ -458,6 +459,7 @@ function ReviewStep({
   saving,
   onOpenManualCorrection,
   onPhotoV2Select,
+  onSavePhotoOnly,
 }: {
   draft: PhotoLogDraft
   accuracyEnabled?: boolean
@@ -469,16 +471,12 @@ function ReviewStep({
   saving?: boolean
   onOpenManualCorrection?: () => void
   onPhotoV2Select?: Props['onPhotoV2Select']
+  onSavePhotoOnly?: () => void
 }) {
   const iosLiteMode = isNativeIOS() && accuracyEnabled && !draft.accuracy
   const accuracyMode = accuracyEnabled && !!draft.accuracy
-  const readyForLog = iosLiteMode
-    ? draft.photo_v2
-      ? photoV2ReadyForLog(draft.photo_v2)
-      : false
-    : !accuracyMode || draft.accuracy!.ready_for_food_log
-  const showMacros = !accuracyMode || draft.accuracy!.show_macros
-  const selectedV2Id = draft.photo_v2?.selected_candidate_id ?? draft.photo_v2?.outcome.candidates[0]?.id
+  const readyForLog = !accuracyMode || draft.accuracy!.ready_for_food_log
+  const showMacros = iosLiteMode ? false : !accuracyMode || draft.accuracy!.show_macros
 
   const [calText, setCalText] = useState(draft.calories != null ? String(draft.calories) : '')
   const [proText, setProText] = useState(draft.protein_g != null ? String(draft.protein_g) : '')
@@ -562,37 +560,25 @@ function ReviewStep({
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
             {draft.previewUrl ? '正在辨識…' : '正在準備照片…'}
           </p>
-        ) : iosLiteMode && draft.matchingNutrition ? (
-          <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
-            載入營養選項…
-          </p>
-        ) : iosLiteMode && draft.photo_v2 ? (
-          <IosLiteConfirmSection
-            photoV2={draft.photo_v2}
-            selectedId={selectedV2Id}
-            onPhotoV2Select={onPhotoV2Select}
-            onOpenManualCorrection={onOpenManualCorrection}
-          />
         ) : iosLiteMode ? (
-          <div className="space-y-3">
+          <div className="space-y-3 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
             <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-              營養選項載入失敗，可手動搜尋菜品。
+              若要記錄熱量與營養，請搜尋確認菜品。不確認也可以先加入照片紀錄。
             </p>
             {onOpenManualCorrection && (
               <button
                 type="button"
                 onClick={onOpenManualCorrection}
-                className="w-full h-12 text-[15px] active:opacity-90"
+                className="w-full h-12 text-[15px] flex items-center justify-center gap-2 active:opacity-90"
                 style={{
                   borderRadius: 22,
-                  backgroundColor: TODAY.card,
-                  color: TODAY.mocha,
+                  backgroundColor: TODAY.mocha,
+                  color: '#FFFFFF',
                   fontWeight: 600,
-                  border: `1.5px solid ${TODAY.mocha}`,
                 }}
               >
-                搜尋全部菜品
+                <Search className="h-4 w-4" strokeWidth={ICON_STROKE} />
+                搜尋確認營養
               </button>
             )}
           </div>
@@ -704,27 +690,46 @@ function ReviewStep({
 
       <div className="ios-bottom-sheet__footer shrink-0 px-5 pt-2 pb-3 space-y-2">
         <p className="text-[11px] text-center leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400, opacity: 0.8 }}>
-          {accuracyMode && draft.accuracy?.nutrition_status === 'unknown'
-            ? '此筆為照片紀錄，不含營養統計。'
-            : iosLiteMode && draft.photo_v2?.outcome.action === 'create_unknown'
+          {iosLiteMode
+            ? '照片紀錄不含營養；搜尋確認後可記錄熱量。'
+            : accuracyMode && draft.accuracy?.nutrition_status === 'unknown'
               ? '此筆為照片紀錄，不含營養統計。'
               : '營養資料僅來自官方資料庫，經確認後入帳。'}
         </p>
-        <button
-          type="button"
-          disabled={draft.loading || saving || !draft.name.trim() || !readyForLog}
-          onClick={onSave}
-          className="w-full text-[17px] disabled:opacity-40 active:scale-[0.99] transition-transform"
-          style={{
-            height: 60,
-            borderRadius: BB_V2.radius.button,
-            backgroundColor: BB_V2.accent.orange,
-            color: '#FFFFFF',
-            fontWeight: 600,
-          }}
-        >
-          {saving ? '加入中…' : !readyForLog ? '請先確認這餐' : '加入今天'}
-        </button>
+        {iosLiteMode ? (
+          <button
+            type="button"
+            disabled={draft.loading || saving || !draft.name.trim()}
+            onClick={onSavePhotoOnly}
+            className="w-full text-[17px] disabled:opacity-40 active:scale-[0.99] transition-transform"
+            style={{
+              height: 56,
+              borderRadius: BB_V2.radius.button,
+              backgroundColor: TODAY.card,
+              color: TODAY.mocha,
+              fontWeight: 600,
+              border: `1.5px solid ${TODAY.mocha}`,
+            }}
+          >
+            {saving ? '加入中…' : '先加入照片紀錄'}
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled={draft.loading || saving || !draft.name.trim() || !readyForLog}
+            onClick={onSave}
+            className="w-full text-[17px] disabled:opacity-40 active:scale-[0.99] transition-transform"
+            style={{
+              height: 60,
+              borderRadius: BB_V2.radius.button,
+              backgroundColor: BB_V2.accent.orange,
+              color: '#FFFFFF',
+              fontWeight: 600,
+            }}
+          >
+            {saving ? '加入中…' : !readyForLog ? '請先確認這餐' : '加入今天'}
+          </button>
+        )}
       </div>
     </div>
   )
@@ -765,6 +770,7 @@ export default function PhotoLogSheet({
   onBackToCapture,
   onOpenManualCorrection,
   onPhotoV2Select,
+  onSavePhotoOnly,
 }: Props) {
   return (
     <AppOverlay open={open} onClose={onClose} variant="sheet">
@@ -792,6 +798,7 @@ export default function PhotoLogSheet({
             saving={saving}
             onOpenManualCorrection={onOpenManualCorrection}
             onPhotoV2Select={onPhotoV2Select}
+            onSavePhotoOnly={onSavePhotoOnly}
           />
         ) : (
           <CaptureStep onPickFile={onPickFile} onClose={onClose} />

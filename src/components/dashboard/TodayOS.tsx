@@ -77,8 +77,10 @@ import PhotoLogSheet, { type PhotoLogDraft } from '@/components/dashboard/today/
 import ManualPhotoCorrectionSheet from '@/components/dashboard/today/ManualPhotoCorrectionSheet'
 import {
   buildFoodLogFromManualPhotoCorrection,
+  buildPhotoAiMeta,
   type ManualPhotoCorrectionResult,
 } from '@/lib/nutrition/photo-manual-correction'
+import { buildPhotoVisualParse } from '@/lib/nutrition/photo-visual-parse'
 import { isNutritionPendingConfirmation } from '@/lib/nutrition/food-log-display'
 import { enqueueUnknownFromLog } from '@/lib/nutrition/unknown-food-flow'
 import {
@@ -431,7 +433,6 @@ export default function TodayOS({
   const autoRollKeyRef = useRef('')
   const lastPostureLineRef = useRef('')
   const photoPreviewUrlRef = useRef<string | null>(null)
-  const photoMatchGenRef = useRef(0)
   const [dicePreviewByMeal, setDicePreviewByMeal] = useState<Partial<Record<MealType, MealSuggestion>>>({})
   const dicePreview = dicePreviewByMeal[mealSlotLegacy] ?? null
   const [localDiceRolls, setLocalDiceRolls] = useState(0)
@@ -657,7 +658,6 @@ export default function TodayOS({
   }, [registerDeleteLog, removeLogById])
 
   const parsePhotoDraft = useCallback(async (file: File, previewUrl: string) => {
-    const matchGen = ++photoMatchGenRef.current
     let parsedName = ''
     try {
       const parsed = await uploadFoodPhotoFile(file)
@@ -677,35 +677,12 @@ export default function TodayOS({
                 carbs_g: null,
                 fat_g: null,
                 loading: false,
-                matchingNutrition: true,
+                matchingNutrition: false,
                 photo_v2: undefined,
                 accuracy: undefined,
               }
             : prev
         )
-
-        void fetchPhotoMatch(parsedName, {
-          store: storesInText(parsedName)?.[0],
-          photo_id: photoId,
-        })
-          .then(photo_v2 => {
-            if (photoMatchGenRef.current !== matchGen) return
-            setPhotoDraft(prev =>
-              prev
-                ? {
-                    ...prev,
-                    photo_v2,
-                    matchingNutrition: false,
-                  }
-                : prev
-            )
-          })
-          .catch(() => {
-            if (photoMatchGenRef.current !== matchGen) return
-            setPhotoDraft(prev =>
-              prev ? { ...prev, matchingNutrition: false } : prev
-            )
-          })
         return
       }
 
@@ -792,7 +769,6 @@ export default function TodayOS({
   )
 
   const closePhotoSheet = useCallback(() => {
-    photoMatchGenRef.current += 1
     setPhotoOpen(false)
     setPhotoDraft(null)
     setPhotoProcessing(false)
@@ -836,6 +812,50 @@ export default function TodayOS({
       }
     })
   }, [])
+
+  const savePhotoOnly = useCallback(() => {
+    if (!photoDraft || photoSaving || photoDraft.loading) return
+    const label = photoDraft.name.trim()
+    if (!label) return
+    setPhotoSaving(true)
+    const logId = `photo-${Date.now()}`
+    const finish = (url: string) => {
+      const visual = buildPhotoVisualParse(label)
+      const entry = buildFoodLogFromManualPhotoCorrection(
+        {
+          mode: 'unknown_photo',
+          label,
+          category: visual.visual_category,
+          photoAi: buildPhotoAiMeta(visual, []),
+        },
+        { id: logId, photo_data_url: url, slot: activeSlot }
+      )
+      commitLog({
+        id: entry.id,
+        name: entry.display_label ?? entry.name,
+        display_label: entry.display_label ?? entry.name,
+        user_input_label: entry.user_input_label,
+        matched_item_label: entry.matched_item_label,
+        matched_restaurant: entry.matched_restaurant,
+        match_type: entry.match_type,
+        store: entry.store,
+        calories: entry.calories,
+        protein_g: entry.protein_g,
+        carbs_g: entry.carbs_g,
+        fat_g: entry.fat_g,
+        source: entry.source,
+        photo_data_url: entry.photo_data_url,
+        photo_ai_meta: entry.photo_ai_meta,
+        photo_correction_meta: entry.photo_correction_meta,
+        capture_status: entry.capture_status,
+        nutrition_status: entry.nutrition_status,
+        nutrition_confidence: entry.nutrition_confidence,
+      })
+      closePhotoSheet()
+      setPhotoSaving(false)
+    }
+    void fileToDataUrl(photoDraft.file).then(finish)
+  }, [photoDraft, photoSaving, commitLog, closePhotoSheet, activeSlot])
 
   const savePhotoDraft = useCallback(() => {
     if (!photoDraft || photoSaving || photoDraft.loading) return
@@ -1361,15 +1381,20 @@ export default function TodayOS({
         onBackToCapture={() => setPhotoDraft(null)}
         onOpenManualCorrection={() => setManualPhotoOpen(true)}
         onPhotoV2Select={handlePhotoV2Select}
+        onSavePhotoOnly={savePhotoOnly}
         saving={photoSaving}
       />
 
-      {(photoDraft?.accuracy || photoDraft?.photo_v2) && (
+      {photoDraft && (photoDraft.accuracy || photoDraft.photo_v2 || (isNativeIOS() && photoDraft.name)) && (
         <ManualPhotoCorrectionSheet
           open={manualPhotoOpen}
           initialLabel={photoDraft.accuracy?.label ?? photoDraft.photo_v2?.detected_label ?? photoDraft.name}
           initialRestaurant={photoDraft.accuracy?.store ?? photoDraft.photo_v2?.store}
-          visualParse={photoDraft.accuracy?.visual_parse ?? photoDraft.photo_v2!.visual_parse}
+          visualParse={
+            photoDraft.accuracy?.visual_parse ??
+            photoDraft.photo_v2?.visual_parse ??
+            buildPhotoVisualParse(photoDraft.name)
+          }
           originalCandidates={
             photoDraft.accuracy?.photo_ai_original_candidates ??
             photoDraft.photo_v2?.photo_ai_original_candidates ??
