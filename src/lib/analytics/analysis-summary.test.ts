@@ -139,4 +139,24 @@ describe('analysis-summary', () => {
     assert.equal(summary.weightTrend.deltaKg, -0.6)
     assert.ok(summary.insights.some(i => i.tone === 'success'))
   })
+
+  it('paces weekly water goal by elapsed days in the week', () => {
+    const today = '2024-06-17'
+    const summary = buildAnalysisSummary({
+      periodType: 'week',
+      anchorDate: new Date(today),
+      todayDate: today,
+      measurements: [],
+      checkins: [
+        checkin(today, [
+          { name: '早餐', calories: 400, protein_g: 30, slot: 'breakfast' },
+          { name: '午餐', calories: 550, protein_g: 40, slot: 'lunch' },
+          { name: '晚餐', calories: 500, protein_g: 35, slot: 'dinner' },
+        ]),
+      ],
+      targets,
+    })
+    const waterAction = summary.nextActions.find(a => a.id === 'water-2000')
+    assert.equal(waterAction?.done, true)
+  })
 })

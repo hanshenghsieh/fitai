@@ -9,7 +9,9 @@ import type { WeeklyPlanData } from '@/types'
 import {
   buildDayPlansByDate,
   loadAnalyticsBundle,
+  mergeTodayWeightMeasurement,
   PROGRESS_ANALYTICS_LOOKBACK_DAYS,
+  resolveLatestWeightKg,
 } from '@/lib/app/analytics-data'
 import { getAppUser } from '@/lib/supabase/app-session'
 
@@ -44,13 +46,17 @@ async function ProgressContent() {
     plannedWorkoutTitle = todayPlan.workout.type_zh
   }
 
-  const latestWeight =
-    bundle.measurements[bundle.measurements.length - 1]?.weight_kg ?? bundle.profileWeightKg ?? null
+  const latestWeight = resolveLatestWeightKg(
+    bundle.measurements,
+    bundle.profileWeightKg,
+    bundle.todayStr
+  )
+  const measurements = mergeTodayWeightMeasurement(bundle.measurements, latestWeight, bundle.todayStr)
 
   return (
     <div className="max-w-lg mx-auto pb-6" style={{ backgroundColor: BB_V2.bg.canvas }}>
       <AnalyticsScreen
-        measurements={bundle.measurements}
+        measurements={measurements}
         checkins={bundle.checkins}
         targets={{
           calories: latestTargets.calories,
@@ -62,6 +68,7 @@ async function ProgressContent() {
         dayPlansByDate={dayPlansByDate}
         currentWeightKg={latestWeight}
         plannedWorkoutTitle={plannedWorkoutTitle}
+        todayDate={bundle.todayStr}
       />
     </div>
   )

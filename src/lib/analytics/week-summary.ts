@@ -59,7 +59,7 @@ export interface WeekSummaryInput extends Omit<AnalysisInput, 'periodType'> {
 }
 
 export function buildWeekSummary(input: WeekSummaryInput): WeekSummary {
-  const analysis = buildAnalysisSummary({ ...input, periodType: 'week' })
+  const analysis = buildAnalysisSummary({ ...input, periodType: 'week', todayDate: input.todayDate })
   const { start, end } = analysis.dateRange
   const days = enumerateDaysInRange(start, end)
   const logs = logsForWeek(input.checkins, start, end)
@@ -133,7 +133,10 @@ export function buildWeekSummary(input: WeekSummaryInput): WeekSummary {
         weightDeltaKg: analysis.weightTrend.deltaKg,
       })
 
-  const insights = generateWeeklyInsights(analysis)
+  const insights = generateWeeklyInsights(analysis, {
+    todayWaterMl: cMap.get(input.todayDate)?.water_ml ?? 0,
+    waterTargetMl: input.targets.water_ml,
+  })
   const challenges = generateWeeklyChallenges(analysis, weeklyMetrics, input.targets.water_ml)
   const mealStrategy = generateMealStrategy(analysis)
   const workoutStrategy = generateWorkoutStrategy(analysis)

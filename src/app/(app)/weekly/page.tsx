@@ -10,7 +10,9 @@ import type { WeeklyPlanData } from '@/types'
 import {
   buildDayPlansByDate,
   loadAnalyticsBundle,
+  mergeTodayWeightMeasurement,
   WEEK_ANALYTICS_LOOKBACK_DAYS,
+  resolveLatestWeightKg,
 } from '@/lib/app/analytics-data'
 import { getAppUser } from '@/lib/supabase/app-session'
 
@@ -51,13 +53,17 @@ async function WeekContent() {
     workoutTarget = currentPlanData.days.filter(d => d.workout?.type !== 'rest').length || 4
   }
 
-  const latestWeight =
-    bundle.measurements[bundle.measurements.length - 1]?.weight_kg ?? bundle.profileWeightKg ?? null
+  const latestWeight = resolveLatestWeightKg(
+    bundle.measurements,
+    bundle.profileWeightKg,
+    bundle.todayStr
+  )
+  const measurements = mergeTodayWeightMeasurement(bundle.measurements, latestWeight, bundle.todayStr)
 
   const summary = buildWeekSummary({
     anchorDate: new Date(),
     todayDate: bundle.todayStr,
-    measurements: bundle.measurements,
+    measurements,
     checkins: bundle.checkins,
     targets: {
       calories: latestTargets.calories,

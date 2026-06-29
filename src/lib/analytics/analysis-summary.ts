@@ -42,6 +42,8 @@ export interface AnalysisDayPlanHint {
 export interface AnalysisInput {
   periodType: AnalysisPeriodType
   anchorDate: Date
+  /** Taipei nutrition day key — used to pace weekly water goals and skip stale nudges. */
+  todayDate?: string
   measurements: BodyMeasurement[]
   checkins: AnalysisCheckinRow[]
   targets: AnalysisTargets
@@ -431,6 +433,10 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
   }).length
   const workoutSessions = periodCheckins.filter(c => c.workout_items?.some(w => w.completed)).length
 
+  const todayKey = input.todayDate ?? format(input.anchorDate, 'yyyy-MM-dd')
+  const pastDaysInPeriod = days.filter(d => d <= todayKey).length
+  const requiredWaterDays = Math.min(5, Math.max(1, pastDaysInPeriod))
+
   const nextActions: NextActionItem[] = [
     {
       id: 'protein-5',
@@ -445,7 +451,7 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
     {
       id: 'water-2000',
       label: `每天喝水 ${waterTarget}ml`,
-      done: waterDays.length >= Math.min(5, days.length),
+      done: waterDays.length >= requiredWaterDays,
     },
     {
       id: 'workout-3',

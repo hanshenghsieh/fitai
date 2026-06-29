@@ -24,6 +24,34 @@ export interface AnalyticsBundle {
   weekStart: string
 }
 
+/** Prefer today's body log, then profile (settings save), then latest historical row. */
+export function resolveLatestWeightKg(
+  measurements: { measured_at: string; weight_kg: number }[],
+  profileWeightKg: number | null,
+  todayStr: string
+): number | null {
+  const todayRow = measurements.find(m => m.measured_at.slice(0, 10) === todayStr)
+  if (todayRow) return todayRow.weight_kg
+  if (profileWeightKg != null) return profileWeightKg
+  return measurements.at(-1)?.weight_kg ?? null
+}
+
+/** Keep measurements in sync with the resolved latest weight (e.g. profile saved but log lagged). */
+export function mergeTodayWeightMeasurement(
+  measurements: { measured_at: string; weight_kg: number }[],
+  latestWeightKg: number | null,
+  todayStr: string
+): { measured_at: string; weight_kg: number }[] {
+  if (latestWeightKg == null) return measurements
+  const idx = measurements.findIndex(m => m.measured_at.slice(0, 10) === todayStr)
+  if (idx >= 0) {
+    const next = [...measurements]
+    next[idx] = { ...next[idx]!, weight_kg: latestWeightKg }
+    return next
+  }
+  return [...measurements, { measured_at: todayStr, weight_kg: latestWeightKg }]
+}
+
 export async function loadAnalyticsBundle(
   supabase: SupabaseClient,
   userId: string,

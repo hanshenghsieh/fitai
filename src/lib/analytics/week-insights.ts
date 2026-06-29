@@ -9,7 +9,15 @@ export interface CoachInsightCard {
   suggestion: string
 }
 
-export function generateWeeklyInsights(summary: AnalysisSummary): CoachInsightCard[] {
+export interface WeeklyInsightContext {
+  todayWaterMl: number
+  waterTargetMl: number
+}
+
+export function generateWeeklyInsights(
+  summary: AnalysisSummary,
+  ctx?: WeeklyInsightContext
+): CoachInsightCard[] {
   if (summary.insufficient_data) return []
 
   const cards: CoachInsightCard[] = []
@@ -55,14 +63,17 @@ export function generateWeeklyInsights(summary: AnalysisSummary): CoachInsightCa
   }
 
   const waterDone = summary.nextActions.find(a => a.id === 'water-2000')
-  if (waterDone && !waterDone.done) {
+  const todayWaterMet =
+    ctx != null && ctx.waterTargetMl > 0 && ctx.todayWaterMl >= ctx.waterTargetMl * 0.9
+  if (waterDone && !waterDone.done && !todayWaterMet) {
+    const targetMl = ctx?.waterTargetMl ?? 2000
     cards.push({
       id: 'water-low',
       tone: 'warning',
       icon: 'water',
       title: '水喝太少',
       body: `喝水達標 ${summary.dietRecordSummary.waterMetDays} / ${summary.dietRecordSummary.waterTotalDays} 天`,
-      suggestion: '建議：每天固定喝滿 2000ml，分次完成',
+      suggestion: `建議：每天固定喝滿 ${targetMl}ml，分次完成`,
     })
   }
 

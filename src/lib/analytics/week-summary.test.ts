@@ -206,6 +206,29 @@ describe('generateWeeklyInsights', () => {
     })
     assert.ok(generateWeeklyInsights(s).length <= 3)
   })
+
+  it('skips water insight when today already met goal', () => {
+    const today = '2024-06-18'
+    const checkins = mealCheckins({
+      '2024-06-16': 3,
+      '2024-06-17': 3,
+      '2024-06-18': 3,
+    }).map(c =>
+      c.checkin_date === today
+        ? { ...c, water_ml: 2100 }
+        : { ...c, water_ml: 400 }
+    )
+    const s = buildAnalysisSummary({
+      periodType: 'week',
+      anchorDate: new Date(today),
+      todayDate: today,
+      measurements: [],
+      checkins,
+      targets,
+    })
+    const insights = generateWeeklyInsights(s, { todayWaterMl: 2100, waterTargetMl: 2000 })
+    assert.ok(!insights.some(i => i.id === 'water-low'))
+  })
 })
 
 describe('generateMealStrategy', () => {

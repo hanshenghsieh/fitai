@@ -38,6 +38,7 @@ interface Props {
   dayPlansByDate?: Record<string, AnalysisDayPlanHint>
   currentWeightKg?: number | null
   plannedWorkoutTitle?: string
+  todayDate?: string
 }
 
 const PERIODS: { id: AnalysisPeriodType; label: string }[] = [
@@ -103,6 +104,7 @@ export default function AnalyticsScreen({
   dayPlansByDate,
   currentWeightKg,
   plannedWorkoutTitle,
+  todayDate,
 }: Props) {
   const [periodType, setPeriodType] = useState<AnalysisPeriodType>('week')
   const [anchorDate, setAnchorDate] = useState(() => new Date())
@@ -112,13 +114,14 @@ export default function AnalyticsScreen({
       buildAnalysisSummary({
         periodType,
         anchorDate,
+        todayDate,
         measurements,
         checkins,
         targets,
         dayPlansByDate,
         currentWeightKg,
       }),
-    [periodType, anchorDate, measurements, checkins, targets, dayPlansByDate, currentWeightKg]
+    [periodType, anchorDate, todayDate, measurements, checkins, targets, dayPlansByDate, currentWeightKg]
   )
 
   const mealRec = useMemo(() => buildMealRecommendationStrategy(summary), [summary])
@@ -213,9 +216,19 @@ export default function AnalyticsScreen({
           )}
         </div>
         {!summary.weightTrend.sufficient ? (
-          <p className="text-[14px] py-6 text-center" style={{ color: BB_V2.text.secondary }}>
-            再記一次，就能看見趨勢。
-          </p>
+          <div className="py-4 text-center space-y-2">
+            {summary.weightTrend.currentKg != null ? (
+              <div>
+                <p className="text-[12px]" style={{ color: BB_V2.text.secondary }}>目前</p>
+                <p className="text-[22px] tabular-nums" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+                  {summary.weightTrend.currentKg.toFixed(1)} kg
+                </p>
+              </div>
+            ) : null}
+            <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
+              再記一次，就能看見趨勢。
+            </p>
+          </div>
         ) : (
           <>
             <div className="flex gap-6 mb-4">
