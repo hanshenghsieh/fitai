@@ -36,7 +36,7 @@ async function main() {
 
   const ok = cssOk && !navigateTab
   console.log({
-    commit: 'ff4518d',
+    commit: 'b41937f',
     cssOk,
     navigateTabRemoved: !navigateTab,
     jsChunksScanned: jsPaths.size,
