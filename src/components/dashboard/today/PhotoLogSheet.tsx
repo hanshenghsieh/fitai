@@ -8,9 +8,12 @@ import { isNativeIOS } from '@/lib/capacitor-native'
 import BBCard from '@/components/ui/BBCard'
 import AppOverlay from '@/components/ui/AppOverlay'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
+import type { PhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
+import { photoV2ReadyForLog, photoV2UiMessage } from '@/lib/nutrition/search-v2/photo-pipeline'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
 
 const ICON_STROKE = TODAY.iconStroke
+const IOS_LITE_CANDIDATE_LIMIT = 3
 
 export interface PhotoLogDraft {
   file: File
@@ -23,6 +26,8 @@ export interface PhotoLogDraft {
   fat_g?: number | null
   loading: boolean
   accuracy?: PhotoAccuracyState
+  /** iOS: keep slim server snapshot; hydrate accuracy only on save. */
+  photo_v2?: PhotoV2State
 }
 
 interface Props {
@@ -38,6 +43,7 @@ interface Props {
   saving?: boolean
   onBackToCapture?: () => void
   onOpenManualCorrection?: () => void
+  onPhotoV2Select?: (candidateId: string) => void
 }
 
 function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void; onClose: () => void }) {
@@ -165,6 +171,98 @@ function FoodTag({ label, style }: { label: string; style?: React.CSSProperties 
     >
       {label}
     </span>
+  )
+}
+
+function IosLiteConfirmSection({
+  photoV2,
+  selectedId,
+  onPhotoV2Select,
+  onOpenManualCorrection,
+}: {
+  photoV2: PhotoV2State
+  selectedId?: string
+  onPhotoV2Select?: (candidateId: string) => void
+  onOpenManualCorrection?: () => void
+}) {
+  const unknown = photoV2.outcome.action === 'create_unknown'
+  const candidates = photoV2.outcome.candidates.slice(0, IOS_LITE_CANDIDATE_LIMIT)
+
+  if (unknown) {
+    return (
+      <div className="space-y-3 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
+        <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
+          目前沒有可信營養資料
+        </p>
+        <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+          {photoV2UiMessage(photoV2)}
+        </p>
+        {onOpenManualCorrection && (
+          <button
+            type="button"
+            onClick={onOpenManualCorrection}
+            className="w-full h-12 text-[15px] active:opacity-90"
+            style={{
+              borderRadius: 22,
+              backgroundColor: TODAY.card,
+              color: TODAY.mocha,
+              fontWeight: 600,
+              border: `1.5px solid ${TODAY.mocha}`,
+            }}
+          >
+            搜尋全部菜品 / 手動更改
+          </button>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-3 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
+      <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+        選最接近的一項（或手動搜尋）：
+      </p>
+      {candidates.length > 0 && (
+        <div className="flex flex-col gap-2">
+          {candidates.map(c => {
+            const active = c.id === selectedId
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => onPhotoV2Select?.(c.id)}
+                className="w-full px-4 py-3 text-[14px] text-left active:opacity-85"
+                style={{
+                  borderRadius: 20,
+                  backgroundColor: active ? TODAY.pillActiveBg : TODAY.card,
+                  color: active ? TODAY.pillActiveText : TODAY.text,
+                  fontWeight: active ? 600 : 500,
+                  border: active ? 'none' : `1.5px solid ${TODAY.pillBg}`,
+                }}
+              >
+                {c.store ? `${c.store} · ${c.name}` : c.name}
+              </button>
+            )
+          })}
+        </div>
+      )}
+      {onOpenManualCorrection && (
+        <button
+          type="button"
+          onClick={onOpenManualCorrection}
+          className="w-full h-12 text-[15px] flex items-center justify-center gap-2 active:opacity-90"
+          style={{
+            borderRadius: 22,
+            backgroundColor: TODAY.pillBg,
+            color: TODAY.mocha,
+            fontWeight: 600,
+          }}
+        >
+          <Search className="h-4 w-4" strokeWidth={ICON_STROKE} />
+          搜尋全部菜品
+        </button>
+      )}
+    </div>
   )
 }
 
@@ -357,6 +455,7 @@ function ReviewStep({
   onSave,
   saving,
   onOpenManualCorrection,
+  onPhotoV2Select,
 }: {
   draft: PhotoLogDraft
   accuracyEnabled?: boolean
@@ -367,10 +466,16 @@ function ReviewStep({
   onSave: () => void
   saving?: boolean
   onOpenManualCorrection?: () => void
+  onPhotoV2Select?: Props['onPhotoV2Select']
 }) {
+  const iosLiteMode =
+    isNativeIOS() && accuracyEnabled && !!draft.photo_v2 && !draft.accuracy
   const accuracyMode = accuracyEnabled && !!draft.accuracy
-  const readyForLog = !accuracyMode || draft.accuracy!.ready_for_food_log
+  const readyForLog = iosLiteMode
+    ? photoV2ReadyForLog(draft.photo_v2!)
+    : !accuracyMode || draft.accuracy!.ready_for_food_log
   const showMacros = !accuracyMode || draft.accuracy!.show_macros
+  const selectedV2Id = draft.photo_v2?.selected_candidate_id ?? draft.photo_v2?.outcome.candidates[0]?.id
 
   const [calText, setCalText] = useState(draft.calories != null ? String(draft.calories) : '')
   const [proText, setProText] = useState(draft.protein_g != null ? String(draft.protein_g) : '')
@@ -449,6 +554,13 @@ function ReviewStep({
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
             {draft.previewUrl ? '正在辨識…' : '正在準備照片…'}
           </p>
+        ) : iosLiteMode ? (
+          <IosLiteConfirmSection
+            photoV2={draft.photo_v2!}
+            selectedId={selectedV2Id}
+            onPhotoV2Select={onPhotoV2Select}
+            onOpenManualCorrection={onOpenManualCorrection}
+          />
         ) : accuracyMode && draft.accuracy && onAccuracyChange ? (
           <AccuracyConfirmSection
             accuracy={draft.accuracy}
@@ -559,7 +671,9 @@ function ReviewStep({
         <p className="text-[11px] text-center leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400, opacity: 0.8 }}>
           {accuracyMode && draft.accuracy?.nutrition_status === 'unknown'
             ? '此筆為照片紀錄，不含營養統計。'
-            : '營養資料僅來自官方資料庫，經確認後入帳。'}
+            : iosLiteMode && draft.photo_v2?.outcome.action === 'create_unknown'
+              ? '此筆為照片紀錄，不含營養統計。'
+              : '營養資料僅來自官方資料庫，經確認後入帳。'}
         </p>
         <button
           type="button"
@@ -574,7 +688,7 @@ function ReviewStep({
             fontWeight: 600,
           }}
         >
-          {saving ? '加入中…' : accuracyMode && !readyForLog ? '請先確認這餐' : '加入今天'}
+          {saving ? '加入中…' : !readyForLog ? '請先確認這餐' : '加入今天'}
         </button>
       </div>
     </div>
@@ -615,6 +729,7 @@ export default function PhotoLogSheet({
   saving,
   onBackToCapture,
   onOpenManualCorrection,
+  onPhotoV2Select,
 }: Props) {
   return (
     <AppOverlay open={open} onClose={onClose} variant="sheet">
@@ -641,6 +756,7 @@ export default function PhotoLogSheet({
             onSave={onSave}
             saving={saving}
             onOpenManualCorrection={onOpenManualCorrection}
+            onPhotoV2Select={onPhotoV2Select}
           />
         ) : (
           <CaptureStep onPickFile={onPickFile} onClose={onClose} />

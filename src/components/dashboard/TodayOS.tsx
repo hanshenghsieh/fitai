@@ -24,7 +24,7 @@ import {
   photoAccuracyReadyForLog,
   updatePhotoAccuracyState,
 } from '@/lib/nutrition/photo-log-accuracy'
-import { resolvePhotoOfficialRecord } from '@/lib/nutrition/search-v2/photo-pipeline'
+import { resolvePhotoOfficialRecord, updatePhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 import type { UserConfirmationAnswers } from '@/lib/nutrition/types'
 import { buildUserBanks } from '@/lib/banks/build-banks'
 import { formatPostureLine } from '@/lib/copy/zaijian'
@@ -663,6 +663,27 @@ export default function TodayOS({
         throw new Error('辨識結果不完整，請再試一次')
       }
 
+      if (isNativeIOS()) {
+        setPhotoDraft(prev =>
+          prev
+            ? {
+                ...prev,
+                previewUrl,
+                file,
+                name: parsedName,
+                calories: null,
+                protein_g: null,
+                carbs_g: null,
+                fat_g: null,
+                loading: false,
+                photo_v2: parsed.photo_v2,
+                accuracy: undefined,
+              }
+            : prev
+        )
+        return
+      }
+
       await new Promise<void>(resolve => {
         setTimeout(resolve, 200)
       })
@@ -671,28 +692,6 @@ export default function TodayOS({
       const resolved = accuracy.v2.outcome.official_record
       const display = photoAccuracyDisplayMacros(accuracy)
       const displayName = resolved?.name ?? accuracy.label
-
-      if (isNativeIOS()) {
-        setPhotoDraft(prev =>
-          prev
-            ? {
-                ...prev,
-                previewUrl,
-                file,
-                name: displayName,
-                calories: null,
-                protein_g: null,
-                carbs_g: null,
-                fat_g: null,
-                loading: false,
-                accuracy: undefined,
-              }
-            : prev
-        )
-        await new Promise<void>(resolve => {
-          setTimeout(resolve, 400)
-        })
-      }
 
       setPhotoDraft(prev =>
         prev
@@ -706,6 +705,7 @@ export default function TodayOS({
               carbs_g: display.carbs_g,
               fat_g: display.fat_g,
               loading: false,
+              photo_v2: undefined,
               accuracy,
             }
           : prev
@@ -795,14 +795,34 @@ export default function TodayOS({
     })
   }, [])
 
+  const handlePhotoV2Select = useCallback((candidateId: string) => {
+    setPhotoDraft(prev => {
+      if (!prev?.photo_v2) return prev
+      const v2 = updatePhotoV2State(prev.photo_v2, {
+        selected_candidate_id: candidateId,
+        user_confirmed: true,
+      })
+      const picked = resolvePhotoOfficialRecord(v2)
+      return {
+        ...prev,
+        photo_v2: v2,
+        name: picked?.name ?? prev.name,
+      }
+    })
+  }, [])
+
   const savePhotoDraft = useCallback(() => {
     if (!photoDraft || photoSaving || photoDraft.loading) return
-    if (!photoDraft.accuracy) return
-    if (!photoAccuracyReadyForLog(photoDraft.accuracy)) return
+
+    const accuracy =
+      photoDraft.accuracy ??
+      (photoDraft.photo_v2 ? photoAccuracyStateFromV2(photoDraft.photo_v2) : null)
+    if (!accuracy) return
+    if (!photoAccuracyReadyForLog(accuracy)) return
     setPhotoSaving(true)
     const logId = `photo-${Date.now()}`
     const finish = (url: string) => {
-      const { payload, meta } = buildPhotoLogCommitFromAccuracy(photoDraft.accuracy!, {
+      const { payload, meta } = buildPhotoLogCommitFromAccuracy(accuracy, {
         id: logId,
         photo_data_url: url,
       })
@@ -1314,16 +1334,21 @@ export default function TodayOS({
         onSave={savePhotoDraft}
         onBackToCapture={() => setPhotoDraft(null)}
         onOpenManualCorrection={() => setManualPhotoOpen(true)}
+        onPhotoV2Select={handlePhotoV2Select}
         saving={photoSaving}
       />
 
-      {photoDraft?.accuracy && (
+      {(photoDraft?.accuracy || photoDraft?.photo_v2) && (
         <ManualPhotoCorrectionSheet
           open={manualPhotoOpen}
-          initialLabel={photoDraft.accuracy.label}
-          initialRestaurant={photoDraft.accuracy.store}
-          visualParse={photoDraft.accuracy.visual_parse}
-          originalCandidates={photoDraft.accuracy.photo_ai_original_candidates}
+          initialLabel={photoDraft.accuracy?.label ?? photoDraft.photo_v2?.detected_label ?? photoDraft.name}
+          initialRestaurant={photoDraft.accuracy?.store ?? photoDraft.photo_v2?.store}
+          visualParse={photoDraft.accuracy?.visual_parse ?? photoDraft.photo_v2!.visual_parse}
+          originalCandidates={
+            photoDraft.accuracy?.photo_ai_original_candidates ??
+            photoDraft.photo_v2?.photo_ai_original_candidates ??
+            []
+          }
           onClose={() => setManualPhotoOpen(false)}
           onCommit={handleManualPhotoCorrection}
         />
