@@ -8,6 +8,7 @@ import { isNativeIOS } from '@/lib/capacitor-native'
 import BBCard from '@/components/ui/BBCard'
 import AppOverlay from '@/components/ui/AppOverlay'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
+import { photoAccuracyDisplayMacros } from '@/lib/nutrition/photo-log-accuracy'
 import type { PhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 import { photoV2ReadyForLog, photoV2UiMessage } from '@/lib/nutrition/search-v2/photo-pipeline'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
@@ -475,8 +476,21 @@ function ReviewStep({
 }) {
   const iosLiteMode = isNativeIOS() && accuracyEnabled && !draft.accuracy
   const accuracyMode = accuracyEnabled && !!draft.accuracy
+  const macroDisplay = draft.accuracy
+    ? photoAccuracyDisplayMacros(draft.accuracy)
+    : {
+        calories: draft.calories,
+        protein_g: draft.protein_g,
+        carbs_g: draft.carbs_g ?? null,
+        fat_g: draft.fat_g ?? null,
+      }
   const readyForLog = !accuracyMode || draft.accuracy!.ready_for_food_log
-  const showMacros = iosLiteMode ? false : !accuracyMode || draft.accuracy!.show_macros
+  const showMacros = iosLiteMode
+    ? false
+    : !accuracyMode ||
+      draft.accuracy!.show_macros ||
+      macroDisplay.calories != null ||
+      macroDisplay.protein_g != null
 
   const [calText, setCalText] = useState(draft.calories != null ? String(draft.calories) : '')
   const [proText, setProText] = useState(draft.protein_g != null ? String(draft.protein_g) : '')
@@ -560,6 +574,11 @@ function ReviewStep({
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
             {draft.previewUrl ? '正在辨識…' : '正在準備照片…'}
           </p>
+        ) : draft.matchingNutrition ? (
+          <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
+            載入營養選項…
+          </p>
         ) : iosLiteMode ? (
           <div className="space-y-3 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
             <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
@@ -600,14 +619,19 @@ function ReviewStep({
               {draft.name || '這餐'}
             </p>
             <p className="text-[32px] tabular-nums mb-4" style={{ color: BB_V2.accent.orange, fontWeight: 700 }}>
-              {draft.calories ?? '—'}
+              {macroDisplay.calories ?? '—'}
               <span className="text-[16px] ml-1" style={{ fontWeight: 600 }}>kcal</span>
             </p>
+            {accuracyMode && !draft.accuracy!.show_macros && macroDisplay.calories != null && (
+              <p className="text-[12px] mb-3" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
+                參考最接近選項的營養，確認後入帳。
+              </p>
+            )}
             <div className="grid grid-cols-3 gap-3">
               {[
-                { label: '蛋白質', value: draft.protein_g, unit: 'g', color: BB_V2.macro.protein },
-                { label: '碳水', value: draft.carbs_g, unit: 'g', color: BB_V2.macro.carbs },
-                { label: '脂肪', value: draft.fat_g, unit: 'g', color: BB_V2.macro.fat },
+                { label: '蛋白質', value: macroDisplay.protein_g, unit: 'g', color: BB_V2.macro.protein },
+                { label: '碳水', value: macroDisplay.carbs_g, unit: 'g', color: BB_V2.macro.carbs },
+                { label: '脂肪', value: macroDisplay.fat_g, unit: 'g', color: BB_V2.macro.fat },
               ].map(row => (
                 <div
                   key={row.label}

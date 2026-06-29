@@ -1,0 +1,204 @@
+{
+  "version": "2.1.0",
+  "updated_at": "2026-06-18",
+  "sources": [
+    {
+      "brand": "7-11",
+      "brand_id": "7eleven",
+      "source_type": "official",
+      "imported_count": 23,
+      "skipped_count": 2,
+      "skip_reason": "too_small:1",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "85度C",
+      "brand_id": "85c",
+      "source_type": "official",
+      "imported_count": 5,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "cama café",
+      "brand_id": "cama",
+      "source_type": "official",
+      "imported_count": 2,
+      "skipped_count": 2,
+      "skip_reason": "drink_or_snack:1",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "丹丹漢堡",
+      "brand_id": "dandan",
+      "source_type": "official",
+      "imported_count": 2,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "全家",
+      "brand_id": "familymart",
+      "source_type": "official",
+      "imported_count": 23,
+      "skipped_count": 2,
+      "skip_reason": "too_small:1",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "萊爾富",
+      "brand_id": "hilife",
+      "source_type": "official",
+      "imported_count": 0,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "鬍鬚張",
+      "brand_id": "huzhang",
+      "source_type": "official",
+      "imported_count": 9,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "肯德基",
+      "brand_id": "kfc",
+      "source_type": "official",
+      "imported_count": 5,
+      "skipped_count": 2,
+      "skip_reason": "drink_or_snack:1",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "路易莎",
+      "brand_id": "louisa",
+      "source_type": "official",
+      "imported_count": 5,
+      "skipped_count": 4,
+      "skip_reason": "drink_or_snack:2",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "丸龜製麵",
+      "brand_id": "marugame",
+      "source_type": "official",
+      "imported_count": 5,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "麥當勞",
+      "brand_id": "mcdonald",
+      "source_type": "official",
+      "imported_count": 9,
+      "skipped_count": 8,
+      "skip_reason": "drink_or_snack:4",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "摩斯漢堡",
+      "brand_id": "mos",
+      "source_type": "official",
+      "imported_count": 5,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "伯朗咖啡",
+      "brand_id": "mrbrown",
+      "source_type": "official",
+      "imported_count": 2,
+      "skipped_count": 2,
+      "skip_reason": "drink_or_snack:1",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "OK mart",
+      "brand_id": "okmart",
+      "source_type": "official",
+      "imported_count": 0,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "全聯",
+      "brand_id": "pxmart",
+      "source_type": "official",
+      "imported_count": 0,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "星巴克",
+      "brand_id": "starbucks",
+      "source_type": "official",
+      "imported_count": 5,
+      "skipped_count": 4,
+      "skip_reason": "drink_or_snack:2",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "Subway",
+      "brand_id": "subway",
+      "source_type": "official",
+      "imported_count": 3,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "Sukiya",
+      "brand_id": "sukiya",
+      "source_type": "official",
+      "imported_count": 3,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "三商巧福",
+      "brand_id": "sunright",
+      "source_type": "official",
+      "imported_count": 12,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "吉野家",
+      "brand_id": "yoshinoya",
+      "source_type": "official",
+      "imported_count": 2,
+      "skipped_count": 0,
+      "skip_reason": "none",
+      "last_updated": "2026-06-29"
+    },
+    {
+      "brand": "standard_estimate_templates",
+      "source_type": "standard_estimate",
+      "imported_count": 210,
+      "skipped_count": 13,
+      "skip_reason": "addons,blocked_roles,low_estimate",
+      "last_updated": "2026-06-18"
+    }
+  ],
+  "summary": {
+    "official_items": 133,
+    "standard_estimate_items": 223,
+    "merged_total": 356,
+    "main_pool": 330,
+    "addon_blocked": 26,
+    "official_recommendable": 120,
+    "estimated_recommendable": 210,
+    "low_estimate": 3
+  }
+}

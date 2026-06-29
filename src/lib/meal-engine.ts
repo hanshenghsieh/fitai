@@ -6,6 +6,10 @@ import { suggestNextMeal, suggestionToCustomSelection } from './meal-suggest'
 import { suggestLightSnack } from './light-snack-suggest'
 import { nearbyBrands } from './nearby-engine'
 import { getDiceMenuSource, lookupDiceMenuItem } from './dice-menu-pool'
+import { rollRecommendationV2, USE_RECOMMENDATION_V2 } from '@/lib/recommendation/v2/engine'
+import { getRecommendationFoodsV2 } from '@/lib/recommendation/v2/food-data'
+import type { RecommendationQueueState } from '@/lib/recommendation/v2/types'
+import type { FoodLogEntry } from '@/lib/banks/types'
 
 export type { MealSuggestion, UserMemoryState, EatOutPreferences }
 export { suggestNextMeal, suggestionToCustomSelection }
@@ -29,9 +33,17 @@ export function currentMealSlot(): MealType {
 
 export function namesFromSeenIds(seenIds: string[]): string[] {
   const names = new Set<string>()
+  const v2ById = USE_RECOMMENDATION_V2
+    ? new Map(getRecommendationFoodsV2().map(i => [i.id, i.name]))
+    : null
   for (const composite of seenIds) {
     for (const part of composite.split('|')) {
       const itemId = part.split(':')[0]
+      const v2Name = v2ById?.get(itemId)
+      if (v2Name) {
+        names.add(v2Name)
+        continue
+      }
       const item = lookupDiceMenuItem(itemId)
       if (item) names.add(item.name)
     }
@@ -83,11 +95,32 @@ export function rollMealSuggestion(params: {
   adherence?: import('@/lib/engines/adherence-types').AdherenceState | null
   calorie_bank?: import('@/lib/banks/calorie-bank-types').CalorieBankRow | null
   day_state?: import('@/lib/engines/next-meal-engine').TodayMealState | null
+  today_food_logs?: FoodLogEntry[]
+  queue_state?: RecommendationQueueState | null
+  seed?: number
 }): {
   suggestion: MealSuggestion | null
   rolls_used: number
   pool_exhausted: boolean
+  queue_state?: RecommendationQueueState | null
 } {
+  if (USE_RECOMMENDATION_V2 && params.day_state) {
+    const v2 = rollRecommendationV2({
+      meal_type: params.meal_type,
+      daily_targets: params.daily_targets,
+      day_state: params.day_state,
+      today_food_logs: params.today_food_logs ?? [],
+      queue_state: params.queue_state ?? null,
+      seed: params.seed ?? Date.now() + params.rolls_used * 9973,
+    })
+    return {
+      suggestion: v2.suggestion,
+      rolls_used: params.rolls_used + 1,
+      pool_exhausted: v2.pool_exhausted,
+      queue_state: v2.queue_state,
+    }
+  }
+
   const recentIds = recentDiceExcludeIds(params.seen_ids, params.rolls_used)
   const seenNames = namesFromSeenIds(recentIds)
   const excludeNames = [...new Set([...seenNames, ...(params.exclude_names ?? [])])]
@@ -147,6 +180,7 @@ export function rollMealSuggestion(params: {
     suggestion,
     rolls_used: params.rolls_used + 1,
     pool_exhausted,
+    queue_state: undefined,
   }
 }
 

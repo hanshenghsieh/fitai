@@ -1,0 +1,27 @@
+{
+  "updated_at": "2026-06-18",
+  "description": "BetterBit v2.1 菜單資料來源。主推薦僅使用 official + estimated。",
+  "primary_recommendation_source": {
+    "id": "recommendation-foods-v2",
+    "path": "data/food-kb/recommendation-foods-v2.json",
+    "status": "active",
+    "merged_from": ["official-foods-v2.json", "standard-estimate-foods-v2.json"]
+  },
+  "confidence_tiers": [
+    { "level": "official", "ui_label": "官方營養資料", "recommendable": true },
+    { "level": "estimated", "ui_label": "標準份量估算", "recommendable": true },
+    { "level": "low_estimate", "ui_label": "粗略估算", "recommendable": false }
+  ],
+  "legacy_sources": [
+    {
+      "id": "eat-out-menu-ts",
+      "path": "src/lib/convenience-store-menu.ts",
+      "status": "legacy_backup"
+    },
+    {
+      "id": "dice-menu-bulk",
+      "path": "data/food-kb/dice-menu-bulk.json",
+      "status": "legacy_backup"
+    }
+  ]
+}

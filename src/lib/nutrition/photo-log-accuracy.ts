@@ -142,18 +142,40 @@ export function photoAccuracyDisplayMacros(state: PhotoAccuracyState): {
   carbs_g: number | null
   fat_g: number | null
 } {
-  if (!state.show_macros) {
-    return { calories: null, protein_g: null, carbs_g: null, fat_g: null }
+  const empty = { calories: null, protein_g: null, carbs_g: null, fat_g: null }
+
+  if (state.show_macros) {
+    const official = resolvePhotoOfficialRecord(state.v2)
+    if (!official) return empty
+    return {
+      calories: official.macros.calories,
+      protein_g: official.macros.protein,
+      carbs_g: official.macros.carbs,
+      fat_g: official.macros.fat,
+    }
   }
+
+  const preview = photoAccuracyPreviewMacros(state)
+  if (preview.calories != null) return preview
+  return empty
+}
+
+/** Best-effort macros for UI preview before user confirms a candidate. */
+export function photoAccuracyPreviewMacros(state: PhotoAccuracyState): {
+  calories: number | null
+  protein_g: number | null
+  carbs_g: number | null
+  fat_g: number | null
+} {
+  const empty = { calories: null, protein_g: null, carbs_g: null, fat_g: null }
   const official = resolvePhotoOfficialRecord(state.v2)
-  if (!official) {
-    return { calories: null, protein_g: null, carbs_g: null, fat_g: null }
-  }
+  const candidate = official ?? photoV2DisplayCandidates(state.v2)[0]
+  if (!candidate?.macros) return empty
   return {
-    calories: official.macros.calories,
-    protein_g: official.macros.protein,
-    carbs_g: official.macros.carbs,
-    fat_g: official.macros.fat,
+    calories: candidate.macros.calories,
+    protein_g: candidate.macros.protein,
+    carbs_g: candidate.macros.carbs,
+    fat_g: candidate.macros.fat,
   }
 }
 

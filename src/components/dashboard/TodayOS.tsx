@@ -21,6 +21,7 @@ import { isNativeIOS } from '@/lib/capacitor-native'
 import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
 import {
   buildPhotoLogCommitFromAccuracy,
+  createPhotoAccuracyState,
   photoAccuracyStateFromV2,
   photoAccuracyDisplayMacros,
   photoAccuracyReadyForLog,
@@ -31,7 +32,7 @@ import type { UserConfirmationAnswers } from '@/lib/nutrition/types'
 import { buildUserBanks } from '@/lib/banks/build-banks'
 import { formatPostureLine } from '@/lib/copy/zaijian'
 import { getCorrectionMessage } from '@/lib/engines/correction-engine'
-import { buildAdherenceState, adherenceToTrustEvent } from '@/lib/engines/adherence-engine'
+import { buildAdherenceState } from '@/lib/engines/adherence-engine'
 import { mergeBankIntoAdherence } from '@/lib/engines/calorie-bank-engine'
 import {
   avgDailyKcalFromLogs,
@@ -61,6 +62,8 @@ import {
   memoryFromCheckinMeta,
   type MealSuggestion,
 } from '@/lib/meal-engine'
+import { USE_RECOMMENDATION_V2 } from '@/lib/recommendation/v2/engine'
+import type { RecommendationQueueState } from '@/lib/recommendation/v2/types'
 import { preloadDiceMenuBulk, isDiceMenuBulkReady, getDiceMenuSource } from '@/lib/dice-menu-pool'
 import {
   clearTodaySheetParams,
@@ -236,22 +239,38 @@ function diceSessionKey(mealType: MealType): string {
   return `dice-session-${getNutritionDayKey(new Date())}-${mealType}`
 }
 
-function loadDiceSession(mealType: MealType): { stores: string[]; ids: string[] } {
+function loadDiceSession(mealType: MealType): {
+  stores: string[]
+  ids: string[]
+  queue?: RecommendationQueueState
+} {
   if (typeof window === 'undefined') return { stores: [], ids: [] }
   try {
     const raw = sessionStorage.getItem(diceSessionKey(mealType))
     if (!raw) return { stores: [], ids: [] }
-    const parsed = JSON.parse(raw) as { stores?: string[]; ids?: string[] }
-    return { stores: parsed.stores ?? [], ids: parsed.ids ?? [] }
+    const parsed = JSON.parse(raw) as {
+      stores?: string[]
+      ids?: string[]
+      queue?: RecommendationQueueState
+    }
+    return { stores: parsed.stores ?? [], ids: parsed.ids ?? [], queue: parsed.queue }
   } catch {
     return { stores: [], ids: [] }
   }
 }
 
-function saveDiceSession(mealType: MealType, stores: string[], ids: string[]) {
+function saveDiceSession(
+  mealType: MealType,
+  stores: string[],
+  ids: string[],
+  queue?: RecommendationQueueState
+) {
   if (typeof window === 'undefined') return
   try {
-    sessionStorage.setItem(diceSessionKey(mealType), JSON.stringify({ stores, ids }))
+    sessionStorage.setItem(
+      diceSessionKey(mealType),
+      JSON.stringify({ stores, ids, queue })
+    )
   } catch {
     /* quota / private mode */
   }
@@ -390,8 +409,6 @@ export default function TodayOS({
       ).adherence,
     [foodLogs, userMemory, todayPlan, goalSnapshot, workoutDone, workoutTotal, recentMissedDays, recentFoodLogs, calorieBank]
   )
-  const inferredTrustEvent = useMemo(() => adherenceToTrustEvent(adherenceState), [adherenceState])
-
   const dayState = useMemo(() => {
     const todayStr = getNutritionDayKey()
     const dayKeys7 = Array.from({ length: 7 }, (_, i) =>
@@ -686,11 +703,32 @@ export default function TodayOS({
         return
       }
 
-      const photo_v2 = await fetchPhotoMatch(parsedName, {
-        store: storesInText(parsedName)?.[0],
-        photo_id: photoId,
-      })
-      const accuracy = photoAccuracyStateFromV2(photo_v2)
+      setPhotoDraft(prev =>
+        prev
+          ? {
+              ...prev,
+              previewUrl,
+              file,
+              name: parsedName,
+              loading: false,
+              matchingNutrition: true,
+            }
+          : prev
+      )
+
+      const store = storesInText(parsedName)?.[0]
+      let accuracy
+      try {
+        const photo_v2 = await fetchPhotoMatch(parsedName, {
+          store,
+          photo_id: photoId,
+        })
+        accuracy = photoAccuracyStateFromV2(photo_v2)
+      } catch (matchErr) {
+        console.warn('Photo match API failed, using client fallback', matchErr)
+        accuracy = createPhotoAccuracyState(parsedName, { store, photo_id: photoId })
+      }
+
       const resolved = accuracy.v2.outcome.official_record
       const display = photoAccuracyDisplayMacros(accuracy)
 
@@ -993,6 +1031,9 @@ export default function TodayOS({
           adherence: adherenceState,
           calorie_bank: calorieBank,
           day_state: dayStateRef.current,
+          today_food_logs: foodLogs,
+          queue_state: session.queue,
+          seed: Date.now() + localDiceRolls * 9973,
         })
 
         setLocalDiceRolls(n => n + 1)
@@ -1009,7 +1050,7 @@ export default function TodayOS({
         const id = result.suggestion.id
         const nextStores = store ? [...new Set([...session.stores, store])].slice(-20) : session.stores
         const nextIds = [...new Set([...session.ids, id])].slice(-40)
-        saveDiceSession(slot, nextStores, nextIds)
+        saveDiceSession(slot, nextStores, nextIds, result.queue_state ?? undefined)
         setDicePreviewByMeal(prev => ({ ...prev, [slot]: result.suggestion! }))
       } finally {
         rollingRef.current = false
@@ -1025,7 +1066,9 @@ export default function TodayOS({
       }
     }
 
-    if (isDiceMenuBulkReady()) {
+    if (USE_RECOMMENDATION_V2) {
+      scheduleRoll()
+    } else if (isDiceMenuBulkReady()) {
       scheduleRoll()
     } else {
       void preloadDiceMenuBulk().finally(scheduleRoll)
@@ -1089,8 +1132,6 @@ export default function TodayOS({
   const showingConfirmedSelection = !dicePreview && slotSelectedItems.length > 0 && !hasSlotLogs
   const showingLoggedOnly =
     !dicePreview && slotSelectedItems.length === 0 && slotLoggedItems.length > 0
-  const highlightKey =
-    dicePreview?.highlight_key ?? slotMealSuggest?.current_highlight_key ?? 'balanced'
 
   useEffect(() => {
     if (dayState.overTargetProtection) return
@@ -1286,13 +1327,9 @@ export default function TodayOS({
             )}
             <DiceMealPreview
               items={displayItems}
-              mealType={mealSlotLegacy}
-              schedule={userMemory.work_schedule ?? 'standard'}
-              lifeEvent={inferredTrustEvent}
-              prefersCook={profile?.cooking_time_mins != null && profile.cooking_time_mins >= 20}
-              highlightKey={highlightKey}
-              highlightPriceMeta={dicePreview?.highlight_price_meta}
-              debugReason={dicePreview?.recommendation_debug_reason}
+              recommendationReasons={dicePreview?.recommendation_reason}
+              benefitPoints={dicePreview?.recommendation_benefit_points}
+              confidenceLevel={dicePreview?.confidence_level}
             />
             {showingConfirmedSelection && slotMealSuggest?.current_highlight && (
               <p className="text-[13px] px-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>

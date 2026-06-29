@@ -70,10 +70,15 @@ describe('Nutrition Accuracy UI integration', () => {
     assert.equal(photoAccuracyReadyForLog(switched), false)
   })
 
-  it('display macros hidden until official confirmed', () => {
+  it('clarify flow can show preview macros before user confirms', () => {
     const state = createPhotoAccuracyState('竹筍湯')
+    assert.equal(state.show_macros, false)
     const display = photoAccuracyDisplayMacros(state)
-    assert.equal(display.calories, null)
-    assert.equal(display.protein_g, null)
+    if (state.candidates.length > 0) {
+      assert.ok(display.calories != null || display.protein_g != null)
+    } else {
+      assert.equal(display.calories, null)
+      assert.equal(display.protein_g, null)
+    }
   })
 })

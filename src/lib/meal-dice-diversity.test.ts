@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { computeTodayMealState } from '@/lib/engines/next-meal-engine'
 import { recentDiceExcludeIds, rollMealSuggestion } from '@/lib/meal-engine'
+import { USE_RECOMMENDATION_V2 } from '@/lib/recommendation/v2/engine'
+import type { RecommendationQueueState } from '@/lib/recommendation/v2/types'
 import {
   DICE_MIN_AVAILABLE_CANDIDATES,
   clearSessionDicePoolsForTests,
@@ -73,9 +75,6 @@ describe('Dice diversity — reroll pool policy', () => {
   })
 
   it('same-store reroll yields different combos at Subway', async () => {
-    await preloadDiceMenuBulk()
-    clearSessionDicePoolsForTests()
-
     const dayState = computeTodayMealState({
       todayFoodLogs: [],
       normalTargetKcal: 1680,
@@ -83,6 +82,31 @@ describe('Dice diversity — reroll pool policy', () => {
       mealSlot: 'lunch',
       hourOfDay: 12,
     })
+
+    if (USE_RECOMMENDATION_V2) {
+      let queueState: RecommendationQueueState | null = null
+      const mainNames = new Set<string>()
+
+      for (let i = 0; i < 12; i++) {
+        const result = rollMealSuggestion({
+          meal_type: 'lunch',
+          daily_targets: { calories: 1680, protein_g: 100, carbs_g: 200, fat_g: 55 },
+          day_state: dayState,
+          seen_ids: [],
+          rolls_used: i,
+          queue_state: queueState,
+        })
+        queueState = result.queue_state ?? null
+        const main = result.suggestion?.lines[0]?.item.name
+        if (main) mainNames.add(main)
+      }
+
+      assert.ok(mainNames.size >= 3, `v2 queue expected >=3 unique mains, got ${mainNames.size}`)
+      return
+    }
+
+    await preloadDiceMenuBulk()
+    clearSessionDicePoolsForTests()
 
     let preview: import('@/lib/meal-engine-types').MealSuggestion | null = null
     const subwayLabels = new Set<string>()

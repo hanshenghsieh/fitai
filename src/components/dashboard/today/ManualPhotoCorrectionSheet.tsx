@@ -104,11 +104,6 @@ export default function ManualPhotoCorrectionSheet({
     setAdvancedOpen(false)
   }, [open, initialLabel, initialRestaurant, visualParse])
 
-  useEffect(() => {
-    if (!open || selectedCandidate || templateCandidates.length !== 1) return
-    setSelectedCandidate(templateCandidates[0]!)
-  }, [open, selectedCandidate, templateCandidates])
-
   const searchCandidates = useMemo(() => {
     const queries = [...new Set([searchQuery.trim(), label.trim()].filter(Boolean))]
     const seen = new Set<string>()
@@ -131,6 +126,11 @@ export default function ManualPhotoCorrectionSheet({
     () => searchCandidates.filter(c => c.source_tier === 'food_dna'),
     [searchCandidates]
   )
+
+  useEffect(() => {
+    if (!open || selectedCandidate || templateCandidates.length !== 1) return
+    setSelectedCandidate(templateCandidates[0]!)
+  }, [open, selectedCandidate, templateCandidates])
 
   const photoAi = buildPhotoAiMeta(visualParse, originalCandidates)
 

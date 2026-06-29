@@ -70,6 +70,12 @@ export interface MealSuggestion {
   recommendation_debug_reason?: string
   /** Rule-engine explainability — max 5 reasons */
   recommendation_reason?: Array<{ code: string; label: string }>
+  /** v2 recommendation — data confidence for UI */
+  confidence_level?: 'official' | 'estimated' | 'low_estimate' | 'manual'
+  /** v2 recommendation — bullet benefits for trust copy */
+  recommendation_benefit_points?: string[]
+  /** v2 recommendation — which fallback tier produced this pick */
+  fallback_tier?: number
 }
 
 export interface SuggestContext {

@@ -1,0 +1,4621 @@
+{
+  "version": "2.1.0",
+  "updated_at": "2026-06-18",
+  "description": "BetterBit 官方可驗證營養資料（連鎖、超商官方標示）",
+  "items": [
+    {
+      "id": "off-7eleven-泰式酸辣雞腿冷麵",
+      "brand": "7-11",
+      "name": "泰式酸辣雞腿冷麵",
+      "item_type": "single",
+      "calories": 369,
+      "protein": 23,
+      "fat": 12,
+      "carbs": 42,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-京醬鴨絲飯",
+      "brand": "7-11",
+      "name": "京醬鴨絲飯",
+      "item_type": "single",
+      "calories": 500,
+      "protein": 31,
+      "fat": 17,
+      "carbs": 56,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-港式叉燒油雞飯",
+      "brand": "7-11",
+      "name": "港式叉燒油雞飯",
+      "item_type": "single",
+      "calories": 500,
+      "protein": 31,
+      "fat": 17,
+      "carbs": 56,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-三杯雞燴飯",
+      "brand": "7-11",
+      "name": "三杯雞燴飯",
+      "item_type": "single",
+      "calories": 700,
+      "protein": 44,
+      "fat": 23,
+      "carbs": 79,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-麻油雞飯",
+      "brand": "7-11",
+      "name": "麻油雞飯",
+      "item_type": "single",
+      "calories": 354,
+      "protein": 22,
+      "fat": 12,
+      "carbs": 40,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-四起司香草烤雞握便當",
+      "brand": "7-11",
+      "name": "四起司香草烤雞握便當",
+      "item_type": "single",
+      "calories": 414,
+      "protein": 26,
+      "fat": 14,
+      "carbs": 47,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-爆蛋肉燥新極大飯",
+      "brand": "7-11",
+      "name": "爆蛋肉燥新極大飯",
+      "item_type": "single",
+      "calories": 307,
+      "protein": 23,
+      "fat": 10,
+      "carbs": 32,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-柱侯牛腱飯",
+      "brand": "7-11",
+      "name": "柱侯牛腱飯",
+      "item_type": "single",
+      "calories": 574,
+      "protein": 36,
+      "fat": 19,
+      "carbs": 65,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-府城肉燥厚切排骨飯",
+      "brand": "7-11",
+      "name": "府城肉燥厚切排骨飯",
+      "item_type": "single",
+      "calories": 620,
+      "protein": 39,
+      "fat": 21,
+      "carbs": 70,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-米香鹹酥蝦飯",
+      "brand": "7-11",
+      "name": "米香鹹酥蝦飯",
+      "item_type": "single",
+      "calories": 226,
+      "protein": 16,
+      "fat": 7,
+      "carbs": 24,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-晶英三杯蛤蜊飯",
+      "brand": "7-11",
+      "name": "晶英三杯蛤蜊飯",
+      "item_type": "single",
+      "calories": 250,
+      "protein": 18,
+      "fat": 8,
+      "carbs": 27,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-晶英韓式炸豬排起司雙拼飯",
+      "brand": "7-11",
+      "name": "晶英韓式炸豬排起司雙拼飯",
+      "item_type": "single",
+      "calories": 351,
+      "protein": 22,
+      "fat": 12,
+      "carbs": 39,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-麻辣奶油鮮蝦義大利麵",
+      "brand": "7-11",
+      "name": "麻辣奶油鮮蝦義大利麵",
+      "item_type": "single",
+      "calories": 586,
+      "protein": 41,
+      "fat": 19,
+      "carbs": 63,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-御飯糰-梅子紫蘇",
+      "brand": "7-11",
+      "name": "御飯糰-梅子紫蘇",
+      "item_type": "single",
+      "calories": 180,
+      "protein": 7,
+      "fat": 7,
+      "carbs": 23,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-御飯糰-鮭魚",
+      "brand": "7-11",
+      "name": "御飯糰-鮭魚",
+      "item_type": "single",
+      "calories": 190,
+      "protein": 13,
+      "fat": 6,
+      "carbs": 21,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-御飯糰-鮪魚起司",
+      "brand": "7-11",
+      "name": "御飯糰-鮪魚起司",
+      "item_type": "single",
+      "calories": 200,
+      "protein": 14,
+      "fat": 6,
+      "carbs": 22,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-原賞三明治-火腿起司蛋",
+      "brand": "7-11",
+      "name": "原賞三明治-火腿起司蛋",
+      "item_type": "single",
+      "calories": 280,
+      "protein": 21,
+      "fat": 9,
+      "carbs": 29,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-原賞三明治-雞肉沙拉",
+      "brand": "7-11",
+      "name": "原賞三明治-雞肉沙拉",
+      "item_type": "single",
+      "calories": 240,
+      "protein": 15,
+      "fat": 8,
+      "carbs": 27,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-7-11茶葉蛋",
+      "brand": "7-11",
+      "name": "7-11茶葉蛋",
+      "item_type": "single",
+      "calories": 50,
+      "protein": 4,
+      "fat": 2,
+      "carbs": 5,
+      "meal_role": "side",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-豆漿早餐組合",
+      "brand": "7-11",
+      "name": "豆漿早餐組合",
+      "item_type": "single",
+      "calories": 300,
+      "protein": 15,
+      "fat": 11,
+      "carbs": 36,
+      "meal_role": "light_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-台韓半半炸雞便當",
+      "brand": "7-11",
+      "name": "台韓半半炸雞便當",
+      "item_type": "single",
+      "calories": 650,
+      "protein": 41,
+      "fat": 22,
+      "carbs": 73,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-泡菜豬肉豆腐煲燴飯",
+      "brand": "7-11",
+      "name": "泡菜豬肉豆腐煲燴飯",
+      "item_type": "single",
+      "calories": 531,
+      "protein": 33,
+      "fat": 18,
+      "carbs": 60,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-椰香綠咖哩嫩雞飯",
+      "brand": "7-11",
+      "name": "椰香綠咖哩嫩雞飯",
+      "item_type": "single",
+      "calories": 668,
+      "protein": 42,
+      "fat": 22,
+      "carbs": 75,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-7eleven-港式醬燜牛肉燴飯",
+      "brand": "7-11",
+      "name": "港式醬燜牛肉燴飯",
+      "item_type": "single",
+      "calories": 488,
+      "protein": 31,
+      "fat": 16,
+      "carbs": 55,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.7-11.com.tw/freshfoods/",
+      "source_note": "7-11 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-85c-起司條麵包",
+      "brand": "85度C",
+      "name": "起司條麵包",
+      "item_type": "single",
+      "calories": 280,
+      "protein": 10,
+      "fat": 10,
+      "carbs": 38,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.85cafe.com/",
+      "source_note": "85度C 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-85c-蒜香法棍",
+      "brand": "85度C",
+      "name": "蒜香法棍",
+      "item_type": "single",
+      "calories": 220,
+      "protein": 7,
+      "fat": 5,
+      "carbs": 38,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.85cafe.com/",
+      "source_note": "85度C 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-85c-海綿蛋糕",
+      "brand": "85度C",
+      "name": "海綿蛋糕",
+      "item_type": "single",
+      "calories": 320,
+      "protein": 6,
+      "fat": 12,
+      "carbs": 48,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.85cafe.com/",
+      "source_note": "85度C 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-85c-總匯三明治",
+      "brand": "85度C",
+      "name": "總匯三明治",
+      "item_type": "single",
+      "calories": 380,
+      "protein": 16,
+      "fat": 18,
+      "carbs": 40,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.85cafe.com/",
+      "source_note": "85度C 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-85c-雞排便當",
+      "brand": "85度C",
+      "name": "雞排便當",
+      "item_type": "single",
+      "calories": 620,
+      "protein": 30,
+      "fat": 22,
+      "carbs": 72,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.85cafe.com/",
+      "source_note": "85度C 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-cama-小農拿鐵-中",
+      "brand": "cama café",
+      "name": "小農拿鐵（中）",
+      "item_type": "single",
+      "calories": 170,
+      "protein": 8,
+      "fat": 7,
+      "carbs": 15,
+      "meal_role": "drink",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.camacafe.com/",
+      "source_note": "cama café 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-cama-燻雞三明治",
+      "brand": "cama café",
+      "name": "燻雞三明治",
+      "item_type": "single",
+      "calories": 340,
+      "protein": 20,
+      "fat": 12,
+      "carbs": 34,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.camacafe.com/",
+      "source_note": "cama café 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-cama-蔬食捲餅",
+      "brand": "cama café",
+      "name": "蔬食捲餅",
+      "item_type": "single",
+      "calories": 300,
+      "protein": 12,
+      "fat": 8,
+      "carbs": 42,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.camacafe.com/",
+      "source_note": "cama café 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-dandan-炸雞腿堡",
+      "brand": "丹丹漢堡",
+      "name": "炸雞腿堡",
+      "item_type": "single",
+      "calories": 520,
+      "protein": 24,
+      "fat": 28,
+      "carbs": 42,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.ddburger.com.tw/",
+      "source_note": "丹丹漢堡 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-dandan-招牌麵線",
+      "brand": "丹丹漢堡",
+      "name": "招牌麵線",
+      "item_type": "single",
+      "calories": 380,
+      "protein": 12,
+      "fat": 14,
+      "carbs": 52,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.ddburger.com.tw/",
+      "source_note": "丹丹漢堡 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-泰式酸辣雞腿冷麵",
+      "brand": "全家",
+      "name": "泰式酸辣雞腿冷麵",
+      "item_type": "single",
+      "calories": 369,
+      "protein": 23,
+      "fat": 12,
+      "carbs": 42,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-京醬鴨絲飯",
+      "brand": "全家",
+      "name": "京醬鴨絲飯",
+      "item_type": "single",
+      "calories": 500,
+      "protein": 31,
+      "fat": 17,
+      "carbs": 56,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-港式叉燒油雞飯",
+      "brand": "全家",
+      "name": "港式叉燒油雞飯",
+      "item_type": "single",
+      "calories": 500,
+      "protein": 31,
+      "fat": 17,
+      "carbs": 56,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-三杯雞燴飯",
+      "brand": "全家",
+      "name": "三杯雞燴飯",
+      "item_type": "single",
+      "calories": 700,
+      "protein": 44,
+      "fat": 23,
+      "carbs": 79,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-麻油雞飯",
+      "brand": "全家",
+      "name": "麻油雞飯",
+      "item_type": "single",
+      "calories": 354,
+      "protein": 22,
+      "fat": 12,
+      "carbs": 40,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-四起司香草烤雞握便當",
+      "brand": "全家",
+      "name": "四起司香草烤雞握便當",
+      "item_type": "single",
+      "calories": 414,
+      "protein": 26,
+      "fat": 14,
+      "carbs": 47,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-爆蛋肉燥新極大飯",
+      "brand": "全家",
+      "name": "爆蛋肉燥新極大飯",
+      "item_type": "single",
+      "calories": 307,
+      "protein": 23,
+      "fat": 10,
+      "carbs": 32,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-柱侯牛腱飯",
+      "brand": "全家",
+      "name": "柱侯牛腱飯",
+      "item_type": "single",
+      "calories": 574,
+      "protein": 36,
+      "fat": 19,
+      "carbs": 65,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-府城肉燥厚切排骨飯",
+      "brand": "全家",
+      "name": "府城肉燥厚切排骨飯",
+      "item_type": "single",
+      "calories": 620,
+      "protein": 39,
+      "fat": 21,
+      "carbs": 70,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-米香鹹酥蝦飯",
+      "brand": "全家",
+      "name": "米香鹹酥蝦飯",
+      "item_type": "single",
+      "calories": 226,
+      "protein": 16,
+      "fat": 7,
+      "carbs": 24,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-晶英三杯蛤蜊飯",
+      "brand": "全家",
+      "name": "晶英三杯蛤蜊飯",
+      "item_type": "single",
+      "calories": 250,
+      "protein": 18,
+      "fat": 8,
+      "carbs": 27,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-晶英韓式炸豬排起司雙拼飯",
+      "brand": "全家",
+      "name": "晶英韓式炸豬排起司雙拼飯",
+      "item_type": "single",
+      "calories": 351,
+      "protein": 22,
+      "fat": 12,
+      "carbs": 39,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-麻辣奶油鮮蝦義大利麵",
+      "brand": "全家",
+      "name": "麻辣奶油鮮蝦義大利麵",
+      "item_type": "single",
+      "calories": 586,
+      "protein": 41,
+      "fat": 19,
+      "carbs": 63,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-御飯糰-梅子紫蘇",
+      "brand": "全家",
+      "name": "御飯糰-梅子紫蘇",
+      "item_type": "single",
+      "calories": 180,
+      "protein": 7,
+      "fat": 7,
+      "carbs": 23,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-御飯糰-鮭魚",
+      "brand": "全家",
+      "name": "御飯糰-鮭魚",
+      "item_type": "single",
+      "calories": 190,
+      "protein": 13,
+      "fat": 6,
+      "carbs": 21,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-御飯糰-鮪魚起司",
+      "brand": "全家",
+      "name": "御飯糰-鮪魚起司",
+      "item_type": "single",
+      "calories": 200,
+      "protein": 14,
+      "fat": 6,
+      "carbs": 22,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-原賞三明治-火腿起司蛋",
+      "brand": "全家",
+      "name": "原賞三明治-火腿起司蛋",
+      "item_type": "single",
+      "calories": 280,
+      "protein": 21,
+      "fat": 9,
+      "carbs": 29,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-原賞三明治-雞肉沙拉",
+      "brand": "全家",
+      "name": "原賞三明治-雞肉沙拉",
+      "item_type": "single",
+      "calories": 240,
+      "protein": 15,
+      "fat": 8,
+      "carbs": 27,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-7-11茶葉蛋",
+      "brand": "全家",
+      "name": "7-11茶葉蛋",
+      "item_type": "single",
+      "calories": 50,
+      "protein": 4,
+      "fat": 2,
+      "carbs": 5,
+      "meal_role": "side",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-豆漿早餐組合",
+      "brand": "全家",
+      "name": "豆漿早餐組合",
+      "item_type": "single",
+      "calories": 300,
+      "protein": 15,
+      "fat": 11,
+      "carbs": 36,
+      "meal_role": "light_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-台韓半半炸雞便當",
+      "brand": "全家",
+      "name": "台韓半半炸雞便當",
+      "item_type": "single",
+      "calories": 650,
+      "protein": 41,
+      "fat": 22,
+      "carbs": 73,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-泡菜豬肉豆腐煲燴飯",
+      "brand": "全家",
+      "name": "泡菜豬肉豆腐煲燴飯",
+      "item_type": "single",
+      "calories": 531,
+      "protein": 33,
+      "fat": 18,
+      "carbs": 60,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-椰香綠咖哩嫩雞飯",
+      "brand": "全家",
+      "name": "椰香綠咖哩嫩雞飯",
+      "item_type": "single",
+      "calories": 668,
+      "protein": 42,
+      "fat": 22,
+      "carbs": 75,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-familymart-港式醬燜牛肉燴飯",
+      "brand": "全家",
+      "name": "港式醬燜牛肉燴飯",
+      "item_type": "single",
+      "calories": 488,
+      "protein": 31,
+      "fat": 16,
+      "carbs": 55,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "late_night"
+      ],
+      "venue_type": "convenience_store",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.familymart.com.tw/freshFood/",
+      "source_note": "全家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-huzhang-肉燥飯",
+      "brand": "鬍鬚張",
+      "name": "肉燥飯",
+      "item_type": "single",
+      "calories": 450,
+      "protein": 14,
+      "fat": 14,
+      "carbs": 68,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.huzhang.com.tw/",
+      "source_note": "鬍鬚張 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-huzhang-雞肉粥",
+      "brand": "鬍鬚張",
+      "name": "雞肉粥",
+      "item_type": "single",
+      "calories": 300,
+      "protein": 15,
+      "fat": 5,
+      "carbs": 45,
+      "meal_role": "light_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.huzhang.com.tw/",
+      "source_note": "鬍鬚張 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-huzhang-排骨飯",
+      "brand": "鬍鬚張",
+      "name": "排骨飯",
+      "item_type": "single",
+      "calories": 750,
+      "protein": 30,
+      "fat": 30,
+      "carbs": 88,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.huzhang.com.tw/",
+      "source_note": "鬍鬚張 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-huzhang-雞腿飯",
+      "brand": "鬍鬚張",
+      "name": "雞腿飯",
+      "item_type": "single",
+      "calories": 700,
+      "protein": 38,
+      "fat": 26,
+      "carbs": 80,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.huzhang.com.tw/",
+      "source_note": "鬍鬚張 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-huzhang-焢肉飯",
+      "brand": "鬍鬚張",
+      "name": "焢肉飯",
+      "item_type": "single",
+      "calories": 680,
+      "protein": 24,
+      "fat": 28,
+      "carbs": 82,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.huzhang.com.tw/",
+      "source_note": "鬍鬚張 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-huzhang-魚排便當",
+      "brand": "鬍鬚張",
+      "name": "魚排便當",
+      "item_type": "single",
+      "calories": 620,
+      "protein": 32,
+      "fat": 18,
+      "carbs": 72,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.huzhang.com.tw/",
+      "source_note": "鬍鬚張 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-huzhang-排骨麵",
+      "brand": "鬍鬚張",
+      "name": "排骨麵",
+      "item_type": "single",
+      "calories": 650,
+      "protein": 28,
+      "fat": 24,
+      "carbs": 75,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.huzhang.com.tw/",
+      "source_note": "鬍鬚張 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-huzhang-牛肉麵",
+      "brand": "鬍鬚張",
+      "name": "牛肉麵",
+      "item_type": "single",
+      "calories": 600,
+      "protein": 32,
+      "fat": 18,
+      "carbs": 65,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.huzhang.com.tw/",
+      "source_note": "鬍鬚張 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-huzhang-肉燥麵",
+      "brand": "鬍鬚張",
+      "name": "肉燥麵",
+      "item_type": "single",
+      "calories": 480,
+      "protein": 16,
+      "fat": 16,
+      "carbs": 62,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.huzhang.com.tw/",
+      "source_note": "鬍鬚張 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-kfc-咔啦脆雞腿堡",
+      "brand": "肯德基",
+      "name": "咔啦脆雞腿堡",
+      "item_type": "single",
+      "calories": 450,
+      "protein": 24,
+      "fat": 24,
+      "carbs": 38,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.kfcclub.com.tw/menu",
+      "source_note": "肯德基 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-kfc-原味炸雞-2塊",
+      "brand": "肯德基",
+      "name": "原味炸雞（2塊）",
+      "item_type": "single",
+      "calories": 380,
+      "protein": 24,
+      "fat": 22,
+      "carbs": 18,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.kfcclub.com.tw/menu",
+      "source_note": "肯德基 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-kfc-燻雞蛋餅",
+      "brand": "肯德基",
+      "name": "燻雞蛋餅",
+      "item_type": "single",
+      "calories": 380,
+      "protein": 18,
+      "fat": 20,
+      "carbs": 34,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.kfcclub.com.tw/menu",
+      "source_note": "肯德基 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-kfc-上校雞塊-6塊",
+      "brand": "肯德基",
+      "name": "上校雞塊（6塊）",
+      "item_type": "single",
+      "calories": 280,
+      "protein": 18,
+      "fat": 18,
+      "carbs": 16,
+      "meal_role": "snack",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.kfcclub.com.tw/menu",
+      "source_note": "肯德基 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-kfc-香雞飯套餐",
+      "brand": "肯德基",
+      "name": "香雞飯套餐",
+      "item_type": "combo",
+      "calories": 650,
+      "protein": 32,
+      "fat": 24,
+      "carbs": 72,
+      "meal_role": "main_meal",
+      "portion_type": "combo",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.kfcclub.com.tw/menu",
+      "source_note": "肯德基 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-kfc-咔啦脆雞-二塊",
+      "brand": "肯德基",
+      "name": "咔啦脆雞（二塊）",
+      "item_type": "single",
+      "calories": 380,
+      "protein": 28,
+      "fat": 24,
+      "carbs": 12,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.kfcclub.com.tw/menu",
+      "source_note": "肯德基 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-louisa-經典拿鐵-中",
+      "brand": "路易莎",
+      "name": "經典拿鐵（中）",
+      "item_type": "single",
+      "calories": 180,
+      "protein": 8,
+      "fat": 8,
+      "carbs": 16,
+      "meal_role": "drink",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.louisacoffee.co/",
+      "source_note": "路易莎 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-louisa-美式-中",
+      "brand": "路易莎",
+      "name": "美式（中）",
+      "item_type": "single",
+      "calories": 10,
+      "protein": 0,
+      "fat": 0,
+      "carbs": 1,
+      "meal_role": "drink",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.louisacoffee.co/",
+      "source_note": "路易莎 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-louisa-厚片吐司-奶酥",
+      "brand": "路易莎",
+      "name": "厚片吐司（奶酥）",
+      "item_type": "single",
+      "calories": 280,
+      "protein": 6,
+      "fat": 12,
+      "carbs": 38,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "breakfast",
+        "lunch"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.louisacoffee.co/",
+      "source_note": "路易莎 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-louisa-花生厚片",
+      "brand": "路易莎",
+      "name": "花生厚片",
+      "item_type": "single",
+      "calories": 320,
+      "protein": 10,
+      "fat": 16,
+      "carbs": 36,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.louisacoffee.co/",
+      "source_note": "路易莎 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-louisa-燻雞帕尼尼",
+      "brand": "路易莎",
+      "name": "燻雞帕尼尼",
+      "item_type": "single",
+      "calories": 380,
+      "protein": 24,
+      "fat": 12,
+      "carbs": 38,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.louisacoffee.co/",
+      "source_note": "路易莎 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-louisa-鮪魚沙拉",
+      "brand": "路易莎",
+      "name": "鮪魚沙拉",
+      "item_type": "single",
+      "calories": 260,
+      "protein": 22,
+      "fat": 12,
+      "carbs": 16,
+      "meal_role": "light_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.louisacoffee.co/",
+      "source_note": "路易莎 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-louisa-奶油培根義大利麵",
+      "brand": "路易莎",
+      "name": "奶油培根義大利麵",
+      "item_type": "single",
+      "calories": 580,
+      "protein": 20,
+      "fat": 28,
+      "carbs": 62,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.louisacoffee.co/",
+      "source_note": "路易莎 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-marugame-釜玉烏龍",
+      "brand": "丸龜製麵",
+      "name": "釜玉烏龍",
+      "item_type": "single",
+      "calories": 480,
+      "protein": 16,
+      "fat": 12,
+      "carbs": 72,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.marugame.com.tw/",
+      "source_note": "丸龜製麵 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-marugame-牛肉烏龍",
+      "brand": "丸龜製麵",
+      "name": "牛肉烏龍",
+      "item_type": "single",
+      "calories": 550,
+      "protein": 24,
+      "fat": 18,
+      "carbs": 68,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.marugame.com.tw/",
+      "source_note": "丸龜製麵 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-marugame-天婦羅烏龍",
+      "brand": "丸龜製麵",
+      "name": "天婦羅烏龍",
+      "item_type": "single",
+      "calories": 620,
+      "protein": 14,
+      "fat": 24,
+      "carbs": 78,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.marugame.com.tw/",
+      "source_note": "丸龜製麵 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-marugame-明太子烏龍",
+      "brand": "丸龜製麵",
+      "name": "明太子烏龍",
+      "item_type": "single",
+      "calories": 520,
+      "protein": 18,
+      "fat": 16,
+      "carbs": 70,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.marugame.com.tw/",
+      "source_note": "丸龜製麵 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-marugame-咖哩烏龍",
+      "brand": "丸龜製麵",
+      "name": "咖哩烏龍",
+      "item_type": "single",
+      "calories": 580,
+      "protein": 16,
+      "fat": 18,
+      "carbs": 82,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.marugame.com.tw/",
+      "source_note": "丸龜製麵 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-大麥克",
+      "brand": "麥當勞",
+      "name": "大麥克",
+      "item_type": "single",
+      "calories": 563,
+      "protein": 26,
+      "fat": 30,
+      "carbs": 42,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-雙層牛肉吉士堡",
+      "brand": "麥當勞",
+      "name": "雙層牛肉吉士堡",
+      "item_type": "single",
+      "calories": 480,
+      "protein": 28,
+      "fat": 26,
+      "carbs": 35,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-麥香雞",
+      "brand": "麥當勞",
+      "name": "麥香雞",
+      "item_type": "single",
+      "calories": 400,
+      "protein": 18,
+      "fat": 18,
+      "carbs": 36,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-麥香魚",
+      "brand": "麥當勞",
+      "name": "麥香魚",
+      "item_type": "single",
+      "calories": 340,
+      "protein": 16,
+      "fat": 16,
+      "carbs": 38,
+      "meal_role": "light_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-勁辣雞腿堡",
+      "brand": "麥當勞",
+      "name": "勁辣雞腿堡",
+      "item_type": "single",
+      "calories": 480,
+      "protein": 26,
+      "fat": 24,
+      "carbs": 40,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-麥克雞塊-6塊",
+      "brand": "麥當勞",
+      "name": "麥克雞塊（6塊）",
+      "item_type": "single",
+      "calories": 280,
+      "protein": 16,
+      "fat": 16,
+      "carbs": 18,
+      "meal_role": "snack",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-薯條-中",
+      "brand": "麥當勞",
+      "name": "薯條（中）",
+      "item_type": "single",
+      "calories": 340,
+      "protein": 4,
+      "fat": 16,
+      "carbs": 42,
+      "meal_role": "drink",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-豬肉滿福堡",
+      "brand": "麥當勞",
+      "name": "豬肉滿福堡",
+      "item_type": "single",
+      "calories": 350,
+      "protein": 16,
+      "fat": 18,
+      "carbs": 32,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-無敵蛋餅",
+      "brand": "麥當勞",
+      "name": "無敵蛋餅",
+      "item_type": "single",
+      "calories": 420,
+      "protein": 14,
+      "fat": 24,
+      "carbs": 38,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-四盎司牛肉堡",
+      "brand": "麥當勞",
+      "name": "四盎司牛肉堡",
+      "item_type": "single",
+      "calories": 520,
+      "protein": 26,
+      "fat": 28,
+      "carbs": 38,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-蘋果派",
+      "brand": "麥當勞",
+      "name": "蘋果派",
+      "item_type": "single",
+      "calories": 250,
+      "protein": 2,
+      "fat": 12,
+      "carbs": 34,
+      "meal_role": "drink",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-玉米濃湯",
+      "brand": "麥當勞",
+      "name": "玉米濃湯",
+      "item_type": "single",
+      "calories": 120,
+      "protein": 4,
+      "fat": 4,
+      "carbs": 18,
+      "meal_role": "drink",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mcdonald-雙層麥香魚",
+      "brand": "麥當勞",
+      "name": "雙層麥香魚",
+      "item_type": "single",
+      "calories": 450,
+      "protein": 20,
+      "fat": 22,
+      "carbs": 42,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mcdonalds.com/tw/zh-tw/sustainability/good-food/nutrition-calculator.html",
+      "source_note": "麥當勞 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mos-摩斯漢堡",
+      "brand": "摩斯漢堡",
+      "name": "摩斯漢堡",
+      "item_type": "single",
+      "calories": 380,
+      "protein": 18,
+      "fat": 18,
+      "carbs": 36,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mos.com.tw/menu",
+      "source_note": "摩斯漢堡 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mos-摩斯雞腿堡",
+      "brand": "摩斯漢堡",
+      "name": "摩斯雞腿堡",
+      "item_type": "single",
+      "calories": 480,
+      "protein": 26,
+      "fat": 22,
+      "carbs": 40,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mos.com.tw/menu",
+      "source_note": "摩斯漢堡 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mos-熱狗堡",
+      "brand": "摩斯漢堡",
+      "name": "熱狗堡",
+      "item_type": "single",
+      "calories": 320,
+      "protein": 12,
+      "fat": 16,
+      "carbs": 32,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mos.com.tw/menu",
+      "source_note": "摩斯漢堡 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mos-摩斯吉士漢堡",
+      "brand": "摩斯漢堡",
+      "name": "摩斯吉士漢堡",
+      "item_type": "single",
+      "calories": 420,
+      "protein": 20,
+      "fat": 22,
+      "carbs": 36,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mos.com.tw/menu",
+      "source_note": "摩斯漢堡 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mos-辣味雞腿堡",
+      "brand": "摩斯漢堡",
+      "name": "辣味雞腿堡",
+      "item_type": "single",
+      "calories": 450,
+      "protein": 24,
+      "fat": 20,
+      "carbs": 38,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mos.com.tw/menu",
+      "source_note": "摩斯漢堡 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mrbrown-拿鐵-中",
+      "brand": "伯朗咖啡",
+      "name": "拿鐵（中）",
+      "item_type": "single",
+      "calories": 160,
+      "protein": 7,
+      "fat": 7,
+      "carbs": 14,
+      "meal_role": "drink",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mr-brown.com/",
+      "source_note": "伯朗咖啡 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mrbrown-燻雞義大利麵",
+      "brand": "伯朗咖啡",
+      "name": "燻雞義大利麵",
+      "item_type": "single",
+      "calories": 480,
+      "protein": 24,
+      "fat": 16,
+      "carbs": 55,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mr-brown.com/",
+      "source_note": "伯朗咖啡 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-mrbrown-青醬雞肉飯",
+      "brand": "伯朗咖啡",
+      "name": "青醬雞肉飯",
+      "item_type": "single",
+      "calories": 520,
+      "protein": 28,
+      "fat": 16,
+      "carbs": 62,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.mr-brown.com/",
+      "source_note": "伯朗咖啡 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-starbucks-拿鐵-中",
+      "brand": "星巴克",
+      "name": "拿鐵（中）",
+      "item_type": "single",
+      "calories": 190,
+      "protein": 10,
+      "fat": 7,
+      "carbs": 18,
+      "meal_role": "drink",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.starbucks.com.tw/products/",
+      "source_note": "星巴克 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-starbucks-美式咖啡-中",
+      "brand": "星巴克",
+      "name": "美式咖啡（中）",
+      "item_type": "single",
+      "calories": 15,
+      "protein": 1,
+      "fat": 0,
+      "carbs": 2,
+      "meal_role": "drink",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": false,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.starbucks.com.tw/products/",
+      "source_note": "星巴克 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-starbucks-火腿起司可頌",
+      "brand": "星巴克",
+      "name": "火腿起司可頌",
+      "item_type": "single",
+      "calories": 320,
+      "protein": 14,
+      "fat": 18,
+      "carbs": 28,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.starbucks.com.tw/products/",
+      "source_note": "星巴克 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-starbucks-雞肉沙拉三明治",
+      "brand": "星巴克",
+      "name": "雞肉沙拉三明治",
+      "item_type": "single",
+      "calories": 350,
+      "protein": 22,
+      "fat": 14,
+      "carbs": 32,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.starbucks.com.tw/products/",
+      "source_note": "星巴克 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-starbucks-雞肉捲餅",
+      "brand": "星巴克",
+      "name": "雞肉捲餅",
+      "item_type": "single",
+      "calories": 380,
+      "protein": 24,
+      "fat": 14,
+      "carbs": 36,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.starbucks.com.tw/products/",
+      "source_note": "星巴克 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-starbucks-雞胸沙拉",
+      "brand": "星巴克",
+      "name": "雞胸沙拉",
+      "item_type": "single",
+      "calories": 280,
+      "protein": 28,
+      "fat": 10,
+      "carbs": 18,
+      "meal_role": "light_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.starbucks.com.tw/products/",
+      "source_note": "星巴克 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-starbucks-青醬雞肉義大利麵",
+      "brand": "星巴克",
+      "name": "青醬雞肉義大利麵",
+      "item_type": "single",
+      "calories": 520,
+      "protein": 28,
+      "fat": 18,
+      "carbs": 58,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.starbucks.com.tw/products/",
+      "source_note": "星巴克 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-subway-蔬菜沙拉潛艇堡",
+      "brand": "Subway",
+      "name": "蔬菜沙拉潛艇堡",
+      "item_type": "single",
+      "calories": 230,
+      "protein": 10,
+      "fat": 4,
+      "carbs": 38,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.subway.com.tw/menu",
+      "source_note": "Subway 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-subway-照燒雞胸潛艇堡",
+      "brand": "Subway",
+      "name": "照燒雞胸潛艇堡",
+      "item_type": "single",
+      "calories": 300,
+      "protein": 26,
+      "fat": 5,
+      "carbs": 40,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.subway.com.tw/menu",
+      "source_note": "Subway 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-subway-牛排起司潛艇堡",
+      "brand": "Subway",
+      "name": "牛排起司潛艇堡",
+      "item_type": "single",
+      "calories": 380,
+      "protein": 28,
+      "fat": 12,
+      "carbs": 42,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.subway.com.tw/menu",
+      "source_note": "Subway 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sukiya-牛丼-小",
+      "brand": "Sukiya",
+      "name": "牛丼（小）",
+      "item_type": "single",
+      "calories": 480,
+      "protein": 22,
+      "fat": 14,
+      "carbs": 58,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sukiya.com.tw/",
+      "source_note": "Sukiya 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sukiya-親子丼",
+      "brand": "Sukiya",
+      "name": "親子丼",
+      "item_type": "single",
+      "calories": 560,
+      "protein": 26,
+      "fat": 16,
+      "carbs": 68,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sukiya.com.tw/",
+      "source_note": "Sukiya 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sukiya-起司牛丼",
+      "brand": "Sukiya",
+      "name": "起司牛丼",
+      "item_type": "single",
+      "calories": 680,
+      "protein": 30,
+      "fat": 26,
+      "carbs": 72,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sukiya.com.tw/",
+      "source_note": "Sukiya 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-肉燥飯套餐",
+      "brand": "三商巧福",
+      "name": "肉燥飯套餐",
+      "item_type": "combo",
+      "calories": 520,
+      "protein": 18,
+      "fat": 16,
+      "carbs": 72,
+      "meal_role": "main_meal",
+      "portion_type": "combo",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-雞肉粥",
+      "brand": "三商巧福",
+      "name": "雞肉粥",
+      "item_type": "single",
+      "calories": 320,
+      "protein": 16,
+      "fat": 6,
+      "carbs": 48,
+      "meal_role": "light_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-皮蛋瘦肉粥",
+      "brand": "三商巧福",
+      "name": "皮蛋瘦肉粥",
+      "item_type": "single",
+      "calories": 380,
+      "protein": 20,
+      "fat": 10,
+      "carbs": 52,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-燒餅油條套餐",
+      "brand": "三商巧福",
+      "name": "燒餅油條套餐",
+      "item_type": "combo",
+      "calories": 480,
+      "protein": 12,
+      "fat": 22,
+      "carbs": 58,
+      "meal_role": "main_meal",
+      "portion_type": "combo",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-原味牛肉麵",
+      "brand": "三商巧福",
+      "name": "原味牛肉麵",
+      "item_type": "single",
+      "calories": 580,
+      "protein": 32,
+      "fat": 18,
+      "carbs": 68,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-清燉牛肉麵",
+      "brand": "三商巧福",
+      "name": "清燉牛肉麵",
+      "item_type": "single",
+      "calories": 520,
+      "protein": 30,
+      "fat": 12,
+      "carbs": 62,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-排骨飯",
+      "brand": "三商巧福",
+      "name": "排骨飯",
+      "item_type": "single",
+      "calories": 720,
+      "protein": 28,
+      "fat": 28,
+      "carbs": 85,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-雞腿飯",
+      "brand": "三商巧福",
+      "name": "雞腿飯",
+      "item_type": "single",
+      "calories": 680,
+      "protein": 36,
+      "fat": 24,
+      "carbs": 78,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-炸醬麵",
+      "brand": "三商巧福",
+      "name": "炸醬麵",
+      "item_type": "single",
+      "calories": 620,
+      "protein": 22,
+      "fat": 22,
+      "carbs": 78,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-麻醬麵",
+      "brand": "三商巧福",
+      "name": "麻醬麵",
+      "item_type": "single",
+      "calories": 580,
+      "protein": 18,
+      "fat": 20,
+      "carbs": 72,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-乾拌麵-貢丸",
+      "brand": "三商巧福",
+      "name": "乾拌麵+貢丸",
+      "item_type": "combo",
+      "calories": 550,
+      "protein": 20,
+      "fat": 16,
+      "carbs": 75,
+      "meal_role": "main_meal",
+      "portion_type": "combo",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-sunright-水餃-10顆",
+      "brand": "三商巧福",
+      "name": "水餃（10顆）",
+      "item_type": "single",
+      "calories": 450,
+      "protein": 18,
+      "fat": 16,
+      "carbs": 52,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.sunright.com.tw/",
+      "source_note": "三商巧福 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "balanced"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-yoshinoya-牛丼-中",
+      "brand": "吉野家",
+      "name": "牛丼（中）",
+      "item_type": "single",
+      "calories": 733,
+      "protein": 30,
+      "fat": 18,
+      "carbs": 82,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.yoshinoya.com.tw/menu",
+      "source_note": "吉野家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    },
+    {
+      "id": "off-yoshinoya-親子丼-中",
+      "brand": "吉野家",
+      "name": "親子丼（中）",
+      "item_type": "single",
+      "calories": 580,
+      "protein": 28,
+      "fat": 16,
+      "carbs": 72,
+      "meal_role": "main_meal",
+      "portion_type": "single_main",
+      "meal_time": [
+        "lunch",
+        "dinner"
+      ],
+      "venue_type": "chain_restaurant",
+      "is_recommendable": true,
+      "confidence_level": "official",
+      "source_type": "official",
+      "source_url": "https://www.yoshinoya.com.tw/menu",
+      "source_note": "吉野家 官方營養標示",
+      "tags": [
+        "連鎖",
+        "official",
+        "high_protein"
+      ],
+      "recommendation_copy": {
+        "short_reason": "官方營養資料，適合直接對照今天剩餘熱量",
+        "benefit_points": [
+          "來源可驗證",
+          "比亂猜安全"
+        ]
+      }
+    }
+  ]
+}

@@ -1,6 +1,10 @@
 /**
  * 骰子配餐可用菜單池 — 核心菜單 + bulk 變體（5 萬品項交叉配對）
+ *
+ * @deprecated LEGACY — v2 推薦已改用 data/food-kb/recommendation-foods-v2.json。
+ * 此池保留備份，供搜尋/舊流程過渡，不可再作為主推薦來源。
  */
+export const LEGACY_DICE_MENU_POOL = true
 import { eatOutMenu, type ConvenienceItem } from './convenience-store-menu'
 import { getFilteredMenu } from './eat-out-filters'
 import type { MealType } from './checkin-utils'
