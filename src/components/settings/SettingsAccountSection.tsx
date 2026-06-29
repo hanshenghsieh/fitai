@@ -11,16 +11,10 @@ import { colors } from '@/lib/design-system'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import SettingsSection from './SettingsSection'
 import SettingsRow from './SettingsRow'
-import type { WorkSchedule } from '@/lib/human-mode'
 
 interface Props {
   profile: UserProfile | null
   email: string
-  workSchedule: WorkSchedule
-  eatingContext: 'solo' | 'family'
-  scheduleSaving: boolean
-  onWorkSchedule: (s: WorkSchedule) => void
-  onEatingContext: (c: 'solo' | 'family') => void
   onRegenPlan: () => void
   regenLoading: boolean
 }
@@ -28,11 +22,6 @@ interface Props {
 export default function SettingsAccountSection({
   profile,
   email,
-  workSchedule,
-  eatingContext,
-  scheduleSaving,
-  onWorkSchedule,
-  onEatingContext,
   onRegenPlan,
   regenLoading,
 }: Props) {
@@ -125,48 +114,6 @@ export default function SettingsAccountSection({
           </button>
         </div>
       )}
-      <div className="px-4 py-3 border-b space-y-2" style={{ borderColor: colors.border.subtle }}>
-        <p className="text-[14px]" style={{ color: colors.text.primary }}>生活節奏</p>
-        <div className="flex gap-2">
-          {(['standard', 'shift'] as const).map(s => (
-            <button
-              key={s}
-              type="button"
-              disabled={scheduleSaving}
-              onClick={() => onWorkSchedule(s)}
-              className="flex-1 py-2.5 rounded-xl text-[13px] font-medium disabled:opacity-40"
-              style={{
-                backgroundColor: workSchedule === s ? colors.accent.actionSoft : colors.bg.muted,
-                color: workSchedule === s ? colors.text.primary : colors.text.secondary,
-                border: `1px solid ${workSchedule === s ? colors.border.focus : colors.border.subtle}`,
-              }}
-            >
-              {s === 'standard' ? '一般' : '輪班'}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="px-4 py-3 border-b space-y-2" style={{ borderColor: colors.border.subtle }}>
-        <p className="text-[14px]" style={{ color: colors.text.primary }}>用餐方式</p>
-        <div className="flex gap-2">
-          {(['solo', 'family'] as const).map(s => (
-            <button
-              key={s}
-              type="button"
-              disabled={scheduleSaving}
-              onClick={() => onEatingContext(s)}
-              className="flex-1 py-2.5 rounded-xl text-[13px] font-medium disabled:opacity-40"
-              style={{
-                backgroundColor: eatingContext === s ? colors.accent.actionSoft : colors.bg.muted,
-                color: eatingContext === s ? colors.text.primary : colors.text.secondary,
-                border: `1px solid ${eatingContext === s ? colors.border.focus : colors.border.subtle}`,
-              }}
-            >
-              {s === 'solo' ? '個人' : '家庭共餐'}
-            </button>
-          ))}
-        </div>
-      </div>
       <SettingsRow
         label="重排本週計畫"
         detail="生活變了？我們重新幫你排。"

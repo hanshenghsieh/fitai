@@ -1,4 +1,5 @@
 import type { AnalysisSummary } from './analysis-summary'
+import { isRapidWeightLoss } from './weight-pace'
 
 export interface CoachInsightCard {
   id: string
@@ -21,6 +22,19 @@ export function generateWeeklyInsights(
   if (summary.insufficient_data) return []
 
   const cards: CoachInsightCard[] = []
+
+  if (isRapidWeightLoss(summary.weightTrend.deltaKg)) {
+    const delta = summary.weightTrend.deltaKg!
+    cards.push({
+      id: 'weight-fast',
+      tone: 'warning',
+      icon: 'trend',
+      title: '體重降得有點快',
+      body: `本週約 ${delta} kg，建議維持穩定熱量與蛋白質，避免再壓太低。`,
+      suggestion: '建議：以恢復與穩定份量為主，運動改低強度',
+    })
+  }
+
   const avgDinner =
     summary.calorieDistribution.dinnerKcal > 0 && summary.dietRecordSummary.totalMeals > 0
       ? Math.round(summary.calorieDistribution.dinnerKcal / Math.max(1, summary.calorieTrend.metDays || 1))

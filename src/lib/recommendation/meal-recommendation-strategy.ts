@@ -1,4 +1,5 @@
 import type { AnalysisSummary } from '@/lib/analytics/analysis-summary'
+import { isRapidWeightLoss } from '@/lib/analytics/weight-pace'
 
 export interface RecommendedMeal {
   name: string
@@ -10,6 +11,16 @@ export interface RecommendedMeal {
 
 export function buildMealRecommendationStrategy(summary: AnalysisSummary): RecommendedMeal | null {
   if (summary.insufficient_data) return null
+
+  if (isRapidWeightLoss(summary.weightTrend.deltaKg)) {
+    return {
+      name: '雞胸便當 + 無糖豆漿',
+      calories: 520,
+      protein: 32,
+      reason: '本週體重降得偏快，建議維持足量蛋白與穩定份量，避免再壓低熱量。',
+      based_on_insight: '體重下降過快',
+    }
+  }
 
   const parts: string[] = []
   const reasons: string[] = []

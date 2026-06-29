@@ -1,4 +1,5 @@
 import type { AnalysisSummary } from '@/lib/analytics/analysis-summary'
+import { isRapidWeightLoss } from '@/lib/analytics/weight-pace'
 
 export interface RecommendedWorkout {
   title: string
@@ -19,6 +20,17 @@ export function buildWorkoutRecommendationStrategy(
   const calTarget = summary.calorieTrend.target
   const proteinGap = summary.proteinGapAvg ?? 0
   const weightDelta = summary.weightTrend.deltaKg
+
+  if (isRapidWeightLoss(weightDelta)) {
+    return {
+      title: '輕度伸展 + 散步',
+      duration: 20,
+      estimatedCalories: 80,
+      intensity: 'low',
+      reason: '本週體重降得偏快，先以恢復與低強度活動為主，避免額外透支。',
+      based_on_insight: '體重下降過快',
+    }
+  }
 
   if (avgCal != null && avgCal > calTarget * 1.08) {
     return {

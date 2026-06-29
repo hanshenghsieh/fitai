@@ -93,4 +93,13 @@ describe('workout-recommendation-strategy', () => {
     assert.ok(rec)
     assert.equal(rec!.title, '全身訓練')
   })
+
+  it('eases intensity when weight drops too fast', () => {
+    const s = baseSummary()
+    s.weightTrend.deltaKg = -1.2
+    const rec = buildWorkoutRecommendationStrategy(s, '全身訓練')
+    assert.ok(rec)
+    assert.match(rec!.reason, /偏快/)
+    assert.equal(rec!.intensity, 'low')
+  })
 })
