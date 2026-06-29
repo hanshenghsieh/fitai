@@ -143,11 +143,13 @@ export interface PhotoParseResult {
   confidence: 'high' | 'medium' | 'low'
   confidence_pct: number
   ai_nutrition_suppressed: true
+  photo_v2?: PhotoV2State
 }
 
 type PhotoApiJson = {
   error?: string
   data?: { items: Array<{ name: string; confidence: 'high' | 'medium' | 'low' }> }
+  photo_v2?: PhotoV2State
 }
 
 function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
@@ -168,6 +170,7 @@ function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
     confidence: worst,
     confidence_pct: confidenceToPct(worst),
     ai_nutrition_suppressed: true,
+    photo_v2: json.photo_v2,
   }
 }
 

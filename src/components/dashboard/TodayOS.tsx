@@ -14,8 +14,8 @@ import {
   fileToDataUrl,
   prepareFoodPhotoFile,
   uploadFoodPhotoFile,
-  fetchPhotoMatch,
 } from '@/lib/food-capture'
+import { isNativeIOS } from '@/lib/capacitor-native'
 import { isNutritionAccuracyV1 } from '@/lib/nutrition-accuracy-flag'
 import {
   buildPhotoLogCommitFromAccuracy,
@@ -67,7 +67,6 @@ import {
   TODAY_OPEN_PHOTO_EVENT,
   TODAY_OPEN_TEXT_LOG_EVENT,
 } from '@/lib/today-actions'
-import { storesInText } from '@/lib/dice-store-names'
 import { linesToDisplayItems } from '@/lib/meal-suggest'
 import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
 import DiceMealPreview, { type MealPreviewItem } from '@/components/dashboard/DiceMealPreview'
@@ -659,44 +658,49 @@ export default function TodayOS({
     try {
       const parsed = await uploadFoodPhotoFile(file)
       parsedName = parsed.name.trim() || '未知食物'
-      const photoId = `photo-parse-${Date.now()}`
 
-      // Show AI label only — do NOT run client menu search (crashes iOS WebView).
+      if (!parsed.photo_v2) {
+        throw new Error('辨識結果不完整，請再試一次')
+      }
+
+      await new Promise<void>(resolve => {
+        setTimeout(resolve, 200)
+      })
+
+      const accuracy = photoAccuracyStateFromV2(parsed.photo_v2)
+      const resolved = accuracy.v2.outcome.official_record
+      const display = photoAccuracyDisplayMacros(accuracy)
+      const displayName = resolved?.name ?? accuracy.label
+
+      if (isNativeIOS()) {
+        setPhotoDraft(prev =>
+          prev
+            ? {
+                ...prev,
+                previewUrl,
+                file,
+                name: displayName,
+                calories: null,
+                protein_g: null,
+                carbs_g: null,
+                fat_g: null,
+                loading: false,
+                accuracy: undefined,
+              }
+            : prev
+        )
+        await new Promise<void>(resolve => {
+          setTimeout(resolve, 400)
+        })
+      }
+
       setPhotoDraft(prev =>
         prev
           ? {
               ...prev,
               previewUrl,
               file,
-              name: parsedName,
-              loading: true,
-              accuracy: undefined,
-            }
-          : prev
-      )
-
-      await new Promise<void>(resolve => {
-        setTimeout(resolve, 150)
-      })
-
-      const photoV2 = await fetchPhotoMatch(parsedName, {
-        store: storesInText(parsedName)?.[0],
-        photo_id: photoId,
-      })
-      const accuracy = photoAccuracyStateFromV2(photoV2)
-
-      const resolved = accuracy.v2.outcome.official_record
-      const display = photoAccuracyDisplayMacros(accuracy)
-
-      await new Promise<void>(resolve => {
-        setTimeout(resolve, 100)
-      })
-
-      setPhotoDraft(prev =>
-        prev
-          ? {
-              ...prev,
-              name: resolved?.name ?? accuracy.label,
+              name: displayName,
               calories: display.calories,
               protein_g: display.protein_g,
               carbs_g: display.carbs_g,
