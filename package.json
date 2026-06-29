@@ -22,6 +22,7 @@
     "market-lab:500": "npx tsx scripts/market-reality-lab-500/run.ts",
     "mr500:goal-visibility": "npx tsx scripts/market-reality-lab-500/run-goal-visibility.ts",
     "food-photo:verify": "npx tsx scripts/food-photo-verify.ts",
+    "food-photo:pipeline": "node --import tsx scripts/verify-photo-pipeline.mjs",
     "food-images:setup": "npx tsx scripts/setup-food-images.ts",
     "food-images:reset": "npx tsx scripts/setup-food-images.ts -- --force",
     "market-loop": "npx tsx scripts/market-loop/run.ts",

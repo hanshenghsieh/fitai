@@ -413,11 +413,7 @@ function ReviewStep({
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
               <Loader2 className="h-7 w-7 animate-spin" strokeWidth={ICON_STROKE} style={{ color: TODAY.mocha }} />
               <p className="text-[13px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>
-                {draft.loading
-                  ? draft.name
-                    ? '正在比對營養資料…'
-                    : '正在辨識…'
-                  : '照片預覽'}
+                {draft.loading ? '正在辨識…' : '照片預覽'}
               </p>
             </div>
           )}
@@ -440,7 +436,7 @@ function ReviewStep({
         {draft.loading ? (
           <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
-            {draft.previewUrl ? (draft.name ? '正在比對營養資料…' : '正在辨識…') : '正在準備照片…'}
+            {draft.previewUrl ? '正在辨識…' : '正在準備照片…'}
           </p>
         ) : accuracyMode && draft.accuracy && onAccuracyChange ? (
           <AccuracyConfirmSection
