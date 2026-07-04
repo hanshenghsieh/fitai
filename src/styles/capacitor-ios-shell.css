@@ -41,7 +41,7 @@
   overscroll-behavior-y: none;
 }
 
-/* Capacitor / iOS: WKWebView negates scroll insets — enforce safe area on shell */
+/* Capacitor / iOS: WKWebView uses zero scroll insets — enforce safe area on shell */
 html.capacitor-ios .app-shell {
   padding-top: var(--app-safe-top);
   box-sizing: border-box;

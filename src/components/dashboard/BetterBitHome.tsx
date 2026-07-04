@@ -612,35 +612,38 @@ export default function BetterBitHome({
         onDeleteLog={handleDeleteLog}
         onConfirmNutrition={openNutritionConfirmation}
         onOpenPendingQueue={() => setPendingQueueOpen(true)}
+        interstitial={
+          onDashboard ? (
+            <TodayOS
+              todayPlan={todayPlan}
+              profile={profile}
+              goalSnapshot={goalSnapshot}
+              userMemory={displayUserMemory}
+              foodDna={userMemory.food_dna ?? foodDna}
+              dayOfWeek={dayOfWeek}
+              recentMissedDays={recentMissedDays}
+              recentFoodLogs={recentFoodLogs}
+              dailyRolls={dailyRolls}
+              mealSuggest={mealSuggest}
+              customEatOut={customEatOut}
+              dayIndex={dayIndex}
+              workoutDone={workoutDone}
+              workoutTotal={workoutItems.length}
+              calorieBank={calorieBank}
+              onLogFood={handleLogFood}
+              onClearMealSelection={handleClearMealSelection}
+              onPostureLine={setPostureLine}
+              onDiceApply={handleDiceApply}
+              registerDeleteLog={registerDeleteLog}
+              onOpenNutritionConfirmation={openNutritionConfirmation}
+              onMealUiState={handleMealUiState}
+            />
+          ) : undefined
+        }
       />
 
       {onDashboard ? (
       <div className="px-5 pb-6 max-w-[640px] mx-auto space-y-6" style={{ fontFamily: TODAY.font }}>
-        <TodayOS
-          todayPlan={todayPlan}
-          profile={profile}
-          goalSnapshot={goalSnapshot}
-          userMemory={displayUserMemory}
-          foodDna={userMemory.food_dna ?? foodDna}
-          dayOfWeek={dayOfWeek}
-          recentMissedDays={recentMissedDays}
-          recentFoodLogs={recentFoodLogs}
-          dailyRolls={dailyRolls}
-          mealSuggest={mealSuggest}
-          customEatOut={customEatOut}
-          dayIndex={dayIndex}
-          workoutDone={workoutDone}
-          workoutTotal={workoutItems.length}
-          calorieBank={calorieBank}
-          onLogFood={handleLogFood}
-          onClearMealSelection={handleClearMealSelection}
-          onPostureLine={setPostureLine}
-          onDiceApply={handleDiceApply}
-          registerDeleteLog={registerDeleteLog}
-          onOpenNutritionConfirmation={openNutritionConfirmation}
-          onMealUiState={handleMealUiState}
-        />
-
         <TodayWaterLog
           loggedMl={waterMl}
           targetMl={waterTargetMl}

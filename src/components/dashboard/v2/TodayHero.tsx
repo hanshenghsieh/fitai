@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useMemo } from 'react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
@@ -41,6 +42,7 @@ interface Props {
   onDeleteLog?: (id: string) => void
   onConfirmNutrition?: (log: FoodLogEntry) => void
   onOpenPendingQueue?: () => void
+  interstitial?: ReactNode
 }
 
 export default function TodayHero({
@@ -68,6 +70,7 @@ export default function TodayHero({
   onDeleteLog,
   onConfirmNutrition,
   onOpenPendingQueue,
+  interstitial,
 }: Props) {
   const carbsLogged = sumLoggedCarbs(foodLogs)
   const fatLogged = sumLoggedFat(foodLogs)
@@ -124,7 +127,7 @@ export default function TodayHero({
         </div>
       </BBCard>
 
-      {showMealActions && !overTarget && (
+      {showMealActions && !overTarget && !hasDicePreview && (
         <TodayMealActions
           primaryAction={primaryAction}
           primaryLoading={mealActionsLoading}
@@ -138,6 +141,8 @@ export default function TodayHero({
           showReroll={showReroll}
         />
       )}
+
+      {interstitial}
 
       {overTarget && (
         <p className="text-[13px] text-center px-4 leading-relaxed" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>

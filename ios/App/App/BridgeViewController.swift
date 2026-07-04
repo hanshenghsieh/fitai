@@ -54,10 +54,7 @@ class BridgeViewController: CAPBridgeViewController {
         }
 
         if #available(iOS 11.0, *) {
-            let insets = view.safeAreaInsets
-            scrollView.contentInset = UIEdgeInsets(top: -insets.top, left: 0, bottom: -insets.bottom, right: 0)
-            scrollView.scrollIndicatorInsets = scrollView.contentInset
-            injectSafeAreaInsets(insets, into: webView)
+            injectSafeAreaInsets(view.safeAreaInsets, into: webView)
         }
     }
 

@@ -75,6 +75,7 @@ import {
 import { linesToDisplayItems } from '@/lib/meal-suggest'
 import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
 import DiceMealPreview, { type MealPreviewItem } from '@/components/dashboard/DiceMealPreview'
+import TodayMealActions from '@/components/dashboard/today/TodayMealActions'
 import TodayFoodMore from '@/components/dashboard/today/TodayFoodMore'
 import PhotoLogSheet, { type PhotoLogDraft } from '@/components/dashboard/today/PhotoLogSheet'
 import ManualPhotoCorrectionSheet from '@/components/dashboard/today/ManualPhotoCorrectionSheet'
@@ -1445,10 +1446,24 @@ export default function TodayOS({
                 {slotMealSuggest.current_highlight}
               </p>
             )}
-            {dicePreview && (
-              <p className="text-[12px] px-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-                這是推薦預覽，尚未計入今日總量。確認後請點上方「記錄這餐」。
-              </p>
+            {dicePreview && dayState.allowDiceAndSuggest && (
+              <>
+                <p className="text-[12px] px-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+                  這是推薦預覽，尚未計入今日總量。
+                </p>
+                <TodayMealActions
+                  primaryAction="record-meal"
+                  primaryLoading={confirming}
+                  primaryDisabled={confirming || rolling}
+                  rerollDisabled={rolling || confirming || !dayState.allowDiceAndSuggest}
+                  textPhotoDisabled={rolling || confirming}
+                  onPrimary={confirmDice}
+                  onTextLog={() => setMoreOpen(true)}
+                  onPhotoLog={() => setPhotoOpen(true)}
+                  onReroll={rollDice}
+                  showReroll
+                />
+              </>
             )}
           </>
         ) : (
