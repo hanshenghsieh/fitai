@@ -2,11 +2,15 @@
 
 export const TODAY_OPEN_PHOTO_EVENT = 'betterbit:open-photo'
 export const TODAY_OPEN_TEXT_LOG_EVENT = 'betterbit:open-text-log'
+export const TODAY_OPEN_RECORD_SHEET_EVENT = 'betterbit:open-record-sheet'
+export const TODAY_ROLL_DICE_EVENT = 'betterbit:roll-dice'
+export const TODAY_CONFIRM_DICE_EVENT = 'betterbit:confirm-dice'
 
-export type TodaySheetIntent = 'photo' | 'text'
+export type TodaySheetIntent = 'photo' | 'text' | 'record'
 
 export function todaySheetFromSearch(search: string): TodaySheetIntent | null {
   const params = new URLSearchParams(search)
+  if (params.get('record') === '1') return 'record'
   if (params.get('photo') === '1') return 'photo'
   if (params.get('text') === '1') return 'text'
   return null
@@ -15,6 +19,7 @@ export function todaySheetFromSearch(search: string): TodaySheetIntent | null {
 export function clearTodaySheetParams(): void {
   if (typeof window === 'undefined') return
   const url = new URL(window.location.href)
+  url.searchParams.delete('record')
   url.searchParams.delete('photo')
   url.searchParams.delete('text')
   const next = `${url.pathname}${url.search}${url.hash}`
@@ -29,6 +34,21 @@ export function dispatchOpenPhotoSheet(): void {
 export function dispatchOpenTextLogSheet(): void {
   if (typeof window === 'undefined') return
   window.dispatchEvent(new CustomEvent(TODAY_OPEN_TEXT_LOG_EVENT))
+}
+
+export function dispatchOpenRecordSheet(): void {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent(TODAY_OPEN_RECORD_SHEET_EVENT))
+}
+
+export function dispatchRollDice(): void {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent(TODAY_ROLL_DICE_EVENT))
+}
+
+export function dispatchConfirmDice(): void {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent(TODAY_CONFIRM_DICE_EVENT))
 }
 
 let appOverlayDepth = 0

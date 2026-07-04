@@ -20,7 +20,9 @@ export default function WaterCustomSheet({ open, currentMl, onClose, onSaveTotal
   const [value, setValue] = useState(String(currentMl))
 
   useEffect(() => {
-    if (open) setValue(String(currentMl))
+    if (!open) return
+    const timer = window.setTimeout(() => setValue(String(currentMl)), 0)
+    return () => window.clearTimeout(timer)
   }, [open, currentMl])
 
   function handleSave() {
@@ -75,10 +77,7 @@ export default function WaterCustomSheet({ open, currentMl, onClose, onSaveTotal
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={() => {
-                onReset()
-                onClose()
-              }}
+              onClick={onReset}
               className="flex-1 h-12 rounded-[20px] text-[14px]"
               style={{ backgroundColor: BB_V2.bg.pill, color: BB_V2.text.secondary, fontWeight: 500 }}
             >

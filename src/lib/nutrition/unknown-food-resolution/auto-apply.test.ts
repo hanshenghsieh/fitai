@@ -245,7 +245,7 @@ describe('Unknown Food Auto Apply V1', () => {
 
   it('24. auto_resolved UI badge', () => {
     const log = applyAutoResolveToLog(unknownLog('x'), mockCandidate())
-    assert.equal(nutritionStatusBadge(log), 'BetterBit 已補齊')
+    assert.equal(nutritionStatusBadge(log), '估算')
   })
 
   it('25. null macros never coerced to 0 on unknown', () => {

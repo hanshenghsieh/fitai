@@ -42,10 +42,25 @@ import { foodLogsNeedSync, reconcileFoodLogsToday } from '@/lib/food-log-reconci
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
 import { getNutritionDayKey } from '@/lib/timezone'
-import { addWaterMl, resetWaterMl, resolveDailyWaterGoalMl, setWaterMl } from '@/lib/water-log'
+import { addWaterMl, resetWaterMl, resolveDailyWaterGoalMl, setWaterMl as applyWaterTotal } from '@/lib/water-log'
 import { TODAY } from '@/lib/today-design'
 import TodayWaterLog from '@/components/dashboard/today/TodayWaterLog'
 import BBCard from '@/components/ui/BBCard'
+import {
+  dispatchOpenPhotoSheet,
+  dispatchOpenTextLogSheet,
+  dispatchRollDice,
+  dispatchConfirmDice,
+  TODAY_OPEN_RECORD_SHEET_EVENT,
+  todaySheetFromSearch,
+  clearTodaySheetParams,
+} from '@/lib/today-actions'
+import RecordActionSheet from '@/components/dashboard/today/RecordActionSheet'
+import Day1GuideBanner, {
+  dismissDay1Guide,
+  markDay1GuidePending,
+  shouldShowDay1Guide,
+} from '@/components/dashboard/today/Day1GuideBanner'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import { zaijian } from '@/lib/copy/zaijian'
 import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile } from '@/types'
@@ -141,6 +156,15 @@ export default function BetterBitHome({
   const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
   const [trackedDayKey, setTrackedDayKey] = useState(() => getNutritionDayKey())
   const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(null)
+  const [recordSheetOpen, setRecordSheetOpen] = useState(false)
+  const [showDay1Guide, setShowDay1Guide] = useState(false)
+  const recordUrlHandledRef = useRef(false)
+  const [mealUiState, setMealUiState] = useState({
+    hasDicePreview: false,
+    rolling: false,
+    confirming: false,
+    allowDiceAndSuggest: true,
+  })
   const calorieBankSyncedRef = useRef(false)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const persistPatchRef = useRef<{
@@ -157,12 +181,15 @@ export default function BetterBitHome({
   const mealSuggestRef = useRef(mealSuggest)
   const workoutItemsRef = useRef(workoutItems)
   const waterMlRef = useRef(waterMl)
-  waterMlRef.current = waterMl
-  userMemoryRef.current = userMemory
-  customEatOutRef.current = customEatOut
-  dailyRollsRef.current = dailyRolls
-  mealSuggestRef.current = mealSuggest
-  workoutItemsRef.current = workoutItems
+
+  useEffect(() => {
+    waterMlRef.current = waterMl
+    userMemoryRef.current = userMemory
+    customEatOutRef.current = customEatOut
+    dailyRollsRef.current = dailyRolls
+    mealSuggestRef.current = mealSuggest
+    workoutItemsRef.current = workoutItems
+  }, [waterMl, userMemory, customEatOut, dailyRolls, mealSuggest, workoutItems])
 
   useEffect(() => {
     void preloadDiceMenuBulk()
@@ -226,7 +253,6 @@ export default function BetterBitHome({
     const proteinLogged = sumLoggedProtein(displayFoodLogs)
     const normalTarget = todayPlan.daily_targets.calories
     const proteinTarget = todayPlan.daily_targets.protein_g
-    const recoveryActive = isRecoveryActive(calorieBank ?? { recovery_balance_kcal: 0, spread_days_remaining: 0 })
     const dayState = computeTodayMealState({
       todayFoodLogs: displayFoodLogs,
       normalTargetKcal: normalTarget,
@@ -234,6 +260,7 @@ export default function BetterBitHome({
       proteinTargetG: proteinTarget,
       calorieBank,
     })
+    const recoveryActive = isRecoveryActive(calorieBank ?? { recovery_balance_kcal: 0, spread_days_remaining: 0 })
     return {
       caloriesLogged,
       proteinLogged,
@@ -241,15 +268,82 @@ export default function BetterBitHome({
       proteinTarget,
       overTarget: dayState.overTargetProtection,
       recoveryActive,
+      remainingCalories: dayState.remainingCalories,
+      proteinGap: dayState.proteinGap,
+      effectiveMealCalTarget: dayState.effectiveMealCalTarget,
+      allowDiceAndSuggest: dayState.allowDiceAndSuggest,
     }
   }, [displayFoodLogs, todayPlan.daily_targets, calorieBank])
+
+  useEffect(() => {
+    if (!onDashboard) return
+    const openRecord = () => setRecordSheetOpen(true)
+    window.addEventListener(TODAY_OPEN_RECORD_SHEET_EVENT, openRecord)
+    return () => window.removeEventListener(TODAY_OPEN_RECORD_SHEET_EVENT, openRecord)
+  }, [onDashboard])
+
+  useEffect(() => {
+    if (!onDashboard || recordUrlHandledRef.current) return
+    if (todaySheetFromSearch(window.location.search) !== 'record') return
+    recordUrlHandledRef.current = true
+    clearTodaySheetParams()
+    const timer = window.setTimeout(() => setRecordSheetOpen(true), 0)
+    return () => window.clearTimeout(timer)
+  }, [onDashboard])
+
+  const handleMealUiState = useCallback(
+    (state: {
+      hasDicePreview: boolean
+      rolling: boolean
+      confirming: boolean
+      allowDiceAndSuggest: boolean
+    }) => {
+      setMealUiState(prev => {
+        if (
+          prev.hasDicePreview === state.hasDicePreview &&
+          prev.rolling === state.rolling &&
+          prev.confirming === state.confirming &&
+          prev.allowDiceAndSuggest === state.allowDiceAndSuggest
+        ) {
+          return prev
+        }
+        return state
+      })
+    },
+    []
+  )
+
+  const handlePrimaryMealAction = useCallback(() => {
+    if (mealUiState.hasDicePreview) {
+      dispatchConfirmDice()
+      return
+    }
+    if (displayFoodLogs.length === 0) {
+      setRecordSheetOpen(true)
+      return
+    }
+    dispatchRollDice()
+  }, [mealUiState.hasDicePreview, displayFoodLogs.length])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const timer = window.setTimeout(() => {
+      if (shouldShowDay1Guide()) setShowDay1Guide(true)
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
     if (params.get('welcome') !== '1') return
-    toast.message('第一餐在下面。點「常吃」或骰子，一鍵就好。')
-    window.history.replaceState({}, '', '/dashboard')
+    const timer = window.setTimeout(() => {
+      markDay1GuidePending()
+      setShowDay1Guide(true)
+      toast.message('計畫已就緒。先從今天第一餐開始就好。')
+      window.history.replaceState({}, '', '/dashboard')
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [])
 
   const mealModes = mealModesFromCheckin(checkin)
@@ -323,7 +417,7 @@ export default function BetterBitHome({
 
   const handleSetWater = useCallback(
     (totalMl: number) => {
-      const result = setWaterMl(totalMl)
+      const result = applyWaterTotal(totalMl)
       if (!result.ok) {
         toast.message('喝水量不能為負數')
         return
@@ -469,7 +563,7 @@ export default function BetterBitHome({
       const log = displayFoodLogs.find(l => l.id === logId) ?? confirmLogLive
       if (!log) return
       patchFoodLog(logId, applyManualNutritionToLog(log, input))
-      toast.message('已儲存營養資料', { description: '標記為使用者輸入，已計入今日統計。' })
+      toast.message('已儲存營養資料', { description: '標記為手動記錄，已計入今日統計。' })
       setConfirmLog(null)
     },
     [displayFoodLogs, confirmLogLive, patchFoodLog]
@@ -483,6 +577,16 @@ export default function BetterBitHome({
     <>
       <TodayHeader trialDaysLeft={trialDaysLeft} />
       <TodayPosture line={postureLine} />
+      {showDay1Guide && onDashboard ? (
+        <div className="px-5 max-w-[640px] mx-auto">
+          <Day1GuideBanner
+            onDismiss={() => {
+              dismissDay1Guide()
+              setShowDay1Guide(false)
+            }}
+          />
+        </div>
+      ) : null}
       <TodayHero
         caloriesLogged={intakeSummary.caloriesLogged}
         caloriesTarget={intakeSummary.caloriesTarget}
@@ -490,24 +594,25 @@ export default function BetterBitHome({
         proteinTarget={intakeSummary.proteinTarget}
         carbsTarget={todayPlan.daily_targets.carbs_g}
         fatTarget={todayPlan.daily_targets.fat_g}
+        remainingCalories={intakeSummary.remainingCalories}
+        effectiveMealCalTarget={intakeSummary.effectiveMealCalTarget}
+        proteinGap={intakeSummary.proteinGap}
         overTarget={intakeSummary.overTarget}
+        calorieBank={calorieBank}
         foodLogs={displayFoodLogs}
+        hasDicePreview={mealUiState.hasDicePreview}
+        mealActionsLoading={mealUiState.rolling || mealUiState.confirming}
+        rerollDisabled={mealUiState.rolling || mealUiState.confirming || !mealUiState.allowDiceAndSuggest}
+        textPhotoDisabled={mealUiState.rolling || mealUiState.confirming}
+        onPrimaryMealAction={onDashboard ? handlePrimaryMealAction : undefined}
+        onTextLog={onDashboard ? dispatchOpenTextLogSheet : undefined}
+        onPhotoLog={onDashboard ? dispatchOpenPhotoSheet : undefined}
+        onReroll={onDashboard ? dispatchRollDice : undefined}
+        showReroll={mealUiState.hasDicePreview}
         onDeleteLog={handleDeleteLog}
         onConfirmNutrition={openNutritionConfirmation}
         onOpenPendingQueue={() => setPendingQueueOpen(true)}
       />
-
-      {onDashboard ? (
-        <div className="px-5 pb-2 max-w-[640px] mx-auto">
-          <TodayWaterLog
-            loggedMl={waterMl}
-            targetMl={waterTargetMl}
-            onAdd={handleAddWater}
-            onSetTotal={handleSetWater}
-            onReset={handleResetWater}
-          />
-        </div>
-      ) : null}
 
       {onDashboard ? (
       <div className="px-5 pb-6 max-w-[640px] mx-auto space-y-6" style={{ fontFamily: TODAY.font }}>
@@ -533,6 +638,15 @@ export default function BetterBitHome({
           onDiceApply={handleDiceApply}
           registerDeleteLog={registerDeleteLog}
           onOpenNutritionConfirmation={openNutritionConfirmation}
+          onMealUiState={handleMealUiState}
+        />
+
+        <TodayWaterLog
+          loggedMl={waterMl}
+          targetMl={waterTargetMl}
+          onAdd={handleAddWater}
+          onSetTotal={handleSetWater}
+          onReset={handleResetWater}
         />
 
         {isPending && (
@@ -677,6 +791,8 @@ export default function BetterBitHome({
         ) : null}
       </div>
       ) : null}
+
+      <RecordActionSheet open={recordSheetOpen} onClose={() => setRecordSheetOpen(false)} />
 
       <PendingNutritionQueueSheet
         open={pendingQueueOpen}

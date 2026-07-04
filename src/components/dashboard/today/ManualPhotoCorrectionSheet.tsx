@@ -231,10 +231,10 @@ export default function ManualPhotoCorrectionSheet({
         <div className="px-5 pt-5 pb-3 flex items-start justify-between gap-3">
           <div>
             <h2 className="text-[18px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-              手動更改餐點
+              微調這餐
             </h2>
-            <p className="text-[13px] mt-1" style={{ color: BB_V2.text.secondary }}>
-              修正 AI 辨識結果，選擇如何記錄營養
+            <p className="text-[13px] mt-1 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+              這餐看起來像這樣，你可以微調一下。修正後會讓 BetterBit 算得更準。
             </p>
           </div>
           <button type="button" onClick={onClose} className="p-1.5" aria-label="關閉">
@@ -329,7 +329,7 @@ export default function ManualPhotoCorrectionSheet({
               )}
               {templateCandidates.length > 0 && (
                 <p className="text-[13px]" style={{ color: BB_V2.accent.orange, fontWeight: 500 }}>
-                  依辨識結果，找到餐型參考估算（選一個後可加入今天）
+                  找到相近的餐型參考，選一個後可加入今日紀錄
                 </p>
               )}
               {searchCandidates.map(c => {
@@ -407,12 +407,12 @@ export default function ManualPhotoCorrectionSheet({
 
           {mode === 'unknown' && (
             <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-              先保存照片與文字紀錄，不計入今日營養統計。之後找到可信資料可再更新。
+              先保存照片與名稱，標成待確認，不計入今日統計。之後找到資料可以再更新。
             </p>
           )}
         </div>
 
-        <div className="ios-bottom-sheet__footer px-5 pt-2 pb-4">
+        <div className="ios-bottom-sheet__footer px-5 pt-2 pb-4 space-y-2">
           <button
             type="button"
             disabled={!canCommit}
@@ -420,7 +420,15 @@ export default function ManualPhotoCorrectionSheet({
             className="w-full h-14 rounded-[22px] text-[15px] disabled:opacity-40 active:opacity-90"
             style={{ backgroundColor: BB_V2.accent.orange, color: '#fff', fontWeight: 600 }}
           >
-            加入今天
+            加入今日紀錄
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full h-11 text-[14px] active:opacity-80"
+            style={{ color: BB_V2.text.secondary, fontWeight: 500 }}
+          >
+            稍後再說
           </button>
         </div>
       </div>

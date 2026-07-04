@@ -3,7 +3,8 @@
 import { X } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
-import { formatLogCaloriesLine, NUTRITION_PENDING_LABEL } from '@/lib/nutrition/food-log-display'
+import { NUTRITION_PENDING_LABEL } from '@/lib/nutrition/food-log-display'
+import MealStatusBadge from '@/components/dashboard/today/MealStatusBadge'
 import AppOverlay from '@/components/ui/AppOverlay'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
@@ -32,10 +33,10 @@ export default function PendingNutritionQueueSheet({ open, logs, onClose, onSele
         <div className="shrink-0 px-5 pt-5 pb-3 flex items-start justify-between gap-3">
           <div>
             <h2 className="text-[20px] leading-tight" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-              待確認營養
+              待確認
             </h2>
-            <p className="text-[13px] mt-1" style={{ color: BB_V2.text.secondary }}>
-              共 {logs.length} 筆 · 點選項目開始確認
+            <p className="text-[13px] mt-1 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+              共 {logs.length} 筆 · 還沒寫入今日統計，點選開始確認
             </p>
           </div>
           <button type="button" onClick={onClose} className="p-1.5 -mr-1 shrink-0" aria-label="關閉">
@@ -55,12 +56,10 @@ export default function PendingNutritionQueueSheet({ open, logs, onClose, onSele
                 className="w-full text-left px-4 py-3.5 rounded-2xl active:opacity-90 flex items-center justify-between gap-3"
                 style={{ backgroundColor: BB_V2.bg.canvas }}
               >
-                <span className="text-[16px] truncate" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
-                  {log.name}
+                <span className="text-[16px] truncate min-w-0" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
+                  {log.display_label || log.name}
                 </span>
-                <span className="text-[13px] shrink-0" style={{ color: BB_V2.accent.orange, fontWeight: 500 }}>
-                  {formatLogCaloriesLine(log) === NUTRITION_PENDING_LABEL ? NUTRITION_PENDING_LABEL : '待確認'}
-                </span>
+                <MealStatusBadge label={NUTRITION_PENDING_LABEL} tone="pending" />
               </button>
             </li>
           ))}

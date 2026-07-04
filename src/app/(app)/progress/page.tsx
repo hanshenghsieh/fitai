@@ -54,7 +54,7 @@ async function ProgressContent() {
   const measurements = mergeTodayWeightMeasurement(bundle.measurements, latestWeight, bundle.todayStr)
 
   return (
-    <div className="max-w-lg mx-auto pb-6" style={{ backgroundColor: BB_V2.bg.canvas }}>
+    <div className="max-w-lg mx-auto pb-10" style={{ backgroundColor: BB_V2.bg.canvas }}>
       <AnalyticsScreen
         measurements={measurements}
         checkins={bundle.checkins}

@@ -57,6 +57,18 @@ class BridgeViewController: CAPBridgeViewController {
             let insets = view.safeAreaInsets
             scrollView.contentInset = UIEdgeInsets(top: -insets.top, left: 0, bottom: -insets.bottom, right: 0)
             scrollView.scrollIndicatorInsets = scrollView.contentInset
+            injectSafeAreaInsets(insets, into: webView)
         }
+    }
+
+    private func injectSafeAreaInsets(_ insets: UIEdgeInsets, into webView: WKWebView) {
+        let top = max(insets.top, 20)
+        let bottom = max(insets.bottom, 0)
+        let script = """
+        document.documentElement.classList.add('capacitor-ios');
+        document.documentElement.style.setProperty('--app-safe-top', '\(top)px');
+        document.documentElement.style.setProperty('--app-safe-bottom', '\(bottom)px');
+        """
+        webView.evaluateJavaScript(script, completionHandler: nil)
     }
 }

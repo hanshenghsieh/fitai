@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Home, CalendarDays, LineChart, User, Plus } from 'lucide-react'
+import { Home, CalendarDays, LineChart, User, NotebookPen } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
-import { dispatchOpenPhotoSheet } from '@/lib/today-actions'
+import { dispatchOpenRecordSheet } from '@/lib/today-actions'
 
 const sideItems = [
   { href: '/dashboard', label: '今日', icon: Home, match: (p: string) => p === '/dashboard' },
@@ -17,12 +17,12 @@ export default function BottomNav() {
   const pathname = usePathname()
   const router = useRouter()
 
-  function openPhoto() {
+  function openRecord() {
     if (pathname === '/dashboard') {
-      dispatchOpenPhotoSheet()
+      dispatchOpenRecordSheet()
       return
     }
-    router.push('/dashboard?photo=1')
+    router.push('/dashboard?record=1')
   }
 
   const left = sideItems.slice(0, 2)
@@ -53,8 +53,8 @@ export default function BottomNav() {
 
         <button
           type="button"
-          onClick={openPhoto}
-          className="flex items-center justify-center -mt-5 active:scale-95 transition-transform shrink-0 touch-manipulation"
+          onClick={openRecord}
+          className="flex flex-col items-center justify-center -mt-5 active:scale-95 transition-transform shrink-0 touch-manipulation"
           style={{
             width: BB_V2.nav.fabSize,
             height: BB_V2.nav.fabSize,
@@ -63,9 +63,9 @@ export default function BottomNav() {
             boxShadow: BB_V2.shadow.fab,
             color: '#FFFFFF',
           }}
-          aria-label="拍照記錄"
+          aria-label="記錄"
         >
-          <Plus className="h-6 w-6" strokeWidth={2.5} />
+          <NotebookPen className="h-5 w-5" strokeWidth={2.2} />
         </button>
 
         <div className="flex flex-1 justify-around">

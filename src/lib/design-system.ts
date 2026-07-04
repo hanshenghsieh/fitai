@@ -1,30 +1,36 @@
 // BetterBit Design System — Phase 5.5 Brand Maturity
 // MUJI calm · Oura trust · Headspace warmth · Apple restraint
+//
+// @deprecated Prefer BB_V2 from @/lib/betterbit-v2 for new UI.
+// This module remains for legacy imports; values are aligned to BB_V2.
+
+import { BB_V2 } from './betterbit-v2'
 
 export const colors = {
   bg: {
-    canvas: '#FFF9F2',
-    elevated: '#FFFFFF',
-    muted: '#FFF4E8',
+    canvas: BB_V2.bg.canvas,
+    elevated: BB_V2.bg.card,
+    muted: BB_V2.bg.surface,
   },
 
   text: {
-    primary: '#1C1C1E',
-    secondary: '#6E6E73',
+    primary: BB_V2.text.primary,
+    secondary: BB_V2.text.secondary,
+    /** No BB_V2 equivalent — use for de-emphasized onboarding hints */
     tertiary: '#8E8E93',
   },
 
   accent: {
-    action: '#D89A52',
+    action: BB_V2.accent.orange,
     actionHover: '#C88A42',
     actionSoft: 'rgba(216, 154, 82, 0.12)',
-    sage: '#76B69A',
+    sage: BB_V2.accent.green,
     sageSoft: 'rgba(118, 182, 154, 0.12)',
   },
 
   border: {
-    subtle: 'rgba(0,0,0,0.05)',
-    focus: '#D89A52',
+    subtle: BB_V2.divider,
+    focus: BB_V2.accent.orange,
   },
 
   state: {
@@ -59,17 +65,17 @@ export const borderRadius = {
   md: 12,
   lg: 16,
   xl: 20,
-  card: 28,
+  card: BB_V2.radius.card,
   full: 9999,
 } as const
 
 export const typography = {
-  display: { fontSize: 28, fontWeight: 500, lineHeight: 1.25, letterSpacing: '-0.02em' },
-  title: { fontSize: 22, fontWeight: 500, lineHeight: 1.3, letterSpacing: '-0.01em' },
-  headline: { fontSize: 17, fontWeight: 500, lineHeight: 1.35 },
-  body: { fontSize: 15, fontWeight: 400, lineHeight: 1.55 },
-  caption: { fontSize: 13, fontWeight: 400, lineHeight: 1.45 },
-  micro: { fontSize: 11, fontWeight: 500, lineHeight: 1.35, letterSpacing: '0.02em' },
+  display: { fontSize: BB_V2.type.pageTitle.size, fontWeight: BB_V2.type.pageTitle.weight, lineHeight: BB_V2.type.pageTitle.lineHeight, letterSpacing: '-0.02em' },
+  title: { fontSize: BB_V2.type.sectionTitle.size, fontWeight: BB_V2.type.sectionTitle.weight, lineHeight: BB_V2.type.sectionTitle.lineHeight, letterSpacing: '-0.01em' },
+  headline: { fontSize: BB_V2.type.body.size, fontWeight: 500, lineHeight: 1.35 },
+  body: { fontSize: BB_V2.type.body.size, fontWeight: BB_V2.type.body.weight, lineHeight: BB_V2.type.body.lineHeight },
+  caption: { fontSize: BB_V2.type.caption.size, fontWeight: BB_V2.type.caption.weight, lineHeight: BB_V2.type.caption.lineHeight },
+  micro: { fontSize: BB_V2.type.micro.size, fontWeight: BB_V2.type.micro.weight, lineHeight: BB_V2.type.micro.lineHeight, letterSpacing: '0.02em' },
 } as const
 
 export const motion = {
@@ -79,23 +85,23 @@ export const motion = {
   easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
 } as const
 
-/** Card — v2: white, 28px, soft shadow */
+/** Card — v2: white, 28px, soft shadow (aligned to BB_V2) */
 export const cardStyle = {
-  backgroundColor: colors.bg.elevated,
-  borderRadius: borderRadius.card,
-  boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+  backgroundColor: BB_V2.bg.card,
+  borderRadius: BB_V2.radius.card,
+  boxShadow: BB_V2.shadow.card,
 } as const
 
 export const buttonPrimary = {
-  backgroundColor: colors.accent.action,
+  backgroundColor: BB_V2.accent.orange,
   color: '#FFFFFF',
-  borderRadius: 22,
+  borderRadius: BB_V2.radius.button,
   fontWeight: 600,
 } as const
 
 export const buttonGhost = {
-  backgroundColor: colors.bg.muted,
-  color: colors.text.secondary,
-  borderRadius: borderRadius.lg,
+  backgroundColor: BB_V2.bg.surface,
+  color: BB_V2.text.secondary,
+  borderRadius: BB_V2.radius.input,
   fontWeight: 500,
 } as const

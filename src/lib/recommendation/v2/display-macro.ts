@@ -5,9 +5,9 @@ export function usesApproximatePrefix(level: ConfidenceLevel | undefined): boole
 }
 
 export function confidenceDisplayLabel(level: ConfidenceLevel): string {
-  if (level === 'official') return '官方營養資料'
-  if (level === 'estimated') return '標準份量估算'
-  if (level === 'low_estimate') return '粗略估算'
+  if (level === 'official') return '官方資料'
+  if (level === 'estimated') return '資料庫估算'
+  if (level === 'low_estimate') return '估算'
   return '手動整理'
 }
 

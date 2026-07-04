@@ -1,5 +1,6 @@
 'use client'
 
+import { Check } from 'lucide-react'
 import { formatEatOutStoreLine } from '@/lib/eat-out-builder'
 import type { MealSuggestion } from '@/lib/meal-engine-types'
 import { TODAY } from '@/lib/today-design'
@@ -112,20 +113,20 @@ export default function DiceMealPreview({
             {(recommendationReasons ?? []).map(reason => (
               <li
                 key={reason.code}
-                className="text-[13px] leading-relaxed flex gap-2"
+                className="text-[13px] leading-relaxed flex gap-2 items-start"
                 style={{ color: TODAY.textSecondary, fontWeight: 400 }}
               >
-                <span aria-hidden>✅</span>
+                <Check className="h-4 w-4 shrink-0 mt-0.5" strokeWidth={TODAY.iconStroke} style={{ color: TODAY.mocha }} />
                 <span>{reason.label}</span>
               </li>
             ))}
             {(benefitPoints ?? []).map(point => (
               <li
                 key={point}
-                className="text-[13px] leading-relaxed flex gap-2"
+                className="text-[13px] leading-relaxed flex gap-2 items-start"
                 style={{ color: TODAY.textSecondary, fontWeight: 400 }}
               >
-                <span aria-hidden>✅</span>
+                <Check className="h-4 w-4 shrink-0 mt-0.5" strokeWidth={TODAY.iconStroke} style={{ color: TODAY.mocha }} />
                 <span>{point}</span>
               </li>
             ))}

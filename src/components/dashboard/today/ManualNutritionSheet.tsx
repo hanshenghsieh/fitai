@@ -178,7 +178,7 @@ export default function ManualNutritionSheet({ open, foodName, onClose, onCancel
           )}
 
           <p className="text-[11px] leading-relaxed pt-1" style={{ color: BB_V2.text.secondary }}>
-            儲存後會標記為「使用者輸入」，可計入今日統計。
+            儲存後會標記為「手動記錄」，可計入今日統計。
           </p>
         </div>
 
@@ -192,7 +192,7 @@ export default function ManualNutritionSheet({ open, foodName, onClose, onCancel
             儲存營養資料
           </button>
           <button type="button" onClick={onCancel} className="w-full h-10 text-[13px]" style={{ color: BB_V2.text.secondary }}>
-            取消，保持營養待確認
+            取消，保持待確認
           </button>
         </div>
       </div>

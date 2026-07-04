@@ -181,7 +181,7 @@ export default function NutritionConfirmationSheet({
                         先保留文字紀錄
                       </p>
                       <p className="text-[12px] mt-0.5" style={{ color: BB_V2.text.secondary }}>
-                        維持營養待確認，不計入今日統計
+                        維持待確認，不計入今日統計
                       </p>
                     </div>
                   </button>

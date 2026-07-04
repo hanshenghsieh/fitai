@@ -1,6 +1,6 @@
 'use client'
 
-import { colors } from '@/lib/design-system'
+import { BB_V2 } from '@/lib/betterbit-v2'
 
 interface Props {
   active: boolean
@@ -14,11 +14,13 @@ export function OnboardingChip({ active, onClick, children, className = '' }: Pr
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-xl border text-sm font-medium transition-colors ${className}`}
+      className={`text-sm font-medium transition-colors active:opacity-90 ${className}`}
       style={{
-        borderColor: active ? colors.accent.action : colors.border.subtle,
-        backgroundColor: active ? colors.accent.actionSoft : colors.bg.elevated,
-        color: active ? colors.text.primary : colors.text.secondary,
+        borderRadius: BB_V2.radius.input,
+        border: `1.5px solid ${active ? BB_V2.accent.orange : BB_V2.divider}`,
+        backgroundColor: active ? 'rgba(216, 154, 82, 0.12)' : BB_V2.bg.card,
+        color: active ? BB_V2.text.primary : BB_V2.text.secondary,
+        fontWeight: active ? 600 : 500,
       }}
     >
       {children}
@@ -29,12 +31,16 @@ export function OnboardingChip({ active, onClick, children, className = '' }: Pr
 export function OnboardingCard({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) {
   return (
     <div
-      className="rounded-2xl p-5 space-y-4"
-      style={{ backgroundColor: colors.bg.elevated, border: `1px solid ${colors.border.subtle}` }}
+      className="p-5 space-y-4"
+      style={{
+        backgroundColor: BB_V2.bg.card,
+        borderRadius: BB_V2.radius.card,
+        boxShadow: BB_V2.shadow.card,
+      }}
     >
       <div>
-        <h2 className="text-[17px] font-semibold" style={{ color: colors.text.primary }}>{title}</h2>
-        {desc && <p className="text-[13px] mt-1" style={{ color: colors.text.secondary }}>{desc}</p>}
+        <h2 className="text-[17px] font-semibold" style={{ color: BB_V2.text.primary }}>{title}</h2>
+        {desc && <p className="text-[13px] mt-1 leading-relaxed" style={{ color: BB_V2.text.secondary }}>{desc}</p>}
       </div>
       {children}
     </div>

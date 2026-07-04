@@ -28,11 +28,11 @@ export default function WeekDailyPerformance({ days, selectedDate, onSelect }: P
   return (
     <section>
       <div className="flex items-center justify-between mb-3 px-0.5">
-        <h2 className="text-[17px]" style={{ color: 'var(--bb-text-primary)', fontWeight: 700 }}>
-          本週每日表現
+        <h2 className="text-[17px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+          每日記錄
         </h2>
-        <span className="text-[12px]" style={{ color: 'var(--bb-text-secondary)' }}>
-          點擊查看每日細節
+        <span className="text-[12px]" style={{ color: BB_V2.text.secondary }}>
+          點日期看細節
         </span>
       </div>
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">

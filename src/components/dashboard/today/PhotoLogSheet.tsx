@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeft, Camera, Loader2, Search, X } from 'lucide-react'
+import { ArrowLeft, Camera, Loader2, X } from 'lucide-react'
 import { TODAY } from '@/lib/today-design'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { isNativeIOS } from '@/lib/capacitor-native'
@@ -10,7 +10,7 @@ import AppOverlay from '@/components/ui/AppOverlay'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
 import { photoAccuracyDisplayMacros } from '@/lib/nutrition/photo-log-accuracy'
 import type { PhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
-import { photoV2ReadyForLog, photoV2UiMessage } from '@/lib/nutrition/search-v2/photo-pipeline'
+import { photoV2UiMessage } from '@/lib/nutrition/search-v2/photo-pipeline'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
 
 const ICON_STROKE = TODAY.iconStroke
@@ -26,6 +26,8 @@ export interface PhotoLogDraft {
   carbs_g?: number | null
   fat_g?: number | null
   loading: boolean
+  /** Soft inline hint when AI estimate needs manual follow-up (not a hard failure). */
+  recognitionHint?: string
   /** iOS: text-only nutrition match in flight after AI label returns. */
   matchingNutrition?: boolean
   accuracy?: PhotoAccuracyState
@@ -178,16 +180,109 @@ function FoodTag({ label, style }: { label: string; style?: React.CSSProperties 
   )
 }
 
+function PhotoFlowStepHint({ step, loading }: { step: 1 | 2 | 3; loading?: boolean }) {
+  const current = loading ? 1 : step
+  const label =
+    current === 1
+      ? '步驟 1/3 · AI 幫你估算'
+      : current === 2
+        ? '步驟 2/3 · 你確認或修正'
+        : '步驟 3/3 · 加入今日紀錄'
+  return (
+    <p className="text-[12px] text-center" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>
+      {label}
+    </p>
+  )
+}
+
+function PhotoReviewFooter({
+  draft,
+  saving,
+  readyForLog,
+  iosLiteMode,
+  onSave,
+  onSavePhotoOnly,
+  onOpenManualCorrection,
+  onClose,
+}: {
+  draft: PhotoLogDraft
+  saving?: boolean
+  readyForLog: boolean
+  iosLiteMode: boolean
+  onSave: () => void
+  onSavePhotoOnly?: () => void
+  onOpenManualCorrection?: () => void
+  onClose: () => void
+}) {
+  const step: 1 | 2 | 3 = draft.loading ? 1 : readyForLog || iosLiteMode ? 3 : 2
+  const primaryDisabled =
+    draft.loading ||
+    saving ||
+    !draft.name.trim() ||
+    (iosLiteMode ? !onSavePhotoOnly : !readyForLog)
+  const handlePrimary = iosLiteMode && onSavePhotoOnly ? onSavePhotoOnly : onSave
+
+  return (
+    <div className="ios-bottom-sheet__footer shrink-0 px-5 pt-2 pb-3 space-y-2">
+      <PhotoFlowStepHint step={step} loading={draft.loading} />
+      <p className="text-[11px] text-center leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400, opacity: 0.85 }}>
+        {iosLiteMode
+          ? '可先保存照片；營養確認後才會計入今日總量。'
+          : readyForLog
+            ? '確認沒問題就加入今日紀錄。'
+            : '選好最接近的品項，或用手動修正微調。'}
+      </p>
+      <button
+        type="button"
+        disabled={primaryDisabled}
+        onClick={handlePrimary}
+        className="w-full text-[17px] disabled:opacity-40 active:scale-[0.99] transition-transform"
+        style={{
+          height: 56,
+          borderRadius: BB_V2.radius.button,
+          backgroundColor: BB_V2.accent.orange,
+          color: '#FFFFFF',
+          fontWeight: 600,
+        }}
+      >
+        {saving ? '加入中…' : '加入今日紀錄'}
+      </button>
+      {onOpenManualCorrection ? (
+        <button
+          type="button"
+          disabled={draft.loading || saving}
+          onClick={onOpenManualCorrection}
+          className="w-full h-12 text-[15px] disabled:opacity-40 active:opacity-90"
+          style={{
+            borderRadius: BB_V2.radius.button,
+            backgroundColor: TODAY.pillBg,
+            color: TODAY.mocha,
+            fontWeight: 600,
+          }}
+        >
+          手動修正
+        </button>
+      ) : null}
+      <button
+        type="button"
+        onClick={onClose}
+        className="w-full h-11 text-[14px] active:opacity-80"
+        style={{ color: TODAY.textSecondary, fontWeight: 500 }}
+      >
+        稍後再說
+      </button>
+    </div>
+  )
+}
+
 function IosLiteConfirmSection({
   photoV2,
   selectedId,
   onPhotoV2Select,
-  onOpenManualCorrection,
 }: {
   photoV2: PhotoV2State
   selectedId?: string
   onPhotoV2Select?: (candidateId: string) => void
-  onOpenManualCorrection?: () => void
 }) {
   const unknown = photoV2.outcome.action === 'create_unknown'
   const candidates = photoV2.outcome.candidates.slice(0, IOS_LITE_CANDIDATE_LIMIT)
@@ -196,35 +291,22 @@ function IosLiteConfirmSection({
     return (
       <div className="space-y-3 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
         <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
-          目前沒有可信營養資料
+          這餐我先幫你記下來
         </p>
         <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-          {photoV2UiMessage(photoV2)}
+          {photoV2UiMessage(photoV2)}不確定的項目會先標成估算，之後可以再微調。
         </p>
-        {onOpenManualCorrection && (
-          <button
-            type="button"
-            onClick={onOpenManualCorrection}
-            className="w-full h-12 text-[15px] active:opacity-90"
-            style={{
-              borderRadius: 22,
-              backgroundColor: TODAY.card,
-              color: TODAY.mocha,
-              fontWeight: 600,
-              border: `1.5px solid ${TODAY.mocha}`,
-            }}
-          >
-            搜尋全部菜品 / 手動更改
-          </button>
-        )}
       </div>
     )
   }
 
   return (
     <div className="space-y-3 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
+      <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
+        這餐看起來像這樣
+      </p>
       <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-        選最接近的一項（或手動搜尋）：
+        選最接近的一項；不確定可以點下方「手動修正」。
       </p>
       {candidates.length > 0 && (
         <div className="flex flex-col gap-2">
@@ -250,22 +332,6 @@ function IosLiteConfirmSection({
           })}
         </div>
       )}
-      {onOpenManualCorrection && (
-        <button
-          type="button"
-          onClick={onOpenManualCorrection}
-          className="w-full h-12 text-[15px] flex items-center justify-center gap-2 active:opacity-90"
-          style={{
-            borderRadius: 22,
-            backgroundColor: TODAY.pillBg,
-            color: TODAY.mocha,
-            fontWeight: 600,
-          }}
-        >
-          <Search className="h-4 w-4" strokeWidth={ICON_STROKE} />
-          搜尋全部菜品
-        </button>
-      )}
     </div>
   )
 }
@@ -273,11 +339,9 @@ function IosLiteConfirmSection({
 function AccuracyConfirmSection({
   accuracy,
   onAccuracyChange,
-  onOpenManualCorrection,
 }: {
   accuracy: PhotoAccuracyState
   onAccuracyChange: NonNullable<Props['onAccuracyChange']>
-  onOpenManualCorrection?: () => void
 }) {
   const selectedId = accuracy.answers.selected_candidate_id ?? accuracy.candidates[0]?.id
   const questions = accuracy.confirmation_questions.slice(0, 3)
@@ -291,27 +355,11 @@ function AccuracyConfirmSection({
     return (
       <div className="space-y-3 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
         <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
-          目前沒有可信營養資料
+          這餐我先幫你記下來
         </p>
         <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-          {accuracy.ui_message}
+          {accuracy.ui_message}不確定的項目會先標成估算，修正後 BetterBit 會算得更準。
         </p>
-        {onOpenManualCorrection && (
-          <button
-            type="button"
-            onClick={onOpenManualCorrection}
-            className="w-full h-12 text-[15px] active:opacity-90"
-            style={{
-              borderRadius: 22,
-              backgroundColor: TODAY.card,
-              color: TODAY.mocha,
-              fontWeight: 600,
-              border: `1.5px solid ${TODAY.mocha}`,
-            }}
-          >
-            搜尋全部菜品 / 手動更改
-          </button>
-        )}
       </div>
     )
   }
@@ -323,10 +371,10 @@ function AccuracyConfirmSection({
     >
       <div className="space-y-1">
         <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
-          我想先確認一下
+          這餐看起來像這樣
         </p>
         <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-          這餐看起來像（僅最相近 {accuracy.candidates.length} 筆，資料庫還有更多）：
+          選最接近的品項；不確定可以點下方「手動修正」。
         </p>
       </div>
 
@@ -360,23 +408,6 @@ function AccuracyConfirmSection({
         </div>
       )}
 
-      {onOpenManualCorrection && (
-        <button
-          type="button"
-          onClick={onOpenManualCorrection}
-          className="w-full h-12 text-[15px] flex items-center justify-center gap-2 active:opacity-90"
-          style={{
-            borderRadius: 22,
-            backgroundColor: TODAY.pillBg,
-            color: TODAY.mocha,
-            fontWeight: 600,
-          }}
-        >
-          <Search className="h-4 w-4" strokeWidth={ICON_STROKE} />
-          搜尋全部菜品
-        </button>
-      )}
-
       {questions.map(q => (
         <div key={q.id} className="space-y-2">
           <p className="text-[13px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>
@@ -407,19 +438,26 @@ function AccuracyConfirmSection({
         </div>
       ))}
 
-      {!confirmed && (
+      {!confirmed && questions.length > 0 && (
+        <p className="text-[12px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+          選好之後，點下方「加入今日紀錄」。
+        </p>
+      )}
+
+      {selectedId && !confirmed && (
         <button
           type="button"
           onClick={() => onAccuracyChange({ user_confirmed: true })}
-          className="w-full h-12 text-[15px] active:opacity-90"
+          className="w-full h-11 text-[14px] active:opacity-90"
           style={{
-            borderRadius: 22,
-            backgroundColor: TODAY.pillBg,
+            borderRadius: 20,
+            backgroundColor: TODAY.card,
             color: TODAY.mocha,
             fontWeight: 600,
+            border: `1px solid ${BB_V2.divider}`,
           }}
         >
-          確認後我再幫你記錄
+          這樣記錄可以
         </button>
       )}
 
@@ -427,23 +465,6 @@ function AccuracyConfirmSection({
         <p className="text-[13px] text-center leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
           好，我記下來了。營養資料來自官方資料庫。
         </p>
-      )}
-
-      {onOpenManualCorrection && (
-        <button
-          type="button"
-          onClick={onOpenManualCorrection}
-          className="w-full h-12 text-[15px] active:opacity-90"
-          style={{
-            borderRadius: 22,
-            backgroundColor: TODAY.card,
-            color: TODAY.mocha,
-            fontWeight: 600,
-            border: `1.5px solid rgba(142, 131, 120, 0.35)`,
-          }}
-        >
-          都不是？搜尋全部或手動更改
-        </button>
       )}
     </div>
   )
@@ -496,8 +517,11 @@ function ReviewStep({
   const [proText, setProText] = useState(draft.protein_g != null ? String(draft.protein_g) : '')
 
   useEffect(() => {
-    setCalText(draft.calories != null ? String(draft.calories) : '')
-    setProText(draft.protein_g != null ? String(draft.protein_g) : '')
+    const timer = window.setTimeout(() => {
+      setCalText(draft.calories != null ? String(draft.calories) : '')
+      setProText(draft.protein_g != null ? String(draft.protein_g) : '')
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [draft.calories, draft.protein_g])
 
   return (
@@ -569,6 +593,20 @@ function ReviewStep({
           ) : null}
         </div>
 
+        {draft.recognitionHint ? (
+          <div
+            className="p-4 space-y-2"
+            style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}
+          >
+            <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
+              需要你再確認一下
+            </p>
+            <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+              {draft.recognitionHint}
+            </p>
+          </div>
+        ) : null}
+
         {draft.loading ? (
           <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
@@ -579,37 +617,26 @@ function ReviewStep({
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
             載入營養選項…
           </p>
+        ) : iosLiteMode && draft.photo_v2 ? (
+          <IosLiteConfirmSection
+            photoV2={draft.photo_v2}
+            selectedId={draft.photo_v2.selected_candidate_id}
+            onPhotoV2Select={onPhotoV2Select}
+          />
         ) : iosLiteMode ? (
-          <div className="space-y-3 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
-            <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-              若要記錄熱量與營養，請搜尋確認菜品。不確認也可以先加入照片紀錄。
+          <div className="space-y-2 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
+            <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
+              AI 幫你估算好了
             </p>
-            {onOpenManualCorrection && (
-              <button
-                type="button"
-                onClick={onOpenManualCorrection}
-                className="w-full h-12 text-[15px] flex items-center justify-center gap-2 active:opacity-90"
-                style={{
-                  borderRadius: 22,
-                  backgroundColor: TODAY.mocha,
-                  color: '#FFFFFF',
-                  fontWeight: 600,
-                }}
-              >
-                <Search className="h-4 w-4" strokeWidth={ICON_STROKE} />
-                搜尋確認營養
-              </button>
-            )}
+            <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+              若要記錄熱量，請用手動修正搜尋確認；也可以先保存照片，營養標成待確認。
+            </p>
           </div>
         ) : accuracyMode && draft.accuracy && onAccuracyChange ? (
-          <AccuracyConfirmSection
-            accuracy={draft.accuracy}
-            onAccuracyChange={onAccuracyChange}
-            onOpenManualCorrection={onOpenManualCorrection}
-          />
+          <AccuracyConfirmSection accuracy={draft.accuracy} onAccuracyChange={onAccuracyChange} />
         ) : (
           <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            辨識不準也沒關係，你可以改一下。
+            這餐看起來像這樣，你可以微調一下。
           </p>
         )}
 
@@ -712,49 +739,16 @@ function ReviewStep({
         )}
       </div>
 
-      <div className="ios-bottom-sheet__footer shrink-0 px-5 pt-2 pb-3 space-y-2">
-        <p className="text-[11px] text-center leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400, opacity: 0.8 }}>
-          {iosLiteMode
-            ? '照片紀錄不含營養；搜尋確認後可記錄熱量。'
-            : accuracyMode && draft.accuracy?.nutrition_status === 'unknown'
-              ? '此筆為照片紀錄，不含營養統計。'
-              : '營養資料僅來自官方資料庫，經確認後入帳。'}
-        </p>
-        {iosLiteMode ? (
-          <button
-            type="button"
-            disabled={draft.loading || saving || !draft.name.trim()}
-            onClick={onSavePhotoOnly}
-            className="w-full text-[17px] disabled:opacity-40 active:scale-[0.99] transition-transform"
-            style={{
-              height: 56,
-              borderRadius: BB_V2.radius.button,
-              backgroundColor: TODAY.card,
-              color: TODAY.mocha,
-              fontWeight: 600,
-              border: `1.5px solid ${TODAY.mocha}`,
-            }}
-          >
-            {saving ? '加入中…' : '先加入照片紀錄'}
-          </button>
-        ) : (
-          <button
-            type="button"
-            disabled={draft.loading || saving || !draft.name.trim() || !readyForLog}
-            onClick={onSave}
-            className="w-full text-[17px] disabled:opacity-40 active:scale-[0.99] transition-transform"
-            style={{
-              height: 60,
-              borderRadius: BB_V2.radius.button,
-              backgroundColor: BB_V2.accent.orange,
-              color: '#FFFFFF',
-              fontWeight: 600,
-            }}
-          >
-            {saving ? '加入中…' : !readyForLog ? '請先確認這餐' : '加入今天'}
-          </button>
-        )}
-      </div>
+      <PhotoReviewFooter
+        draft={draft}
+        saving={saving}
+        readyForLog={readyForLog}
+        iosLiteMode={iosLiteMode}
+        onSave={onSave}
+        onSavePhotoOnly={onSavePhotoOnly}
+        onOpenManualCorrection={onOpenManualCorrection}
+        onClose={onClose}
+      />
     </div>
   )
 }

@@ -41,6 +41,17 @@
   overscroll-behavior-y: none;
 }
 
+/* Capacitor iOS: native WKWebView negates scroll insets — enforce safe top on scroll root */
+html.capacitor-ios #app-scroll-root {
+  padding-top: var(--app-safe-top);
+  box-sizing: border-box;
+}
+
+/* Header only needs breathing room below status bar (safe top handled by scroll root) */
+html.capacitor-ios .app-page-top {
+  padding-top: 8px;
+}
+
 html[data-app-overlay='open'] .app-bottom-nav {
   display: none;
 }

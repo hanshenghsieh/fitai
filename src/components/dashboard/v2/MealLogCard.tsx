@@ -10,13 +10,14 @@ import BBIcon from '@/components/icons/BBIcon'
 import { dietScoreIcon } from '@/components/icons'
 import FoodPhotoThumb from '@/components/dashboard/today/FoodPhotoThumb'
 import BBCard from '@/components/ui/BBCard'
+import MealStatusBadge from '@/components/dashboard/today/MealStatusBadge'
 import {
   formatLogCaloriesLine,
   formatLogProteinLine,
   getFoodLogDisplayLabel,
   isNutritionPendingConfirmation,
-  nutritionStatusBadge,
 } from '@/lib/nutrition/food-log-display'
+import { getMealTrustDisplay } from '@/lib/nutrition/meal-trust-display'
 
 interface Props {
   log: FoodLogEntry
@@ -36,7 +37,7 @@ export default function MealLogCard({ log, onDelete, onConfirmNutrition }: Props
   const time = formatTime(log.logged_at)
   const hasPhoto = !!(log.photo_data_url || log.source === 'photo')
   const pending = isNutritionPendingConfirmation(log)
-  const badge = nutritionStatusBadge(log)
+  const trust = getMealTrustDisplay(log)
   const clickable = pending && !!onConfirmNutrition
   const dietScore = useMemo(() => {
     if (pending || log.calories == null) return null
@@ -99,21 +100,30 @@ export default function MealLogCard({ log, onDelete, onConfirmNutrition }: Props
         <p className="text-[16px] truncate" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
           {getFoodLogDisplayLabel(log)}
         </p>
-        <p className="text-[13px] mt-0.5" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
-          {time && <span>{time}</span>}
-          {time && log.store ? <span> · </span> : null}
-          {log.store && <span>{log.store}</span>}
-          {badge && (
-            <span className="ml-1" style={{ color: BB_V2.accent.orange }}>
-              · {badge}
+        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+          {time && (
+            <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
+              {time}
             </span>
           )}
-          {log.resolution_note && log.nutrition_status === 'auto_resolved' && (
-            <span className="block text-[11px] mt-1 line-clamp-2" style={{ color: BB_V2.text.secondary }}>
-              {log.resolution_note}
+          {time && log.store ? (
+            <span className="text-[13px]" style={{ color: BB_V2.text.secondary }}>·</span>
+          ) : null}
+          {log.store && (
+            <span className="text-[13px] truncate" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
+              {log.store}
             </span>
           )}
-        </p>
+          <MealStatusBadge label={trust.statusLabel} tone={trust.tone} />
+          {trust.sourceLabel ? (
+            <MealStatusBadge label={trust.sourceLabel} tone={trust.tone} />
+          ) : null}
+        </div>
+        {log.resolution_note && log.nutrition_status === 'auto_resolved' && (
+          <p className="text-[11px] mt-1 line-clamp-2" style={{ color: BB_V2.text.secondary }}>
+            {log.resolution_note}
+          </p>
+        )}
       </div>
       <div className="shrink-0 text-right flex items-center gap-1">
         <div>
@@ -129,6 +139,7 @@ export default function MealLogCard({ log, onDelete, onConfirmNutrition }: Props
           {!pending && proteinLine && (
             <p className="text-[11px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
               {proteinLine}
+              {trust.sourceLabel ? ` · ${trust.sourceLabel}` : ''}
             </p>
           )}
           {dietScore && (

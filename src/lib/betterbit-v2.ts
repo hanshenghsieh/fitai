@@ -47,6 +47,15 @@ export const BB_V2 = {
   font: 'var(--font-noto-tc), -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif',
   iconStroke: 1.75,
   maxWidth: 640,
+  /** Shared type scale — Week / Progress / Onboarding / Today */
+  type: {
+    pageTitle: { size: 22, weight: 700, lineHeight: 1.25 },
+    sectionTitle: { size: 17, weight: 700, lineHeight: 1.35 },
+    body: { size: 15, weight: 400, lineHeight: 1.55 },
+    caption: { size: 13, weight: 400, lineHeight: 1.45 },
+    micro: { size: 11, weight: 500, lineHeight: 1.35 },
+    number: { size: 22, weight: 700, lineHeight: 1.1 },
+  },
   motion: {
     countUpMs: 1000,
     fadeMs: 320,

@@ -15,10 +15,11 @@ import {
   Tooltip,
   XAxis,
 } from 'recharts'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react'
 import BBIcon from '@/components/icons/BBIcon'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import BBCard from '@/components/ui/BBCard'
+import EmptyStateCard from '@/components/ui/EmptyStateCard'
 import {
   buildAnalysisSummary,
   shiftAnalysisAnchor,
@@ -27,6 +28,7 @@ import {
   type AnalysisPeriodType,
   type AnalysisTargets,
 } from '@/lib/analytics/analysis-summary'
+import { buildProgressHeroDisplay } from '@/lib/analytics/progress-display'
 import { buildMealRecommendationStrategy } from '@/lib/recommendation/meal-recommendation-strategy'
 import { buildWorkoutRecommendationStrategy } from '@/lib/recommendation/workout-recommendation-strategy'
 import type { BodyMeasurement } from '@/types'
@@ -42,9 +44,9 @@ interface Props {
 }
 
 const PERIODS: { id: AnalysisPeriodType; label: string }[] = [
-  { id: 'day', label: '日' },
-  { id: 'week', label: '週' },
-  { id: 'month', label: '月' },
+  { id: 'day', label: '單日' },
+  { id: 'week', label: '7 天' },
+  { id: 'month', label: '30 天' },
 ]
 
 function SegmentControl({
@@ -55,10 +57,7 @@ function SegmentControl({
   onChange: (v: AnalysisPeriodType) => void
 }) {
   return (
-    <div
-      className="flex p-1 rounded-full"
-      style={{ backgroundColor: BB_V2.bg.pill }}
-    >
+    <div className="flex p-1 rounded-full" style={{ backgroundColor: BB_V2.bg.pill }}>
       {PERIODS.map(p => {
         const active = value === p.id
         return (
@@ -108,6 +107,7 @@ export default function AnalyticsScreen({
 }: Props) {
   const [periodType, setPeriodType] = useState<AnalysisPeriodType>('week')
   const [anchorDate, setAnchorDate] = useState(() => new Date())
+  const [showDetails, setShowDetails] = useState(false)
 
   const summary = useMemo(
     () =>
@@ -124,11 +124,15 @@ export default function AnalyticsScreen({
     [periodType, anchorDate, todayDate, measurements, checkins, targets, dayPlansByDate, currentWeightKg]
   )
 
+  const hero = useMemo(() => buildProgressHeroDisplay(summary), [summary])
   const mealRec = useMemo(() => buildMealRecommendationStrategy(summary), [summary])
   const workoutRec = useMemo(
     () => buildWorkoutRecommendationStrategy(summary, plannedWorkoutTitle),
     [summary, plannedWorkoutTitle]
   )
+
+  const primaryInsight = summary.insights[0]
+  const nextAction = summary.nextActions.find(a => !a.done) ?? summary.nextActions[0]
 
   const macroData = [
     { name: '蛋白質', value: summary.macroRatio.proteinPct, color: BB_V2.macro.protein },
@@ -145,23 +149,17 @@ export default function AnalyticsScreen({
 
   if (summary.insufficient_data) {
     return (
-      <div className="px-5 pb-8 space-y-6" style={{ fontFamily: BB_V2.font }}>
-        <h1 className="text-[34px] pt-2" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-          分析
+      <div className="px-5 app-page-top pb-10 space-y-6 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
+        <h1 className="text-[22px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+          進步
         </h1>
         <SegmentControl value={periodType} onChange={setPeriodType} />
-        <BBCard className="text-center py-12">
-          <p className="text-[18px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-            {summary.insufficient_reason}
-          </p>
-          <Link
-            href="/dashboard"
-            className="inline-flex mt-6 h-12 px-8 items-center justify-center rounded-full text-[15px]"
-            style={{ backgroundColor: BB_V2.accent.orange, color: '#FFFFFF', fontWeight: 600 }}
-          >
-            去記錄第一餐
-          </Link>
-        </BBCard>
+        <EmptyStateCard
+          title="還沒有足夠資料"
+          reason={summary.insufficient_reason ?? '先記錄今天第一餐，BetterBit 就能幫你看趨勢。'}
+          ctaLabel="回到今天"
+          ctaHref="/dashboard"
+        />
       </div>
     )
   }
@@ -169,10 +167,15 @@ export default function AnalyticsScreen({
   const lastWeight = summary.weightTrend.points.at(-1)
 
   return (
-    <div className="px-5 pb-8 space-y-5" style={{ fontFamily: BB_V2.font }}>
-      <h1 className="text-[34px] pt-2" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-        分析
-      </h1>
+    <div className="px-5 app-page-top pb-10 space-y-5 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
+      <header>
+        <h1 className="text-[22px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+          進步
+        </h1>
+        <p className="text-[14px] mt-1" style={{ color: BB_V2.text.secondary }}>
+          看看最近有沒有變好，以及下一步怎麼做
+        </p>
+      </header>
 
       <SegmentControl value={periodType} onChange={setPeriodType} />
 
@@ -200,7 +203,20 @@ export default function AnalyticsScreen({
         </button>
       </div>
 
-      {/* 1. 體重趨勢 */}
+      {/* Progress Hero */}
+      <BBCard padding={20}>
+        <p className="text-[13px] mb-2" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
+          {hero.periodLabel}摘要
+        </p>
+        <p className="text-[20px] leading-snug" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+          {hero.headline}
+        </p>
+        <p className="text-[14px] mt-2 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+          {hero.interpretation}
+        </p>
+      </BBCard>
+
+      {/* Weight trend */}
       <BBCard>
         <div className="flex items-start justify-between gap-3 mb-3">
           <p className="text-[17px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
@@ -247,7 +263,7 @@ export default function AnalyticsScreen({
                 </div>
               )}
             </div>
-            <ResponsiveContainer width="100%" height={140}>
+            <ResponsiveContainer width="100%" height={120}>
               <LineChart data={summary.weightTrend.points}>
                 <XAxis dataKey="label" hide />
                 <Tooltip />
@@ -256,12 +272,12 @@ export default function AnalyticsScreen({
                   dataKey="weight"
                   stroke={BB_V2.accent.orange}
                   strokeWidth={2}
-                  dot={{ r: 4, fill: BB_V2.accent.orange }}
+                  dot={{ r: 3, fill: BB_V2.accent.orange }}
                 />
               </LineChart>
             </ResponsiveContainer>
             {lastWeight && (
-              <p className="text-[12px] text-right -mt-2" style={{ color: BB_V2.accent.orange, fontWeight: 600 }}>
+              <p className="text-[12px] text-right -mt-1" style={{ color: BB_V2.accent.orange, fontWeight: 600 }}>
                 {lastWeight.weight}
               </p>
             )}
@@ -269,12 +285,19 @@ export default function AnalyticsScreen({
         )}
       </BBCard>
 
-      {/* 2. 熱量趨勢 */}
+      {/* Calorie trend */}
       <BBCard>
-        <p className="text-[17px] mb-3" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+        <p className="text-[17px] mb-1" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
           熱量趨勢
         </p>
-        <div className="flex items-baseline justify-between mb-1">
+        <p className="text-[13px] mb-3" style={{ color: BB_V2.text.secondary }}>
+          {summary.calorieTrend.deltaFromTarget != null && summary.calorieTrend.deltaFromTarget > 0
+            ? `平均高出目標 ${summary.calorieTrend.deltaFromTarget} kcal，下一餐選小份量就好`
+            : summary.calorieTrend.deltaFromTarget != null && summary.calorieTrend.deltaFromTarget <= -80
+              ? `平均低於目標 ${Math.abs(summary.calorieTrend.deltaFromTarget)} kcal，節奏不錯`
+              : '接近目標，維持記錄習慣'}
+        </p>
+        <div className="flex items-baseline justify-between mb-2">
           <p className="text-[22px] tabular-nums" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
             平均 {summary.calorieTrend.average ?? '—'} kcal
           </p>
@@ -282,12 +305,7 @@ export default function AnalyticsScreen({
             目標 {summary.calorieTrend.target} kcal
           </p>
         </div>
-        {summary.calorieTrend.deltaFromTarget != null && summary.calorieTrend.deltaFromTarget <= 0 && (
-          <p className="text-[13px] mb-3" style={{ color: BB_V2.accent.green }}>
-            比目標少 {Math.abs(summary.calorieTrend.deltaFromTarget)} kcal
-          </p>
-        )}
-        <ResponsiveContainer width="100%" height={120}>
+        <ResponsiveContainer width="100%" height={100}>
           <BarChart data={summary.calorieTrend.points}>
             <XAxis dataKey="label" tick={{ fontSize: 10 }} />
             <ReferenceLine y={summary.calorieTrend.target} stroke={BB_V2.text.secondary} strokeDasharray="4 4" />
@@ -298,214 +316,178 @@ export default function AnalyticsScreen({
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-        <p className="text-[13px] mt-2" style={{ color: BB_V2.text.secondary }}>
-          達標天數 {summary.calorieTrend.metDays} / {summary.calorieTrend.totalDays} 天
-        </p>
       </BBCard>
 
-      {/* 3. 蛋白質達標 */}
-      <BBCard>
-        <p className="text-[17px] mb-3" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-          蛋白質達標
-        </p>
-        <div className="flex items-baseline justify-between mb-3">
-          <p className="text-[22px] tabular-nums" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-            平均 {summary.proteinTrend.average ?? '—'} g
+      {/* Primary insight + next action */}
+      {(primaryInsight || nextAction) && (
+        <BBCard>
+          <p className="text-[17px] mb-4" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+            這段時間的重點
           </p>
-          <p className="text-[13px]" style={{ color: BB_V2.text.secondary }}>
-            目標 {summary.proteinTrend.target} g
-          </p>
-        </div>
-        <ResponsiveContainer width="100%" height={120}>
-          <BarChart data={summary.proteinTrend.points}>
-            <XAxis dataKey="label" tick={{ fontSize: 10 }} />
-            <ReferenceLine y={summary.proteinTrend.target} stroke={BB_V2.text.secondary} strokeDasharray="4 4" />
-            <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-              {summary.proteinTrend.points.map(p => (
-                <Cell key={p.date} fill={p.metTarget ? BB_V2.accent.green : BB_V2.macro.protein} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-        <p className="text-[13px] mt-2" style={{ color: BB_V2.text.secondary }}>
-          達標天數 {summary.proteinTrend.metDays} / {summary.proteinTrend.totalDays} 天
-        </p>
-      </BBCard>
-
-      {/* 4. BetterBit 分析 */}
-      <BBCard>
-          <div className="flex items-center gap-2 mb-4">
-          <BBIcon name="ai" size={20} tone="accent" />
-          <p className="text-[17px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-            BetterBit 分析
-          </p>
-        </div>
-        <div className="space-y-5">
-          {summary.insights.map((ins, i) => (
-            <InsightRow key={i} tone={ins.tone} title={ins.title} body={ins.body} />
-          ))}
-        </div>
-      </BBCard>
-
-      {/* 5. 下週建議 */}
-      <BBCard>
-        <p className="text-[17px] mb-4" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-          下週建議
-        </p>
-        <ul className="space-y-4">
-          {summary.nextWeekSuggestions.map((s, i) => (
-            <li key={i} className="text-[14px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-              · {s}
-            </li>
-          ))}
-        </ul>
-        {mealRec && (
-          <p className="text-[13px] mt-4 pt-4 leading-relaxed" style={{ borderTop: `1px solid ${BB_V2.divider}`, color: BB_V2.text.primary }}>
-            配餐建議：{mealRec.name}（{mealRec.calories} kcal / {mealRec.protein}g 蛋白）— {mealRec.reason}
-          </p>
-        )}
-        {workoutRec && (
-          <p className="text-[13px] mt-2 leading-relaxed" style={{ color: BB_V2.text.primary }}>
-            運動建議：{workoutRec.title} {workoutRec.duration} 分鐘 — {workoutRec.reason}
-          </p>
-        )}
-      </BBCard>
-
-      {/* 6. 三大營養素 */}
-      <BBCard>
-        <p className="text-[17px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-          三大營養素比例
-        </p>
-        <p className="text-[13px] mt-1 mb-4" style={{ color: BB_V2.text.secondary }}>
-          用來觀察飲食結構，不是唯一目標。
-        </p>
-        {summary.macroRatio.sufficient ? (
-          <div className="flex items-center gap-4">
-            <ResponsiveContainer width={120} height={120}>
-              <PieChart>
-                <Pie data={macroData} dataKey="value" innerRadius={36} outerRadius={52} paddingAngle={2}>
-                  {macroData.map((e, i) => (
-                    <Cell key={i} fill={e.color} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="space-y-2 text-[14px]" style={{ color: BB_V2.text.secondary }}>
-              <p>蛋白質 {summary.macroRatio.proteinPct}%</p>
-              <p>碳水 {summary.macroRatio.carbsPct}%</p>
-              <p>脂肪 {summary.macroRatio.fatPct}%</p>
+          {primaryInsight ? <InsightRow tone={primaryInsight.tone} title={primaryInsight.title} body={primaryInsight.body} /> : null}
+          {nextAction && (
+            <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${BB_V2.divider}` }}>
+              <p className="text-[13px] mb-1" style={{ color: BB_V2.accent.orange, fontWeight: 600 }}>
+                下一步
+              </p>
+              <p className="text-[14px] leading-relaxed" style={{ color: BB_V2.text.primary }}>
+                {nextAction.label}
+              </p>
+              {mealRec && (
+                <p className="text-[13px] mt-2 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+                  配餐參考：{mealRec.name} — {mealRec.reason}
+                </p>
+              )}
+              {workoutRec && (
+                <p className="text-[13px] mt-1 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+                  運動參考：{workoutRec.title} {workoutRec.duration} 分鐘
+                </p>
+              )}
             </div>
-          </div>
+          )}
+        </BBCard>
+      )}
+
+      {/* Collapsible secondary details */}
+      <button
+        type="button"
+        onClick={() => setShowDetails(v => !v)}
+        className="w-full flex items-center justify-center gap-1.5 py-2 text-[14px]"
+        style={{ color: BB_V2.text.secondary, fontWeight: 500 }}
+      >
+        {showDetails ? '收起詳細分析' : '查看更多分析'}
+        {showDetails ? (
+          <ChevronUp className="h-4 w-4" strokeWidth={BB_V2.iconStroke} />
         ) : (
-          <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>資料不足</p>
+          <ChevronDown className="h-4 w-4" strokeWidth={BB_V2.iconStroke} />
         )}
-      </BBCard>
+      </button>
 
-      {/* 7. 熱量分布 */}
-      <BBCard>
-        <p className="text-[17px] mb-4" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-          熱量分布
-        </p>
-        {summary.calorieDistribution.sufficient ? (
-          <>
-            <div className="space-y-2">
-              {distData.map(row => (
-                <div key={row.name} className="flex justify-between text-[14px]">
-                  <span style={{ color: BB_V2.text.secondary }}>{row.name}</span>
-                  <span style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-                    {row.pct}%（{row.kcal} kcal）
-                  </span>
+      {showDetails && (
+        <div className="space-y-5">
+          <BBCard>
+            <p className="text-[17px] mb-3" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+              蛋白質達標
+            </p>
+            <ResponsiveContainer width="100%" height={100}>
+              <BarChart data={summary.proteinTrend.points}>
+                <XAxis dataKey="label" tick={{ fontSize: 10 }} />
+                <ReferenceLine y={summary.proteinTrend.target} stroke={BB_V2.text.secondary} strokeDasharray="4 4" />
+                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                  {summary.proteinTrend.points.map(p => (
+                    <Cell key={p.date} fill={p.metTarget ? BB_V2.accent.green : BB_V2.macro.protein} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <p className="text-[13px] mt-2" style={{ color: BB_V2.text.secondary }}>
+              達標 {summary.proteinTrend.metDays} / {summary.proteinTrend.totalDays} 天
+            </p>
+          </BBCard>
+
+          {summary.insights.length > 1 && (
+            <BBCard>
+              <div className="space-y-5">
+                {summary.insights.slice(1).map((ins, i) => (
+                  <InsightRow key={i} tone={ins.tone} title={ins.title} body={ins.body} />
+                ))}
+              </div>
+            </BBCard>
+          )}
+
+          <BBCard>
+            <p className="text-[17px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+              三大營養素比例
+            </p>
+            {summary.macroRatio.sufficient ? (
+              <div className="flex items-center gap-4 mt-3">
+                <ResponsiveContainer width={100} height={100}>
+                  <PieChart>
+                    <Pie data={macroData} dataKey="value" innerRadius={30} outerRadius={44} paddingAngle={2}>
+                      {macroData.map((e, i) => (
+                        <Cell key={i} fill={e.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="space-y-1 text-[14px]" style={{ color: BB_V2.text.secondary }}>
+                  <p>蛋白質 {summary.macroRatio.proteinPct}%</p>
+                  <p>碳水 {summary.macroRatio.carbsPct}%</p>
+                  <p>脂肪 {summary.macroRatio.fatPct}%</p>
                 </div>
-              ))}
-            </div>
-            {summary.calorieDistribution.insight && (
-              <p className="text-[13px] mt-4 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-                {summary.calorieDistribution.insight}
+              </div>
+            ) : (
+              <p className="text-[14px] mt-2" style={{ color: BB_V2.text.secondary }}>
+                資料不足，多記幾餐後會顯示
               </p>
             )}
-          </>
-        ) : (
-          <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>資料不足</p>
-        )}
-      </BBCard>
+          </BBCard>
 
-      {/* 8. 飲食紀錄總結 */}
-      <BBCard>
-        <p className="text-[17px] mb-4" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-          飲食紀錄總結
-        </p>
-        <ul className="space-y-2 text-[14px]" style={{ color: BB_V2.text.secondary }}>
-          <li>總餐數 {summary.dietRecordSummary.totalMeals} 餐</li>
-          {summary.dietRecordSummary.avgCaloriesPerMeal != null && (
-            <li>平均每餐熱量 {summary.dietRecordSummary.avgCaloriesPerMeal} kcal</li>
-          )}
-          <li>吃超標天數 {summary.dietRecordSummary.overTargetDays} 天</li>
-          {summary.dietRecordSummary.exerciseBurnKcal != null && (
-            <li>運動消耗 {summary.dietRecordSummary.exerciseBurnKcal} kcal</li>
-          )}
-          <li>
-            喝水達標天數 {summary.dietRecordSummary.waterMetDays} / {summary.dietRecordSummary.waterTotalDays} 天
-          </li>
-        </ul>
-      </BBCard>
+          <BBCard>
+            <p className="text-[17px] mb-3" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+              熱量分布
+            </p>
+            {summary.calorieDistribution.sufficient ? (
+              <div className="space-y-2">
+                {distData.map(row => (
+                  <div key={row.name} className="flex justify-between text-[14px]">
+                    <span style={{ color: BB_V2.text.secondary }}>{row.name}</span>
+                    <span style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
+                      {row.pct}%（{row.kcal} kcal）
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
+                資料不足
+              </p>
+            )}
+          </BBCard>
 
-      {/* 9. 最佳紀錄日 */}
-      {summary.bestDay && (
-        <BBCard>
-          <p className="text-[17px] mb-3" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-            最佳紀錄日
-          </p>
-          <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-            {summary.bestDay.label}
-          </p>
-          <p className="text-[14px] mt-1" style={{ color: BB_V2.text.secondary }}>
-            熱量 {summary.bestDay.calories} kcal · {summary.bestDay.tags.join(' · ')}
-          </p>
-          <div className="mt-3">
-            <BBIcon name="best" size={32} tone="success" />
-          </div>
-        </BBCard>
+          {summary.bestDay && (
+            <BBCard>
+              <p className="text-[17px] mb-2" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+                表現最好的一天
+              </p>
+              <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
+                {summary.bestDay.label}
+              </p>
+              <p className="text-[14px] mt-1" style={{ color: BB_V2.text.secondary }}>
+                熱量 {summary.bestDay.calories} kcal
+              </p>
+            </BBCard>
+          )}
+        </div>
       )}
 
-      {/* 10. 需要加油的日子 */}
-      {summary.needsAttentionDay && (
-        <BBCard>
-          <p className="text-[17px] mb-3" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-            需要加油的日子
-          </p>
-          <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-            {summary.needsAttentionDay.label}
-          </p>
-          <ul className="mt-2 space-y-1 text-[14px]" style={{ color: BB_V2.text.secondary }}>
-            {(summary.needsAttentionDay.issues ?? []).map((issue, i) => (
-              <li key={i}>· {issue}</li>
-            ))}
-          </ul>
-          <div className="mt-3">
-            <BBIcon name="needImprove" size={32} tone="warning" />
-          </div>
-        </BBCard>
-      )}
-
-      {/* 11. 下一步行動 */}
-      <BBCard>
-        <p className="text-[17px] mb-4" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-          下一步行動
-        </p>
-        <ul className="space-y-3">
-          {summary.nextActions.map(action => (
-            <li key={action.id} className="flex items-start gap-3 text-[14px]">
-              <BBIcon
-                name={action.done ? 'success' : 'neutral'}
-                size={18}
-                tone={action.done ? 'success' : 'muted'}
-                className="mt-0.5 shrink-0"
-              />
-              <span style={{ color: BB_V2.text.primary, fontWeight: action.done ? 600 : 400 }}>{action.label}</span>
-            </li>
-          ))}
-        </ul>
-      </BBCard>
+      {/* Terminal CTAs */}
+      <div className="space-y-3 pt-2">
+        <Link
+          href="/dashboard"
+          className="flex w-full h-14 items-center justify-center text-[15px] active:opacity-90"
+          style={{
+            borderRadius: BB_V2.radius.button,
+            backgroundColor: BB_V2.accent.orange,
+            color: '#FFFFFF',
+            fontWeight: 600,
+          }}
+        >
+          回到今天，記錄下一餐
+        </Link>
+        <Link
+          href="/weekly"
+          className="flex w-full h-12 items-center justify-center text-[14px] active:opacity-90"
+          style={{
+            borderRadius: BB_V2.radius.button,
+            backgroundColor: BB_V2.bg.pill,
+            color: BB_V2.text.primary,
+            fontWeight: 600,
+          }}
+        >
+          看本週建議
+        </Link>
+      </div>
     </div>
   )
 }

@@ -382,7 +382,7 @@ describe('P0 — Text record label preservation', () => {
       logged_at: new Date().toISOString(),
       user_declared: true,
     }
-    assert.equal(formatLogCaloriesLine(log), '營養待確認')
+    assert.equal(formatLogCaloriesLine(log), '待確認')
     assert.notEqual(formatLogCaloriesLine(log), '0 kcal')
   })
 

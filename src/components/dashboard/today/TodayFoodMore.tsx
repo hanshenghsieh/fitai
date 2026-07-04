@@ -126,7 +126,7 @@ export default function TodayFoodMore({
                 文字紀錄
               </h2>
               <p className="text-[13px] leading-relaxed mt-1" style={{ color: DS.textSecondary, fontWeight: 400 }}>
-                輸入或搜尋菜名，手動建立這餐
+                搜尋或輸入菜名，確認後加入今日紀錄
               </p>
             </div>
             <button type="button" onClick={onClose} className="p-1.5 -mr-1 shrink-0" aria-label="關閉">
@@ -247,7 +247,7 @@ export default function TodayFoodMore({
               style={{ backgroundColor: DS.mocha, color: '#FFFFFF', fontWeight: 500 }}
             >
               <PenLine className="h-4 w-4" strokeWidth={ICON_STROKE} />
-              {trimmed ? `建立「${trimmed}」紀錄` : '輸入食物名稱後建立紀錄'}
+              {trimmed ? '加入今日紀錄' : '輸入菜名後加入今日紀錄'}
             </button>
           </div>
         )}

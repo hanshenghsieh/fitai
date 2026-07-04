@@ -4,6 +4,10 @@ const CANVAS = '#FFF9F2'
 const VIEWPORT_CONTENT =
   'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'
 
+/** WKWebView often reports env(safe-area-inset-*) as 0 when native scroll insets are negated. */
+const IOS_SAFE_TOP_FALLBACK = 47
+const IOS_SAFE_BOTTOM_FALLBACK = 34
+
 function readEnvInset(side: 'Top' | 'Bottom' | 'Left' | 'Right'): number {
   const probe = document.createElement('div')
   probe.style.cssText =
@@ -14,10 +18,33 @@ function readEnvInset(side: 'Top' | 'Bottom' | 'Left' | 'Right'): number {
   return value
 }
 
+function iosSafeTopFallback(): number {
+  if (typeof window === 'undefined') return IOS_SAFE_TOP_FALLBACK
+  const h = window.screen.height
+  // Tall iPhones (notch / Dynamic Island)
+  if (h >= 812) return IOS_SAFE_TOP_FALLBACK
+  // Classic status bar
+  return 20
+}
+
+function resolveSafeInsets(): { top: number; bottom: number } {
+  let top = readEnvInset('Top')
+  let bottom = readEnvInset('Bottom')
+
+  if (isNativeIOS()) {
+    if (top < 20) top = iosSafeTopFallback()
+    if (bottom < 8) bottom = IOS_SAFE_BOTTOM_FALLBACK
+  }
+
+  return {
+    top: Math.min(top, 59),
+    bottom: Math.min(bottom, 40),
+  }
+}
+
 function applySafeAreaVariables(): void {
   const html = document.documentElement
-  const top = Math.min(readEnvInset('Top'), 59)
-  const bottom = Math.min(readEnvInset('Bottom'), 40)
+  const { top, bottom } = resolveSafeInsets()
 
   html.style.setProperty('--app-safe-top', `${top}px`)
   html.style.setProperty('--app-safe-bottom', `${bottom}px`)

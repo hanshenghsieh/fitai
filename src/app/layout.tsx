@@ -81,6 +81,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
       >
         {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var c=window.Capacitor;if(!c||typeof c.isNativePlatform!=='function'||!c.isNativePlatform())return;if(c.getPlatform&&c.getPlatform()!=='ios')return;var h=window.screen.height;var t=h>=812?47:20;var b=h>=812?34:0;document.documentElement.classList.add('capacitor-ios');document.documentElement.style.setProperty('--app-safe-top',t+'px');document.documentElement.style.setProperty('--app-safe-bottom',b+'px');}catch(e){}})();`,
+          }}
+        />
         <CapacitorShell />
         <OfflineShell />
         <Toaster theme="light" richColors={false} position="top-center" />

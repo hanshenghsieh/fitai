@@ -1,30 +1,19 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { WeekSummary } from '@/lib/analytics/week-summary'
-import { useReveal } from '@/components/motion/useReveal'
-import WeekHeroCard from './WeekHeroCard'
+import { buildWeekHeroDisplay, pickWeekFocusAction } from '@/lib/analytics/week-display'
+import EmptyStateCard from '@/components/ui/EmptyStateCard'
+import WeekSummaryHero from './WeekSummaryHero'
+import WeekFocusActionCard from './WeekFocusActionCard'
+import WeekTrendCards from './WeekTrendCards'
 import WeekDailyPerformance from './WeekDailyPerformance'
-import WeekCoachInsights from './WeekCoachInsights'
-import WeekChallengeGrid from './WeekChallengeGrid'
-import WeekStrategyRow from './WeekStrategyRow'
-import WeekBestWorst from './WeekBestWorst'
-import BBCard from '@/components/ui/BBCard'
 
 interface Props {
   summary: WeekSummary
   error?: string | null
-}
-
-function RevealSection({ index, children }: { index: number; children: ReactNode }) {
-  const reveal = useReveal(index)
-  return (
-    <div ref={reveal.ref} className={reveal.className} style={reveal.style}>
-      {children}
-    </div>
-  )
 }
 
 export default function WeekScreen({ summary, error }: Props) {
@@ -32,89 +21,81 @@ export default function WeekScreen({ summary, error }: Props) {
 
   if (error) {
     return (
-      <div className="px-5 app-page-top text-center" style={{ fontFamily: BB_V2.font }}>
-        <p className="text-[16px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-          暫時無法載入本週資料
-        </p>
-        <p className="text-[14px] mt-2" style={{ color: BB_V2.text.secondary }}>
-          {error}
-        </p>
+      <div className="px-5 app-page-top pb-8 max-w-lg mx-auto space-y-4" style={{ fontFamily: BB_V2.font }}>
+        <header>
+          <h1 className="text-[22px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+            本週
+          </h1>
+        </header>
+        <EmptyStateCard
+          title="暫時無法載入本週資料"
+          reason={error}
+          ctaLabel="回到今天"
+          ctaHref="/dashboard"
+        />
       </div>
     )
   }
 
   if (summary.insufficient_data) {
     return (
-      <div className="px-5 app-page-top pb-8 space-y-6" style={{ fontFamily: BB_V2.font }}>
+      <div className="px-5 app-page-top pb-8 space-y-6 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
         <header>
-          <h1 className="text-[34px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+          <h1 className="text-[22px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
             本週
           </h1>
-          <p className="text-[15px] mt-1" style={{ color: BB_V2.text.secondary }}>
-            你的每一步，都讓改變更靠近。
+          <p className="text-[14px] mt-1" style={{ color: BB_V2.text.secondary }}>
+            記錄幾餐，就能幫你整理本週節奏。
           </p>
         </header>
-        <BBCard className="text-center py-12">
-          <p className="text-[18px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-            {summary.insufficient_reason ?? '再記錄幾餐，我就能幫你看出本週狀態。'}
-          </p>
-          <Link
-            href="/dashboard"
-            className="inline-flex mt-6 h-12 px-8 items-center justify-center rounded-full text-[15px]"
-            style={{ backgroundColor: BB_V2.accent.orange, color: '#FFFFFF', fontWeight: 600 }}
-          >
-            去記錄第一餐
-          </Link>
-        </BBCard>
+        <EmptyStateCard
+          title="還沒有本週資料"
+          reason={summary.insufficient_reason ?? '先記錄今天第一餐，BetterBit 就能幫你整理趨勢。'}
+          ctaLabel="回到今天"
+          ctaHref="/dashboard"
+        />
       </div>
     )
   }
 
+  const hero = buildWeekHeroDisplay(summary)
+  const focusAction = pickWeekFocusAction(summary)
+
   return (
-    <div className="px-5 app-page-top pb-8 space-y-5 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
+    <div className="px-5 app-page-top pb-10 space-y-5 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
       <header>
-        <h1 className="text-[34px] leading-tight" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+        <h1 className="text-[22px] leading-tight" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
           本週
         </h1>
-        <p className="text-[15px] mt-1 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-          你的每一步，都讓改變更靠近。
+        <p className="text-[14px] mt-1 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+          本週狀態與下一步建議
         </p>
       </header>
 
-      {summary.weekScore && (
-        <RevealSection index={0}>
-          <WeekHeroCard weekScore={summary.weekScore} metrics={summary.weeklyMetrics} />
-        </RevealSection>
-      )}
+      <WeekSummaryHero hero={hero} />
 
-      <RevealSection index={1}>
-        <WeekDailyPerformance
-          days={summary.dailyScores}
-          selectedDate={selectedDate}
-          onSelect={setSelectedDate}
-        />
-      </RevealSection>
+      <WeekFocusActionCard action={focusAction} />
 
-      {summary.insights.length > 0 && (
-        <RevealSection index={2}>
-          <WeekCoachInsights insights={summary.insights} />
-        </RevealSection>
-      )}
+      <WeekTrendCards summary={summary} />
 
-      <RevealSection index={3}>
-        <WeekChallengeGrid challenges={summary.challenges} />
-      </RevealSection>
+      <WeekDailyPerformance
+        days={summary.dailyScores}
+        selectedDate={selectedDate}
+        onSelect={setSelectedDate}
+      />
 
-      <RevealSection index={4}>
-        <WeekStrategyRow
-          mealStrategy={summary.mealStrategy}
-          workoutStrategy={summary.workoutStrategy}
-        />
-      </RevealSection>
-
-      <RevealSection index={5}>
-        <WeekBestWorst bestDay={summary.bestDay} worstDay={summary.worstDay} />
-      </RevealSection>
+      <Link
+          href="/dashboard"
+          className="flex w-full h-14 items-center justify-center text-[15px] active:opacity-90"
+          style={{
+            borderRadius: BB_V2.radius.button,
+            backgroundColor: BB_V2.accent.orange,
+            color: '#FFFFFF',
+            fontWeight: 600,
+          }}
+        >
+          回到今天，記錄下一餐
+        </Link>
     </div>
   )
 }

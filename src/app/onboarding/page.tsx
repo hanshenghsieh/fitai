@@ -9,14 +9,27 @@ import { toast } from 'sonner'
 import { Loader2, ChevronRight, ChevronLeft } from 'lucide-react'
 import { addMonths, format } from 'date-fns'
 import { colors, cardStyle } from '@/lib/design-system'
+import { BB_V2 } from '@/lib/betterbit-v2'
 import { calculateGoalPlan } from '@/lib/goal-calculator'
-import { formatDeficitPlain, formatProteinPlain, formatWeeklyFatLoss } from '@/lib/coach-copy'
+import { formatDeficitPlain, formatProteinPlain } from '@/lib/coach-copy'
 import { pickZaiJianLine, zaijian } from '@/lib/copy/zaijian'
 import ZaiJian from '@/components/character/ZaiJian'
 import { OnboardingCard, OnboardingChip } from '@/components/onboarding/OnboardingChip'
 import type { ActivityLevel, FitnessLevel, Goal, UserProfile } from '@/types'
 
 const TOTAL_STEPS = 3
+
+const buttonPrimaryStyle = {
+  backgroundColor: BB_V2.accent.orange,
+  color: '#FFFFFF',
+  fontWeight: 600,
+} as const
+
+const buttonGhostStyle = {
+  backgroundColor: BB_V2.bg.surface,
+  color: BB_V2.text.secondary,
+  fontWeight: 600,
+} as const
 
 interface FormData {
   gender: string
@@ -158,17 +171,17 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="auth-page-shell p-4 pt-8 pb-12" style={{ backgroundColor: colors.bg.canvas }}>
-      <div className="w-full max-w-xl mx-auto space-y-6">
+    <div className="auth-page-shell p-4 pt-8 pb-12" style={{ backgroundColor: BB_V2.bg.canvas, fontFamily: BB_V2.font }}>
+      <div className="w-full mx-auto space-y-6" style={{ maxWidth: BB_V2.maxWidth }}>
         <ZaiJian size="lg" line={pickZaiJianLine(`onboarding_${Math.min(step, 4)}` as 'onboarding_1')} layout="bubble" />
-        <div className="flex justify-between text-[13px]" style={{ color: colors.text.tertiary }}>
+        <div className="flex justify-between text-[13px]" style={{ color: BB_V2.text.secondary }}>
           <span>認識一下</span>
           <span>{step} / {TOTAL_STEPS}</span>
         </div>
-        <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: colors.bg.muted }}>
+        <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: BB_V2.bg.surface }}>
           <div
             className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${(step / TOTAL_STEPS) * 100}%`, backgroundColor: colors.accent.action }}
+            style={{ width: `${(step / TOTAL_STEPS) * 100}%`, backgroundColor: BB_V2.accent.orange }}
           />
         </div>
 
@@ -189,8 +202,8 @@ export default function OnboardingPage() {
             <button
               type="button"
               onClick={() => setStep(s => s - 1)}
-              className="flex-1 py-3 rounded-xl text-[15px] font-semibold flex items-center justify-center gap-1"
-              style={{ backgroundColor: colors.bg.muted, color: colors.text.secondary }}
+              className="flex-1 py-3 text-[15px] font-semibold flex items-center justify-center gap-1 active:opacity-90"
+              style={{ ...buttonGhostStyle, borderRadius: BB_V2.radius.button }}
             >
               <ChevronLeft className="h-4 w-4" /> 上一步
             </button>
@@ -200,8 +213,8 @@ export default function OnboardingPage() {
               type="button"
               onClick={() => setStep(s => s + 1)}
               disabled={!canNext()}
-              className="flex-1 py-3 rounded-xl text-[15px] font-semibold flex items-center justify-center gap-1 disabled:opacity-40"
-              style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
+              className="flex-1 py-3 text-[15px] font-semibold flex items-center justify-center gap-1 disabled:opacity-40 active:opacity-90"
+              style={{ ...buttonPrimaryStyle, borderRadius: BB_V2.radius.button }}
             >
               下一步 <ChevronRight className="h-4 w-4" />
             </button>
@@ -210,8 +223,8 @@ export default function OnboardingPage() {
               type="button"
               onClick={handleSubmit}
               disabled={loading || !disclaimerAccepted}
-              className="flex-1 py-3 rounded-xl text-[15px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40"
-              style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
+              className="flex-1 py-3 text-[15px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40 active:opacity-90"
+              style={{ ...buttonPrimaryStyle, borderRadius: BB_V2.radius.button }}
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               開始我的計畫
@@ -330,6 +343,10 @@ function StepFinish({
   disclaimerAccepted: boolean
   onDisclaimerAccepted: (accepted: boolean) => void
 }) {
+  const [showEquipment, setShowEquipment] = useState(true)
+  const [showInjuries, setShowInjuries] = useState(false)
+  const [showPlanPreview, setShowPlanPreview] = useState(true)
+
   const injuries = [
     { val: 'knee', label: '膝蓋' }, { val: 'back', label: '腰' },
     { val: 'shoulder', label: '肩' }, { val: 'wrist', label: '手腕' },
@@ -357,9 +374,12 @@ function StepFinish({
 
   return (
     <div className="space-y-4">
-      <OnboardingCard title="最後確認" desc="有傷的話跟我說，動作會避開。">
-        <div>
-          <Label className="text-[13px]">你手邊有哪些器材？</Label>
+      <OnboardingCard title="最後確認" desc="設定減脂助手，不是填醫療問卷。選填項目可以略過。">
+        <CollapsibleSection
+          title="你手邊有哪些器材？"
+          open={showEquipment}
+          onToggle={() => setShowEquipment(v => !v)}
+        >
           <div className="flex flex-wrap gap-2 mt-2">
             {equipmentOptions.map(({ val, label }) => (
               <OnboardingChip
@@ -372,12 +392,16 @@ function StepFinish({
               </OnboardingChip>
             ))}
           </div>
-          <p className="text-[11px] mt-2 leading-relaxed" style={{ color: colors.text.tertiary }}>
+          <p className="text-[11px] mt-2 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
             沒有器材也沒問題，會優先安排慢跑、快走、徒手訓練。
           </p>
-        </div>
-        <div>
-          <Label className="text-[13px]">哪裡不舒服（選填）</Label>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="哪裡不舒服（選填）"
+          open={showInjuries}
+          onToggle={() => setShowInjuries(v => !v)}
+        >
           <div className="flex flex-wrap gap-2 mt-2">
             {injuries.map(({ val, label }) => (
               <OnboardingChip key={val} active={data.injuries.includes(val)} onClick={() => set('injuries', toggle(data.injuries, val))} className="px-3 py-2">
@@ -385,53 +409,50 @@ function StepFinish({
               </OnboardingChip>
             ))}
           </div>
-        </div>
+        </CollapsibleSection>
       </OnboardingCard>
 
       {planPreview && (
-        <div className="rounded-2xl p-5 space-y-3" style={cardStyle}>
-          <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: colors.accent.action }}>
-            你的個人化計畫預覽
-          </p>
-          <div className="grid grid-cols-2 gap-2 text-[13px]">
+        <CollapsibleSection
+          title="你的個人化計畫預覽"
+          open={showPlanPreview}
+          onToggle={() => setShowPlanPreview(v => !v)}
+          card
+        >
+          <div className="grid grid-cols-2 gap-2 text-[13px] mt-2">
             <PreviewMetric label="每日熱量" value={`${planPreview.dailyCalories} kcal`} />
             <PreviewMetric label="蛋白質" value={`${planPreview.proteinGrams} g`} />
             {planPreview.dailyDeficit > 0 && (
               <PreviewMetric label="熱量缺口" value={`-${planPreview.dailyDeficit} kcal`} span={2} />
             )}
-            <PreviewMetric label="每週運動" value="重訓 3 次 + 有氧 3 次" span={2} />
           </div>
-          <p className="text-[12px] leading-relaxed" style={{ color: colors.text.secondary }}>
+          <p className="text-[12px] mt-3 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
             {planPreview.dailyDeficit > 0 && formatDeficitPlain(planPreview.dailyDeficit) + '。'}
             {formatProteinPlain(planPreview.proteinGrams, planPreview.leanMassKg)}。
-            {formatWeeklyFatLoss(Math.round(planPreview.weeklyChangeKg * 1000))}。
           </p>
-          <p className="text-[11px]" style={{ color: colors.text.tertiary }}>
-            系統會依這些數字，自動設計每日三餐與課表。你不用自己算。
-          </p>
-        </div>
+        </CollapsibleSection>
       )}
 
-      <ul className="text-[13px] space-y-1.5 px-1" style={{ color: colors.text.secondary }}>
-        <li>· 14 天免費試用，完整計畫</li>
-        <li>· 進首頁就有第一餐建議（mini-win）</li>
-        <li>· 不喜歡可換同熱量組合</li>
+      <ul className="text-[13px] space-y-1.5 px-1" style={{ color: BB_V2.text.secondary }}>
+        <li>· 完成後直接進 Today，從第一餐開始</li>
+        <li>· 不用補過去，記錄下一餐就好</li>
+        <li>· 不知道吃什麼，可以讓 BetterBit 幫你算</li>
       </ul>
 
       <label
-        className="flex items-start gap-3 rounded-2xl p-4 cursor-pointer"
-        style={{ backgroundColor: colors.bg.muted }}
+        className="flex items-start gap-3 p-4 cursor-pointer"
+        style={{ backgroundColor: BB_V2.bg.surface, borderRadius: BB_V2.radius.input }}
       >
         <input
           type="checkbox"
           checked={disclaimerAccepted}
           onChange={e => onDisclaimerAccepted(e.target.checked)}
-          className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--accent)]"
-          style={{ accentColor: colors.accent.action }}
+          className="mt-0.5 h-4 w-4 shrink-0"
+          style={{ accentColor: BB_V2.accent.orange }}
         />
-        <span className="text-[13px] leading-relaxed" style={{ color: colors.text.secondary }}>
+        <span className="text-[12px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
           BetterBit 提供健康與飲食輔助建議，不能取代醫師、營養師或其他專業醫療建議。食物辨識與熱量估算僅供參考。
-          <span className="block mt-2 font-medium" style={{ color: colors.text.primary }}>
+          <span className="block mt-2 font-medium" style={{ color: BB_V2.text.primary }}>
             我了解
           </span>
         </span>
@@ -440,14 +461,46 @@ function StepFinish({
   )
 }
 
+function CollapsibleSection({
+  title,
+  open,
+  onToggle,
+  children,
+  card,
+}: {
+  title: string
+  open: boolean
+  onToggle: () => void
+  children: React.ReactNode
+  card?: boolean
+}) {
+  const Wrapper = card ? 'div' : 'div'
+  return (
+    <Wrapper
+      className={card ? 'p-4' : ''}
+      style={card ? { ...cardStyle, borderRadius: BB_V2.radius.card } : undefined}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between gap-2 text-left"
+      >
+        <span className="text-[14px] font-semibold" style={{ color: BB_V2.text.primary }}>{title}</span>
+        <ChevronRight className={`h-4 w-4 shrink-0 transition-transform ${open ? 'rotate-90' : ''}`} style={{ color: BB_V2.text.secondary }} />
+      </button>
+      {open ? <div className="mt-2">{children}</div> : null}
+    </Wrapper>
+  )
+}
+
 function PreviewMetric({ label, value, span = 1 }: { label: string; value: string; span?: number }) {
   return (
     <div
-      className="rounded-xl px-3 py-2"
-      style={{ backgroundColor: colors.bg.muted, gridColumn: span === 2 ? 'span 2 / span 2' : undefined }}
+      className="px-3 py-2"
+      style={{ backgroundColor: BB_V2.bg.surface, borderRadius: BB_V2.radius.input, gridColumn: span === 2 ? 'span 2 / span 2' : undefined }}
     >
-      <p className="text-[10px]" style={{ color: colors.text.tertiary }}>{label}</p>
-      <p className="font-semibold" style={{ color: colors.text.primary }}>{value}</p>
+      <p className="text-[10px]" style={{ color: BB_V2.text.secondary }}>{label}</p>
+      <p className="font-semibold" style={{ color: BB_V2.text.primary }}>{value}</p>
     </div>
   )
 }

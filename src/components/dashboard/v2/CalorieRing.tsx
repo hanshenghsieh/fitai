@@ -12,14 +12,13 @@ interface Props {
 export default function CalorieRing({ logged, target, remaining }: Props) {
   const safeTarget = Math.max(target, 1)
   const pct = Math.min(1, logged / safeTarget)
-  const display = useCountUp(Math.round(logged), BB_V2.motion.countUpMs)
+  const left = remaining ?? Math.max(0, target - logged)
+  const display = useCountUp(Math.round(left), BB_V2.motion.countUpMs)
   const size = 200
   const stroke = BB_V2.ring.strokeWidth
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   const offset = c * (1 - pct)
-
-  const left = remaining ?? Math.max(0, target - logged)
 
   return (
     <div className="flex flex-col items-center py-2" style={{ fontFamily: BB_V2.font }}>
@@ -50,13 +49,15 @@ export default function CalorieRing({ logged, target, remaining }: Props) {
           <span className="text-[36px] tabular-nums leading-none" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
             {display.toLocaleString()}
           </span>
-          <span className="text-[15px] mt-1 tabular-nums" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
-            / {target.toLocaleString()} kcal
+          <span className="text-[13px] mt-1" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
+            kcal 剩餘
           </span>
         </div>
       </div>
-      <p className="text-[14px] mt-4 text-center" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
-        {left > 0 ? `還可以吃 ${left.toLocaleString()} kcal` : '今天的目標已達成'}
+      <p className="text-[14px] mt-4 text-center tabular-nums" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
+        {left > 0
+          ? `已吃 ${Math.round(logged).toLocaleString()} / 目標 ${target.toLocaleString()} kcal`
+          : '今天的目標已達成'}
       </p>
     </div>
   )

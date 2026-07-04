@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Camera, ClipboardList, RefreshCw } from 'lucide-react'
 import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu } from '@/lib/food-search'
 import {
@@ -67,10 +66,11 @@ import type { RecommendationQueueState } from '@/lib/recommendation/v2/types'
 import { preloadDiceMenuBulk, isDiceMenuBulkReady, getDiceMenuSource } from '@/lib/dice-menu-pool'
 import {
   clearTodaySheetParams,
-  dispatchOpenPhotoSheet,
   todaySheetFromSearch,
   TODAY_OPEN_PHOTO_EVENT,
   TODAY_OPEN_TEXT_LOG_EVENT,
+  TODAY_CONFIRM_DICE_EVENT,
+  TODAY_ROLL_DICE_EVENT,
 } from '@/lib/today-actions'
 import { linesToDisplayItems } from '@/lib/meal-suggest'
 import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
@@ -335,6 +335,12 @@ interface Props {
   }) => void
   registerDeleteLog?: (handler: (logId: string) => void) => void
   onOpenNutritionConfirmation?: (log: FoodLogEntry) => void
+  onMealUiState?: (state: {
+    hasDicePreview: boolean
+    rolling: boolean
+    confirming: boolean
+    allowDiceAndSuggest: boolean
+  }) => void
 }
 
 function buildAdherenceContext(
@@ -400,6 +406,7 @@ export default function TodayOS({
   onDiceApply,
   registerDeleteLog,
   onOpenNutritionConfirmation,
+  onMealUiState,
 }: Props) {
   const pathname = usePathname()
   const onDashboard = pathname === '/dashboard'
@@ -474,6 +481,7 @@ export default function TodayOS({
   const lastPostureLineRef = useRef('')
   const photoPreviewUrlRef = useRef<string | null>(null)
   const [dicePreviewByMeal, setDicePreviewByMeal] = useState<Partial<Record<MealType, MealSuggestion>>>({})
+  const [diceRollHint, setDiceRollHint] = useState<string | null>(null)
   const dicePreview = dicePreviewByMeal[mealSlotLegacy] ?? null
   const [localDiceRolls, setLocalDiceRolls] = useState(0)
   const [moreOpen, setMoreOpen] = useState(false)
@@ -485,11 +493,14 @@ export default function TodayOS({
 
   const [query, setQuery] = useState('')
   const foodLogsRef = useRef(foodLogs)
-  foodLogsRef.current = foodLogs
   const activeSlotRef = useRef(activeSlot)
-  activeSlotRef.current = activeSlot
   const dayStateRef = useRef(dayState)
-  dayStateRef.current = dayState
+
+  useEffect(() => {
+    foodLogsRef.current = foodLogs
+    activeSlotRef.current = activeSlot
+    dayStateRef.current = dayState
+  }, [foodLogs, activeSlot, dayState])
 
   const frequentList = useMemo(() => displayFrequent(foodDna), [foodDna])
   const [selectedFrequentId, setSelectedFrequentId] = useState('')
@@ -776,19 +787,26 @@ export default function TodayOS({
           : prev
       )
     } catch (err) {
-      const message = err instanceof Error ? err.message : '辨識失敗，請稍後再試'
-      toast.error('無法完成辨識', { description: message })
+      const raw = err instanceof Error ? err.message : ''
+      const isHardApiError = /辨識失敗|failed|error|500|401|403/i.test(raw)
+      const hint = '這餐看起來需要你再確認一下，可以手動修正後加入今日紀錄。'
+      if (isHardApiError) {
+        toast.error('暫時無法連線辨識', { description: '你可以手動修正或稍後再試' })
+      } else {
+        toast.message('需要你再確認一下', { description: hint })
+      }
       setPhotoDraft(prev =>
         prev
           ? {
               ...prev,
-              name: parsedName || '未知食物',
+              name: parsedName || '這餐',
               calories: null,
               protein_g: null,
               carbs_g: null,
               fat_g: null,
               loading: false,
               accuracy: undefined,
+              recognitionHint: hint,
             }
           : prev
       )
@@ -1080,18 +1098,22 @@ export default function TodayOS({
         setLocalDiceRolls(n => n + 1)
         if (!result.suggestion) {
           const ds = dayStateRef.current
-          if (isNearDailyTarget(ds) || ds.skipMealRecommendation) {
-            toast.message(nearTargetRollMessage(ds.remainingCalories))
-          } else {
-            toast.message('暫時想不到別的，試試文字紀錄或拍今天吃的')
-          }
+          const hint =
+            isNearDailyTarget(ds) || ds.skipMealRecommendation
+              ? nearTargetRollMessage(ds.remainingCalories)
+              : '暫時想不到別的組合，試試文字紀錄或拍今天吃的。'
+          setDiceRollHint(hint)
+          toast.message(hint)
           return
         }
         if (suggestionUsesOnlyNames(result.suggestion, blockedNames)) {
-          toast.message('暫時想不到別的，試試文字紀錄')
+          const hint = '暫時想不到別的組合，試試文字紀錄。'
+          setDiceRollHint(hint)
+          toast.message(hint)
           return
         }
 
+        setDiceRollHint(null)
         const store = result.suggestion.stores[0]
         const id = result.suggestion.id
         const nextStores = store ? [...new Set([...session.stores, store])].slice(-20) : session.stores
@@ -1155,7 +1177,19 @@ export default function TodayOS({
       return next
     })
     schedulePostureLine(nextLogs, nextMemory, logEntry.calories - mealTargets.calories)
+    confirmingRef.current = false
+    setConfirming(false)
   }, [dicePreview, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, schedulePostureLine, onDiceApply])
+
+  const confirmDiceRef = useRef(confirmDice)
+  const dicePreviewRef = useRef(dicePreview)
+  const allowDiceRef = useRef(dayState.allowDiceAndSuggest)
+
+  useEffect(() => {
+    confirmDiceRef.current = confirmDice
+    dicePreviewRef.current = dicePreview
+    allowDiceRef.current = dayState.allowDiceAndSuggest
+  }, [confirmDice, dicePreview, dayState.allowDiceAndSuggest])
 
   const previewItems = dicePreview ? linesToDisplayItems(dicePreview.lines) : []
   const hasSlotLogs = slotLogs.length > 0
@@ -1170,18 +1204,24 @@ export default function TodayOS({
   const showingConfirmedSelection = !dicePreview && slotSelectedItems.length > 0 && !hasSlotLogs
   const showingLoggedOnly =
     !dicePreview && slotSelectedItems.length === 0 && slotLoggedItems.length > 0
+  const hasDicePreview = Boolean(dicePreview && dayState.allowDiceAndSuggest)
+
+  useEffect(() => {
+    onMealUiState?.({
+      hasDicePreview,
+      rolling,
+      confirming,
+      allowDiceAndSuggest: dayState.allowDiceAndSuggest,
+    })
+  }, [hasDicePreview, rolling, confirming, dayState.allowDiceAndSuggest, onMealUiState])
 
   useEffect(() => {
     if (dayState.overTargetProtection) return
     if (customEatOut[mealSlotLegacy]?.length) return
     if (dicePreviewByMeal[mealSlotLegacy]) return
     if (slotLogs.length > 0) return
-    const key = `${mealSlotLegacy}:empty`
-    if (autoRollKeyRef.current === key) return
-    autoRollKeyRef.current = key
-    rollDice()
+    autoRollKeyRef.current = `${mealSlotLegacy}:empty`
   }, [
-    rollDice,
     dayState.overTargetProtection,
     mealSlotLegacy,
     customEatOut,
@@ -1203,7 +1243,6 @@ export default function TodayOS({
     }
   }, [dayState.overTargetProtection])
 
-  const openMore = useCallback(() => setMoreOpen(true), [])
   const closeMore = useCallback(() => setMoreOpen(false), [])
   const closeAllOverlays = useCallback(() => {
     setMoreOpen(false)
@@ -1314,6 +1353,11 @@ export default function TodayOS({
     const handleRollDice = () => {
       if (onDashboard) rollDice()
     }
+    const handleConfirmDice = () => {
+      if (!onDashboard) return
+      if (!dicePreviewRef.current || !allowDiceRef.current) return
+      confirmDiceRef.current()
+    }
     const handleRouteChange = () => {
       if (todaySheetFromSearch(window.location.search)) return
       closeAllOverlays()
@@ -1321,7 +1365,8 @@ export default function TodayOS({
 
     window.addEventListener(TODAY_OPEN_PHOTO_EVENT, openPhoto)
     window.addEventListener(TODAY_OPEN_TEXT_LOG_EVENT, openTextLog)
-    window.addEventListener('betterbit:roll-dice', handleRollDice)
+    window.addEventListener(TODAY_ROLL_DICE_EVENT, handleRollDice)
+    window.addEventListener(TODAY_CONFIRM_DICE_EVENT, handleConfirmDice)
     window.addEventListener('betterbit:route-change', handleRouteChange)
 
     if (typeof window !== 'undefined' && onDashboard) {
@@ -1338,7 +1383,8 @@ export default function TodayOS({
     return () => {
       window.removeEventListener(TODAY_OPEN_PHOTO_EVENT, openPhoto)
       window.removeEventListener(TODAY_OPEN_TEXT_LOG_EVENT, openTextLog)
-      window.removeEventListener('betterbit:roll-dice', handleRollDice)
+      window.removeEventListener(TODAY_ROLL_DICE_EVENT, handleRollDice)
+      window.removeEventListener(TODAY_CONFIRM_DICE_EVENT, handleConfirmDice)
       window.removeEventListener('betterbit:route-change', handleRouteChange)
     }
   }, [closeAllOverlays, onDashboard, rollDice])
@@ -1351,18 +1397,43 @@ export default function TodayOS({
 
   return (
     <div className="pb-2 space-y-4 max-w-[640px] mx-auto" style={{ fontFamily: TODAY.font }}>
-      <BBCard className="space-y-5">
+      <BBCard className="space-y-4">
+        <div className="flex items-center justify-between gap-3 px-0.5">
+          <h2 className="text-[16px]" style={{ color: TODAY.text, fontWeight: 600 }}>
+            餐點推薦
+          </h2>
+          {dicePreview && dayState.allowDiceAndSuggest && (
+            <span
+              className="text-[11px] px-2.5 py-1 rounded-full shrink-0"
+              style={{ backgroundColor: TODAY.pillBg, color: TODAY.mocha, fontWeight: 600 }}
+            >
+              推薦中 · 尚未記錄
+            </span>
+          )}
+          {showingConfirmedSelection && (
+            <span
+              className="text-[11px] px-2.5 py-1 rounded-full shrink-0"
+              style={{ backgroundColor: 'rgba(76, 140, 106, 0.12)', color: 'var(--bb-icon-color-success)', fontWeight: 600 }}
+            >
+              待記錄
+            </span>
+          )}
+          {showingLoggedOnly && (
+            <span
+              className="text-[11px] px-2.5 py-1 rounded-full shrink-0"
+              style={{ backgroundColor: 'rgba(76, 140, 106, 0.12)', color: 'var(--bb-icon-color-success)', fontWeight: 600 }}
+            >
+              已記錄
+            </span>
+          )}
+        </div>
+
         {rolling && !dicePreview && displayItems.length === 0 ? (
-          <div className="py-14 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+          <div className="py-10 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             想一下…
           </div>
         ) : displayItems.length > 0 ? (
           <>
-            {(showingConfirmedSelection || showingLoggedOnly) && (
-              <p className="text-[12px] px-0.5" style={{ color: TODAY.mocha, fontWeight: 500 }}>
-                {showingConfirmedSelection ? '這餐已選' : '這餐已記錄'}
-              </p>
-            )}
             <DiceMealPreview
               items={displayItems}
               recommendationReasons={dicePreview?.recommendation_reason}
@@ -1374,58 +1445,56 @@ export default function TodayOS({
                 {slotMealSuggest.current_highlight}
               </p>
             )}
+            {dicePreview && (
+              <p className="text-[12px] px-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+                這是推薦預覽，尚未計入今日總量。確認後請點上方「記錄這餐」。
+              </p>
+            )}
           </>
         ) : (
-          <div className="py-10 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            點下方換一個，或改用文字紀錄
+          <div className="py-8 text-center space-y-3">
+            {diceRollHint ? (
+              <div
+                className="mx-1 px-4 py-3 rounded-2xl text-left space-y-2"
+                style={{ backgroundColor: TODAY.surface }}
+              >
+                <p className="text-[14px] leading-relaxed" style={{ color: TODAY.text, fontWeight: 500 }}>
+                  {diceRollHint}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDiceRollHint(null)
+                      rollDice()
+                    }}
+                    className="text-[13px] px-3 py-1.5 rounded-full active:opacity-85"
+                    style={{ backgroundColor: TODAY.pillBg, color: TODAY.mocha, fontWeight: 600 }}
+                  >
+                    再試一次推薦
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDiceRollHint(null)
+                      window.dispatchEvent(new CustomEvent(TODAY_OPEN_TEXT_LOG_EVENT))
+                    }}
+                    className="text-[13px] px-3 py-1.5 rounded-full active:opacity-85"
+                    style={{ backgroundColor: TODAY.card, color: TODAY.textSecondary, fontWeight: 500 }}
+                  >
+                    改用文字記錄
+                  </button>
+                </div>
+              </div>
+            ) : null}
+            <p className="text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+              還沒有這餐的推薦
+            </p>
+            <p className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+              點上方「幫我推薦下一餐」或「＋ 記錄」開始
+            </p>
           </div>
         )}
-
-        <div className="space-y-3 pt-1 relative z-10">
-          {dicePreview && dayState.allowDiceAndSuggest && (
-            <button
-              type="button"
-              disabled={rolling || confirming}
-              onClick={confirmDice}
-              className="w-full h-16 rounded-[24px] text-[18px] disabled:opacity-40 touch-manipulation"
-              style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 500 }}
-            >
-              {confirming ? '記錄中…' : '就決定是它了'}
-            </button>
-          )}
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              disabled={rolling || !dayState.allowDiceAndSuggest}
-              onClick={rollDice}
-              className="flex-1 h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2 disabled:opacity-40 touch-manipulation"
-              style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
-            >
-              <RefreshCw className={`h-[16px] w-[16px] ${rolling ? 'animate-spin' : ''}`} strokeWidth={TODAY.iconStroke} />
-              {rolling ? '想一下…' : '換一個'}
-            </button>
-            <button
-              type="button"
-              onClick={openMore}
-              className="flex-[1.12] h-14 rounded-[22px] text-[14px] flex items-center justify-center gap-2 touch-manipulation"
-              style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
-            >
-              <ClipboardList className="h-[16px] w-[16px]" strokeWidth={TODAY.iconStroke} />
-              文字紀錄
-            </button>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => dispatchOpenPhotoSheet()}
-            className="w-full h-12 rounded-[20px] text-[14px] flex items-center justify-center gap-2 active:opacity-90 touch-manipulation"
-            style={{ backgroundColor: TODAY.surface, color: TODAY.mocha, fontWeight: 500 }}
-          >
-            <Camera className="h-[16px] w-[16px]" strokeWidth={TODAY.iconStroke} />
-            拍今天吃的
-          </button>
-        </div>
       </BBCard>
 
       <TodayFoodMore

@@ -1,4 +1,5 @@
 import type { FoodLogEntry, FoodNutritionStatus } from '@/lib/banks/types'
+import { getMealTrustDisplay } from '@/lib/nutrition/meal-trust-display'
 
 export function getFoodLogDisplayLabel(
   log: Pick<FoodLogEntry, 'name' | 'display_label'>
@@ -7,8 +8,8 @@ export function getFoodLogDisplayLabel(
   return display || log.name
 }
 
-export const NUTRITION_PENDING_LABEL = '營養待確認'
-export const USER_ENTERED_LABEL = '使用者輸入'
+export const NUTRITION_PENDING_LABEL = '待確認'
+export const USER_ENTERED_LABEL = '手動記錄'
 
 const PENDING_STATUSES = new Set<FoodLogEntry['nutrition_status']>([
   'unknown',
@@ -41,7 +42,7 @@ export function isUserEnteredNutrition(log: Pick<FoodLogEntry, 'nutrition_status
   return log.nutrition_status === 'user_entered'
 }
 
-export const AUTO_RESOLVED_LABEL = 'BetterBit 已補齊'
+export const AUTO_RESOLVED_LABEL = '估算'
 
 export function isAutoResolvedNutrition(log: Pick<FoodLogEntry, 'nutrition_status'>): boolean {
   return log.nutrition_status === 'auto_resolved'
@@ -89,13 +90,12 @@ export function formatLogMacroSummary(
   return `${cal} kcal · 蛋白質 ${pro}g`
 }
 
-export function nutritionStatusBadge(log: Pick<FoodLogEntry, 'nutrition_status'>): string | null {
-  if (log.nutrition_status === 'user_entered') return USER_ENTERED_LABEL
-  if (log.nutrition_status === 'auto_resolved') return AUTO_RESOLVED_LABEL
-  if (log.nutrition_status === 'estimated_pending_confirmation') return '待確認'
-  if (log.nutrition_status === 'estimated') return '餐型參考'
-  if (log.nutrition_status === 'pending_review') return '待審核'
-  return null
+export function nutritionStatusBadge(
+  log: Pick<FoodLogEntry, 'nutrition_status' | 'calories' | 'protein_g' | 'source' | 'nutrition_confidence' | 'capture_status'>
+): string | null {
+  const trust = getMealTrustDisplay(log)
+  if (trust.isPending) return trust.statusLabel
+  return trust.sourceLabel
 }
 
 export interface MacroDisplayItem {
