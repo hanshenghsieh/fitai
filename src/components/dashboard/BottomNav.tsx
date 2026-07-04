@@ -9,7 +9,7 @@ import { dispatchOpenRecordSheet } from '@/lib/today-actions'
 const sideItems = [
   { href: '/dashboard', label: '今日', icon: Home, match: (p: string) => p === '/dashboard' },
   { href: '/weekly', label: '本週', icon: CalendarDays, match: (p: string) => p === '/weekly' },
-  { href: '/progress', label: '分析', icon: LineChart, match: (p: string) => p === '/progress' },
+  { href: '/progress', label: '進步', icon: LineChart, match: (p: string) => p === '/progress' },
   { href: '/settings', label: '我的', icon: User, match: (p: string) => p.startsWith('/settings') },
 ] as const
 

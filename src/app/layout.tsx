@@ -72,6 +72,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-TW" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var ua=navigator.userAgent||'';if(!/iPhone|iPad|iPod/i.test(ua))return;var h=screen.height;var t=h>=812?47:20;var b=h>=812?34:0;var r=document.documentElement;r.classList.add('capacitor-ios');r.style.setProperty('--app-safe-top',t+'px');r.style.setProperty('--app-safe-bottom',b+'px');}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body
         className={`${inter.variable} ${notoSansTC.variable} h-full antialiased`}
         style={{
@@ -81,11 +88,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
       >
         {children}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var c=window.Capacitor;if(!c||typeof c.isNativePlatform!=='function'||!c.isNativePlatform())return;if(c.getPlatform&&c.getPlatform()!=='ios')return;var h=window.screen.height;var t=h>=812?47:20;var b=h>=812?34:0;document.documentElement.classList.add('capacitor-ios');document.documentElement.style.setProperty('--app-safe-top',t+'px');document.documentElement.style.setProperty('--app-safe-bottom',b+'px');}catch(e){}})();`,
-          }}
-        />
         <CapacitorShell />
         <OfflineShell />
         <Toaster theme="light" richColors={false} position="top-center" />

@@ -31,7 +31,11 @@ function resolveSafeInsets(): { top: number; bottom: number } {
   let top = readEnvInset('Top')
   let bottom = readEnvInset('Bottom')
 
-  if (isNativeIOS()) {
+  const onIos =
+    isNativeIOS() ||
+    (typeof navigator !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent))
+
+  if (onIos) {
     if (top < 20) top = iosSafeTopFallback()
     if (bottom < 8) bottom = IOS_SAFE_BOTTOM_FALLBACK
   }
@@ -51,13 +55,23 @@ function applySafeAreaVariables(): void {
 }
 
 export function remeasureCapacitorSafeAreas(): void {
-  if (typeof document === 'undefined' || !isNativeIOS()) return
+  if (typeof document === 'undefined') return
+  const onIos =
+    isNativeIOS() ||
+    /iPhone|iPad|iPod/i.test(navigator.userAgent)
+  if (!onIos) return
   applySafeAreaVariables()
 }
 
 /** iOS WebView shell: canvas background, viewport lock, block pinch zoom. */
 export function installCapacitorIOSShell(): () => void {
-  if (typeof document === 'undefined' || !isNativeIOS()) return () => {}
+  if (typeof document === 'undefined') return () => {}
+
+  const onIos =
+    isNativeIOS() ||
+    /iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+  if (!onIos) return () => {}
 
   const html = document.documentElement
   html.classList.add('capacitor-ios')
