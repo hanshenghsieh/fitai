@@ -127,7 +127,7 @@ export default function TodayHero({
         </div>
       </BBCard>
 
-      {showMealActions && !overTarget && !hasDicePreview && (
+      {showMealActions && !overTarget && (
         <TodayMealActions
           primaryAction={primaryAction}
           primaryLoading={mealActionsLoading}
