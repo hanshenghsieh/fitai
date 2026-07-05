@@ -66,7 +66,7 @@ export default function ProgressWeightLog({ lastWeightKg, embedded = false }: Pr
         </p>
         {lastWeightKg != null && !expanded && (
           <span className="text-[13px] tabular-nums" style={{ color: colors.text.tertiary }}>
-            上次 {lastWeightKg} kg
+            上次 {Number(lastWeightKg).toFixed(1)} kg
           </span>
         )}
       </div>

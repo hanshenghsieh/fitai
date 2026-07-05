@@ -247,7 +247,7 @@ export default function AnalyticsScreen({
             </p>
             <ProgressWeightLog
               embedded
-              lastWeightKg={summary.weightTrend.currentKg ?? currentWeightKg}
+              lastWeightKg={summary.weightTrend.previousKg}
             />
           </div>
         ) : (

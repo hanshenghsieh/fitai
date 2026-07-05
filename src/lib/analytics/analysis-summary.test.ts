@@ -164,6 +164,7 @@ describe('analysis-summary', () => {
     assert.equal(summary.weightTrend.sufficient, true)
     assert.equal(summary.weightTrend.points.length, 2)
     assert.equal(summary.weightTrend.currentKg, 65)
+    assert.equal(summary.weightTrend.previousKg, 70)
   })
 
   it('paces weekly water goal by elapsed days in the week', () => {

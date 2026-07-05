@@ -60,6 +60,8 @@ export interface DateRange {
 export interface WeightTrendSummary {
   sufficient: boolean
   currentKg: number | null
+  /** Second-most-recent reading — the weight logged before `currentKg`. */
+  previousKg: number | null
   targetKg: number | null
   deltaKg: number | null
   deltaLabel: string | null
@@ -206,6 +208,21 @@ function measurementsInRange(measurements: BodyMeasurement[], range: DateRange):
   })
 }
 
+function sortMeasurementsChronologically(measurements: BodyMeasurement[]): BodyMeasurement[] {
+  return [...measurements].sort((a, b) => {
+    const byDay = a.measured_at.localeCompare(b.measured_at)
+    if (byDay !== 0) return byDay
+    return (a.created_at ?? '').localeCompare(b.created_at ?? '')
+  })
+}
+
+/** Weight from the reading before the latest entry (for「上次」vs「目前」). */
+export function resolvePreviousWeightKg(measurements: BodyMeasurement[]): number | null {
+  const sorted = sortMeasurementsChronologically(measurements)
+  if (sorted.length < 2) return null
+  return sorted[sorted.length - 2]?.weight_kg ?? null
+}
+
 function sumLogsDay(logs: FoodLogEntry[], day: string) {
   const dayLogs = logs.filter(l => l.logged_at.slice(0, 10) === day)
   return {
@@ -309,6 +326,7 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
     }
   })
   const currentKg = input.currentWeightKg ?? periodMeasurements.at(-1)?.weight_kg ?? null
+  const previousKg = resolvePreviousWeightKg(input.measurements)
   const firstWeight = periodMeasurements[0]?.weight_kg
   const deltaKg =
     currentKg != null && firstWeight != null && periodMeasurements.length >= 2
@@ -474,6 +492,7 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
     weightTrend: {
       sufficient: weightPoints.length >= 2,
       currentKg,
+      previousKg,
       targetKg: input.targets.target_weight_kg,
       deltaKg,
       deltaLabel,
