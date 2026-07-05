@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getNutritionDayKey } from '@/lib/timezone'
+import { appendWeightHistoryToCheckin } from '@/lib/weight-history'
 
 export interface SaveBodyMeasurementInput {
   weight_kg: number
@@ -51,7 +52,7 @@ export async function saveBodyMeasurementLog(
 
   const { data: existingRows, error: selectError } = await supabase
     .from('body_measurements')
-    .select('id')
+    .select('id, weight_kg')
     .eq('user_id', userId)
     .eq('measured_at', measuredAt)
     .order('created_at', { ascending: false })
@@ -59,9 +60,17 @@ export async function saveBodyMeasurementLog(
 
   if (selectError) return { error: new Error(selectError.message) }
 
-  const existingId = existingRows?.[0]?.id
-  if (existingId) {
-    const { error } = await supabase.from('body_measurements').update(payload).eq('id', existingId)
+  const latest = existingRows?.[0]
+  if (latest) {
+    if (latest.weight_kg === body.weight_kg) {
+      const { error } = await supabase.from('body_measurements').update(payload).eq('id', latest.id)
+      if (error) return { error: new Error(error.message) }
+      return { error: null }
+    }
+    // Different weight same day — append so progress can draw a trend line.
+    const { error } = await supabase
+      .from('body_measurements')
+      .insert({ user_id: userId, measured_at: measuredAt, ...payload })
     if (error) return { error: new Error(error.message) }
     return { error: null }
   }
@@ -84,9 +93,10 @@ export async function saveBodyMeasurementForUser(
   }
 
   const logResult = await saveBodyMeasurementLog(supabase, userId, body)
+  const historyResult = await appendWeightHistoryToCheckin(supabase, userId, body.weight_kg)
   return {
     error: null,
     profileSaved: true,
-    logSaved: !logResult.error,
+    logSaved: !logResult.error || !historyResult.error,
   }
 }

@@ -298,10 +298,16 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
       ? Math.round(loggedProDays.reduce((s, p) => s + p.value, 0) / loggedProDays.length)
       : null
 
-  const weightPoints = periodMeasurements.map(m => ({
-    label: format(parseISO(m.measured_at.slice(0, 10)), 'M/d'),
-    weight: m.weight_kg,
-  }))
+  const weightPoints = periodMeasurements.map((m, idx, arr) => {
+    const day = m.measured_at.slice(0, 10)
+    const sameDayBefore = arr.slice(0, idx + 1).filter(x => x.measured_at.slice(0, 10) === day).length
+    const sameDayTotal = arr.filter(x => x.measured_at.slice(0, 10) === day).length
+    const baseLabel = format(parseISO(day), 'M/d')
+    return {
+      label: sameDayTotal > 1 ? `${baseLabel}·${sameDayBefore}` : baseLabel,
+      weight: m.weight_kg,
+    }
+  })
   const currentKg = input.currentWeightKg ?? periodMeasurements.at(-1)?.weight_kg ?? null
   const firstWeight = periodMeasurements[0]?.weight_kg
   const deltaKg =

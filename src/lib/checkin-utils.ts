@@ -66,12 +66,19 @@ export interface UserMemoryMeta {
   }[]
 }
 
+export interface WeightHistoryEntry {
+  logged_at: string
+  weight_kg: number
+}
+
 export interface CheckinMeta {
   meal_modes?: MealModes
   custom_eat_out?: Partial<Record<MealType, CustomEatOutSelection[]>>
   daily_rolls?: DailyRollState
   meal_suggest?: Partial<Record<MealType, MealSuggestState>>
   user_memory?: UserMemoryMeta
+  /** Fallback weight log when body_measurements table is unavailable */
+  weight_history?: WeightHistoryEntry[]
 }
 
 type CheckinSlice = Pick<DailyCheckin, 'checkin_date' | 'diet_items' | 'workout_items'>

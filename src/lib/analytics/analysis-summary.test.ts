@@ -140,6 +140,32 @@ describe('analysis-summary', () => {
     assert.ok(summary.insights.some(i => i.tone === 'success'))
   })
 
+  it('shows weight trend when two readings exist on the same day', () => {
+    const days = ['2026-06-29', '2026-06-30', '2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05']
+    const checkins = days.map(day =>
+      checkin(day, [
+        { name: '早餐', calories: 400, protein_g: 30, slot: 'breakfast' },
+        { name: '午餐', calories: 550, protein_g: 40, slot: 'lunch' },
+        { name: '晚餐', calories: 500, protein_g: 35, slot: 'dinner' },
+      ])
+    )
+    const summary = buildAnalysisSummary({
+      periodType: 'week',
+      anchorDate: new Date('2026-07-05'),
+      todayDate: '2026-07-05',
+      measurements: [
+        { id: '1', user_id: 'u', measured_at: '2026-07-05', weight_kg: 70, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-05T08:00:00Z' },
+        { id: '2', user_id: 'u', measured_at: '2026-07-05', weight_kg: 65, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-05T15:00:00Z' },
+      ],
+      checkins,
+      targets,
+      currentWeightKg: 65,
+    })
+    assert.equal(summary.weightTrend.sufficient, true)
+    assert.equal(summary.weightTrend.points.length, 2)
+    assert.equal(summary.weightTrend.currentKg, 65)
+  })
+
   it('paces weekly water goal by elapsed days in the week', () => {
     const today = '2024-06-17'
     const summary = buildAnalysisSummary({

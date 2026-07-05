@@ -3,6 +3,10 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { getNutritionDayKey } from '@/lib/timezone'
 import type { WeeklyPlanData } from '@/types'
 import type { AnalysisDayPlanHint } from '@/lib/analytics/analysis-summary'
+import {
+  extractWeightHistoryFromCheckins,
+  mergeWeightMeasurementSources,
+} from '@/lib/weight-history'
 
 /** Week view only needs ~4 weeks of check-ins; analytics month nav needs ~10 weeks. */
 export const WEEK_ANALYTICS_LOOKBACK_DAYS = 28
@@ -10,7 +14,7 @@ export const PROGRESS_ANALYTICS_LOOKBACK_DAYS = 70
 
 export interface AnalyticsBundle {
   profileWeightKg: number | null
-  measurements: { measured_at: string; weight_kg: number }[]
+  measurements: { measured_at: string; weight_kg: number; created_at?: string }[]
   activeGoal: { target_weight_kg: number | null } | null
   checkins: {
     checkin_date: string
@@ -24,31 +28,28 @@ export interface AnalyticsBundle {
   weekStart: string
 }
 
-/** Prefer today's body log, then profile (settings save), then latest historical row. */
+/** Prefer today's latest body log, then profile (settings save), then latest historical row. */
 export function resolveLatestWeightKg(
-  measurements: { measured_at: string; weight_kg: number }[],
+  measurements: { measured_at: string; weight_kg: number; created_at?: string }[],
   profileWeightKg: number | null,
   todayStr: string
 ): number | null {
-  const todayRow = measurements.find(m => m.measured_at.slice(0, 10) === todayStr)
-  if (todayRow) return todayRow.weight_kg
+  const todayRows = measurements.filter(m => m.measured_at.slice(0, 10) === todayStr)
+  if (todayRows.length) return todayRows.at(-1)!.weight_kg
   if (profileWeightKg != null) return profileWeightKg
   return measurements.at(-1)?.weight_kg ?? null
 }
 
 /** Keep measurements in sync with the resolved latest weight (e.g. profile saved but log lagged). */
 export function mergeTodayWeightMeasurement(
-  measurements: { measured_at: string; weight_kg: number }[],
+  measurements: { measured_at: string; weight_kg: number; created_at?: string }[],
   latestWeightKg: number | null,
   todayStr: string
-): { measured_at: string; weight_kg: number }[] {
+): { measured_at: string; weight_kg: number; created_at?: string }[] {
   if (latestWeightKg == null) return measurements
-  const idx = measurements.findIndex(m => m.measured_at.slice(0, 10) === todayStr)
-  if (idx >= 0) {
-    const next = [...measurements]
-    next[idx] = { ...next[idx]!, weight_kg: latestWeightKg }
-    return next
-  }
+  const todayRows = measurements.filter(m => m.measured_at.slice(0, 10) === todayStr)
+  const latestToday = todayRows.at(-1)?.weight_kg
+  if (latestToday === latestWeightKg) return measurements
   return [...measurements, { measured_at: todayStr, weight_kg: latestWeightKg }]
 }
 
@@ -72,10 +73,11 @@ export async function loadAnalyticsBundle(
     supabase.from('user_profiles').select('weight_kg').eq('id', userId).single(),
     supabase
       .from('body_measurements')
-      .select('measured_at, weight_kg')
+      .select('measured_at, weight_kg, created_at')
       .eq('user_id', userId)
       .gte('measured_at', since)
-      .order('measured_at', { ascending: true }),
+      .order('measured_at', { ascending: true })
+      .order('created_at', { ascending: true }),
     supabase
       .from('goals')
       .select('target_weight_kg')
@@ -99,7 +101,10 @@ export async function loadAnalyticsBundle(
 
   return {
     profileWeightKg: profile?.weight_kg ?? null,
-    measurements: measurements ?? [],
+    measurements: mergeWeightMeasurementSources(
+      measurements ?? [],
+      extractWeightHistoryFromCheckins(checkins ?? [])
+    ),
     activeGoal: goal?.[0] ?? null,
     checkins: checkins ?? [],
     weeklyPlans: weeklyPlans ?? [],
