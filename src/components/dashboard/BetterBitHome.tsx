@@ -167,6 +167,7 @@ export default function BetterBitHome({
   })
   const calorieBankSyncedRef = useRef(false)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const persistFlushingRef = useRef(false)
   const persistPatchRef = useRef<{
     workoutItems?: WorkoutCheckinItem[]
     userMemory?: UserMemoryMeta
@@ -221,12 +222,6 @@ export default function BetterBitHome({
       })
       .catch(() => {})
   }, [todayPlan.daily_targets.calories, initialFoodLogs, displayFoodLogs])
-
-  useEffect(() => {
-    return () => {
-      if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
-    }
-  }, [])
 
   const waterTargetMl = useMemo(
     () =>
@@ -349,7 +344,11 @@ export default function BetterBitHome({
   const mealModes = mealModesFromCheckin(checkin)
 
   const flushPersist = useCallback(async () => {
-    const patch = persistPatchRef.current
+    if (persistFlushingRef.current) return
+    if (Object.keys(persistPatchRef.current).length === 0) return
+
+    persistFlushingRef.current = true
+    const patch = { ...persistPatchRef.current }
     persistPatchRef.current = {}
     const state = {
       dietItems: checkin?.diet_items ?? [],
@@ -365,15 +364,33 @@ export default function BetterBitHome({
       const res = await fetch('/api/checkin', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        keepalive: true,
         body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId)),
       })
       if (!res.ok) throw new Error()
       const json = (await res.json()) as { calorie_bank?: CalorieBankRow | null }
       if (json.calorie_bank) setCalorieBank(json.calorie_bank)
     } catch {
+      persistPatchRef.current = { ...patch, ...persistPatchRef.current }
       toast.error(GENTLE_ERROR_MESSAGE)
+    } finally {
+      persistFlushingRef.current = false
+      if (Object.keys(persistPatchRef.current).length > 0) {
+        void flushPersist()
+      }
     }
   }, [checkin, mealModes, weeklyPlanId])
+
+  const flushPendingPersist = useCallback(() => {
+    if (persistTimerRef.current) {
+      clearTimeout(persistTimerRef.current)
+      persistTimerRef.current = null
+    }
+    if (Object.keys(persistPatchRef.current).length > 0) {
+      void flushPersist()
+    }
+  }, [flushPersist])
 
   const persist = useCallback(
     (patch: {
@@ -386,6 +403,14 @@ export default function BetterBitHome({
     }) => {
       persistPatchRef.current = { ...persistPatchRef.current, ...patch }
       if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
+
+      const isFoodLogPatch = patch.userMemory?.food_logs_today !== undefined
+      if (isFoodLogPatch) {
+        persistTimerRef.current = null
+        void flushPersist()
+        return
+      }
+
       persistTimerRef.current = setTimeout(() => {
         persistTimerRef.current = null
         void flushPersist()
@@ -393,6 +418,15 @@ export default function BetterBitHome({
     },
     [flushPersist]
   )
+
+  useEffect(() => {
+    const onRouteChange = () => flushPendingPersist()
+    window.addEventListener('betterbit:route-change', onRouteChange)
+    return () => {
+      window.removeEventListener('betterbit:route-change', onRouteChange)
+      flushPendingPersist()
+    }
+  }, [flushPendingPersist])
 
   const commitWaterMl = useCallback(
     (nextMl: number) => {

@@ -8,9 +8,10 @@ import { colors } from '@/lib/design-system'
 
 interface Props {
   lastWeightKg?: number | null
+  embedded?: boolean
 }
 
-export default function ProgressWeightLog({ lastWeightKg }: Props) {
+export default function ProgressWeightLog({ lastWeightKg, embedded = false }: Props) {
   const [expanded, setExpanded] = useState(false)
   const [showBodyFat, setShowBodyFat] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -51,7 +52,14 @@ export default function ProgressWeightLog({ lastWeightKg }: Props) {
   }
 
   return (
-    <div className="mx-5 px-4 py-4 rounded-2xl space-y-3" style={{ backgroundColor: colors.bg.elevated, border: `1px solid ${colors.border.subtle}` }}>
+    <div
+      className={embedded ? 'space-y-3' : 'mx-5 px-4 py-4 rounded-2xl space-y-3'}
+      style={
+        embedded
+          ? undefined
+          : { backgroundColor: colors.bg.elevated, border: `1px solid ${colors.border.subtle}` }
+      }
+    >
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-[15px] font-medium" style={{ color: colors.text.primary }}>
           記一下體重

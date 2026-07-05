@@ -32,6 +32,7 @@ import { buildProgressHeroDisplay } from '@/lib/analytics/progress-display'
 import { buildMealRecommendationStrategy } from '@/lib/recommendation/meal-recommendation-strategy'
 import { buildWorkoutRecommendationStrategy } from '@/lib/recommendation/workout-recommendation-strategy'
 import type { BodyMeasurement } from '@/types'
+import ProgressWeightLog from '@/components/progress/ProgressWeightLog'
 
 interface Props {
   measurements: BodyMeasurement[]
@@ -244,6 +245,10 @@ export default function AnalyticsScreen({
             <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
               再記一次，就能看見趨勢。
             </p>
+            <ProgressWeightLog
+              embedded
+              lastWeightKg={summary.weightTrend.currentKg ?? currentWeightKg}
+            />
           </div>
         ) : (
           <>
