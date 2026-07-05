@@ -39,6 +39,12 @@ import type { FoodDna } from '@/lib/food-memory'
 import { isRecoveryActive } from '@/lib/engines/calorie-bank-engine'
 import { sumLoggedCalories, sumLoggedProtein, computeTodayMealState } from '@/lib/engines/next-meal-engine'
 import { foodLogsNeedSync, reconcileFoodLogsToday } from '@/lib/food-log-reconcile'
+import {
+  clearFoodLogsSessionCache,
+  foodLogIdsFingerprint,
+  resolveFoodLogsFromSession,
+  writeFoodLogsSessionCache,
+} from '@/lib/food-log-session-cache'
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
 import { getNutritionDayKey } from '@/lib/timezone'
@@ -134,7 +140,9 @@ export default function BetterBitHome({
   )
   const [userMemory, setUserMemory] = useState<UserMemoryMeta>(() => {
     const mem = userMemoryFromCheckin(checkin)
-    return { ...mem, food_dna: mem.food_dna ?? foodDna }
+    const serverLogs = mem.food_logs_today ?? []
+    const logs = resolveFoodLogsFromSession(serverLogs)
+    return { ...mem, food_logs_today: logs, food_dna: mem.food_dna ?? foodDna }
   })
 
   const exercises = todayPlan.workout?.main ?? []
@@ -146,7 +154,9 @@ export default function BetterBitHome({
     () => reconcileFoodLogsToday(foodLogs),
     [foodLogs]
   )
-  const reconcileSyncRef = useRef<string | null>(null)
+  const didLocalReconcileRef = useRef(false)
+  const didSessionHydrateRef = useRef(false)
+  const persistAbortRef = useRef<AbortController | null>(null)
 
   const displayUserMemory = useMemo(
     () => ({ ...userMemory, food_logs_today: displayFoodLogs }),
@@ -343,14 +353,8 @@ export default function BetterBitHome({
 
   const mealModes = mealModesFromCheckin(checkin)
 
-  const flushPersist = useCallback(async () => {
-    if (persistFlushingRef.current) return
-    if (Object.keys(persistPatchRef.current).length === 0) return
-
-    persistFlushingRef.current = true
-    const patch = { ...persistPatchRef.current }
-    persistPatchRef.current = {}
-    const state = {
+  const buildPersistState = useCallback(
+    (patch: typeof persistPatchRef.current) => ({
       dietItems: checkin?.diet_items ?? [],
       workoutItems: patch.workoutItems ?? workoutItemsRef.current,
       waterMl: patch.waterMl ?? waterMlRef.current,
@@ -358,38 +362,76 @@ export default function BetterBitHome({
       customEatOut: patch.customEatOut ?? customEatOutRef.current,
       dailyRolls: patch.dailyRolls ?? dailyRollsRef.current,
       mealSuggest: patch.mealSuggest ?? mealSuggestRef.current,
-      userMemory: patch.userMemory ?? userMemoryRef.current,
-    }
+      userMemory: userMemoryRef.current,
+    }),
+    [checkin, mealModes]
+  )
+
+  const flushPersist = useCallback(async () => {
+    if (persistFlushingRef.current) return
+    if (Object.keys(persistPatchRef.current).length === 0) return
+
+    persistFlushingRef.current = true
+    let sawError = false
+
     try {
-      const res = await fetch('/api/checkin', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        keepalive: true,
-        body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId)),
-      })
-      if (!res.ok) throw new Error()
-      const json = (await res.json()) as { calorie_bank?: CalorieBankRow | null }
-      if (json.calorie_bank) setCalorieBank(json.calorie_bank)
-    } catch {
-      persistPatchRef.current = { ...patch, ...persistPatchRef.current }
-      toast.error(GENTLE_ERROR_MESSAGE)
+      while (Object.keys(persistPatchRef.current).length > 0) {
+        const patch = { ...persistPatchRef.current }
+        persistPatchRef.current = {}
+
+        persistAbortRef.current?.abort()
+        const ac = new AbortController()
+        persistAbortRef.current = ac
+
+        const state = buildPersistState(patch)
+        try {
+          const res = await fetch('/api/checkin', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            keepalive: true,
+            signal: ac.signal,
+            body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId)),
+          })
+          if (!res.ok) throw new Error()
+          const json = (await res.json()) as { calorie_bank?: CalorieBankRow | null }
+          if (json.calorie_bank) setCalorieBank(json.calorie_bank)
+          clearFoodLogsSessionCache()
+          writeFoodLogsSessionCache(state.userMemory?.food_logs_today ?? [])
+        } catch (err) {
+          if (err instanceof DOMException && err.name === 'AbortError') {
+            persistPatchRef.current = { ...patch, ...persistPatchRef.current }
+            continue
+          }
+          persistPatchRef.current = { ...patch, ...persistPatchRef.current }
+          sawError = true
+          break
+        }
+      }
     } finally {
       persistFlushingRef.current = false
+      persistAbortRef.current = null
+      if (sawError) toast.error(GENTLE_ERROR_MESSAGE)
       if (Object.keys(persistPatchRef.current).length > 0) {
         void flushPersist()
       }
     }
-  }, [checkin, mealModes, weeklyPlanId])
+  }, [buildPersistState, weeklyPlanId])
 
   const flushPendingPersist = useCallback(() => {
     if (persistTimerRef.current) {
       clearTimeout(persistTimerRef.current)
       persistTimerRef.current = null
     }
-    if (Object.keys(persistPatchRef.current).length > 0) {
-      void flushPersist()
+    persistPatchRef.current = {
+      ...persistPatchRef.current,
+      userMemory: userMemoryRef.current,
     }
+    writeFoodLogsSessionCache(userMemoryRef.current.food_logs_today ?? [])
+    if (persistFlushingRef.current) {
+      persistAbortRef.current?.abort()
+    }
+    void flushPersist()
   }, [flushPersist])
 
   const persist = useCallback(
@@ -407,6 +449,10 @@ export default function BetterBitHome({
       const isFoodLogPatch = patch.userMemory?.food_logs_today !== undefined
       if (isFoodLogPatch) {
         persistTimerRef.current = null
+        writeFoodLogsSessionCache(patch.userMemory!.food_logs_today ?? [])
+        if (persistFlushingRef.current) {
+          persistAbortRef.current?.abort()
+        }
         void flushPersist()
         return
       }
@@ -467,20 +513,31 @@ export default function BetterBitHome({
 
   const handleLogFood = useCallback((logs: FoodLogEntry[], nextMemory: UserMemoryMeta) => {
     userMemoryRef.current = nextMemory
+    writeFoodLogsSessionCache(logs)
     startTransition(() => setUserMemory(nextMemory))
     persist({ userMemory: nextMemory })
   }, [persist])
 
   useEffect(() => {
-    const fingerprint = displayFoodLogs.map(l => `${l.id}:${l.slot}`).join('|')
-    if (reconcileSyncRef.current === fingerprint) return
-    if (!foodLogsNeedSync(foodLogs, displayFoodLogs)) {
-      reconcileSyncRef.current = fingerprint
-      return
-    }
-    reconcileSyncRef.current = fingerprint
-    handleLogFood(displayFoodLogs, { ...userMemory, food_logs_today: displayFoodLogs })
-  }, [displayFoodLogs, foodLogs, userMemory, handleLogFood])
+    if (didLocalReconcileRef.current) return
+    didLocalReconcileRef.current = true
+    const logs = userMemoryRef.current.food_logs_today ?? []
+    const reconciled = reconcileFoodLogsToday(logs)
+    if (!foodLogsNeedSync(logs, reconciled)) return
+    const nextMemory = { ...userMemoryRef.current, food_logs_today: reconciled }
+    userMemoryRef.current = nextMemory
+    writeFoodLogsSessionCache(reconciled)
+    startTransition(() => setUserMemory(nextMemory))
+  }, [])
+
+  useEffect(() => {
+    if (didSessionHydrateRef.current) return
+    didSessionHydrateRef.current = true
+    const serverFp = foodLogIdsFingerprint(initialFoodLogs)
+    const localFp = foodLogIdsFingerprint(userMemoryRef.current.food_logs_today ?? [])
+    if (serverFp === localFp) return
+    persist({ userMemory: userMemoryRef.current })
+  }, [initialFoodLogs, persist])
 
   const handleClearMealSelection = useCallback((mealType: MealType) => {
     const nextCustom = { ...customEatOutRef.current }
