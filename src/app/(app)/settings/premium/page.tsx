@@ -15,7 +15,7 @@ export default async function PremiumPage() {
 
   const [{ data: profile }, { data: subscription }] = await Promise.all([
     supabase.from('user_profiles').select('created_at').eq('id', user.id).single(),
-    supabase.from('subscriptions').select(SUBSCRIPTION_ACCESS_FIELDS).eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).single(),
+    supabase.from('subscriptions').select(SUBSCRIPTION_ACCESS_FIELDS).eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
   ])
 
   const access = getAccessStatus(profile?.created_at ?? new Date().toISOString(), subscription, {

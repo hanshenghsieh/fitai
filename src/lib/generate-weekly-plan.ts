@@ -76,7 +76,7 @@ export async function generateWeeklyPlanForUser(
     .eq('user_id', input.userId)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single()
+    .maybeSingle()
 
   const access = withSafeModeAccess(
     getAccessStatus(profile.created_at, subscription, { userEmail: input.userEmail })

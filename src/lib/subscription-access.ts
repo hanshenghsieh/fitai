@@ -39,7 +39,9 @@ export function isPremiumSubscription(subscription: SubscriptionRecord | null | 
   if (!subscription) return false
 
   const status = subscription.subscription_status ?? subscription.status
-  const source = subscription.subscription_source ?? 'stripe'
+  const source =
+    subscription.subscription_source ??
+    (subscription.stripe_subscription_id?.startsWith('manual_grant_') ? 'manual_grant' : 'stripe')
 
   if (subscription.is_premium === true) return true
   if (!isGrantedPremiumSource(source)) return false
