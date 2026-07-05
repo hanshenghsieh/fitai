@@ -7,7 +7,7 @@ import type { WeeklyPlanData, DayPlan, UserProfile } from '@/types'
 import { colors } from '@/lib/design-system'
 import NotificationPrompt from '@/components/dashboard/NotificationPrompt'
 import BetterBitHome from '@/components/dashboard/BetterBitHome'
-import GeneratePlanButton from '@/components/dashboard/GeneratePlanButton'
+import TodayPlanEmpty from '@/components/dashboard/today/TodayPlanEmpty'
 import ZaiJianPanel from '@/components/character/ZaiJianPanel'
 import ZaiJian from '@/components/character/ZaiJian'
 import TodayDashboardSkeleton from '@/components/dashboard/TodayDashboardSkeleton'
@@ -18,6 +18,8 @@ import { SUBSCRIPTION_ACCESS_FIELDS } from '@/lib/subscription-types'
 import { getAppUser } from '@/lib/supabase/app-session'
 import { userMemoryFromCheckin } from '@/lib/checkin-utils'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
+import { generateWeeklyPlanForUser } from '@/lib/generate-weekly-plan'
+import { messageForGeneratePlanError } from '@/lib/generate-plan-errors'
 
 const PLAN_FAILED_LINE = {
   text: GENTLE_ERROR_MESSAGE,
@@ -36,8 +38,10 @@ async function DashboardContent() {
   const fourteenDaysAgo = format(subDays(nutritionDate, 14), 'yyyy-MM-dd')
   const dayOfWeek = differenceInDays(nutritionDate, parse(weekStart, 'yyyy-MM-dd', now))
 
+  let planGenerateError: string | null = null
+
   const [
-    { data: weeklyPlan },
+    weeklyPlanResult,
     { data: checkin },
     { data: profileRow },
     { data: recentCheckins },
@@ -48,13 +52,13 @@ async function DashboardContent() {
       .select('id, week_start, generation_status, plan_data')
       .eq('user_id', user.id)
       .eq('week_start', weekStart)
-      .single(),
+      .maybeSingle(),
     supabase
       .from('daily_checkins')
       .select('*')
       .eq('user_id', user.id)
       .eq('checkin_date', todayStr)
-      .single(),
+      .maybeSingle(),
     supabase
       .from('user_profiles')
       .select('id, display_name, weight_kg, body_fat_pct, created_at, gender, age, height_cm, goal_type, activity_level, is_vegetarian, is_vegan, is_halal, is_gluten_free, allergens, disliked_foods, food_budget, onboarding_completed')
@@ -76,7 +80,30 @@ async function DashboardContent() {
       .single(),
   ])
 
-  const planData = weeklyPlan?.plan_data as WeeklyPlanData | null
+  let weeklyPlan = weeklyPlanResult.data
+  let planData = weeklyPlan?.plan_data as WeeklyPlanData | null
+
+  if ((!weeklyPlan || !planData?.days?.length) && profileRow?.onboarding_completed) {
+    const generated = await generateWeeklyPlanForUser(supabase, {
+      userId: user.id,
+      userEmail: user.email,
+    })
+    if (generated.ok) {
+      const refreshed = await supabase
+        .from('weekly_plans')
+        .select('id, week_start, generation_status, plan_data')
+        .eq('user_id', user.id)
+        .eq('week_start', weekStart)
+        .maybeSingle()
+      weeklyPlan = refreshed.data
+      planData = refreshed.data?.plan_data as WeeklyPlanData | null
+    } else {
+      planGenerateError = messageForGeneratePlanError({
+        error: generated.error,
+        code: generated.code,
+      })
+    }
+  }
   const goalSnapshot = planData?.goal_snapshot
   const safeDayIndex = Math.min(Math.max(0, dayOfWeek), Math.max(0, (planData?.days?.length ?? 1) - 1))
   const todayPlan: DayPlan | null = planData?.days?.[safeDayIndex] ?? planData?.days?.[0] ?? null
@@ -111,9 +138,7 @@ async function DashboardContent() {
       )}
 
       {!weeklyPlan || !planData?.days?.length ? (
-        <ZaiJianPanel moment="empty">
-          <GeneratePlanButton />
-        </ZaiJianPanel>
+        <TodayPlanEmpty failed={Boolean(planGenerateError)} errorMessage={planGenerateError} />
       ) : todayPlan ? (
         <BetterBitHome
           todayPlan={todayPlan}
@@ -130,9 +155,7 @@ async function DashboardContent() {
           initialFoodLogs={userMemoryFromCheckin(checkin ?? null).food_logs_today ?? []}
         />
       ) : (
-        <ZaiJianPanel moment="empty">
-          <GeneratePlanButton />
-        </ZaiJianPanel>
+        <TodayPlanEmpty failed={Boolean(planGenerateError)} errorMessage={planGenerateError} />
       )}
     </div>
   )
