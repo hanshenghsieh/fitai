@@ -5,12 +5,21 @@ import { HelpCircle, Landmark, X } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import { isRecoveryActive } from '@/lib/engines/calorie-bank-engine'
+import type { DailyExcessDriver } from '@/lib/engines/calorie-bank-engine'
 import { buildCalorieBankExplainer } from '@/lib/engines/calorie-bank-explainer'
 import { getRecoverySpreadHint } from '@/lib/engines/recovery-copy'
 import AppOverlay from '@/components/ui/AppOverlay'
 
+const DRIVER_LABEL: Record<Exclude<DailyExcessDriver, null>, string> = {
+  kcal: '總熱量',
+  protein: '蛋白質',
+  fat: '脂肪',
+  carbs: '碳水',
+}
+
 export function getCalorieBankBannerCopy(
-  bank: CalorieBankRow
+  bank: CalorieBankRow,
+  excessDriver: DailyExcessDriver = null
 ): { title: string; body: string; subtext: string } | null {
   const normal = bank.daily_target_kcal
   const adjusted = bank.internal_target_kcal
@@ -41,23 +50,29 @@ export function getCalorieBankBannerCopy(
 
   const hint = getRecoverySpreadHint(bank.spread_days_remaining)
   if (!hint) return null
+
+  const driverLabel = excessDriver ? DRIVER_LABEL[excessDriver] : null
   return {
     title,
-    body: `今日目標 ${normal.toLocaleString()} kcal`,
+    body: driverLabel
+      ? `今日${driverLabel}已超過計畫（熱量目標 ${normal.toLocaleString()} kcal）`
+      : `今日有項目超過計畫（目標 ${normal.toLocaleString()} kcal）`,
     subtext: hint,
   }
 }
 
 function CalorieBankExplainSheet({
   bank,
+  excessDriver,
   open,
   onClose,
 }: {
   bank: CalorieBankRow
+  excessDriver: DailyExcessDriver
   open: boolean
   onClose: () => void
 }) {
-  const detail = buildCalorieBankExplainer(bank)
+  const detail = buildCalorieBankExplainer(bank, excessDriver)
 
   return (
     <AppOverlay open={open} onClose={onClose} variant="sheet">
@@ -152,13 +167,14 @@ function CalorieBankExplainSheet({
 
 interface Props {
   bank: CalorieBankRow | null | undefined
+  excessDriver?: DailyExcessDriver
 }
 
-export default function CalorieBankBanner({ bank }: Props) {
+export default function CalorieBankBanner({ bank, excessDriver = null }: Props) {
   const [explainOpen, setExplainOpen] = useState(false)
 
   if (!bank) return null
-  const copy = getCalorieBankBannerCopy(bank)
+  const copy = getCalorieBankBannerCopy(bank, excessDriver)
   if (!copy) return null
 
   return (
@@ -215,7 +231,12 @@ export default function CalorieBankBanner({ bank }: Props) {
         </div>
       </div>
 
-      <CalorieBankExplainSheet bank={bank} open={explainOpen} onClose={() => setExplainOpen(false)} />
+      <CalorieBankExplainSheet
+        bank={bank}
+        excessDriver={excessDriver}
+        open={explainOpen}
+        onClose={() => setExplainOpen(false)}
+      />
     </>
   )
 }

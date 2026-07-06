@@ -2,8 +2,10 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import {
   clampDailyAdjust,
+  computeEffectiveDailyExcess,
   computeRecoveryWindow,
   recoveryTargetsForDayOffsets,
+  resolveDailyExcessDriver,
   syncCalorieBankRow,
   tickRecoveryFromPrevious,
   calorieFloorFromGender,
@@ -14,6 +16,7 @@ const USER = 'user-1'
 const DATE = '2026-06-18'
 const FLOOR = 1500
 const TARGET = 1700
+const MACROS = { targetProteinG: 88, targetFatG: 67, targetCarbsG: 258 }
 
 function baseRow(overrides: Partial<CalorieBankRow> = {}): CalorieBankRow {
   return {
@@ -45,6 +48,7 @@ describe('Calorie Bank Engine v1', () => {
       actualKcal: 3200,
       previousRow: null,
       existingToday: null,
+      ...MACROS,
     })
 
     assert.equal(row.delta_kcal, 1500)
@@ -79,13 +83,7 @@ describe('Calorie Bank Engine v1', () => {
       actualKcal: 3200,
       previousRow: null,
       existingToday: null,
-    })
-
-    const day2Start = tickRecoveryFromPrevious(day1, TARGET, FLOOR)
-    const day2Partial = baseRow({
-      date: '2026-06-18',
-      ...day2Start,
-      actual_kcal: 0,
+      ...MACROS,
     })
 
     const day2 = syncCalorieBankRow({
@@ -95,15 +93,15 @@ describe('Calorie Bank Engine v1', () => {
       calorieFloor: FLOOR,
       actualKcal: 3000,
       previousRow: day1,
-      existingToday: day2Partial,
+      existingToday: null,
+      ...MACROS,
     })
 
-    assert.ok(day2.recovery_balance_kcal > day1.recovery_balance_kcal - 150)
     assert.equal(day2.recovery_balance_kcal, 1350 + 1300)
   })
 
   it('Case D: after recovery completes, target returns to normal', () => {
-    let row = baseRow({
+    const row = baseRow({
       recovery_balance_kcal: 100,
       spread_days_remaining: 1,
       daily_adjust_kcal: -100,
@@ -144,5 +142,108 @@ describe('Calorie Bank Engine v1', () => {
   it('female floor default is 1200', () => {
     assert.equal(calorieFloorFromGender('female'), 1200)
     assert.equal(calorieFloorFromGender('male'), 1500)
+  })
+
+  it('fat over target triggers bank even when kcal is under', () => {
+    const excess = computeEffectiveDailyExcess(
+      { kcal: 1845, protein_g: 106, fat_g: 106, carbs_g: 126 },
+      { kcal: 1897, protein_g: 88, fat_g: 67, carbs_g: 258 }
+    )
+    assert.equal(excess, 351)
+    assert.equal(resolveDailyExcessDriver(
+      { kcal: 1845, protein_g: 106, fat_g: 106, carbs_g: 126 },
+      { kcal: 1897, protein_g: 88, fat_g: 67, carbs_g: 258 }
+    ), 'fat')
+
+    const row = syncCalorieBankRow({
+      userId: USER,
+      date: DATE,
+      normalTargetKcal: 1897,
+      calorieFloor: FLOOR,
+      actualKcal: 1845,
+      actualProteinG: 106,
+      actualFatG: 106,
+      actualCarbsG: 126,
+      targetProteinG: 88,
+      targetFatG: 67,
+      targetCarbsG: 258,
+      previousRow: null,
+      existingToday: null,
+    })
+
+    assert.ok(row.recovery_balance_kcal > 0)
+    assert.ok(row.spread_days_remaining > 0)
+  })
+
+  it('deleting meals revokes same-day bank when back under all targets', () => {
+    const over = syncCalorieBankRow({
+      userId: USER,
+      date: DATE,
+      normalTargetKcal: TARGET,
+      calorieFloor: FLOOR,
+      actualKcal: 2200,
+      previousRow: null,
+      existingToday: null,
+      ...MACROS,
+    })
+    assert.ok(over.recovery_balance_kcal > 0)
+
+    const afterDelete = syncCalorieBankRow({
+      userId: USER,
+      date: DATE,
+      normalTargetKcal: TARGET,
+      calorieFloor: FLOOR,
+      actualKcal: 1600,
+      previousRow: null,
+      existingToday: over,
+      ...MACROS,
+    })
+
+    assert.equal(afterDelete.recovery_balance_kcal, 0)
+    assert.equal(afterDelete.spread_days_remaining, 0)
+    assert.equal(afterDelete.internal_target_kcal, TARGET)
+  })
+
+  it('deleting meals keeps yesterday carryover when still under today', () => {
+    const yesterday = syncCalorieBankRow({
+      userId: USER,
+      date: '2026-06-17',
+      normalTargetKcal: TARGET,
+      calorieFloor: FLOOR,
+      actualKcal: 3200,
+      previousRow: null,
+      existingToday: null,
+      ...MACROS,
+    })
+
+    const todayOver = syncCalorieBankRow({
+      userId: USER,
+      date: DATE,
+      normalTargetKcal: TARGET,
+      calorieFloor: FLOOR,
+      actualKcal: 2200,
+      previousRow: yesterday,
+      existingToday: null,
+      ...MACROS,
+    })
+    assert.ok(todayOver.recovery_balance_kcal > yesterday.recovery_balance_kcal)
+
+    const todayFixed = syncCalorieBankRow({
+      userId: USER,
+      date: DATE,
+      normalTargetKcal: TARGET,
+      calorieFloor: FLOOR,
+      actualKcal: 1600,
+      actualProteinG: 80,
+      actualFatG: 60,
+      actualCarbsG: 200,
+      previousRow: yesterday,
+      existingToday: todayOver,
+      ...MACROS,
+    })
+
+    assert.ok(todayFixed.recovery_balance_kcal > 0)
+    assert.ok(todayFixed.recovery_balance_kcal < todayOver.recovery_balance_kcal)
+    assert.equal(todayFixed.recovery_balance_kcal, tickRecoveryFromPrevious(yesterday, TARGET, FLOOR).recovery_balance_kcal)
   })
 })

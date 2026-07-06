@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
+import type { DailyExcessDriver } from '@/lib/engines/calorie-bank-engine'
 import { sumLoggedCarbs, sumLoggedFat } from '@/lib/food-log-macros'
 import { countPendingNutritionLogs, filterPendingNutritionLogs } from '@/lib/nutrition/food-log-display'
 import CalorieRing from './CalorieRing'
@@ -29,6 +30,7 @@ interface Props {
   proteinGap: number
   overTarget?: boolean
   calorieBank?: CalorieBankRow | null
+  excessDriver?: DailyExcessDriver
   foodLogs?: FoodLogEntry[]
   hasDicePreview?: boolean
   mealActionsLoading?: boolean
@@ -57,6 +59,7 @@ export default function TodayHero({
   proteinGap,
   overTarget = false,
   calorieBank = null,
+  excessDriver = null,
   foodLogs = [],
   hasDicePreview = false,
   mealActionsLoading = false,
@@ -113,7 +116,7 @@ export default function TodayHero({
           </p>
         )}
 
-        <CalorieBankBanner bank={calorieBank} />
+        <CalorieBankBanner bank={calorieBank} excessDriver={excessDriver} />
 
         <div className="pt-2" style={{ borderTop: `1px solid ${BB_V2.divider}` }}>
           <MacroBars

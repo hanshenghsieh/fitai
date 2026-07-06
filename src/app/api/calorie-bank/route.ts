@@ -9,6 +9,11 @@ import {
 } from '@/lib/banks/calorie-bank-store'
 import type { UserProfile } from '@/types'
 
+function num(v: unknown): number {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : 0
+}
+
 export async function GET() {
   const supabase = await createClient()
   const {
@@ -30,13 +35,19 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => ({}))
   const date = typeof body.date === 'string' ? body.date : getNutritionDayKey()
-  const normalTargetKcal = Number(body.normal_target_kcal)
-  const actualKcal = Number(body.actual_kcal)
+  const calories = num(body.normal_target_kcal ?? body.target_kcal)
+  const protein_g = num(body.target_protein_g)
+  const fat_g = num(body.target_fat_g)
+  const carbs_g = num(body.target_carbs_g)
+  const actualKcal = num(body.actual_kcal)
+  const actualProteinG = num(body.actual_protein_g)
+  const actualFatG = num(body.actual_fat_g)
+  const actualCarbsG = num(body.actual_carbs_g)
 
-  if (!Number.isFinite(normalTargetKcal) || normalTargetKcal <= 0) {
+  if (calories <= 0) {
     return NextResponse.json({ error: 'normal_target_kcal required' }, { status: 400 })
   }
-  if (!Number.isFinite(actualKcal) || actualKcal < 0) {
+  if (actualKcal < 0) {
     return NextResponse.json({ error: 'actual_kcal required' }, { status: 400 })
   }
 
@@ -50,8 +61,11 @@ export async function POST(request: NextRequest) {
     supabase,
     userId: user.id,
     date,
-    normalTargetKcal,
+    dailyTargets: { calories, protein_g, fat_g, carbs_g },
     actualKcal,
+    actualProteinG,
+    actualFatG,
+    actualCarbsG,
     profile: profile as UserProfile | null,
   })
 

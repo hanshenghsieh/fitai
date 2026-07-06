@@ -1,5 +1,6 @@
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import { isRecoveryActive } from '@/lib/engines/calorie-bank-engine'
+import type { DailyExcessDriver } from '@/lib/engines/calorie-bank-engine'
 
 export interface CalorieBankExplainer {
   intro: string
@@ -8,22 +9,34 @@ export interface CalorieBankExplainer {
   statusLines: { label: string; value: string }[]
 }
 
-export function buildCalorieBankExplainer(bank: CalorieBankRow): CalorieBankExplainer {
+const DRIVER_LABEL: Record<Exclude<DailyExcessDriver, null>, string> = {
+  kcal: '總熱量',
+  protein: '蛋白質',
+  fat: '脂肪',
+  carbs: '碳水',
+}
+
+export function buildCalorieBankExplainer(
+  bank: CalorieBankRow,
+  excessDriver: DailyExcessDriver = null
+): CalorieBankExplainer {
   const normal = bank.daily_target_kcal
   const adjusted = bank.internal_target_kcal
   const diff = adjusted - normal
   const recovery = isRecoveryActive(bank)
 
   const intro =
-    '吃多了或吃少了，都不用重來。熱量銀行會把差額慢慢分散到接下來幾天，自動微調每日目標——不用補償性節食，也不製造罪惡感。'
+    '熱量、蛋白質、脂肪、碳水任一項超過今日計畫，BetterBit 會啟用熱量銀行，把差額分散到接下來幾天——刪除餐點、數值回到計畫內，當天觸發的銀行會自動撤銷。'
 
   let reasonBody = '今天的目標已依你最近的飲食節奏微調。'
   if (diff > 0) {
     reasonBody = `昨天吃得比目標少約 ${Math.abs(diff).toLocaleString()} kcal，所以今天目標略為提高，幫你把熱量溫和補回來。`
   } else if (diff < 0 && recovery) {
-    reasonBody = `先前吃得比目標多，銀行裡還有約 ${bank.recovery_balance_kcal.toLocaleString()} kcal 待平衡，所以今天目標略為降低。`
+    reasonBody = `先前超過計畫，銀行裡還有約 ${bank.recovery_balance_kcal.toLocaleString()} kcal 待平衡，所以今天目標略為降低。`
+  } else if (recovery && excessDriver) {
+    reasonBody = `今日${DRIVER_LABEL[excessDriver]}已超過計畫，熱量銀行正在幫你分散平衡。`
   } else if (recovery) {
-    reasonBody = `先前吃得比目標多，熱量銀行正在幫你分散平衡。今天照常記錄就好。`
+    reasonBody = '先前超過今日計畫，熱量銀行正在幫你分散平衡。'
   }
 
   const statusLines: { label: string; value: string }[] = [

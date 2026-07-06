@@ -1,10 +1,12 @@
-import { format, subDays, parseISO } from 'date-fns'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import {
   calorieFloorFromGender,
   syncCalorieBankRow,
 } from '@/lib/engines/calorie-bank-engine'
+import { sumLoggedCalories, sumLoggedProtein } from '@/lib/engines/next-meal-engine'
+import { enrichFoodLogs, sumLoggedCarbs, sumLoggedFat } from '@/lib/food-log-macros'
+import type { FoodLogEntry } from '@/lib/banks/types'
 import { getNutritionDayKey } from '@/lib/timezone'
 import type { UserProfile } from '@/types'
 
@@ -37,6 +39,23 @@ function withPersisted(row: CalorieBankRow, persisted: boolean): CalorieBankRow 
 
 function logCalorieBankError(context: string, message: string, meta?: Record<string, unknown>) {
   console.error(`[calorie_bank] ${context}:`, message, meta ?? '')
+}
+
+export interface DailyMacroTargets {
+  calories: number
+  protein_g: number
+  fat_g: number
+  carbs_g: number
+}
+
+function sumBankIntakeFromLogs(logs: FoodLogEntry[]) {
+  const enriched = enrichFoodLogs(logs)
+  return {
+    kcal: sumLoggedCalories(enriched),
+    protein_g: sumLoggedProtein(enriched),
+    carbs_g: sumLoggedCarbs(enriched),
+    fat_g: sumLoggedFat(enriched),
+  }
 }
 
 export async function getCalorieBankRow(
@@ -131,14 +150,27 @@ export async function syncCalorieBankForUser(params: {
   supabase: SupabaseClient
   userId: string
   date: string
-  normalTargetKcal: number
+  dailyTargets: DailyMacroTargets
   actualKcal: number
+  actualProteinG?: number
+  actualFatG?: number
+  actualCarbsG?: number
   profile?: UserProfile | null
 }): Promise<CalorieBankRow | null> {
-  const { supabase, userId, date, normalTargetKcal, actualKcal, profile } = params
+  const {
+    supabase,
+    userId,
+    date,
+    dailyTargets,
+    actualKcal,
+    actualProteinG = 0,
+    actualFatG = 0,
+    actualCarbsG = 0,
+    profile,
+  } = params
   const floor = calorieFloorFromGender(profile?.gender)
 
-  const prevDate = format(subDays(parseISO(date), 1), 'yyyy-MM-dd')
+  const prevDate = formatSubDay(date)
   const [previousRow, existingToday] = await Promise.all([
     getCalorieBankRow(supabase, userId, prevDate),
     getCalorieBankRow(supabase, userId, date),
@@ -147,14 +179,26 @@ export async function syncCalorieBankForUser(params: {
   const row = syncCalorieBankRow({
     userId,
     date,
-    normalTargetKcal,
+    normalTargetKcal: dailyTargets.calories,
     calorieFloor: floor,
     actualKcal,
+    actualProteinG,
+    actualFatG,
+    actualCarbsG,
+    targetProteinG: dailyTargets.protein_g,
+    targetFatG: dailyTargets.fat_g,
+    targetCarbsG: dailyTargets.carbs_g,
     previousRow,
     existingToday,
   })
 
   return upsertCalorieBankRow(supabase, row)
+}
+
+function formatSubDay(date: string): string {
+  const d = new Date(`${date}T12:00:00`)
+  d.setDate(d.getDate() - 1)
+  return d.toISOString().slice(0, 10)
 }
 
 export function sumFoodLogCalories(
@@ -167,16 +211,20 @@ export function sumFoodLogCalories(
 export async function syncBankFromFoodLogs(params: {
   supabase: SupabaseClient
   userId: string
-  normalTargetKcal: number
-  foodLogs: { calories?: number }[] | null | undefined
+  dailyTargets: DailyMacroTargets
+  foodLogs: FoodLogEntry[] | null | undefined
   profile?: UserProfile | null
 }): Promise<CalorieBankRow | null> {
+  const intake = sumBankIntakeFromLogs(params.foodLogs ?? [])
   return syncCalorieBankForUser({
     supabase: params.supabase,
     userId: params.userId,
     date: getNutritionDayKey(),
-    normalTargetKcal: params.normalTargetKcal,
-    actualKcal: sumFoodLogCalories(params.foodLogs),
+    dailyTargets: params.dailyTargets,
+    actualKcal: intake.kcal,
+    actualProteinG: intake.protein_g,
+    actualFatG: intake.fat_g,
+    actualCarbsG: intake.carbs_g,
     profile: params.profile,
   })
 }

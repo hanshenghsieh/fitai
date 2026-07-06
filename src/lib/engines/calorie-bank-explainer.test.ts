@@ -22,7 +22,7 @@ function row(overrides: Partial<CalorieBankRow>): CalorieBankRow {
 describe('calorie-bank-explainer', () => {
   it('explains recovery after overeating', () => {
     const detail = buildCalorieBankExplainer(row({}))
-    assert.match(detail.reasonBody, /待平衡/)
+    assert.match(detail.reasonBody, /超過計畫|待平衡/)
     assert.ok(detail.statusLines.some(l => l.label === '待平衡熱量'))
     assert.ok(detail.statusLines.some(l => l.label === '預計還需' && l.value.includes('3')))
   })

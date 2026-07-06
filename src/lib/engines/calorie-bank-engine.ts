@@ -9,6 +9,22 @@ import type { DiceAdherenceBias, AdherenceState } from '@/lib/engines/adherence-
 export const DEFAULT_CALORIE_FLOOR_MALE = 1500
 export const DEFAULT_CALORIE_FLOOR_FEMALE = 1200
 
+export interface DailyIntakeSnapshot {
+  kcal: number
+  protein_g: number
+  fat_g: number
+  carbs_g: number
+}
+
+export interface DailyTargetSnapshot {
+  kcal: number
+  protein_g: number
+  fat_g: number
+  carbs_g: number
+}
+
+export type DailyExcessDriver = 'kcal' | 'protein' | 'fat' | 'carbs' | null
+
 export function calorieFloorFromGender(gender?: string | null): number {
   return gender === 'female' ? DEFAULT_CALORIE_FLOOR_FEMALE : DEFAULT_CALORIE_FLOOR_MALE
 }
@@ -45,6 +61,37 @@ export function isRecoveryActive(row: Pick<CalorieBankRow, 'recovery_balance_kca
   return row.recovery_balance_kcal > 0 && row.spread_days_remaining > 0
 }
 
+/** Effective over-target amount — kcal OR any macro converted to kcal equivalent. */
+export function computeEffectiveDailyExcess(
+  actual: DailyIntakeSnapshot,
+  target: DailyTargetSnapshot
+): number {
+  const kcalExcess = Math.max(0, actual.kcal - target.kcal)
+  const proteinExcessKcal = Math.max(0, actual.protein_g - target.protein_g) * 4
+  const fatExcessKcal = Math.max(0, actual.fat_g - target.fat_g) * 9
+  const carbsExcessKcal = Math.max(0, actual.carbs_g - target.carbs_g) * 4
+  return Math.max(kcalExcess, proteinExcessKcal, fatExcessKcal, carbsExcessKcal)
+}
+
+export function resolveDailyExcessDriver(
+  actual: DailyIntakeSnapshot,
+  target: DailyTargetSnapshot
+): DailyExcessDriver {
+  const excess = computeEffectiveDailyExcess(actual, target)
+  if (excess <= 0) return null
+
+  const kcalExcess = Math.max(0, actual.kcal - target.kcal)
+  const proteinExcessKcal = Math.max(0, actual.protein_g - target.protein_g) * 4
+  const fatExcessKcal = Math.max(0, actual.fat_g - target.fat_g) * 9
+  const carbsExcessKcal = Math.max(0, actual.carbs_g - target.carbs_g) * 4
+
+  if (fatExcessKcal >= excess && fatExcessKcal > 0) return 'fat'
+  if (proteinExcessKcal >= excess && proteinExcessKcal > 0) return 'protein'
+  if (carbsExcessKcal >= excess && carbsExcessKcal > 0) return 'carbs'
+  if (kcalExcess > 0) return 'kcal'
+  return 'kcal'
+}
+
 /** Carry recovery from previous nutrition day into today (morning tick). */
 export function tickRecoveryFromPrevious(
   previous: CalorieBankRow | null,
@@ -64,10 +111,7 @@ export function tickRecoveryFromPrevious(
   }
 
   const adjust = clampDailyAdjust(previous.daily_adjust_kcal, normalTargetKcal, calorieFloor)
-  const applied = Math.min(
-    previous.recovery_balance_kcal,
-    Math.abs(adjust)
-  )
+  const applied = Math.min(previous.recovery_balance_kcal, Math.abs(adjust))
   const nextBalance = Math.max(0, previous.recovery_balance_kcal - applied)
   const nextSpread = Math.max(0, previous.spread_days_remaining - 1)
   const internal = Math.max(calorieFloor, normalTargetKcal + adjust)
@@ -85,7 +129,7 @@ export function tickRecoveryFromPrevious(
     const window = computeRecoveryWindow(nextBalance)
     const rolledAdjust = clampDailyAdjust(window.dailyAdjustKcal, normalTargetKcal, calorieFloor)
     return {
-      internal_target_kcal: internal,
+      internal_target_kcal: Math.max(calorieFloor, normalTargetKcal + rolledAdjust),
       recovery_balance_kcal: nextBalance,
       spread_days_remaining: window.spreadDays,
       daily_adjust_kcal: rolledAdjust,
@@ -100,28 +144,29 @@ export function tickRecoveryFromPrevious(
   }
 }
 
-function applyNewExcess(
-  row: Pick<
+function applyTodayExcessToRecovery(
+  morningTick: Pick<
     CalorieBankRow,
-    'recovery_balance_kcal' | 'spread_days_remaining' | 'daily_adjust_kcal' | 'daily_target_kcal'
+    'internal_target_kcal' | 'recovery_balance_kcal' | 'spread_days_remaining' | 'daily_adjust_kcal'
   >,
-  addedExcess: number,
+  todayExcessKcal: number,
+  normalTargetKcal: number,
   calorieFloor: number
-): Pick<CalorieBankRow, 'recovery_balance_kcal' | 'spread_days_remaining' | 'daily_adjust_kcal'> {
-  if (addedExcess <= 0) {
-    return {
-      recovery_balance_kcal: row.recovery_balance_kcal,
-      spread_days_remaining: row.spread_days_remaining,
-      daily_adjust_kcal: row.daily_adjust_kcal,
-    }
+): Pick<
+  CalorieBankRow,
+  'internal_target_kcal' | 'recovery_balance_kcal' | 'spread_days_remaining' | 'daily_adjust_kcal'
+> {
+  if (todayExcessKcal <= 0) {
+    return morningTick
   }
 
-  const nextBalance = row.recovery_balance_kcal + addedExcess
-  const window = computeRecoveryWindow(nextBalance)
-  const adjust = clampDailyAdjust(window.dailyAdjustKcal, row.daily_target_kcal, calorieFloor)
+  const totalBalance = morningTick.recovery_balance_kcal + todayExcessKcal
+  const window = computeRecoveryWindow(totalBalance)
+  const adjust = clampDailyAdjust(window.dailyAdjustKcal, normalTargetKcal, calorieFloor)
 
   return {
-    recovery_balance_kcal: nextBalance,
+    internal_target_kcal: Math.max(calorieFloor, normalTargetKcal + adjust),
+    recovery_balance_kcal: totalBalance,
     spread_days_remaining: window.spreadDays,
     daily_adjust_kcal: adjust,
   }
@@ -134,44 +179,52 @@ export function syncCalorieBankRow(input: {
   normalTargetKcal: number
   calorieFloor: number
   actualKcal: number
+  actualProteinG?: number
+  actualFatG?: number
+  actualCarbsG?: number
+  targetProteinG?: number
+  targetFatG?: number
+  targetCarbsG?: number
   previousRow: CalorieBankRow | null
   existingToday: CalorieBankRow | null
 }): CalorieBankRow {
-  const { userId, date, normalTargetKcal, calorieFloor, actualKcal, previousRow, existingToday } = input
+  const {
+    userId,
+    date,
+    normalTargetKcal,
+    calorieFloor,
+    actualKcal,
+    actualProteinG = 0,
+    actualFatG = 0,
+    actualCarbsG = 0,
+    targetProteinG = 0,
+    targetFatG = 0,
+    targetCarbsG = 0,
+    previousRow,
+    existingToday,
+  } = input
 
-  const tick = existingToday
-    ? {
-        internal_target_kcal: existingToday.internal_target_kcal,
-        recovery_balance_kcal: existingToday.recovery_balance_kcal,
-        spread_days_remaining: existingToday.spread_days_remaining,
-        daily_adjust_kcal: existingToday.daily_adjust_kcal,
-      }
-    : tickRecoveryFromPrevious(previousRow, normalTargetKcal, calorieFloor)
-
-  const priorActual = existingToday?.actual_kcal ?? 0
-  const priorExcess = Math.max(0, priorActual - normalTargetKcal)
-  const newExcess = Math.max(0, actualKcal - normalTargetKcal)
-  const addedExcess = Math.max(0, newExcess - priorExcess)
-
-  const recovery = applyNewExcess(
+  const morningTick = tickRecoveryFromPrevious(previousRow, normalTargetKcal, calorieFloor)
+  const todayExcess = computeEffectiveDailyExcess(
+    { kcal: actualKcal, protein_g: actualProteinG, fat_g: actualFatG, carbs_g: actualCarbsG },
     {
-      daily_target_kcal: normalTargetKcal,
-      recovery_balance_kcal: tick.recovery_balance_kcal,
-      spread_days_remaining: tick.spread_days_remaining,
-      daily_adjust_kcal: tick.daily_adjust_kcal,
-    },
-    addedExcess,
-    calorieFloor
+      kcal: normalTargetKcal,
+      protein_g: targetProteinG,
+      fat_g: targetFatG,
+      carbs_g: targetCarbsG,
+    }
   )
 
+  const recovery = applyTodayExcessToRecovery(morningTick, todayExcess, normalTargetKcal, calorieFloor)
+
   const deltaKcal = actualKcal - normalTargetKcal
-  const runningBalance = tick.internal_target_kcal - actualKcal
+  const runningBalance = recovery.internal_target_kcal - actualKcal
 
   return {
     user_id: userId,
     date,
     daily_target_kcal: normalTargetKcal,
-    internal_target_kcal: tick.internal_target_kcal,
+    internal_target_kcal: recovery.internal_target_kcal,
     actual_kcal: actualKcal,
     delta_kcal: deltaKcal,
     running_balance_kcal: runningBalance,

@@ -6,11 +6,11 @@ import { syncBankFromFoodLogs } from '@/lib/banks/calorie-bank-store'
 import { differenceInDays, format, parseISO, startOfWeek } from 'date-fns'
 import type { WeeklyPlanData, UserProfile } from '@/types'
 
-async function resolveNormalTargetKcal(
+async function resolveDailyTargets(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   nutritionDate: string
-): Promise<number | null> {
+): Promise<{ calories: number; protein_g: number; fat_g: number; carbs_g: number } | null> {
   const date = parseISO(nutritionDate)
   const weekStart = format(startOfWeek(date, { weekStartsOn: 1 }), 'yyyy-MM-dd')
   const dayIndex = differenceInDays(date, parseISO(weekStart))
@@ -27,7 +27,15 @@ async function resolveNormalTargetKcal(
   if (!days?.length) return null
 
   const safeIndex = Math.min(Math.max(0, dayIndex), days.length - 1)
-  return days[safeIndex]?.daily_targets?.calories ?? null
+  const targets = days[safeIndex]?.daily_targets
+  if (!targets?.calories) return null
+
+  return {
+    calories: targets.calories,
+    protein_g: targets.protein_g ?? 0,
+    fat_g: targets.fat_g ?? 0,
+    carbs_g: targets.carbs_g ?? 0,
+  }
 }
 
 async function maybeSyncCalorieBank(
@@ -39,13 +47,13 @@ async function maybeSyncCalorieBank(
   const meta = parseCheckinMeta(checkin)
   const logs = meta.user_memory?.food_logs_today ?? []
   const today = getNutritionDayKey()
-  const normalTarget = await resolveNormalTargetKcal(supabase, userId, today)
-  if (!normalTarget) return null
+  const dailyTargets = await resolveDailyTargets(supabase, userId, today)
+  if (!dailyTargets) return null
 
   return syncBankFromFoodLogs({
     supabase,
     userId,
-    normalTargetKcal: normalTarget,
+    dailyTargets,
     foodLogs: logs,
     profile,
   })

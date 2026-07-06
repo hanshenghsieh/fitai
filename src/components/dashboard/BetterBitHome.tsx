@@ -41,8 +41,9 @@ import {
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { FoodDna } from '@/lib/food-memory'
-import { isRecoveryActive } from '@/lib/engines/calorie-bank-engine'
+import { isRecoveryActive, resolveDailyExcessDriver } from '@/lib/engines/calorie-bank-engine'
 import { sumLoggedCalories, sumLoggedProtein, computeTodayMealState } from '@/lib/engines/next-meal-engine'
+import { sumLoggedCarbs, sumLoggedFat } from '@/lib/food-log-macros'
 import { foodLogsNeedSync, reconcileFoodLogsToday } from '@/lib/food-log-reconcile'
 import {
   clearFoodLogsSessionCache,
@@ -215,14 +216,19 @@ export default function BetterBitHome({
     if (calorieBankSyncedRef.current) return
     calorieBankSyncedRef.current = true
     const logs = initialFoodLogs.length ? initialFoodLogs : displayFoodLogs
-    const actualKcal = sumLoggedCalories(logs)
-    const normalTargetKcal = todayPlan.daily_targets.calories
+    const targets = todayPlan.daily_targets
     void fetch('/api/calorie-bank', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        normal_target_kcal: normalTargetKcal,
-        actual_kcal: actualKcal,
+        normal_target_kcal: targets.calories,
+        target_protein_g: targets.protein_g,
+        target_fat_g: targets.fat_g,
+        target_carbs_g: targets.carbs_g,
+        actual_kcal: sumLoggedCalories(logs),
+        actual_protein_g: sumLoggedProtein(logs),
+        actual_carbs_g: sumLoggedCarbs(logs),
+        actual_fat_g: sumLoggedFat(logs),
         date: getNutritionDayKey(),
       }),
     })
@@ -236,7 +242,7 @@ export default function BetterBitHome({
         }
       })
       .catch(() => {})
-  }, [todayPlan.daily_targets.calories, initialFoodLogs, displayFoodLogs])
+  }, [todayPlan.daily_targets, initialFoodLogs, displayFoodLogs])
 
   const waterTargetMl = useMemo(
     () =>
@@ -271,6 +277,20 @@ export default function BetterBitHome({
       calorieBank,
     })
     const recoveryActive = isRecoveryActive(calorieBank ?? { recovery_balance_kcal: 0, spread_days_remaining: 0 })
+    const excessDriver = resolveDailyExcessDriver(
+      {
+        kcal: caloriesLogged,
+        protein_g: proteinLogged,
+        fat_g: sumLoggedFat(displayFoodLogs),
+        carbs_g: sumLoggedCarbs(displayFoodLogs),
+      },
+      {
+        kcal: normalTarget,
+        protein_g: proteinTarget,
+        fat_g: todayPlan.daily_targets.fat_g ?? 0,
+        carbs_g: todayPlan.daily_targets.carbs_g ?? 0,
+      }
+    )
     return {
       caloriesLogged,
       proteinLogged,
@@ -278,6 +298,7 @@ export default function BetterBitHome({
       proteinTarget,
       overTarget: dayState.overTargetProtection,
       recoveryActive,
+      excessDriver,
       remainingCalories: dayState.remainingCalories,
       proteinGap: dayState.proteinGap,
       effectiveMealCalTarget: dayState.effectiveMealCalTarget,
@@ -713,6 +734,7 @@ export default function BetterBitHome({
         proteinGap={intakeSummary.proteinGap}
         overTarget={intakeSummary.overTarget}
         calorieBank={calorieBank}
+        excessDriver={intakeSummary.excessDriver}
         foodLogs={displayFoodLogs}
         hasDicePreview={mealUiState.hasDicePreview}
         mealActionsLoading={mealUiState.rolling || mealUiState.confirming}
