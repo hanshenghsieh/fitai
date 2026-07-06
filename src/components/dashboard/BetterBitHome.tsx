@@ -42,6 +42,7 @@ import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { FoodDna } from '@/lib/food-memory'
 import { isRecoveryActive, resolveDailyExcessDriver } from '@/lib/engines/calorie-bank-engine'
+import { previewCalorieBankFromLogs } from '@/lib/banks/preview-calorie-bank'
 import { sumLoggedCalories, sumLoggedProtein, computeTodayMealState } from '@/lib/engines/next-meal-engine'
 import { sumLoggedCarbs, sumLoggedFat } from '@/lib/food-log-macros'
 import { foodLogsNeedSync, reconcileFoodLogsToday } from '@/lib/food-log-reconcile'
@@ -53,7 +54,7 @@ import {
 } from '@/lib/food-log-session-cache'
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
-import { getNutritionDayKey } from '@/lib/timezone'
+import { getNutritionDayKey, getPreviousNutritionDayKey } from '@/lib/timezone'
 import { addWaterMl, resetWaterMl, resolveDailyWaterGoalMl, setWaterMl as applyWaterTotal } from '@/lib/water-log'
 import { TODAY } from '@/lib/today-design'
 import TodayWaterLog from '@/components/dashboard/today/TodayWaterLog'
@@ -172,6 +173,7 @@ export default function BetterBitHome({
   const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
   const [trackedDayKey, setTrackedDayKey] = useState(() => getNutritionDayKey())
   const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(null)
+  const [previousDayBank, setPreviousDayBank] = useState<CalorieBankRow | null>(null)
   const [recordSheetOpen, setRecordSheetOpen] = useState(false)
   const [showDay1Guide, setShowDay1Guide] = useState(false)
   const recordUrlHandledRef = useRef(false)
@@ -217,32 +219,56 @@ export default function BetterBitHome({
     calorieBankSyncedRef.current = true
     const logs = initialFoodLogs.length ? initialFoodLogs : displayFoodLogs
     const targets = todayPlan.daily_targets
-    void fetch('/api/calorie-bank', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        normal_target_kcal: targets.calories,
-        target_protein_g: targets.protein_g,
-        target_fat_g: targets.fat_g,
-        target_carbs_g: targets.carbs_g,
-        actual_kcal: sumLoggedCalories(logs),
-        actual_protein_g: sumLoggedProtein(logs),
-        actual_carbs_g: sumLoggedCarbs(logs),
-        actual_fat_g: sumLoggedFat(logs),
-        date: getNutritionDayKey(),
+    const yesterday = getPreviousNutritionDayKey()
+
+    void Promise.all([
+      fetch('/api/calorie-bank', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          normal_target_kcal: targets.calories,
+          target_protein_g: targets.protein_g,
+          target_fat_g: targets.fat_g,
+          target_carbs_g: targets.carbs_g,
+          actual_kcal: sumLoggedCalories(logs),
+          actual_protein_g: sumLoggedProtein(logs),
+          actual_carbs_g: sumLoggedCarbs(logs),
+          actual_fat_g: sumLoggedFat(logs),
+          date: getNutritionDayKey(),
+        }),
       }),
-    })
-      .then(async res => {
-        const json = (await res.json()) as { bank?: CalorieBankRow | null }
-        if (json.bank) setCalorieBank(json.bank)
-        else if (!res.ok) {
+      fetch(`/api/calorie-bank?date=${yesterday}`),
+    ])
+      .then(async ([postRes, prevRes]) => {
+        const postJson = (await postRes.json()) as { bank?: CalorieBankRow | null }
+        if (postJson.bank) setCalorieBank(postJson.bank)
+        else if (!postRes.ok) {
           const getRes = await fetch('/api/calorie-bank')
           const getJson = (await getRes.json()) as { bank?: CalorieBankRow | null }
           if (getJson.bank) setCalorieBank(getJson.bank)
         }
+        const prevJson = (await prevRes.json()) as { bank?: CalorieBankRow | null }
+        if (prevJson.bank) setPreviousDayBank(prevJson.bank)
       })
       .catch(() => {})
   }, [todayPlan.daily_targets, initialFoodLogs, displayFoodLogs])
+
+  const effectiveCalorieBank = useMemo(() => {
+    if (!profile?.id) return calorieBank
+    return previewCalorieBankFromLogs({
+      userId: profile.id,
+      logs: displayFoodLogs,
+      dailyTargets: {
+        calories: todayPlan.daily_targets.calories,
+        protein_g: todayPlan.daily_targets.protein_g,
+        fat_g: todayPlan.daily_targets.fat_g,
+        carbs_g: todayPlan.daily_targets.carbs_g,
+      },
+      profile,
+      previousDayBank,
+      persistedTodayBank: calorieBank,
+    })
+  }, [profile, displayFoodLogs, todayPlan.daily_targets, previousDayBank, calorieBank])
 
   const waterTargetMl = useMemo(
     () =>
@@ -272,11 +298,11 @@ export default function BetterBitHome({
     const dayState = computeTodayMealState({
       todayFoodLogs: displayFoodLogs,
       normalTargetKcal: normalTarget,
-      internalTargetKcal: calorieBank?.internal_target_kcal,
+      internalTargetKcal: effectiveCalorieBank?.internal_target_kcal,
       proteinTargetG: proteinTarget,
-      calorieBank,
+      calorieBank: effectiveCalorieBank,
     })
-    const recoveryActive = isRecoveryActive(calorieBank ?? { recovery_balance_kcal: 0, spread_days_remaining: 0 })
+    const recoveryActive = isRecoveryActive(effectiveCalorieBank ?? { recovery_balance_kcal: 0, spread_days_remaining: 0 })
     const excessDriver = resolveDailyExcessDriver(
       {
         kcal: caloriesLogged,
@@ -304,7 +330,7 @@ export default function BetterBitHome({
       effectiveMealCalTarget: dayState.effectiveMealCalTarget,
       allowDiceAndSuggest: dayState.allowDiceAndSuggest,
     }
-  }, [displayFoodLogs, todayPlan.daily_targets, calorieBank])
+  }, [displayFoodLogs, todayPlan.daily_targets, effectiveCalorieBank])
 
   useEffect(() => {
     if (!onDashboard) return
@@ -733,7 +759,7 @@ export default function BetterBitHome({
         effectiveMealCalTarget={intakeSummary.effectiveMealCalTarget}
         proteinGap={intakeSummary.proteinGap}
         overTarget={intakeSummary.overTarget}
-        calorieBank={calorieBank}
+        calorieBank={effectiveCalorieBank}
         excessDriver={intakeSummary.excessDriver}
         foodLogs={displayFoodLogs}
         hasDicePreview={mealUiState.hasDicePreview}
@@ -765,7 +791,7 @@ export default function BetterBitHome({
               dayIndex={dayIndex}
               workoutDone={workoutDone}
               workoutTotal={workoutItems.length}
-              calorieBank={calorieBank}
+              calorieBank={effectiveCalorieBank}
               onLogFood={handleLogFood}
               onClearMealSelection={handleClearMealSelection}
               onPostureLine={setPostureLine}

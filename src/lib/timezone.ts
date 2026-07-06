@@ -27,6 +27,13 @@ export function getNutritionDayKey(date = new Date()): string {
   return getTaipeiDateKey(date)
 }
 
+export function getPreviousNutritionDayKey(date = new Date()): string {
+  const key = getNutritionDayKey(date)
+  const [y, m, d] = key.split('-').map(Number)
+  const noon = new Date(Date.UTC(y!, m! - 1, d!, 4, 0, 0))
+  return getNutritionDayKey(new Date(noon.getTime() - 24 * 60 * 60 * 1000))
+}
+
 export function nutritionDayResetLabel(): string {
   return `紀錄日於凌晨 ${NUTRITION_DAY_ROLLOVER_HOUR}:00（台北）換新`
 }

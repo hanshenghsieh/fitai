@@ -14,14 +14,18 @@ function num(v: unknown): number {
   return Number.isFinite(n) ? n : 0
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const date = getNutritionDayKey()
+  const dateParam = request.nextUrl.searchParams.get('date')
+  const date =
+    typeof dateParam === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)
+      ? dateParam
+      : getNutritionDayKey()
   const row = await getCalorieBankRow(supabase, user.id, date)
   return NextResponse.json({ bank: row })
 }

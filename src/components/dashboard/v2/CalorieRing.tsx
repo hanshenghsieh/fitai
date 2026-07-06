@@ -57,7 +57,9 @@ export default function CalorieRing({ logged, target, remaining }: Props) {
       <p className="text-[14px] mt-4 text-center tabular-nums" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
         {left > 0
           ? `已吃 ${Math.round(logged).toLocaleString()} / 目標 ${target.toLocaleString()} kcal`
-          : '今天的目標已達成'}
+          : left < 0
+            ? `已吃 ${Math.round(logged).toLocaleString()} / 目標 ${target.toLocaleString()} kcal（超出 ${Math.abs(Math.round(left)).toLocaleString()}）`
+            : '今天的目標已達成'}
       </p>
     </div>
   )
