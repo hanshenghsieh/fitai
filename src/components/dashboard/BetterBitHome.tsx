@@ -33,6 +33,11 @@ import {
 } from '@/lib/nutrition/unknown-food-flow'
 import type { MenuLookupHit } from '@/lib/food-menu-lookup'
 import type { ManualNutritionInput } from '@/lib/nutrition/unknown-food-flow'
+import {
+  applyHomeCookedTotalsToLog,
+  calculateHomeCookedMeal,
+  type HomeCookedMealDraft,
+} from '@/lib/nutrition/home-cooked'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { FoodDna } from '@/lib/food-memory'
@@ -660,6 +665,24 @@ export default function BetterBitHome({
     [displayFoodLogs, confirmLogLive, patchFoodLog]
   )
 
+  const handleHomeCookedSave = useCallback(
+    (logId: string, draft: HomeCookedMealDraft) => {
+      const log = displayFoodLogs.find(l => l.id === logId) ?? confirmLogLive
+      if (!log) return
+      const totals = calculateHomeCookedMeal(draft)
+      if (!totals) {
+        toast.error('請至少填一項食材重量')
+        return
+      }
+      patchFoodLog(logId, applyHomeCookedTotalsToLog(log, draft, totals))
+      toast.message('已依重量估算營養', {
+        description: `${totals.calories} kcal · 蛋白質 ${totals.protein_g}g`,
+      })
+      setConfirmLog(null)
+    },
+    [displayFoodLogs, confirmLogLive, patchFoodLog]
+  )
+
   const handleKeepTextRecord = useCallback((_logId: string) => {
     setConfirmLog(null)
   }, [])
@@ -901,6 +924,7 @@ export default function BetterBitHome({
         onClose={() => setConfirmLog(null)}
         onConfirmVerified={handleConfirmVerified}
         onManualSave={handleManualNutritionSave}
+        onHomeCookedSave={handleHomeCookedSave}
         onKeepTextRecord={handleKeepTextRecord}
       />
 

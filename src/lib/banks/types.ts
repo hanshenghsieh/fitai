@@ -124,4 +124,6 @@ export interface FoodLogEntry {
     portion_adjustments: Record<string, unknown>
     candidate_label: string
   }
+  /** Weight-based home-cooked decomposition */
+  home_cooked_meta?: import('@/lib/nutrition/home-cooked/types').HomeCookedMeta
 }

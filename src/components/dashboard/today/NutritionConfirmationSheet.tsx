@@ -1,13 +1,15 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { X, PenLine, Search, FileText, Check } from 'lucide-react'
+import { X, Search, FileText, Check, Scale } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { MenuLookupHit } from '@/lib/food-menu-lookup'
 import { findSimilarVerifiedItems, type ManualNutritionInput } from '@/lib/nutrition/unknown-food-flow'
-import ManualNutritionSheet from '@/components/dashboard/today/ManualNutritionSheet'
+import { parseMealLabelToDraft } from '@/lib/nutrition/home-cooked'
+import IngredientPortionSheet from '@/components/dashboard/today/IngredientPortionSheet'
 import AppOverlay from '@/components/ui/AppOverlay'
+import type { HomeCookedMealDraft } from '@/lib/nutrition/home-cooked'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
 const ICON_STROKE = 1.8
@@ -18,6 +20,7 @@ interface Props {
   onClose: () => void
   onConfirmVerified: (hit: MenuLookupHit) => void
   onManualSave: (logId: string, input: ManualNutritionInput) => void
+  onHomeCookedSave: (logId: string, draft: HomeCookedMealDraft) => void
   onKeepTextRecord: (logId: string) => void
 }
 
@@ -27,9 +30,10 @@ export default function NutritionConfirmationSheet({
   onClose,
   onConfirmVerified,
   onManualSave,
+  onHomeCookedSave,
   onKeepTextRecord,
 }: Props) {
-  const [manualOpen, setManualOpen] = useState(false)
+  const [portionOpen, setPortionOpen] = useState(false)
   const [pendingHit, setPendingHit] = useState<MenuLookupHit | null>(null)
 
   const similar = useMemo(
@@ -37,18 +41,30 @@ export default function NutritionConfirmationSheet({
     [log?.name, log]
   )
 
+  const homeCookedDraft = useMemo(
+    () => (log ? parseMealLabelToDraft(log.name) : null),
+    [log?.name, log]
+  )
+  const matchedIngredientCount =
+    homeCookedDraft?.ingredients.filter(i => i.food_id != null && i.category !== 'sauce').length ?? 0
+  const canUsePortionFlow = matchedIngredientCount > 0
+
   useEffect(() => {
     if (!open) {
       setPendingHit(null)
-      setManualOpen(false)
+      setPortionOpen(false)
+      return
     }
-  }, [open, log?.id])
+    if (canUsePortionFlow) {
+      setPortionOpen(true)
+    }
+  }, [open, log?.id, canUsePortionFlow])
 
   if (!log) return null
 
   return (
     <>
-      <AppOverlay open={open} onClose={onClose} variant="sheet">
+      <AppOverlay open={open && !portionOpen} onClose={onClose} variant="sheet">
         <div
           className="ios-bottom-sheet max-w-lg mx-auto w-full"
           style={{
@@ -69,9 +85,7 @@ export default function NutritionConfirmationSheet({
                   {log.name}
                 </p>
                 <p className="text-[13px] leading-relaxed mt-2" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
-                  目前沒有可信營養資料。
-                  <br />
-                  你可以選相近品項、手動輸入營養，或先保留文字紀錄。
+                  目前沒有可信營養資料。填重量就能估算，或選相近品項。
                 </p>
               </div>
               <button type="button" onClick={onClose} className="p-1.5 -mr-1 shrink-0" aria-label="關閉">
@@ -120,6 +134,25 @@ export default function NutritionConfirmationSheet({
               </section>
             ) : (
               <>
+                {canUsePortionFlow && (
+                  <button
+                    type="button"
+                    onClick={() => setPortionOpen(true)}
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left active:opacity-90"
+                    style={{ backgroundColor: BB_V2.bg.canvas, border: `1.5px solid ${BB_V2.accent.orange}` }}
+                  >
+                    <Scale className="h-4 w-4 shrink-0" strokeWidth={ICON_STROKE} style={{ color: BB_V2.accent.orange }} />
+                    <div>
+                      <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
+                        填重量算營養
+                      </p>
+                      <p className="text-[12px] mt-0.5" style={{ color: BB_V2.text.secondary }}>
+                        重量、用油量、烹調方式、醬汁
+                      </p>
+                    </div>
+                  </button>
+                )}
+
                 {similar.length > 0 && (
                   <section>
                     <p className="text-[13px] mb-2 flex items-center gap-1.5" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
@@ -148,58 +181,43 @@ export default function NutritionConfirmationSheet({
                   </section>
                 )}
 
-                <section className="space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => setManualOpen(true)}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left active:opacity-90"
-                    style={{ backgroundColor: BB_V2.bg.canvas }}
-                  >
-                    <PenLine className="h-4 w-4 shrink-0" strokeWidth={ICON_STROKE} style={{ color: BB_V2.accent.orange }} />
-                    <div>
-                      <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
-                        手動輸入營養
-                      </p>
-                      <p className="text-[12px] mt-0.5" style={{ color: BB_V2.text.secondary }}>
-                        熱量、蛋白質、脂肪、碳水
-                      </p>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onKeepTextRecord(log.id)
-                      onClose()
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left active:opacity-90"
-                    style={{ backgroundColor: BB_V2.bg.canvas }}
-                  >
-                    <FileText className="h-4 w-4 shrink-0" strokeWidth={ICON_STROKE} style={{ color: BB_V2.text.secondary }} />
-                    <div>
-                      <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
-                        先保留文字紀錄
-                      </p>
-                      <p className="text-[12px] mt-0.5" style={{ color: BB_V2.text.secondary }}>
-                        維持待確認，不計入今日統計
-                      </p>
-                    </div>
-                  </button>
-                </section>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onKeepTextRecord(log.id)
+                    onClose()
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left active:opacity-90"
+                  style={{ backgroundColor: BB_V2.bg.canvas }}
+                >
+                  <FileText className="h-4 w-4 shrink-0" strokeWidth={ICON_STROKE} style={{ color: BB_V2.text.secondary }} />
+                  <div>
+                    <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
+                      先保留文字紀錄
+                    </p>
+                    <p className="text-[12px] mt-0.5" style={{ color: BB_V2.text.secondary }}>
+                      維持待確認，不計入今日統計
+                    </p>
+                  </div>
+                </button>
               </>
             )}
           </div>
         </div>
       </AppOverlay>
 
-      <ManualNutritionSheet
-        open={manualOpen}
-        foodName={log.name}
-        onClose={() => setManualOpen(false)}
-        onCancel={() => setManualOpen(false)}
-        onSave={input => {
+      <IngredientPortionSheet
+        open={portionOpen}
+        mealLabel={log.name}
+        onClose={() => setPortionOpen(false)}
+        onSave={draft => {
+          onHomeCookedSave(log.id, draft)
+          setPortionOpen(false)
+          onClose()
+        }}
+        onManualSave={input => {
           onManualSave(log.id, input)
-          setManualOpen(false)
+          setPortionOpen(false)
           onClose()
         }}
       />
