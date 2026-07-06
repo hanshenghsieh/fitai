@@ -1,10 +1,16 @@
 import { resolveWholeFoodLabel } from '@/lib/nutrition/home-cooked/whole-food-registry'
 import { defaultAmountForCategory } from '@/lib/nutrition/home-cooked/cooking-adjustments'
-import type { DetectedIngredientLine, HomeCookedMealDraft } from '@/lib/nutrition/home-cooked/types'
+import type { DetectedIngredientLine, HomeCookedMealDraft, SauceLevel } from '@/lib/nutrition/home-cooked/types'
 
 const SPLIT_RE = /[+＋、,，/／|｜\n]+/
 
-/** Parse composite meal label into ingredient lines with DB matches. */
+function inferSauceLevel(mealLabel: string, ingredients: DetectedIngredientLine[]): SauceLevel {
+  const text = `${mealLabel} ${ingredients.map(i => i.raw_label).join(' ')}`
+  if (/醬|滷|咖哩|咖喱|勾芡|調味/.test(text)) return 'normal'
+  return 'none'
+}
+
+/** Parse composite meal label into ingredient lines with IngredientDB matches. */
 export function parseMealLabelToDraft(mealLabel: string): HomeCookedMealDraft {
   const parts = mealLabel
     .split(SPLIT_RE)
@@ -30,14 +36,12 @@ export function parseMealLabelToDraft(mealLabel: string): HomeCookedMealDraft {
   return {
     meal_label: mealLabel,
     ingredients,
+    meal_cooking_method: 'stir_fried',
     meal_oil_level: 'normal',
-    meal_prep_method: 'boiled',
-    has_sauce: ingredients.some(i => i.category === 'sauce' || i.food_id === 'curry_sauce'),
-    sauce_amount_ml: null,
+    sauce_level: inferSauceLevel(mealLabel, ingredients),
   }
 }
 
-/** Suggest default amounts for unmatched high-confidence lines (UI helper). */
 export function withSuggestedDefaults(draft: HomeCookedMealDraft): HomeCookedMealDraft {
   return {
     ...draft,

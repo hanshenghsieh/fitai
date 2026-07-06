@@ -1,0 +1,38 @@
+[
+  {
+    "sauce_level": "無",
+    "kcal": 0,
+    "protein_g": 0,
+    "fat_g": 0,
+    "carb_g": 0,
+    "sodium_mg": 0,
+    "note": "不加醬/不喝湯汁"
+  },
+  {
+    "sauce_level": "少",
+    "kcal": 15,
+    "protein_g": 0.5,
+    "fat_g": 0.2,
+    "carb_g": 3,
+    "sodium_mg": 250,
+    "note": "薄薄一層醬油/滷汁/便當醬"
+  },
+  {
+    "sauce_level": "正常",
+    "kcal": 40,
+    "protein_g": 1,
+    "fat_g": 0.5,
+    "carb_g": 8,
+    "sodium_mg": 650,
+    "note": "一般外食醬汁量"
+  },
+  {
+    "sauce_level": "多",
+    "kcal": 80,
+    "protein_g": 2,
+    "fat_g": 1,
+    "carb_g": 16,
+    "sodium_mg": 1300,
+    "note": "大量醬汁、滷汁、勾芡、甜醬"
+  }
+]

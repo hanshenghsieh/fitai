@@ -1,6 +1,11 @@
+import oilRulesJson from '@/lib/nutrition/home-cooked/data/oil-rules.json'
+import sauceRulesJson from '@/lib/nutrition/home-cooked/data/sauce-rules.json'
 import type {
-  IngredientPrepMethod,
+  MealCookingMethod,
   MealOilLevel,
+  OilRule,
+  SauceLevel,
+  SauceRule,
   WholeFoodCategory,
 } from '@/lib/nutrition/home-cooked/types'
 
@@ -9,32 +14,69 @@ export interface MacroSnapshot {
   protein_g: number
   carbs_g: number
   fat_g: number
+  sodium_mg?: number
 }
 
-/** Extra fat (g) added per 100g edible portion for protein-heavy items. */
-const PREP_FAT_DELTA_PER_100G: Record<IngredientPrepMethod, number> = {
-  raw: 0,
-  boiled: 0,
-  steamed: 0,
-  grilled: 1.5,
-  pan_fried: 6,
-  stir_fried: 5,
-  deep_fried: 12,
+const OIL_RULES = oilRulesJson as OilRule[]
+const SAUCE_RULES = sauceRulesJson as SauceRule[]
+
+const COOKING_ZH: Record<MealCookingMethod, string> = {
+  boiled: '水煮',
+  steamed: '蒸',
+  grilled: '烤',
+  stir_fried: '炒',
+  deep_fried: '炸',
 }
 
-/** Meal-level multiplier on fat grams for mixed dishes. */
-const MEAL_OIL_FAT_MULT: Record<MealOilLevel, number> = {
-  light: 0.85,
-  normal: 1,
-  heavy: 1.2,
+const OIL_ZH: Record<MealOilLevel, string> = {
+  none: '無油',
+  light: '少油',
+  normal: '一般',
+  heavy: '多油',
 }
 
-/** Whether to show prep picker for this category in UI. */
-export function shouldOfferPrepMethod(category: WholeFoodCategory): boolean {
-  return category === 'protein' || category === 'fat'
+const SAUCE_ZH: Record<SauceLevel, string> = {
+  none: '無',
+  light: '少',
+  normal: '正常',
+  heavy: '多',
 }
 
-/** Default unit hint for UI placeholders. */
+const oilLookup = new Map(OIL_RULES.map(r => [r.lookup_key, r.oil_g_per_meal]))
+const sauceLookup = new Map(
+  SAUCE_RULES.map(r => [r.sauce_level, r])
+)
+
+export function lookupMealOilGrams(
+  cooking: MealCookingMethod,
+  oilLevel: MealOilLevel
+): number {
+  const key = `${COOKING_ZH[cooking]}|${OIL_ZH[oilLevel]}`
+  return oilLookup.get(key) ?? 0
+}
+
+export function applyMealOilGrams(totals: MacroSnapshot, oilG: number): MacroSnapshot {
+  if (oilG <= 0) return totals
+  return {
+    ...totals,
+    calories: totals.calories + Math.round(oilG * 9),
+    fat_g: Math.round((totals.fat_g + oilG) * 10) / 10,
+  }
+}
+
+export function applySauceLevel(totals: MacroSnapshot, level: SauceLevel): MacroSnapshot {
+  if (level === 'none') return totals
+  const rule = sauceLookup.get(SAUCE_ZH[level])
+  if (!rule) return totals
+  return {
+    calories: totals.calories + rule.kcal,
+    protein_g: Math.round((totals.protein_g + rule.protein_g) * 10) / 10,
+    carbs_g: Math.round((totals.carbs_g + rule.carb_g) * 10) / 10,
+    fat_g: Math.round((totals.fat_g + rule.fat_g) * 10) / 10,
+    sodium_mg: (totals.sodium_mg ?? 0) + rule.sodium_mg,
+  }
+}
+
 export function defaultAmountForCategory(category: WholeFoodCategory): number {
   switch (category) {
     case 'protein':
@@ -43,8 +85,6 @@ export function defaultAmountForCategory(category: WholeFoodCategory): number {
       return 150
     case 'veg':
       return 100
-    case 'sauce':
-      return 30
     case 'fat':
       return 10
     default:
@@ -52,26 +92,4 @@ export function defaultAmountForCategory(category: WholeFoodCategory): number {
   }
 }
 
-export function applyPrepMethodAdjust(
-  base: MacroSnapshot,
-  category: WholeFoodCategory,
-  amountGrams: number,
-  prep?: IngredientPrepMethod
-): MacroSnapshot {
-  if (!prep || prep === 'raw' || prep === 'boiled' || prep === 'steamed') return base
-  if (category !== 'protein' && category !== 'fat') return base
-
-  const deltaFat = (PREP_FAT_DELTA_PER_100G[prep] * amountGrams) / 100
-  const fat_g = Math.round((base.fat_g + deltaFat) * 10) / 10
-  const calories = Math.round(base.calories + deltaFat * 9)
-  return { ...base, fat_g, calories }
-}
-
-export function applyMealOilLevel(totals: MacroSnapshot, level: MealOilLevel): MacroSnapshot {
-  if (level === 'normal') return totals
-  const mult = MEAL_OIL_FAT_MULT[level]
-  const fat_g = Math.round(totals.fat_g * mult * 10) / 10
-  const fatDelta = fat_g - totals.fat_g
-  const calories = Math.round(totals.calories + fatDelta * 9)
-  return { ...totals, fat_g, calories }
-}
+export { COOKING_ZH, OIL_ZH, SAUCE_ZH }

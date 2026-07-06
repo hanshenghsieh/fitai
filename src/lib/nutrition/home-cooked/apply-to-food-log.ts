@@ -7,16 +7,15 @@ export function buildHomeCookedMeta(
 ): HomeCookedMeta {
   return {
     meal_label: draft.meal_label,
+    meal_cooking_method: draft.meal_cooking_method,
     meal_oil_level: draft.meal_oil_level,
-    meal_prep_method: draft.meal_prep_method,
-    has_sauce: draft.has_sauce,
-    sauce_amount_ml: draft.has_sauce ? draft.sauce_amount_ml : null,
+    sauce_level: draft.sauce_level,
+    meal_oil_g: totals.meal_oil_g,
     ingredients: totals.items.map(item => ({
       food_id: item.food_id,
       name_zh: item.name_zh,
       amount: item.amount,
       unit: item.unit,
-      prep_method: item.prep_method,
       calories: item.calories,
       protein_g: item.protein_g,
       carbs_g: item.carbs_g,
@@ -24,6 +23,7 @@ export function buildHomeCookedMeta(
     })),
     resolved_at: new Date().toISOString(),
     source: 'home_cooked_portion',
+    nutrition_model: 'BetterBit_whole_food_nutrition_model_expanded_5x',
   }
 }
 
@@ -45,10 +45,9 @@ export function applyHomeCookedTotalsToLog(
     user_nutrition_meta: {
       source_type: 'user_input',
       portion: totals.items.map(i => `${i.name_zh} ${i.amount}${i.unit}`).join('、'),
-      source_note: 'home_cooked_portion',
+      source_note: 'BetterBit_whole_food_nutrition_model_expanded_5x',
       entered_at: meta.resolved_at,
       partial: false,
-      fiber_g: totals.fiber_g,
       sodium_mg: totals.sodium_mg,
     },
     home_cooked_meta: meta,

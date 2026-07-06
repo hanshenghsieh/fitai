@@ -1,0 +1,142 @@
+[
+  {
+    "lookup_key": "水煮|無油",
+    "cooking_method": "水煮",
+    "oil_level": "無油",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "水煮|少油",
+    "cooking_method": "水煮",
+    "oil_level": "少油",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "水煮|一般",
+    "cooking_method": "水煮",
+    "oil_level": "一般",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "水煮|多油",
+    "cooking_method": "水煮",
+    "oil_level": "多油",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "蒸|無油",
+    "cooking_method": "蒸",
+    "oil_level": "無油",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "蒸|少油",
+    "cooking_method": "蒸",
+    "oil_level": "少油",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "蒸|一般",
+    "cooking_method": "蒸",
+    "oil_level": "一般",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "蒸|多油",
+    "cooking_method": "蒸",
+    "oil_level": "多油",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "烤|無油",
+    "cooking_method": "烤",
+    "oil_level": "無油",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "烤|少油",
+    "cooking_method": "烤",
+    "oil_level": "少油",
+    "oil_g_per_meal": 3,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "烤|一般",
+    "cooking_method": "烤",
+    "oil_level": "一般",
+    "oil_g_per_meal": 6,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "烤|多油",
+    "cooking_method": "烤",
+    "oil_level": "多油",
+    "oil_g_per_meal": 10,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "炒|無油",
+    "cooking_method": "炒",
+    "oil_level": "無油",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "炒|少油",
+    "cooking_method": "炒",
+    "oil_level": "少油",
+    "oil_g_per_meal": 5,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "炒|一般",
+    "cooking_method": "炒",
+    "oil_level": "一般",
+    "oil_g_per_meal": 10,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "炒|多油",
+    "cooking_method": "炒",
+    "oil_level": "多油",
+    "oil_g_per_meal": 18,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "炸|無油",
+    "cooking_method": "炸",
+    "oil_level": "無油",
+    "oil_g_per_meal": 0,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "炸|少油",
+    "cooking_method": "炸",
+    "oil_level": "少油",
+    "oil_g_per_meal": 10,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "炸|一般",
+    "cooking_method": "炸",
+    "oil_level": "一般",
+    "oil_g_per_meal": 20,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  },
+  {
+    "lookup_key": "炸|多油",
+    "cooking_method": "炸",
+    "oil_level": "多油",
+    "oil_g_per_meal": 35,
+    "note": "以整餐估算；實際依鍋具、吸油率、是否瀝油差異大"
+  }
+]

@@ -3,38 +3,54 @@ import assert from 'node:assert/strict'
 import { parseMealLabelToDraft } from './parse-meal-label.ts'
 import { calculateHomeCookedMeal, isHomeCookedDraftComplete } from './portion-calculator.ts'
 import { resolveWholeFoodLabel } from './whole-food-registry.ts'
+import { lookupMealOilGrams } from './cooking-adjustments.ts'
 
-describe('home-cooked portion flow', () => {
+describe('home-cooked portion flow (BetterBit XLSX model)', () => {
   it('parses composite meal label into ingredients', () => {
-    const draft = parseMealLabelToDraft('鮭魚塊 + 豆腐 + 高麗菜 + 紅蘿蔔 + 豆芽菜 + 咖哩醬汁 + 炒絞肉')
-    assert.ok(draft.ingredients.length >= 5)
-    assert.ok(draft.ingredients.some(i => i.food_id === 'salmon'))
-    assert.ok(draft.ingredients.some(i => i.food_id === 'tofu'))
-    assert.ok(draft.ingredients.some(i => i.food_id === 'cabbage'))
+    const draft = parseMealLabelToDraft('鮭魚塊 + 豆腐 + 高麗菜 + 紅蘿蔔 + 炒絞肉')
+    assert.ok(draft.ingredients.length >= 4)
+    assert.ok(draft.ingredients.some(i => i.food_id === 'sf001'))
+    assert.ok(draft.ingredients.some(i => i.food_id === 'so001'))
+    assert.ok(draft.ingredients.some(i => i.food_id === 'vg004'))
   })
 
-  it('calculates 200g salmon nutrition', () => {
+  it('calculates 200g salmon from IngredientDB SF001', () => {
     const { food } = resolveWholeFoodLabel('鮭魚塊')
     assert.ok(food)
+    assert.equal(food!.id, 'sf001')
     const draft = parseMealLabelToDraft('鮭魚塊')
     draft.ingredients[0]!.amount = 200
-    draft.ingredients[0]!.unit = 'g'
-    draft.has_sauce = false
+    draft.meal_cooking_method = 'steamed'
+    draft.meal_oil_level = 'none'
+    draft.sauce_level = 'none'
     const totals = calculateHomeCookedMeal(draft)
     assert.ok(totals)
-    // salmon 208 kcal/100g → 200g ≈ 416 kcal
-    assert.equal(totals!.calories, 416)
-    assert.equal(totals!.protein_g, 40)
+    assert.equal(totals!.calories, 412)
+    assert.equal(totals!.protein_g, 44.2)
     assert.equal(isHomeCookedDraftComplete(draft), true)
   })
 
-  it('sums multi-ingredient meal', () => {
-    const draft = parseMealLabelToDraft('豆腐 + 高麗菜')
-    draft.ingredients.find(i => i.food_id === 'tofu')!.amount = 150
-    draft.ingredients.find(i => i.food_id === 'cabbage')!.amount = 100
+  it('adds meal oil from Oil_Rules sheet', () => {
+    assert.equal(lookupMealOilGrams('stir_fried', 'normal'), 10)
+    const draft = parseMealLabelToDraft('鮭魚塊')
+    draft.ingredients[0]!.amount = 100
+    draft.meal_cooking_method = 'stir_fried'
+    draft.meal_oil_level = 'normal'
+    draft.sauce_level = 'none'
     const totals = calculateHomeCookedMeal(draft)
     assert.ok(totals)
-    assert.ok(totals!.calories > 100)
-    assert.equal(totals!.items.length, 2)
+    assert.equal(totals!.meal_oil_g, 10)
+    assert.ok(totals!.calories > 206)
+  })
+
+  it('adds sauce from Sauce_Rules sheet', () => {
+    const draft = parseMealLabelToDraft('鮭魚塊')
+    draft.ingredients[0]!.amount = 100
+    draft.sauce_level = 'normal'
+    draft.meal_oil_level = 'none'
+    draft.meal_cooking_method = 'boiled'
+    const totals = calculateHomeCookedMeal(draft)
+    assert.ok(totals)
+    assert.equal(totals!.calories, 206 + 40)
   })
 })

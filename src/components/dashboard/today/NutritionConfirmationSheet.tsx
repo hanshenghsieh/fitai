@@ -46,7 +46,7 @@ export default function NutritionConfirmationSheet({
     [log?.name, log]
   )
   const matchedIngredientCount =
-    homeCookedDraft?.ingredients.filter(i => i.food_id != null && i.category !== 'sauce').length ?? 0
+    homeCookedDraft?.ingredients.filter(i => i.food_id != null).length ?? 0
   const canUsePortionFlow = matchedIngredientCount > 0
 
   useEffect(() => {

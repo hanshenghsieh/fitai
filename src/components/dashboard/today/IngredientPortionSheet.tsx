@@ -11,25 +11,34 @@ import {
   parseMealLabelToDraft,
   type DetectedIngredientLine,
   type HomeCookedMealDraft,
-  type IngredientPrepMethod,
+  type MealCookingMethod,
   type MealOilLevel,
+  type SauceLevel,
 } from '@/lib/nutrition/home-cooked'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
 const ICON_STROKE = 1.8
 
 const OIL_OPTIONS: { id: MealOilLevel; label: string }[] = [
+  { id: 'none', label: '無油' },
   { id: 'light', label: '少油' },
   { id: 'normal', label: '一般' },
   { id: 'heavy', label: '多油' },
 ]
 
-const PREP_OPTIONS: { id: IngredientPrepMethod; label: string }[] = [
+const COOKING_OPTIONS: { id: MealCookingMethod; label: string }[] = [
   { id: 'boiled', label: '水煮' },
   { id: 'steamed', label: '蒸' },
-  { id: 'grilled', label: '烤/煎' },
+  { id: 'grilled', label: '烤' },
   { id: 'stir_fried', label: '炒' },
   { id: 'deep_fried', label: '炸' },
+]
+
+const SAUCE_OPTIONS: { id: SauceLevel; label: string }[] = [
+  { id: 'none', label: '無' },
+  { id: 'light', label: '少' },
+  { id: 'normal', label: '正常' },
+  { id: 'heavy', label: '多' },
 ]
 
 interface Props {
@@ -109,8 +118,7 @@ export default function IngredientPortionSheet({
 
   useEffect(() => {
     if (!open) return
-    const parsed = parseMealLabelToDraft(mealLabel)
-    setDraft(parsed)
+    setDraft(parseMealLabelToDraft(mealLabel))
     setAdvancedOpen(false)
     setCalories('')
     setProtein('')
@@ -119,7 +127,7 @@ export default function IngredientPortionSheet({
   }, [open, mealLabel])
 
   const weightLines = useMemo(
-    () => draft.ingredients.filter(i => i.food_id != null && i.category !== 'sauce'),
+    () => draft.ingredients.filter(i => i.food_id != null),
     [draft.ingredients]
   )
 
@@ -207,7 +215,6 @@ export default function IngredientPortionSheet({
         </div>
 
         <div className="ios-bottom-sheet__scroll px-5 pb-2 space-y-5">
-          {/* 1. 重量 */}
           <section className="space-y-2">
             <p className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
               重量
@@ -249,7 +256,6 @@ export default function IngredientPortionSheet({
             )}
           </section>
 
-          {/* 2. 用油量 */}
           <ChipRow
             label="用油量"
             options={OIL_OPTIONS}
@@ -257,86 +263,28 @@ export default function IngredientPortionSheet({
             onChange={meal_oil_level => setDraft(prev => ({ ...prev, meal_oil_level }))}
           />
 
-          {/* 3. 烹調方式 */}
           <ChipRow
             label="烹調方式"
-            options={PREP_OPTIONS}
-            value={draft.meal_prep_method ?? 'boiled'}
-            onChange={meal_prep_method => setDraft(prev => ({ ...prev, meal_prep_method }))}
+            options={COOKING_OPTIONS}
+            value={draft.meal_cooking_method}
+            onChange={meal_cooking_method => setDraft(prev => ({ ...prev, meal_cooking_method }))}
           />
 
-          {/* 4. 有無醬汁 */}
-          <section className="space-y-2">
-            <p className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
-              有無醬汁
-            </p>
-            <div className="flex gap-2">
-              {[
-                { id: false, label: '無' },
-                { id: true, label: '有' },
-              ].map(opt => {
-                const active = draft.has_sauce === opt.id
-                return (
-                  <button
-                    key={String(opt.id)}
-                    type="button"
-                    onClick={() =>
-                      setDraft(prev => ({
-                        ...prev,
-                        has_sauce: opt.id,
-                        sauce_amount_ml: opt.id ? prev.sauce_amount_ml ?? 30 : null,
-                      }))
-                    }
-                    className="flex-1 h-10 rounded-full text-[14px]"
-                    style={{
-                      backgroundColor: active ? BB_V2.accent.orange : BB_V2.bg.canvas,
-                      color: active ? '#FFF' : BB_V2.text.secondary,
-                      fontWeight: active ? 600 : 400,
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                )
-              })}
-            </div>
-            {draft.has_sauce && (
-              <div className="flex items-center gap-3 pt-1">
-                <span className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
-                  醬汁約
-                </span>
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  value={draft.sauce_amount_ml ?? ''}
-                  onChange={e => {
-                    const v = e.target.value
-                    setDraft(prev => ({
-                      ...prev,
-                      sauce_amount_ml: v === '' ? null : Number(v),
-                    }))
-                  }}
-                  className="w-24 h-11 px-3 rounded-xl text-[16px] tabular-nums text-right outline-none"
-                  style={{
-                    backgroundColor: BB_V2.bg.canvas,
-                    color: BB_V2.text.primary,
-                    border: `1px solid ${BB_V2.divider}`,
-                  }}
-                />
-                <span className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
-                  ml
-                </span>
-              </div>
-            )}
-          </section>
+          <ChipRow
+            label="醬汁"
+            options={SAUCE_OPTIONS}
+            value={draft.sauce_level}
+            onChange={sauce_level => setDraft(prev => ({ ...prev, sauce_level }))}
+          />
 
           {preview && !hasManualOverride && (
             <p className="text-[13px] text-center tabular-nums" style={{ color: BB_V2.text.secondary }}>
               預估約 <span style={{ color: BB_V2.text.primary, fontWeight: 600 }}>{preview.calories} kcal</span>
               {' · '}蛋白 {preview.protein_g}g
+              {preview.meal_oil_g != null && preview.meal_oil_g > 0 ? ` · 油 +${preview.meal_oil_g}g` : ''}
             </p>
           )}
 
-          {/* 進階：手動熱量/巨量 */}
           <button
             type="button"
             onClick={() => setAdvancedOpen(v => !v)}
