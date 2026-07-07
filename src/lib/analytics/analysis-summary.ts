@@ -233,38 +233,6 @@ function weightsNear(a: number, b: number): boolean {
   return Math.abs(a - b) < 0.05
 }
 
-/** When only one log exists, use goal start weight as the first trend point. */
-export function injectGoalStartWeightBaseline(
-  measurements: BodyMeasurement[],
-  startWeightKg: number | null | undefined,
-  startDate: string | null | undefined
-): BodyMeasurement[] {
-  const sorted = sortMeasurementsChronologically(
-    measurements.filter(m => m.weight_kg != null) as BodyMeasurement[]
-  )
-  if (sorted.length >= 2 || startWeightKg == null || sorted.length === 0) return sorted
-
-  const latest = sorted[sorted.length - 1]!
-  if (weightsNear(startWeightKg, latest.weight_kg!)) return sorted
-  if (sorted.some(m => m.weight_kg != null && weightsNear(m.weight_kg, startWeightKg))) return sorted
-
-  const baselineDay = startDate?.slice(0, 10) ?? sorted[0]!.measured_at.slice(0, 10)
-  const baseline: BodyMeasurement = {
-    id: 'goal-start-weight',
-    user_id: sorted[0]!.user_id,
-    measured_at: baselineDay,
-    weight_kg: startWeightKg,
-    body_fat_pct: null,
-    muscle_mass_kg: null,
-    waist_cm: null,
-    hip_cm: null,
-    chest_cm: null,
-    created_at: `${baselineDay}T00:00:00.000Z`,
-  }
-
-  return sortMeasurementsChronologically([baseline, ...sorted])
-}
-
 function dedupeWeightMeasurements(measurements: BodyMeasurement[]): BodyMeasurement[] {
   const sorted = sortMeasurementsChronologically(
     measurements.filter(m => m.weight_kg != null) as BodyMeasurement[]
@@ -280,15 +248,87 @@ function dedupeWeightMeasurements(measurements: BodyMeasurement[]): BodyMeasurem
   return out
 }
 
-/** Real logs only — one chart point per saved measurement in the selected period. */
-export function buildPeriodWeightTrendMeasurements(
+/** When only one log exists, use goal start weight as the first trend point. */
+export function injectGoalStartWeightBaseline(
   measurements: BodyMeasurement[],
-  range: DateRange
+  startWeightKg: number | null | undefined,
+  startDate: string | null | undefined
 ): BodyMeasurement[] {
   const dedupedAll = dedupeWeightMeasurements(
     measurements.filter(m => !isSyntheticWeightMeasurementId(m.id))
   )
-  return measurementsInRange(dedupedAll, range)
+  const initial = resolveInitialWeightPoint(dedupedAll, startWeightKg, startDate)
+  if (!initial || initial.id !== 'goal-start-weight') return dedupedAll
+  return sortMeasurementsChronologically([initial, ...dedupedAll])
+}
+
+function resolveInitialWeightPoint(
+  dedupedAll: BodyMeasurement[],
+  startWeightKg: number | null | undefined,
+  startDate: string | null | undefined
+): BodyMeasurement | null {
+  if (startWeightKg == null) return null
+  const baselineDay = startDate?.slice(0, 10)
+  if (!baselineDay) return null
+
+  const onboardingLog = dedupedAll.find(
+    m =>
+      m.weight_kg != null &&
+      m.measured_at.slice(0, 10) === baselineDay &&
+      weightsNear(m.weight_kg, startWeightKg)
+  )
+  if (onboardingLog) return onboardingLog
+
+  return {
+    id: 'goal-start-weight',
+    user_id: dedupedAll[0]?.user_id ?? 'unknown',
+    measured_at: baselineDay,
+    weight_kg: startWeightKg,
+    body_fat_pct: null,
+    muscle_mass_kg: null,
+    waist_cm: null,
+    hip_cm: null,
+    chest_cm: null,
+    created_at: `${baselineDay}T00:00:00.000Z`,
+  }
+}
+
+function buildFullWeightTrendMeasurements(
+  measurements: BodyMeasurement[],
+  startWeightKg?: number | null,
+  startDate?: string | null
+): BodyMeasurement[] {
+  const dedupedAll = dedupeWeightMeasurements(
+    measurements.filter(m => !isSyntheticWeightMeasurementId(m.id))
+  )
+  const initial = resolveInitialWeightPoint(dedupedAll, startWeightKg, startDate)
+  if (!initial) return dedupedAll
+  if (initial.id !== 'goal-start-weight') return dedupedAll
+  return sortMeasurementsChronologically([initial, ...dedupedAll])
+}
+
+/** Initial weight + each saved update — one chart point per measurement in the selected period. */
+export function buildPeriodWeightTrendMeasurements(
+  measurements: BodyMeasurement[],
+  range: DateRange,
+  startWeightKg?: number | null,
+  startDate?: string | null
+): BodyMeasurement[] {
+  const dedupedAll = dedupeWeightMeasurements(
+    measurements.filter(m => !isSyntheticWeightMeasurementId(m.id))
+  )
+  const fullTrend = buildFullWeightTrendMeasurements(measurements, startWeightKg, startDate)
+  const initial = resolveInitialWeightPoint(dedupedAll, startWeightKg, startDate)
+  const inPeriodLogs = measurementsInRange(dedupedAll, range)
+
+  if (initial) {
+    const initialDay = initial.measured_at.slice(0, 10)
+    if (initialDay < range.start && inPeriodLogs.length > 0) {
+      return sortMeasurementsChronologically([initial, ...inPeriodLogs])
+    }
+  }
+
+  return measurementsInRange(fullTrend, range)
 }
 
 export function hasVisibleWeightTrend(points: { weight: number }[]): boolean {
@@ -356,7 +396,12 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
   const allLogs = extractRecentFoodLogsFromCheckins(input.checkins)
   const logs = logsInRange(allLogs, dateRange)
   const periodCheckins = checkinsInRange(input.checkins, dateRange)
-  const periodTrendMeasurements = buildPeriodWeightTrendMeasurements(input.measurements, dateRange)
+  const periodTrendMeasurements = buildPeriodWeightTrendMeasurements(
+    input.measurements,
+    dateRange,
+    input.targets.start_weight_kg,
+    input.targets.start_date
+  )
   const days = enumerateDays(dateRange)
 
   const totalMeals = logs.length
@@ -412,7 +457,7 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
   const previousKg = resolvePreviousWeightKg(periodTrendMeasurements)
   const firstWeight = periodTrendMeasurements[0]?.weight_kg
   const deltaKg =
-    currentKg != null && firstWeight != null && hasVisibleWeightTrend(weightPoints)
+    currentKg != null && firstWeight != null && weightPoints.length >= 2
       ? Math.round((currentKg - firstWeight) * 10) / 10
       : null
   const deltaLabel =
