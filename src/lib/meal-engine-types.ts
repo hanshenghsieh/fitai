@@ -76,6 +76,11 @@ export interface MealSuggestion {
   recommendation_benefit_points?: string[]
   /** v2 recommendation — which fallback tier produced this pick */
   fallback_tier?: number
+  /** Dish-first recommendation payload — template primary, brands secondary */
+  dish_recommendation?: import('@/lib/recommendation/dish-first/types').DishRecommendationResult & {
+    selectedVariantId?: string | null
+    selectedBrandItemId?: string | null
+  }
 }
 
 export interface SuggestContext {

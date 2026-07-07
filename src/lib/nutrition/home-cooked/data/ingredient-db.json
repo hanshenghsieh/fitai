@@ -9818,5 +9818,27 @@
     "default_unit": "g",
     "source": "USDA FDC / Taiwan FDA / estimate",
     "note": "極高脂，通常用量小"
+  },
+  {
+    "id": "me075",
+    "food_id": "ME075",
+    "name_zh": "牛小排（熟）",
+    "category": "protein",
+    "excel_category": "肉類/蛋白質",
+    "state": "熟/可食部",
+    "aliases": [
+      "牛小排（熟）",
+      "牛小排",
+      "US牛小排",
+      "短肋牛小排"
+    ],
+    "calories_per_100": 295,
+    "protein_g_per_100": 23,
+    "carbs_g_per_100": 0,
+    "fat_g_per_100": 22,
+    "sodium_mg_per_100": 60,
+    "default_unit": "g",
+    "source": "USDA FDC / Taiwan FDA / estimate",
+    "note": "熟牛小排，油脂偏高；外食份量差異大"
   }
 ]

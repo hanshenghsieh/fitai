@@ -7,6 +7,12 @@ import { suggestLightSnack } from './light-snack-suggest'
 import { nearbyBrands } from './nearby-engine'
 import { getDiceMenuSource, lookupDiceMenuItem } from './dice-menu-pool'
 import { rollRecommendationV2, USE_RECOMMENDATION_V2 } from '@/lib/recommendation/v2/engine'
+import {
+  dishRecommendationToMealSuggestion,
+  rollDishFirstRecommendation,
+  USE_DISH_FIRST_RECOMMENDATION,
+  type DishRecommendationQueueState,
+} from '@/lib/recommendation/dish-first'
 import { getRecommendationFoodsV2 } from '@/lib/recommendation/v2/food-data'
 import type { RecommendationQueueState } from '@/lib/recommendation/v2/types'
 import type { FoodLogEntry } from '@/lib/banks/types'
@@ -97,13 +103,35 @@ export function rollMealSuggestion(params: {
   day_state?: import('@/lib/engines/next-meal-engine').TodayMealState | null
   today_food_logs?: FoodLogEntry[]
   queue_state?: RecommendationQueueState | null
+  dish_queue_state?: DishRecommendationQueueState | null
+  exclude_template_ids?: string[]
   seed?: number
 }): {
   suggestion: MealSuggestion | null
   rolls_used: number
   pool_exhausted: boolean
   queue_state?: RecommendationQueueState | null
+  dish_queue_state?: DishRecommendationQueueState | null
 } {
+  if (USE_DISH_FIRST_RECOMMENDATION && params.day_state) {
+    const dishRoll = rollDishFirstRecommendation({
+      meal_type: params.meal_type,
+      day_state: params.day_state,
+      exclude_template_ids: params.exclude_template_ids ?? [],
+      seed: params.seed ?? Date.now() + params.rolls_used * 9973,
+      queue_state: params.dish_queue_state ?? null,
+    })
+    if (dishRoll.result) {
+      return {
+        suggestion: dishRecommendationToMealSuggestion(dishRoll.result, params.meal_type),
+        rolls_used: params.rolls_used + 1,
+        pool_exhausted: dishRoll.pool_exhausted,
+        queue_state: params.queue_state,
+        dish_queue_state: dishRoll.queue_state,
+      }
+    }
+  }
+
   if (USE_RECOMMENDATION_V2 && params.day_state) {
     const v2 = rollRecommendationV2({
       meal_type: params.meal_type,

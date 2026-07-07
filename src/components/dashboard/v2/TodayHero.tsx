@@ -42,6 +42,7 @@ interface Props {
   onReroll?: () => void
   showReroll?: boolean
   onDeleteLog?: (id: string) => void
+  onEditLog?: (log: FoodLogEntry) => void
   onConfirmNutrition?: (log: FoodLogEntry) => void
   onOpenPendingQueue?: () => void
   interstitial?: ReactNode
@@ -71,6 +72,7 @@ export default function TodayHero({
   onReroll,
   showReroll = true,
   onDeleteLog,
+  onEditLog,
   onConfirmNutrition,
   onOpenPendingQueue,
   interstitial,
@@ -180,6 +182,7 @@ export default function TodayHero({
                 key={log.id}
                 log={log}
                 onDelete={onDeleteLog ? () => onDeleteLog(log.id) : undefined}
+                onEdit={onEditLog}
                 onConfirmNutrition={onConfirmNutrition}
               />
             ))}

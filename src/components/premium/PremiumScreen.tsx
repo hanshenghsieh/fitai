@@ -8,14 +8,17 @@ import { ChevronLeft, Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
 import { shouldHideExternalPaymentsClient } from '@/lib/ios-payment-gate'
-import { getStripePriceId } from '@/lib/stripe-config'
+import { getStripePriceId, SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
 import {
   PREMIUM_BODY,
   PREMIUM_FEATURES,
-  PREMIUM_SUBSCRIBED_BODY,
+  PREMIUM_MANAGE_FOOTNOTE,
+  PREMIUM_MANAGE_FOOTNOTE_WEB,
+  PREMIUM_SUBTITLE_SUBSCRIBED,
   premiumPosture,
   premiumTrialWhisper,
 } from '@/lib/premium-narrative'
+import { isCapacitorNative } from '@/lib/capacitor-native'
 import LegalLinksRow from '@/components/legal/LegalLinksRow'
 import PremiumTestFlightScreen from '@/components/premium/PremiumTestFlightScreen'
 
@@ -25,10 +28,11 @@ interface Props {
 
 function PremiumFeatureList() {
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-2.5">
       {PREMIUM_FEATURES.map(feature => (
-        <li key={feature} className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
-          ・{feature}
+        <li key={feature} className="text-[15px] leading-relaxed flex gap-2" style={{ color: colors.text.secondary }}>
+          <span style={{ color: colors.accent.sage }}>✓</span>
+          <span>{feature}</span>
         </li>
       ))}
     </ul>
@@ -63,6 +67,7 @@ function PremiumStripeScreen({ access }: Props) {
   const priceId = getStripePriceId()
   const stripeReady = !!priceId
   const isSubscribed = subscription?.status === 'active'
+  const manageFootnote = isCapacitorNative() ? PREMIUM_MANAGE_FOOTNOTE : PREMIUM_MANAGE_FOOTNOTE_WEB
 
   useEffect(() => {
     void fetch('/api/get-subscription')
@@ -127,11 +132,16 @@ function PremiumStripeScreen({ access }: Props) {
         </Link>
 
         <h1 className="text-[22px] font-medium tracking-tight" style={{ color: colors.text.primary }}>
-          BetterBit 會員
+          BetterBit Pro
         </h1>
         <p className="text-[15px] mt-3 leading-relaxed" style={{ color: colors.text.secondary }}>
           {premiumPosture(access, isSubscribed)}
         </p>
+        {isSubscribed && (
+          <p className="text-[14px] mt-2 leading-relaxed" style={{ color: colors.text.secondary }}>
+            {PREMIUM_SUBTITLE_SUBSCRIBED}
+          </p>
+        )}
         {trialWhisper && !isSubscribed && (
           <p className="text-[14px] mt-2 leading-relaxed" style={{ color: colors.text.tertiary }}>
             {trialWhisper}
@@ -144,10 +154,10 @@ function PremiumStripeScreen({ access }: Props) {
           <Loader2 className="h-5 w-5 animate-spin mx-auto" style={{ color: colors.text.tertiary }} />
         ) : isSubscribed ? (
           <div className="space-y-6">
-            <p className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
-              {PREMIUM_SUBSCRIBED_BODY}
-            </p>
             <PremiumFeatureList />
+            <p className="text-[16px] font-medium" style={{ color: colors.text.primary }}>
+              {SUBSCRIPTION_PRICE_LABEL}
+            </p>
             {subscription?.current_period_end && (
               <p className="text-[13px]" style={{ color: colors.text.tertiary }}>
                 {subscription.cancel_at_period_end ? '本期結束後停止 · ' : ''}
@@ -158,11 +168,14 @@ function PremiumStripeScreen({ access }: Props) {
               type="button"
               onClick={handleBillingPortal}
               disabled={portalLoading}
-              className="text-[14px] font-medium"
-              style={{ color: colors.accent.action }}
+              className="w-full py-3 rounded-xl text-[15px] font-medium"
+              style={{ backgroundColor: colors.bg.muted, color: colors.text.primary }}
             >
-              {portalLoading ? '開啟中…' : '管理帳單'}
+              {portalLoading ? '開啟中…' : '管理訂閱'}
             </button>
+            <p className="text-[12px] leading-relaxed" style={{ color: colors.text.tertiary }}>
+              {manageFootnote}
+            </p>
             <LegalLinksRow />
             <Link href="/dashboard" className="block text-[14px]" style={{ color: colors.text.tertiary }}>
               回到 Today
@@ -174,6 +187,9 @@ function PremiumStripeScreen({ access }: Props) {
               {PREMIUM_BODY}
             </p>
             <PremiumFeatureList />
+            <p className="text-[16px] font-medium" style={{ color: colors.text.primary }}>
+              {SUBSCRIPTION_PRICE_LABEL}
+            </p>
 
             <div className="pt-2 space-y-4">
               <button

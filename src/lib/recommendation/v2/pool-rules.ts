@@ -1,4 +1,5 @@
 import type { MealType } from '@/lib/checkin-utils'
+import { isBrandMenuPlausible } from './brand-menu-fit'
 import {
   BLOCKED_MAIN_ROLES,
   MAIN_CONFIDENCE_LEVELS,
@@ -9,6 +10,7 @@ import {
 
 export function isMainRecommendableItem(item: RecommendationFoodV2): boolean {
   if (!item.is_recommendable) return false
+  if (!isBrandMenuPlausible(item)) return false
   if (!MAIN_MEAL_ROLES.includes(item.meal_role)) return false
   if (!MAIN_PORTION_TYPES.includes(item.portion_type)) return false
   if (BLOCKED_MAIN_ROLES.includes(item.meal_role)) return false

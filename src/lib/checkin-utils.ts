@@ -157,16 +157,62 @@ export function calcStreakDays(checkins: CheckinSlice[]): number {
   return streak
 }
 
+export function reconcileWorkoutItems(
+  saved: WorkoutCheckinItem[] | undefined | null,
+  planExercises: { exercise_id: string; exercise_name_zh: string }[]
+): WorkoutCheckinItem[] {
+  if (planExercises.length === 0) return []
+
+  const savedList = saved ?? []
+  const planIds = planExercises.map(e => e.exercise_id)
+  const planIdSet = new Set(planIds)
+  const savedIdSet = new Set(savedList.map(s => s.exercise_id))
+  const matchesPlan =
+    savedList.length === planIds.length &&
+    planIds.every(id => savedIdSet.has(id)) &&
+    savedList.every(s => planIdSet.has(s.exercise_id))
+
+  const completionById = new Map(savedList.map(s => [s.exercise_id, s.completed]))
+
+  if (matchesPlan) {
+    return savedList.map(s => {
+      const plan = planExercises.find(e => e.exercise_id === s.exercise_id)
+      return {
+        exercise_id: s.exercise_id,
+        exercise_name: plan?.exercise_name_zh ?? s.exercise_name,
+        completed: s.completed,
+      }
+    })
+  }
+
+  return planExercises.map(ex => ({
+    exercise_id: ex.exercise_id,
+    exercise_name: ex.exercise_name_zh,
+    completed: completionById.get(ex.exercise_id) ?? false,
+  }))
+}
+
+export function workoutItemsNeedSync(
+  before: WorkoutCheckinItem[],
+  after: WorkoutCheckinItem[]
+): boolean {
+  if (before.length !== after.length) return true
+  return after.some((item, i) => {
+    const prev = before[i]
+    return (
+      !prev ||
+      prev.exercise_id !== item.exercise_id ||
+      prev.exercise_name !== item.exercise_name ||
+      prev.completed !== item.completed
+    )
+  })
+}
+
 export function initWorkoutItems(
   checkin: DailyCheckin | null,
   exercises: { exercise_id: string; exercise_name_zh: string }[]
 ): WorkoutCheckinItem[] {
-  if (checkin?.workout_items?.length) return checkin.workout_items
-  return exercises.map(ex => ({
-    exercise_id: ex.exercise_id,
-    exercise_name: ex.exercise_name_zh,
-    completed: false,
-  }))
+  return reconcileWorkoutItems(checkin?.workout_items, exercises)
 }
 
 export function customEatOutFromCheckin(checkin: DailyCheckin | null): Partial<Record<MealType, CustomEatOutSelection[]>> {

@@ -6,6 +6,8 @@ import { CheckCircle2, Circle, ChevronDown, ChevronUp, Play } from 'lucide-react
 import {
   buildCheckinPayload,
   initWorkoutItems,
+  reconcileWorkoutItems,
+  workoutItemsNeedSync,
   dailyRollsFromCheckin,
   userMemoryFromCheckin,
   mealSuggestFromCheckin,
@@ -23,6 +25,9 @@ import TodayPosture from '@/components/dashboard/today/TodayPosture'
 import TodayHero, { filterPendingNutritionLogs } from '@/components/dashboard/v2/TodayHero'
 import TodayOS from '@/components/dashboard/TodayOS'
 import NutritionConfirmationSheet from '@/components/dashboard/today/NutritionConfirmationSheet'
+import MealEditSheet from '@/components/dashboard/today/MealEditSheet'
+import { patchFoodRecordOnLog } from '@/lib/nutrition/p0-common-foods/apply-to-log'
+import type { CommonFoodItem, FoodRecordDraft } from '@/lib/nutrition/p0-common-foods/types'
 import PendingNutritionQueueSheet from '@/components/dashboard/today/PendingNutritionQueueSheet'
 import AppOverlay from '@/components/ui/AppOverlay'
 import { enrichFoodLog } from '@/lib/food-log-macros'
@@ -155,6 +160,14 @@ export default function BetterBitHome({
   const exercises = todayPlan.workout?.main ?? []
   const warmup = todayPlan.workout?.warmup ?? []
   const cooldown = todayPlan.workout?.cooldown ?? []
+  const planExerciseList = useMemo(
+    () => exercises.map(ex => ({ exercise_id: ex.exercise_id, exercise_name_zh: ex.exercise_name_zh })),
+    [exercises]
+  )
+  const planExerciseKey = useMemo(
+    () => planExerciseList.map(e => e.exercise_id).join('|'),
+    [planExerciseList]
+  )
   const workoutDone = workoutItems.filter(w => w.completed).length
   const foodLogs = userMemory.food_logs_today ?? []
   const displayFoodLogs = useMemo(
@@ -591,6 +604,14 @@ export default function BetterBitHome({
     persist({ userMemory: userMemoryRef.current })
   }, [initialFoodLogs, persist])
 
+  useEffect(() => {
+    const reconciled = reconcileWorkoutItems(workoutItemsRef.current, planExerciseList)
+    if (!workoutItemsNeedSync(workoutItemsRef.current, reconciled)) return
+    workoutItemsRef.current = reconciled
+    setWorkoutItems(reconciled)
+    persist({ workoutItems: reconciled })
+  }, [planExerciseKey, planExerciseList, persist])
+
   const handleClearMealSelection = useCallback((mealType: MealType) => {
     const nextCustom = { ...customEatOutRef.current }
     delete nextCustom[mealType]
@@ -660,7 +681,13 @@ export default function BetterBitHome({
   }, [deleteConfirmId])
 
   const [confirmLog, setConfirmLog] = useState<FoodLogEntry | null>(null)
+  const [editLog, setEditLog] = useState<FoodLogEntry | null>(null)
   const [pendingQueueOpen, setPendingQueueOpen] = useState(false)
+
+  const editLogLive = useMemo(() => {
+    if (!editLog) return null
+    return displayFoodLogs.find(l => l.id === editLog.id) ?? editLog
+  }, [editLog, displayFoodLogs])
 
   const confirmLogLive = useMemo(() => {
     if (!confirmLog) return null
@@ -707,6 +734,58 @@ export default function BetterBitHome({
       if (!log) return
       patchFoodLog(logId, applyManualNutritionToLog(log, input))
       toast.message('已儲存營養資料', { description: '標記為手動記錄，已計入今日統計。' })
+      setConfirmLog(null)
+    },
+    [displayFoodLogs, confirmLogLive, patchFoodLog]
+  )
+
+  const handleEditMealSave = useCallback(
+    (logId: string, draft: HomeCookedMealDraft) => {
+      const log = displayFoodLogs.find(l => l.id === logId) ?? editLogLive
+      if (!log) return
+      const totals = calculateHomeCookedMeal(draft)
+      if (!totals) {
+        toast.error('請至少填一項食材重量')
+        return
+      }
+      patchFoodLog(logId, applyHomeCookedTotalsToLog(log, draft, totals))
+      toast.message('已更新餐點，今日狀態已重新計算。')
+      setEditLog(null)
+    },
+    [displayFoodLogs, editLogLive, patchFoodLog]
+  )
+
+  const handleEditFoodRecordSave = useCallback(
+    (logId: string, item: CommonFoodItem, draft: FoodRecordDraft) => {
+      const log = displayFoodLogs.find(l => l.id === logId) ?? editLogLive
+      if (!log) return
+      patchFoodLog(logId, patchFoodRecordOnLog(log, item, draft))
+      toast.message('已更新餐點，今日狀態已重新計算。')
+      setEditLog(null)
+    },
+    [displayFoodLogs, editLogLive, patchFoodLog]
+  )
+
+  const handleEditManualSave = useCallback(
+    (logId: string, input: ManualNutritionInput) => {
+      const log = displayFoodLogs.find(l => l.id === logId) ?? editLogLive
+      if (!log) return
+      patchFoodLog(logId, applyManualNutritionToLog(log, input))
+      toast.message('已更新餐點，今日狀態已重新計算。')
+      setEditLog(null)
+    },
+    [displayFoodLogs, editLogLive, patchFoodLog]
+  )
+
+  const handleFoodRecordConfirmSave = useCallback(
+    (logId: string, item: CommonFoodItem, draft: FoodRecordDraft) => {
+      const log = displayFoodLogs.find(l => l.id === logId) ?? confirmLogLive
+      if (!log) return
+      const patch = patchFoodRecordOnLog(log, item, draft)
+      patchFoodLog(logId, patch)
+      toast.message('已依份量估算營養', {
+        description: `${patch.calories ?? 0} kcal · 蛋白質 ${patch.protein_g ?? 0}g`,
+      })
       setConfirmLog(null)
     },
     [displayFoodLogs, confirmLogLive, patchFoodLog]
@@ -772,6 +851,7 @@ export default function BetterBitHome({
         onReroll={onDashboard ? dispatchRollDice : undefined}
         showReroll={mealUiState.hasDicePreview}
         onDeleteLog={handleDeleteLog}
+        onEditLog={log => setEditLog(log)}
         onConfirmNutrition={openNutritionConfirmation}
         onOpenPendingQueue={() => setPendingQueueOpen(true)}
         interstitial={
@@ -882,8 +962,8 @@ export default function BetterBitHome({
                 <div>
                   <p className="text-[12px] mb-3" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>主訓練</p>
                   <div className="space-y-4">
-                    {workoutItems.map((ex, idx) => {
-                      const planEx = exercises.find(e => e.exercise_id === ex.exercise_id) ?? exercises[idx]
+                    {workoutItems.map(ex => {
+                      const planEx = exercises.find(e => e.exercise_id === ex.exercise_id)
                       return (
                         <div key={ex.exercise_id} className="space-y-2">
                           <div className="flex items-start gap-3">
@@ -896,7 +976,7 @@ export default function BetterBitHome({
                             </button>
                             <div className="flex-1 min-w-0">
                               <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 500 }}>
-                                {ex.exercise_name}
+                                {planEx?.exercise_name_zh ?? ex.exercise_name}
                               </p>
                               {planEx && (
                                 <p className="text-[13px] mt-0.5" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
@@ -973,7 +1053,17 @@ export default function BetterBitHome({
         onConfirmVerified={handleConfirmVerified}
         onManualSave={handleManualNutritionSave}
         onHomeCookedSave={handleHomeCookedSave}
+        onFoodRecordSave={handleFoodRecordConfirmSave}
         onKeepTextRecord={handleKeepTextRecord}
+      />
+
+      <MealEditSheet
+        open={!!editLogLive}
+        log={editLogLive}
+        onClose={() => setEditLog(null)}
+        onHomeCookedSave={handleEditMealSave}
+        onManualSave={handleEditManualSave}
+        onFoodRecordSave={handleEditFoodRecordSave}
       />
 
       <AppOverlay

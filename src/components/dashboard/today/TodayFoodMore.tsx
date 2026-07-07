@@ -1,12 +1,15 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useMemo } from 'react'
 import { Search, X, PenLine } from 'lucide-react'
 import type { FrequentFood } from '@/lib/food-memory'
 import { primaryFoodLabel } from '@/lib/food-photography'
 import type { FoodSlot } from '@/lib/food-slots'
 import { isNativeIOS } from '@/lib/capacitor-native'
 import AppOverlay from '@/components/ui/AppOverlay'
+
+import type { FoodSearchHit } from '@/lib/food-search'
+import { findP0FoodCandidates } from '@/lib/nutrition/p0-common-foods/resolve-p0-food'
 
 import { BB_V2 } from '@/lib/betterbit-v2'
 
@@ -27,13 +30,14 @@ interface Props {
   activeSlot: FoodSlot
   query: string
   onQueryChange: (q: string) => void
-  searchResults: Array<{ id: string; name: string; store?: string; calories: number; protein_g: number }>
-  onPickSearch: (item: { id: string; name: string; store?: string; calories: number; protein_g: number }) => void
+  searchResults: FoodSearchHit[]
+  onPickSearch: (item: FoodSearchHit) => void
   frequentList: FrequentFood[]
   selectedFrequentId: string
   onSelectFrequent: (id: string) => void
   onCommitFrequent: (frequentId?: string) => void
   onCreateFreeText?: (name: string, options?: { forceUnknown?: boolean }) => void
+  onCreateEstimate?: (name: string) => void
 }
 
 function FrequentRow({ food, onClick, compact }: { food: FrequentFood; onClick: () => void; compact?: boolean }) {
@@ -73,6 +77,7 @@ export default function TodayFoodMore({
   onSelectFrequent: _onSelectFrequent,
   onCommitFrequent,
   onCreateFreeText,
+  onCreateEstimate,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -101,10 +106,29 @@ export default function TodayFoodMore({
   const trimmed = query.trim()
   const hasSearch = trimmed.length > 0
   const noSearchHits = hasSearch && searchResults.length === 0
+  const nearCandidates = useMemo(() => {
+    if (!noSearchHits) return []
+    return findP0FoodCandidates(trimmed, 5)
+  }, [noSearchHits, trimmed])
+
+  const toSearchHit = (item: (typeof nearCandidates)[number]['item']): FoodSearchHit => ({
+    id: `p0-${item.id}`,
+    name: item.name,
+    store: item.category,
+    calories: Math.round(item.kcalDefault),
+    protein_g: item.proteinDefault_g,
+    carbs_g: item.carbsDefault_g,
+    fat_g: item.fatDefault_g,
+    foodType: item.foodType,
+    sourceType: item.sourceType,
+    p0FoodId: item.id,
+    searchSource: 'p0',
+    sourceLabel: '資料庫估算',
+  })
 
   const handleCreate = () => {
     if (!trimmed || !onCreateFreeText) return
-    onCreateFreeText(trimmed, { forceUnknown: true })
+    onCreateFreeText(trimmed)
   }
 
   return (
@@ -171,14 +195,39 @@ export default function TodayFoodMore({
                     {item.name}
                   </p>
                   <p className="text-[14px] mt-1" style={{ color: DS.textSecondary }}>
-                    {item.store ? `${item.store} · ` : ''}{item.calories} kcal · 蛋白質 {item.protein_g}g
+                    {item.store ? `${item.store} · ` : ''}
+                    {item.calories} kcal · 蛋白質 {item.protein_g}g
+                    {item.sourceLabel ? ` · ${item.sourceLabel}` : ''}
                   </p>
                 </button>
               ))}
             </div>
           )}
 
-          {noSearchHits && onCreateFreeText && (
+          {noSearchHits && nearCandidates.length > 0 && (
+            <div className="mb-5 space-y-3">
+              <p className="text-[14px] leading-relaxed" style={{ color: DS.text, fontWeight: 500 }}>
+                我找到幾個相近食材，你可以選一個來估算。
+              </p>
+              {nearCandidates.map(hit => (
+                <button
+                  key={hit.item.id}
+                  type="button"
+                  onClick={() => onPickSearch(toSearchHit(hit.item))}
+                  className="w-full text-left py-2 active:opacity-90"
+                >
+                  <p className="text-[16px] font-medium" style={{ color: DS.text }}>
+                    {hit.item.name}
+                  </p>
+                  <p className="text-[14px] mt-1" style={{ color: DS.textSecondary }}>
+                    {hit.item.category} · {Math.round(hit.item.kcalDefault)} kcal · 資料庫估算
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {noSearchHits && nearCandidates.length === 0 && (onCreateEstimate || onCreateFreeText) && (
             <div
               className="mb-5 py-6 px-4 text-center"
               style={{
@@ -190,8 +239,18 @@ export default function TodayFoodMore({
                 找不到「{trimmed}」
               </p>
               <p className="text-[13px] mt-2 leading-relaxed" style={{ color: DS.textSecondary, fontWeight: 400 }}>
-                沒關係，可以直接建立文字紀錄。
+                你可以先用估算方式記錄，我們會幫你算一個大概值。
               </p>
+              {onCreateEstimate ? (
+                <button
+                  type="button"
+                  onClick={() => onCreateEstimate(trimmed)}
+                  className="mt-4 px-5 h-11 rounded-full text-[14px] active:opacity-90"
+                  style={{ backgroundColor: DS.mocha, color: '#FFF', fontWeight: 500 }}
+                >
+                  建立估算餐點
+                </button>
+              ) : null}
             </div>
           )}
 

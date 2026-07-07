@@ -19,4 +19,4 @@ export function isStripeConfigured(): boolean {
   )
 }
 
-export const SUBSCRIPTION_PRICE_LABEL = 'NT$500/月'
+export const SUBSCRIPTION_PRICE_LABEL = 'NT$299 / 月'

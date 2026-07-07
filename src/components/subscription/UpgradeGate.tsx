@@ -36,7 +36,7 @@ export default function UpgradeGate({ access, feature, children, preview }: Prop
             className="inline-block px-6 py-2.5 rounded-xl font-semibold text-white text-sm"
             style={{ backgroundColor: colors.accent.action }}
           >
-            訂閱 NT$500/月
+            訂閱 NT$299 / 月
           </Link>
         </div>
       </div>
@@ -61,7 +61,7 @@ export default function UpgradeGate({ access, feature, children, preview }: Prop
             className="inline-block px-6 py-2.5 rounded-xl font-semibold text-white text-sm"
             style={{ backgroundColor: colors.accent.action }}
           >
-            訂閱 NT$500/月
+            訂閱 NT$299 / 月
           </Link>
         </div>
       </div>

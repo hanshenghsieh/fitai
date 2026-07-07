@@ -113,22 +113,28 @@ const BREAKFAST = [
 ]
 
 const BENTO_PROTEINS = [
-  ['雞胸', 38, 12, 8, 55],
-  ['烤雞腿', 35, 18, 14, 58],
-  ['滷雞腿', 33, 20, 16, 60],
-  ['魚排', 32, 14, 12, 56],
-  ['排骨', 30, 22, 18, 58],
-  ['控肉', 24, 22, 20, 58],
-  ['燒肉', 28, 20, 16, 56],
-  ['三杯雞', 30, 18, 14, 54],
-  ['鮭魚', 34, 20, 14, 52],
-  ['瘦肉', 30, 14, 10, 54],
+  ['雞胸', 38, 12, 8],
+  ['烤雞腿', 35, 18, 14],
+  ['滷雞腿', 33, 20, 16],
+  ['魚排', 32, 14, 12],
+  ['排骨', 30, 22, 18],
+  ['控肉', 24, 22, 20],
+  ['燒肉', 28, 20, 16],
+  ['三杯雞', 30, 18, 14],
+  ['鮭魚', 34, 20, 14],
+  ['瘦肉', 30, 14, 10],
 ]
 const BENTO_RICE = [
-  ['半飯', 130, 2, 1, 28],
-  ['少飯', 90, 1, 0, 20],
-  ['正常飯', 195, 4, 1, 42],
+  ['半飯', 2, 1, 28],
+  ['少飯', 1, 0, 20],
+  ['正常飯', 4, 1, 42],
 ]
+/** 青菜 + 醬汁等固定加值（kcal） */
+const BENTO_SIDES_CAL = 60
+
+function kcalFromMacros(pro, fat, carb) {
+  return Math.round(pro * 4 + fat * 9 + carb * 4)
+}
 
 const BUFFET_TEMPLATES = [
   ['半飯＋雞胸＋兩樣青菜', 480, 35, 10, 50],
@@ -311,15 +317,17 @@ export function buildStandardEstimateItems() {
     )
   }
 
-  for (const [protein, pPro, pFat, pCarb, pCal] of BENTO_PROTEINS) {
-    for (const [riceLabel, rCal, rPro, rFat, rCarb] of BENTO_RICE) {
+  for (const [protein, pPro, pFat, pCarb] of BENTO_PROTEINS) {
+    for (const [riceLabel, rPro, rFat, rCarb] of BENTO_RICE) {
       const name = `${protein}便當${riceLabel}`
+      const calories =
+        kcalFromMacros(pPro, pFat, pCarb) + kcalFromMacros(rPro, rFat, rCarb) + BENTO_SIDES_CAL
       items.push(
         est({
           id: id('est-bento'),
           brand: '便當店',
           name,
-          calories: pCal + rCal,
+          calories,
           protein: pPro + rPro,
           fat: pFat + rFat,
           carbs: pCarb + rCarb,

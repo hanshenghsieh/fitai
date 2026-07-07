@@ -4,6 +4,7 @@
  */
 import { resolveMenuFromQuery, searchFoodMenuExtended } from '@/lib/food-menu-lookup'
 import { userLabelMatchesVerified } from '@/lib/nutrition/food-category-guard'
+import { resolveP0FoodByLabel } from '@/lib/nutrition/p0-common-foods/resolve-p0-food'
 import { NULL_MACROS } from '@/lib/nutrition/search-v2/types'
 import { isClearlyUnknownQuery, hasClarificationPattern } from '@/lib/nutrition/search-v2/query-patterns'
 import type { TextFoodLogPayload, TextMealResolveResult } from '@/lib/nutrition/search-v2/text-log-pipeline'
@@ -74,6 +75,23 @@ export function resolveFreeTextMealClient(query: string): TextMealResolveResult 
   const kb = resolveMenuFromQuery(trimmed)
   if (kb && userLabelMatchesVerified(trimmed, kb.name)) {
     return { can_commit: true, action: 'create_official', payload: officialFromKb(kb, trimmed) }
+  }
+
+  const p0 = resolveP0FoodByLabel(trimmed)
+  if (p0) {
+    return {
+      can_commit: true,
+      action: 'create_unknown',
+      payload: unknownPayload(trimmed, 'P0 通用食材 — 請確認份量', {
+        name: p0.name,
+        display_label: p0.name,
+        matched_item_label: p0.name,
+        match_type: 'p0_common_food_pending_portion',
+        nutrition_status: 'estimated_pending_confirmation',
+        nutrition_confidence: 'B',
+        capture_status: 'resolved',
+      }),
+    }
   }
 
   if (isClearlyUnknownQuery(trimmed)) {

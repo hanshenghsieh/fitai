@@ -6,6 +6,7 @@ import type { AccessStatus } from '@/lib/subscription-access'
 import SettingsSection from '@/components/settings/SettingsSection'
 import SettingsRow from '@/components/settings/SettingsRow'
 import { shouldHideExternalPaymentsClient } from '@/lib/ios-payment-gate'
+import { SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
 
 interface Props {
   access: AccessStatus
@@ -31,22 +32,22 @@ export default function SettingsPremiumTeaser({ access }: Props) {
   return (
     <SettingsSection
       title="會員"
-      description={hidePayments ? '封測期間開放完整功能。' : '管理方案與會員功能'}
+      description={hidePayments ? '封測期間開放完整功能。' : isSubscribed ? 'BetterBit Pro 使用中' : '解鎖完整外食減脂工具'}
     >
       <SettingsRow
         label={
           hidePayments
-            ? 'BetterBit 會員'
+            ? 'BetterBit Pro'
             : isSubscribed
-              ? '會員進行中'
-              : 'BetterBit 會員'
+              ? 'BetterBit Pro 使用中'
+              : 'BetterBit Pro'
         }
         detail={
           hidePayments
             ? '封測期間開放完整功能'
             : isSubscribed
-              ? '管理方案與帳單'
-              : '解鎖完整外食減脂工具'
+              ? '你已解鎖完整減脂工具'
+              : SUBSCRIPTION_PRICE_LABEL
         }
         onClick={() => router.push('/settings/premium')}
         last

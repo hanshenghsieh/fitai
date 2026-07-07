@@ -80,6 +80,16 @@ describe('recommendation v2 pool rules', () => {
     assert.ok(low)
     assert.equal(isMainRecommendableItem(low!), false)
   })
+  it('blocks absurd coffee-chain lunchbox items', () => {
+    const bad = items.find(i => i.id === 'off-85c-雞排便當')
+    assert.ok(bad)
+    assert.equal(isMainRecommendableItem(bad!), false)
+  })
+  it('blocks fake KFC rice combo', () => {
+    const bad = items.find(i => i.id === 'off-kfc-香雞飯套餐')
+    assert.ok(bad)
+    assert.equal(isMainRecommendableItem(bad!), false)
+  })
 })
 
 describe('recommendation v2 queue', () => {

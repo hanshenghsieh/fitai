@@ -126,4 +126,8 @@ export interface FoodLogEntry {
   }
   /** Weight-based home-cooked decomposition */
   home_cooked_meta?: import('@/lib/nutrition/home-cooked/types').HomeCookedMeta
+  /** P0 / foodType-aware record snapshot — edits stay on this log only */
+  food_record_meta?: import('@/lib/nutrition/p0-common-foods/types').FoodRecordDraft
+  /** Dish-first meal log metadata */
+  dish_log_meta?: import('@/lib/recommendation/dish-first/types').DishLogMeta
 }

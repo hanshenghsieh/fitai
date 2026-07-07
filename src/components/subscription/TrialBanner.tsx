@@ -36,14 +36,14 @@ export default function TrialBanner({ access }: Props) {
       >
         <p className="text-[14px] font-medium" style={{ color: colors.text.primary }}>{TRIAL_DAYS} 天試用完了</p>
         <p className="text-[13px]" style={{ color: colors.text.secondary }}>
-          NT$500 ≈ 兩杯手搖/月，比一次營養諮詢便宜。要繼續少煩決策嗎？
+          NT$299 / 月，比一次營養諮詢便宜。要繼續少煩決策嗎？
         </p>
         <Link
           href="/settings"
           className="inline-block text-[12px] font-medium px-4 py-2"
           style={{ backgroundColor: colors.accent.action, color: colors.bg.elevated, borderRadius: 12 }}
         >
-          訂閱 NT$500/月
+          訂閱 NT$299 / 月
         </Link>
       </div>
     )

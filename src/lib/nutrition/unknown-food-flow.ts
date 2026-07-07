@@ -2,6 +2,7 @@ import type { FoodLogEntry } from '@/lib/banks/types'
 import { searchFoodMenuExtended } from '@/lib/food-menu-lookup'
 import { resolveMenuFromQuery } from '@/lib/food-menu-lookup'
 import type { MenuLookupHit } from '@/lib/food-menu-lookup'
+import { resolveP0FoodByLabel } from '@/lib/nutrition/p0-common-foods/resolve-p0-food'
 import { enqueueUnknownFood } from '@/lib/nutrition/search-v2/unknown-queue'
 import type { ClarificationSession } from '@/lib/nutrition/search-v2/types'
 import { collectClientCandidates } from '@/lib/nutrition/search-v2/matcher-core'
@@ -48,9 +49,12 @@ export function findSimilarVerifiedItems(query: string, limit = 8): MenuLookupHi
 }
 
 export function enqueueUnknownFromLog(log: FoodLogEntry): void {
-  const matches = findSimilarVerifiedItems(log.name, 6).map(h => h.name)
+  const label = log.display_label ?? log.name
+  if (resolveP0FoodByLabel(label)) return
+
+  const matches = findSimilarVerifiedItems(label, 6).map(h => h.name)
   enqueueUnknownFood({
-    food_name: log.name,
+    food_name: label,
     restaurant: log.store ?? null,
     possible_matches: matches,
   })

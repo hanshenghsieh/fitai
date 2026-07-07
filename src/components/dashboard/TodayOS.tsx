@@ -3,7 +3,13 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { format, subDays, parseISO } from 'date-fns'
-import { searchFoodMenu } from '@/lib/food-search'
+import { searchFoodMenu, type FoodSearchHit } from '@/lib/food-search'
+import FoodTypePortionSheet from '@/components/dashboard/today/FoodTypePortionSheet'
+import EstimateMealSheet from '@/components/dashboard/today/EstimateMealSheet'
+import { getP0FoodById } from '@/lib/nutrition/p0-common-foods/catalog'
+import { resolveP0FoodByLabel } from '@/lib/nutrition/p0-common-foods/resolve-p0-food'
+import { applyFoodRecordToLog } from '@/lib/nutrition/p0-common-foods/apply-to-log'
+import type { CommonFoodItem, FoodRecordDraft } from '@/lib/nutrition/p0-common-foods/types'
 import {
   createUnknownFreeTextMeal,
   resolveOrEstimateFreeTextMeal,
@@ -75,6 +81,20 @@ import {
 import { linesToDisplayItems } from '@/lib/meal-suggest'
 import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
 import DiceMealPreview, { type MealPreviewItem } from '@/components/dashboard/DiceMealPreview'
+import DishRecommendationCard from '@/components/dashboard/DishRecommendationCard'
+import {
+  buildFoodLogFromDishRecommendation,
+  buildDishRecommendationReasons,
+  dishRecommendationToMealSuggestion,
+  getBrandItemById,
+  getBrandItemsForTemplateResolved,
+  getDishTemplateById,
+  getDishVariantById,
+  recommendationDisplayName,
+  scoreDishTemplateForUserDay,
+  type DishRecommendationQueueState,
+} from '@/lib/recommendation/dish-first'
+import { buildRecommendationCoachBullets } from '@/lib/recommendation/recommendation-coach-copy'
 import TodayFoodMore from '@/components/dashboard/today/TodayFoodMore'
 import PhotoLogSheet, { type PhotoLogDraft } from '@/components/dashboard/today/PhotoLogSheet'
 import ManualPhotoCorrectionSheet from '@/components/dashboard/today/ManualPhotoCorrectionSheet'
@@ -266,6 +286,7 @@ function loadDiceSession(mealType: MealType): {
   stores: string[]
   ids: string[]
   queue?: RecommendationQueueState
+  dishQueue?: DishRecommendationQueueState
 } {
   if (typeof window === 'undefined') return { stores: [], ids: [] }
   try {
@@ -275,8 +296,14 @@ function loadDiceSession(mealType: MealType): {
       stores?: string[]
       ids?: string[]
       queue?: RecommendationQueueState
+      dishQueue?: DishRecommendationQueueState
     }
-    return { stores: parsed.stores ?? [], ids: parsed.ids ?? [], queue: parsed.queue }
+    return {
+      stores: parsed.stores ?? [],
+      ids: parsed.ids ?? [],
+      queue: parsed.queue,
+      dishQueue: parsed.dishQueue,
+    }
   } catch {
     return { stores: [], ids: [] }
   }
@@ -286,13 +313,14 @@ function saveDiceSession(
   mealType: MealType,
   stores: string[],
   ids: string[],
-  queue?: RecommendationQueueState
+  queue?: RecommendationQueueState,
+  dishQueue?: DishRecommendationQueueState
 ) {
   if (typeof window === 'undefined') return
   try {
     sessionStorage.setItem(
       diceSessionKey(mealType),
-      JSON.stringify({ stores, ids, queue })
+      JSON.stringify({ stores, ids, queue, dishQueue })
     )
   } catch {
     /* quota / private mode */
@@ -481,10 +509,14 @@ export default function TodayOS({
   const lastPostureLineRef = useRef('')
   const photoPreviewUrlRef = useRef<string | null>(null)
   const [dicePreviewByMeal, setDicePreviewByMeal] = useState<Partial<Record<MealType, MealSuggestion>>>({})
+  const [dishVariantByMeal, setDishVariantByMeal] = useState<Partial<Record<MealType, string | null>>>({})
   const [diceRollHint, setDiceRollHint] = useState<string | null>(null)
   const dicePreview = dicePreviewByMeal[mealSlotLegacy] ?? null
   const [localDiceRolls, setLocalDiceRolls] = useState(0)
   const [moreOpen, setMoreOpen] = useState(false)
+  const [p0PortionFood, setP0PortionFood] = useState<CommonFoodItem | null>(null)
+  const [p0SearchQuery, setP0SearchQuery] = useState('')
+  const [estimateQuery, setEstimateQuery] = useState<string | null>(null)
   const [photoOpen, setPhotoOpen] = useState(false)
   const [photoDraft, setPhotoDraft] = useState<PhotoLogDraft | null>(null)
   const [photoProcessing, setPhotoProcessing] = useState(false)
@@ -1074,6 +1106,7 @@ export default function TodayOS({
             day_index: dayIndex,
             seen_ids: excludeIds,
             exclude_names: [...blockedNames],
+            exclude_template_ids: [],
             exclude_stores: [],
             rolls_used: localDiceRolls + seedBump,
             user_lat: coords?.lat,
@@ -1083,6 +1116,7 @@ export default function TodayOS({
             day_state: dayStateRef.current,
             today_food_logs: foodLogsRef.current,
             queue_state: queueState,
+            dish_queue_state: session.dishQueue ?? null,
             seed: Date.now() + (localDiceRolls + seedBump) * 9973,
           })
         }
@@ -1118,7 +1152,7 @@ export default function TodayOS({
         const id = result.suggestion.id
         const nextStores = store ? [...new Set([...session.stores, store])].slice(-20) : session.stores
         const nextIds = [...new Set([...session.ids, id])].slice(-40)
-        saveDiceSession(slot, nextStores, nextIds, result.queue_state ?? undefined)
+        saveDiceSession(slot, nextStores, nextIds, result.queue_state ?? undefined, result.dish_queue_state ?? undefined)
         setDicePreviewByMeal(prev => ({ ...prev, [slot]: result.suggestion! }))
       } finally {
         rollingRef.current = false
@@ -1139,21 +1173,39 @@ export default function TodayOS({
     if (!dicePreview || confirmingRef.current) return
     confirmingRef.current = true
     setConfirming(true)
-    const items = linesToDisplayItems(dicePreview.lines)
-    const totals = sumItemMacros(items)
-    const logEntry: FoodLogEntry = {
-      id: `dice-${dicePreview.id}`,
-      name: items.map(i => formatEatOutDiceLabel(i)).join(' + '),
-      store: dicePreview.stores[0] ?? (items.length === 1 ? items[0]?.store : undefined),
-      calories: totals.calories,
-      protein_g: totals.protein_g,
-      carbs_g: totals.carbs_g,
-      fat_g: totals.fat_g,
-      slot: activeSlot,
-      logged_at: new Date().toISOString(),
-      user_declared: true,
-      source: 'dice',
+
+    let logEntry: FoodLogEntry
+    if (dicePreview.dish_recommendation) {
+      const variantId =
+        dishVariantByMeal[mealSlotLegacy] ??
+        dicePreview.dish_recommendation.selectedVariantId ??
+        dicePreview.dish_recommendation.variant?.id ??
+        null
+      const variant = variantId ? getDishVariantById(variantId) : dicePreview.dish_recommendation.variant
+      logEntry = buildFoodLogFromDishRecommendation({
+        result: dicePreview.dish_recommendation,
+        selectedVariant: variant,
+        slot: activeSlot,
+        id: `dice-${dicePreview.id}`,
+      })
+    } else {
+      const items = linesToDisplayItems(dicePreview.lines)
+      const totals = sumItemMacros(items)
+      logEntry = {
+        id: `dice-${dicePreview.id}`,
+        name: items.map(i => formatEatOutDiceLabel(i)).join(' + '),
+        store: dicePreview.stores[0] ?? (items.length === 1 ? items[0]?.store : undefined),
+        calories: totals.calories,
+        protein_g: totals.protein_g,
+        carbs_g: totals.carbs_g,
+        fat_g: totals.fat_g,
+        slot: activeSlot,
+        logged_at: new Date().toISOString(),
+        user_declared: true,
+        source: 'dice',
+      }
     }
+
     const nextLogs = [...foodLogs, logEntry]
     const nextDna = learnFromLog(userMemory.food_dna ?? foodDna, logEntry)
     const nextMemory = { ...userMemory, food_logs_today: nextLogs, food_dna: nextDna }
@@ -1179,7 +1231,33 @@ export default function TodayOS({
     schedulePostureLine(nextLogs, nextMemory, logEntry.calories - mealTargets.calories)
     confirmingRef.current = false
     setConfirming(false)
-  }, [dicePreview, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, schedulePostureLine, onDiceApply])
+  }, [dicePreview, dishVariantByMeal, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, schedulePostureLine, onDiceApply])
+
+  const handleSelectDishVariant = useCallback(
+    (variantId: string | null) => {
+      if (!dicePreview?.dish_recommendation) return
+      const variant = variantId ? getDishVariantById(variantId) : null
+      const template = dicePreview.dish_recommendation.template
+      const copy = buildDishRecommendationReasons({ template, variant, day: dayState })
+      const score = scoreDishTemplateForUserDay(template, dayState, variant)
+      const next = dishRecommendationToMealSuggestion(
+        {
+          ...dicePreview.dish_recommendation,
+          variant,
+          selectedVariantId: variantId,
+          reasons: copy.reasons,
+          benefitPoints: copy.benefitPoints,
+          eatingTips: copy.eatingTips,
+          score,
+        },
+        mealSlotLegacy,
+        variant
+      )
+      setDishVariantByMeal(prev => ({ ...prev, [mealSlotLegacy]: variantId }))
+      setDicePreviewByMeal(prev => ({ ...prev, [mealSlotLegacy]: next }))
+    },
+    [dicePreview, mealSlotLegacy, dayState]
+  )
 
   const confirmDiceRef = useRef(confirmDice)
   const dicePreviewRef = useRef(dicePreview)
@@ -1205,6 +1283,20 @@ export default function TodayOS({
   const showingLoggedOnly =
     !dicePreview && slotSelectedItems.length === 0 && slotLoggedItems.length > 0
   const hasDicePreview = Boolean(dicePreview && dayState.allowDiceAndSuggest)
+
+  const previewCoachBullets = useMemo(() => {
+    if (!dicePreview || previewItems.length === 0) return []
+    const totals = sumItemMacros(previewItems)
+    return buildRecommendationCoachBullets({
+      proteinGap: dayState.proteinGap,
+      remainingCalories: dayState.remainingCalories,
+      effectiveMealCalTarget: dayState.effectiveMealCalTarget,
+      mealCalories: totals.calories,
+      mealProtein: totals.protein_g,
+      mealFat: totals.fat_g,
+      existingLabels: dicePreview.recommendation_benefit_points,
+    })
+  }, [dicePreview, previewItems, dayState.proteinGap, dayState.remainingCalories, dayState.effectiveMealCalTarget])
 
   useEffect(() => {
     onMealUiState?.({
@@ -1262,8 +1354,67 @@ export default function TodayOS({
     []
   )
   const handlePickSearch = useCallback(
-    (item: { id: string; name: string; store?: string; calories: number; protein_g: number; carbs_g?: number; fat_g?: number }) => {
+    (item: FoodSearchHit) => {
       const trimmedQuery = query.trim()
+      if (item.p0FoodId) {
+        const food = getP0FoodById(item.p0FoodId)
+        if (food) {
+          setP0SearchQuery(trimmedQuery || item.name)
+          setP0PortionFood(food)
+          setQuery('')
+          closeMore()
+          return
+        }
+      }
+      if (item.dishTemplateId) {
+        const template = getDishTemplateById(item.dishTemplateId)
+        if (template) {
+          const variant = item.dishVariantId ? getDishVariantById(item.dishVariantId) : null
+          const brand = item.dishBrandItemId ? getBrandItemById(item.dishBrandItemId) : null
+          const result = {
+            template,
+            variant,
+            brandItems: getBrandItemsForTemplateResolved(template.id),
+            score: {
+              total: 0,
+              calorieFit: 0,
+              proteinFit: 0,
+              fatPenalty: 0,
+              adjustability: 0,
+              confidence: 0,
+              variantPenalty: 0,
+            },
+            reasons: [{ code: 'search_pick', label: '你選了這個餐點類型' }],
+            benefitPoints: [],
+            eatingTips: template.recommendedAdjustments ?? [],
+          }
+          const logEntry = buildFoodLogFromDishRecommendation({
+            result,
+            selectedVariant: variant,
+            selectedBrandItem: brand,
+            slot: activeSlot,
+            id: item.id,
+          })
+          commitLog({
+            id: logEntry.id,
+            name: logEntry.name,
+            display_label: logEntry.display_label,
+            store: logEntry.store,
+            calories: logEntry.calories,
+            protein_g: logEntry.protein_g,
+            carbs_g: logEntry.carbs_g,
+            fat_g: logEntry.fat_g,
+            source: 'search',
+            nutrition_status: logEntry.nutrition_status,
+            nutrition_confidence: logEntry.nutrition_confidence,
+            capture_status: logEntry.capture_status,
+            dish_log_meta: logEntry.dish_log_meta,
+          })
+          setQuery('')
+          closeMore()
+          return
+        }
+      }
       commitLog({
         id: item.id,
         name: item.name,
@@ -1278,22 +1429,81 @@ export default function TodayOS({
         carbs_g: item.carbs_g,
         fat_g: item.fat_g,
         source: 'search',
-        nutrition_status: 'official',
-        nutrition_confidence: 'A',
+        nutrition_status: item.sourceType === 'official' ? 'official' : 'estimated',
+        nutrition_confidence: item.sourceType === 'official' ? 'A' : 'B',
         capture_status: 'resolved',
       })
       setQuery('')
       closeMore()
     },
-    [commitLog, query, closeMore]
+    [commitLog, query, closeMore, activeSlot]
+  )
+
+  const handleP0PortionSave = useCallback(
+    (item: CommonFoodItem, draft: FoodRecordDraft) => {
+      const trimmedQuery = p0SearchQuery.trim()
+      const patch = applyFoodRecordToLog(item, draft, {
+        user_input_label: trimmedQuery || item.name,
+        matched_item_label: item.name,
+        match_type: 'user_selected_p0_food',
+        slot: activeSlotRef.current,
+      })
+      commitLog(patch)
+      setP0PortionFood(null)
+      setP0SearchQuery('')
+      toast.message('已加入今日紀錄', {
+        description: item.sourceType === 'user_custom' ? '自訂估算' : '資料庫估算',
+      })
+    },
+    [commitLog, p0SearchQuery]
+  )
+
+  const handleEstimateSave = useCallback(
+    (item: CommonFoodItem, draft: FoodRecordDraft) => {
+      const trimmedQuery = estimateQuery?.trim() ?? item.name
+      const patch = applyFoodRecordToLog(item, { ...draft, sourceType: 'user_custom' }, {
+        user_input_label: trimmedQuery,
+        matched_item_label: item.name,
+        match_type: 'user_custom_estimate',
+        slot: activeSlotRef.current,
+        source: 'free_text',
+      })
+      commitLog(patch)
+      setEstimateQuery(null)
+      setQuery('')
+      toast.message('已建立估算餐點', { description: '這次紀錄只會留在今日。' })
+    },
+    [commitLog, estimateQuery]
   )
   const handleCreateFreeText = useCallback(
     (name: string, options?: { forceUnknown?: boolean }) => {
       const trimmed = name.trim()
       if (!trimmed) return
+
+      const p0 = resolveP0FoodByLabel(trimmed)
+      if (p0) {
+        setP0SearchQuery(trimmed)
+        setP0PortionFood(p0)
+        setQuery('')
+        closeMore()
+        return
+      }
+
       const est = options?.forceUnknown
         ? createUnknownFreeTextMeal(trimmed)
         : resolveOrEstimateFreeTextMeal(trimmed)
+
+      if (est.match_type === 'p0_common_food_pending_portion') {
+        const p0 = resolveP0FoodByLabel(trimmed)
+        if (p0) {
+          setP0SearchQuery(trimmed)
+          setP0PortionFood(p0)
+          setQuery('')
+          closeMore()
+          return
+        }
+      }
+
       if (est.blocked) {
         toast.message('需要再確認一下', {
           description: est.explanation ?? '請從搜尋建議選擇正確品項，或輸入更明確的菜名。',
@@ -1432,23 +1642,68 @@ export default function TodayOS({
           <div className="py-10 text-center text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
             想一下…
           </div>
-        ) : displayItems.length > 0 ? (
+        ) : displayItems.length > 0 || dicePreview?.dish_recommendation ? (
           <>
-            <DiceMealPreview
-              items={displayItems}
-              recommendationReasons={dicePreview?.recommendation_reason}
-              benefitPoints={dicePreview?.recommendation_benefit_points}
-              confidenceLevel={dicePreview?.confidence_level}
-            />
+            {dicePreview?.dish_recommendation ? (
+              <DishRecommendationCard
+                suggestion={dicePreview}
+                dayState={dayState}
+                selectedVariantId={dishVariantByMeal[mealSlotLegacy] ?? null}
+                onSelectVariant={handleSelectDishVariant}
+                coachBullets={previewCoachBullets}
+              />
+            ) : (
+              <DiceMealPreview
+                items={displayItems}
+                recommendationReasons={dicePreview?.recommendation_reason}
+                benefitPoints={dicePreview?.recommendation_benefit_points}
+                coachBullets={previewCoachBullets}
+                confidenceLevel={dicePreview?.confidence_level}
+              />
+            )}
             {showingConfirmedSelection && slotMealSuggest?.current_highlight && (
               <p className="text-[13px] px-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
                 {slotMealSuggest.current_highlight}
               </p>
             )}
             {dicePreview && dayState.allowDiceAndSuggest && (
-              <p className="text-[12px] px-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-                這是推薦預覽，尚未計入今日總量。
-              </p>
+              <div className="flex flex-col gap-2 pt-1">
+                <button
+                  type="button"
+                  disabled={confirming}
+                  onClick={confirmDice}
+                  className="w-full h-12 rounded-[20px] text-[15px] disabled:opacity-40 touch-manipulation"
+                  style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 600 }}
+                >
+                  {confirming
+                    ? '記錄中…'
+                    : dicePreview.dish_recommendation
+                      ? `記錄${recommendationDisplayName(
+                          dicePreview.dish_recommendation.template,
+                          dicePreview.dish_recommendation.variant
+                        )}`
+                      : '記錄這餐'}
+                </button>
+                <button
+                  type="button"
+                  disabled={rolling}
+                  onClick={rollDice}
+                  className="w-full h-11 rounded-[18px] text-[14px] disabled:opacity-40 touch-manipulation"
+                  style={{ backgroundColor: TODAY.pillBg, color: TODAY.text, fontWeight: 500 }}
+                >
+                  {rolling ? '換選中…' : '換一個選擇'}
+                </button>
+              </div>
+            )}
+            {showingLoggedOnly && (
+              <button
+                type="button"
+                disabled
+                className="w-full h-11 rounded-[18px] text-[14px] opacity-70"
+                style={{ backgroundColor: 'rgba(76, 140, 106, 0.12)', color: 'var(--bb-icon-color-success)', fontWeight: 600 }}
+              >
+                已加入今日紀錄
+              </button>
             )}
           </>
         ) : (
@@ -1488,11 +1743,25 @@ export default function TodayOS({
               </div>
             ) : null}
             <p className="text-[14px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-              還沒有這餐的推薦
+              {foodLogs.length === 0
+                ? '我需要先知道你今天吃了什麼，才好推薦下一餐。'
+                : '還沒有這餐的推薦'}
             </p>
             <p className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-              點上方「幫我推薦下一餐」或「＋ 記錄」開始
+              {foodLogs.length === 0
+                ? '先記錄一餐，我會幫你算今天比較適合吃什麼。'
+                : '點上方「幫我推薦下一餐」或「＋ 記錄」開始'}
             </p>
+            {foodLogs.length === 0 && (
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent(TODAY_OPEN_TEXT_LOG_EVENT))}
+                className="mx-auto mt-1 h-11 px-5 rounded-[18px] text-[14px]"
+                style={{ backgroundColor: TODAY.mocha, color: '#FFFFFF', fontWeight: 600 }}
+              >
+                記錄一餐
+              </button>
+            )}
           </div>
         )}
       </BBCard>
@@ -1510,6 +1779,26 @@ export default function TodayOS({
         onSelectFrequent={setSelectedFrequentId}
         onCommitFrequent={handleCommitFrequent}
         onCreateFreeText={handleCreateFreeText}
+        onCreateEstimate={q => {
+          setEstimateQuery(q)
+          closeMore()
+        }}
+      />
+
+      {p0PortionFood ? (
+        <FoodTypePortionSheet
+          open
+          item={p0PortionFood}
+          onClose={() => setP0PortionFood(null)}
+          onSave={(draft, _nutrition) => handleP0PortionSave(p0PortionFood, draft)}
+        />
+      ) : null}
+
+      <EstimateMealSheet
+        open={estimateQuery != null}
+        query={estimateQuery ?? ''}
+        onClose={() => setEstimateQuery(null)}
+        onSave={handleEstimateSave}
       />
 
       <PhotoLogSheet

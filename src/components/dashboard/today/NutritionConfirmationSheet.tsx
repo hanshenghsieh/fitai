@@ -1,15 +1,16 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { X, Search, FileText, Check, Scale } from 'lucide-react'
+import { X, Search, FileText, Check } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { MenuLookupHit } from '@/lib/food-menu-lookup'
 import { findSimilarVerifiedItems, type ManualNutritionInput } from '@/lib/nutrition/unknown-food-flow'
-import { parseMealLabelToDraft } from '@/lib/nutrition/home-cooked'
-import IngredientPortionSheet from '@/components/dashboard/today/IngredientPortionSheet'
-import AppOverlay from '@/components/ui/AppOverlay'
+import UnifiedPortionSheet from '@/components/dashboard/today/UnifiedPortionSheet'
+import { hasPortionFlow, resolvePortionContextFromLog } from '@/lib/nutrition/p0-common-foods/portion-context'
 import type { HomeCookedMealDraft } from '@/lib/nutrition/home-cooked'
+import type { CommonFoodItem, FoodRecordDraft } from '@/lib/nutrition/p0-common-foods/types'
+import AppOverlay from '@/components/ui/AppOverlay'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
 const ICON_STROKE = 1.8
@@ -21,6 +22,7 @@ interface Props {
   onConfirmVerified: (hit: MenuLookupHit) => void
   onManualSave: (logId: string, input: ManualNutritionInput) => void
   onHomeCookedSave: (logId: string, draft: HomeCookedMealDraft) => void
+  onFoodRecordSave: (logId: string, item: CommonFoodItem, draft: FoodRecordDraft) => void
   onKeepTextRecord: (logId: string) => void
 }
 
@@ -31,23 +33,20 @@ export default function NutritionConfirmationSheet({
   onConfirmVerified,
   onManualSave,
   onHomeCookedSave,
+  onFoodRecordSave,
   onKeepTextRecord,
 }: Props) {
   const [portionOpen, setPortionOpen] = useState(false)
   const [pendingHit, setPendingHit] = useState<MenuLookupHit | null>(null)
 
-  const similar = useMemo(
-    () => (log ? findSimilarVerifiedItems(log.name, 10) : []),
-    [log?.name, log]
-  )
+  const portionCtx = useMemo(() => (log ? resolvePortionContextFromLog(log) : null), [log])
+  const canUsePortionFlow = portionCtx != null && portionCtx.kind !== 'unresolved'
+  const isP0 = portionCtx?.kind === 'p0'
 
-  const homeCookedDraft = useMemo(
-    () => (log ? parseMealLabelToDraft(log.name) : null),
-    [log?.name, log]
-  )
-  const matchedIngredientCount =
-    homeCookedDraft?.ingredients.filter(i => i.food_id != null).length ?? 0
-  const canUsePortionFlow = matchedIngredientCount > 0
+  const similar = useMemo(() => {
+    if (!log || isP0) return []
+    return findSimilarVerifiedItems(log.display_label ?? log.name, 10)
+  }, [log, isP0])
 
   useEffect(() => {
     if (!open) {
@@ -61,6 +60,8 @@ export default function NutritionConfirmationSheet({
   }, [open, log?.id, canUsePortionFlow])
 
   if (!log) return null
+
+  const mealLabel = log.display_label ?? log.name
 
   return (
     <>
@@ -82,10 +83,14 @@ export default function NutritionConfirmationSheet({
                   確認這筆紀錄
                 </h2>
                 <p className="text-[17px] mt-3" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-                  {log.name}
+                  {mealLabel}
                 </p>
                 <p className="text-[13px] leading-relaxed mt-2" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
-                  目前沒有可信營養資料。填重量就能估算，或選相近品項。
+                  {isP0
+                    ? '我們在通用食材庫找到這項，填份量就能估算。'
+                    : canUsePortionFlow
+                      ? '填重量就能估算營養。'
+                      : '目前沒有可信營養資料。你可以建立估算餐點，或選相近品項。'}
                 </p>
               </div>
               <button type="button" onClick={onClose} className="p-1.5 -mr-1 shrink-0" aria-label="關閉">
@@ -138,18 +143,15 @@ export default function NutritionConfirmationSheet({
                   <button
                     type="button"
                     onClick={() => setPortionOpen(true)}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left active:opacity-90"
+                    className="w-full px-4 py-3.5 rounded-2xl text-left active:opacity-90"
                     style={{ backgroundColor: BB_V2.bg.canvas, border: `1.5px solid ${BB_V2.accent.orange}` }}
                   >
-                    <Scale className="h-4 w-4 shrink-0" strokeWidth={ICON_STROKE} style={{ color: BB_V2.accent.orange }} />
-                    <div>
-                      <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-                        填重量算營養
-                      </p>
-                      <p className="text-[12px] mt-0.5" style={{ color: BB_V2.text.secondary }}>
-                        重量、用油量、烹調方式、醬汁
-                      </p>
-                    </div>
+                    <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
+                      {isP0 ? '填份量算營養' : '填重量算營養'}
+                    </p>
+                    <p className="text-[12px] mt-0.5" style={{ color: BB_V2.text.secondary }}>
+                      份量、用油量、烹調方式、醬汁
+                    </p>
                   </button>
                 )}
 
@@ -206,11 +208,19 @@ export default function NutritionConfirmationSheet({
         </div>
       </AppOverlay>
 
-      <IngredientPortionSheet
+      <UnifiedPortionSheet
         open={portionOpen}
-        mealLabel={log.name}
+        mealLabel={mealLabel}
+        log={log}
+        title={isP0 ? '填份量算營養' : '填重量算營養'}
+        saveLabel="儲存並計入今日"
         onClose={() => setPortionOpen(false)}
-        onSave={draft => {
+        onFoodRecordSave={(item, draft) => {
+          onFoodRecordSave(log.id, item, draft)
+          setPortionOpen(false)
+          onClose()
+        }}
+        onHomeCookedSave={draft => {
           onHomeCookedSave(log.id, draft)
           setPortionOpen(false)
           onClose()
