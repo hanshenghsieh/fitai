@@ -1,4 +1,5 @@
 import type { BodyMeasurement } from '@/types'
+import { dedupeSameSaveWeightRows, type WeightMeasurementRow } from '@/lib/weight-history'
 
 const CACHE_KEY = 'bb_weight_measurements_v1'
 
@@ -95,6 +96,46 @@ function sortMeasurements(rows: BodyMeasurement[]): BodyMeasurement[] {
   })
 }
 
+function toWeightRow(m: BodyMeasurement): WeightMeasurementRow {
+  return {
+    id: m.id,
+    measured_at: m.measured_at,
+    weight_kg: m.weight_kg as number,
+    created_at: m.created_at,
+  }
+}
+
+function dedupeBodyMeasurements(rows: BodyMeasurement[]): BodyMeasurement[] {
+  const dedupedRows = dedupeSameSaveWeightRows(rows.filter(m => m.weight_kg != null).map(toWeightRow))
+  return dedupedRows.map((row, idx) => {
+    const existing =
+      rows.find(
+        m =>
+          m.id && row.id && m.id === row.id
+      ) ??
+      rows.find(
+        m =>
+          m.measured_at.slice(0, 10) === row.measured_at.slice(0, 10) &&
+          m.weight_kg != null &&
+          Math.abs(m.weight_kg - row.weight_kg) < 0.05 &&
+          (!row.created_at || m.created_at === row.created_at)
+      )
+    if (existing) return existing
+    return {
+      id: row.id ?? `deduped-weight-${row.measured_at}-${row.weight_kg}-${idx}`,
+      user_id: rows[0]?.user_id ?? 'local',
+      measured_at: row.measured_at,
+      weight_kg: row.weight_kg,
+      body_fat_pct: null,
+      muscle_mass_kg: null,
+      waist_cm: null,
+      hip_cm: null,
+      chest_cm: null,
+      created_at: row.created_at ?? `${row.measured_at}T12:00:00.000Z`,
+    }
+  })
+}
+
 /** Union every source — never drop a distinct point from client cache or optimistic saves. */
 export function mergeWeightMeasurementsPreferComplete(
   ...sources: (BodyMeasurement[] | null | undefined)[]
@@ -107,7 +148,7 @@ export function mergeWeightMeasurementsPreferComplete(
       if (!byKey.has(key)) byKey.set(key, m)
     }
   }
-  return sortMeasurements([...byKey.values()])
+  return dedupeBodyMeasurements(sortMeasurements([...byKey.values()]))
 }
 
 /** Never accept a shorter list when we already have more chart points locally. */

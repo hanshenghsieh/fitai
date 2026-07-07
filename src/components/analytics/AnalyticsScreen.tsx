@@ -355,7 +355,11 @@ export default function AnalyticsScreen({
       ) {
         toast.error('部分體重紀錄可能未同步，請稍後再試')
       }
-      await refreshMeasurements(weightKg, next)
+      if (savedMeasurements?.length) {
+        await refreshMeasurements(weightKg, savedMeasurements)
+      } else {
+        await refreshMeasurements(weightKg, next)
+      }
     },
     [serverMeasurements, refreshMeasurements, userId, todayDate, effectiveCurrentWeightKg]
   )

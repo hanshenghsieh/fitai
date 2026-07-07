@@ -110,6 +110,14 @@ describe('weight-measurements-session-cache', () => {
     assert.equal(merged[2]?.weight_kg, 68.2)
   })
 
+  it('dedupes same-day same-weight rows from one save when merging client and server', () => {
+    const server = [sample('db-74', '2026-07-08', 74, '2026-07-08T15:30:10.000Z')]
+    const client = [sample('checkin-74', '2026-07-08', 74, '2026-07-08T15:30:05.000Z')]
+    const merged = mergeWeightMeasurementsPreferComplete(server, client)
+    assert.equal(merged.length, 1)
+    assert.equal(merged[0]?.weight_kg, 74)
+  })
+
   it('write cache never downgrades to fewer points than already stored', () => {
     const store = new Map<string, string>()
     const storage = {

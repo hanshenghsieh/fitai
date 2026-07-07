@@ -142,8 +142,9 @@ export async function appendWeightHistoryToCheckin(
           existing.logged_at.slice(0, 10) === entry.logged_at.slice(0, 10)
       )
     })
-    const toAppend = filteredEntries.length ? filteredEntries : [newEntries[newEntries.length - 1]!]
-    const nextHistory = mergeWeightHistoryEntries(currentMeta.weight_history, toAppend) ?? toAppend
+    if (filteredEntries.length === 0) return { error: null }
+
+    const nextHistory = mergeWeightHistoryEntries(currentMeta.weight_history, filteredEntries) ?? filteredEntries
     const incomingNotes = JSON.stringify({ ...currentMeta, weight_history: nextHistory })
     const mergedNotes = mergePersistedCheckinNotes(
       incomingNotes,
