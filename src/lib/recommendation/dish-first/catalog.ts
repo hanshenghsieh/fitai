@@ -24,6 +24,7 @@ const REQUIRES_VARIANT_TEMPLATE_IDS = new Set([
   'dish_cv_chicken_meal',
   'dish_salad_meal',
   'dish_sweet_potato_egg',
+  'dish_chicken_breast_bento',
 ])
 
 function mergeVariants(seedVariants: DishVariant[]): DishVariant[] {

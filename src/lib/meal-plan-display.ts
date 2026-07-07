@@ -1,5 +1,6 @@
 import { buildMealCombination, comboToSaved } from '@/lib/meal-combo-engine'
 import { buildHomeCombo, comboToDailyMeal } from '@/lib/home-combo-engine'
+import { buildDishFirstConvenienceMealsForDay } from '@/lib/recommendation/dish-first/weekly-plan'
 import { isValidMealLines } from '@/lib/meal-combo-validity'
 import type { DayPlan, ConvenienceMealCombination } from '@/types'
 import type { UserProfile } from '@/types'
@@ -28,6 +29,19 @@ export function getConvenienceMealsForDay(
     }
 
     const ratio = MEAL_RATIOS[mealType]
+    const dishMeals = buildDishFirstConvenienceMealsForDay({
+      nutrition: {
+        dailyCalories: targets.calories,
+        proteinGrams: targets.protein_g,
+        carbsGrams: targets.carbs_g,
+        fatGrams: targets.fat_g,
+      },
+      dayIndex,
+      weekSeed: dayIndex + targets.calories,
+    })
+    const dishMeal = dishMeals.find(m => m.meal_type === mealType)
+    if (dishMeal?.items?.length) return dishMeal
+
     const combo = buildMealCombination(
       mealType,
       Math.round(targets.calories * ratio),

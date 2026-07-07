@@ -1,5 +1,6 @@
 import type { AnalysisSummary } from '@/lib/analytics/analysis-summary'
 import { isRapidWeightLoss } from '@/lib/analytics/weight-pace'
+import { pickDishHintForMealSlot } from '@/lib/recommendation/dish-first/weekly-plan'
 
 export interface RecommendedMeal {
   name: string
@@ -7,19 +8,41 @@ export interface RecommendedMeal {
   protein: number
   reason: string
   based_on_insight: string
+  dishTemplate?: string
+}
+
+function dishFirstMealRec(summary: AnalysisSummary, reason: string, insight: string): RecommendedMeal | null {
+  const dish = pickDishHintForMealSlot({
+    mealSlot: 'lunch',
+    dailyCalories: summary.calorieTrend.target ?? 1800,
+    proteinGrams: summary.proteinTrend.target ?? 120,
+    proteinGap: summary.proteinGapAvg ?? 0,
+    seed: (summary.proteinGapAvg ?? 0) * 17 + (summary.calorieTrend.target ?? 1800),
+  })
+  if (!dish) return null
+  return {
+    name: dish,
+    calories: 0,
+    protein: 0,
+    reason,
+    based_on_insight: insight,
+    dishTemplate: dish,
+  }
 }
 
 export function buildMealRecommendationStrategy(summary: AnalysisSummary): RecommendedMeal | null {
   if (summary.insufficient_data) return null
 
   if (isRapidWeightLoss(summary.weightTrend.deltaKg)) {
-    return {
-      name: '雞胸便當 + 無糖豆漿',
-      calories: 520,
-      protein: 32,
-      reason: '本週體重降得偏快，建議維持足量蛋白與穩定份量，避免再壓低熱量。',
-      based_on_insight: '體重下降過快',
-    }
+    return (
+      dishFirstMealRec(summary, '本週體重降得偏快，建議維持足量蛋白與穩定份量，避免再壓低熱量。', '體重下降過快') ?? {
+        name: '雞胸便當 + 無糖豆漿',
+        calories: 520,
+        protein: 32,
+        reason: '本週體重降得偏快，建議維持足量蛋白與穩定份量，避免再壓低熱量。',
+        based_on_insight: '體重下降過快',
+      }
+    )
   }
 
   const parts: string[] = []
@@ -58,13 +81,15 @@ export function buildMealRecommendationStrategy(summary: AnalysisSummary): Recom
 
   if (!parts.length) {
     if ((summary.calorieTrend.deltaFromTarget ?? 0) > 0) {
-      return {
-        name: '雞胸沙拉碗',
-        calories: 420,
-        protein: 35,
-        reason: '平均熱量略高，推薦清爽高蛋白餐',
-        based_on_insight: '熱量略高',
-      }
+      return (
+        dishFirstMealRec(summary, '平均熱量略高，推薦清爽高蛋白餐', '熱量略高') ?? {
+          name: '雞胸沙拉碗',
+          calories: 420,
+          protein: 35,
+          reason: '平均熱量略高，推薦清爽高蛋白餐',
+          based_on_insight: '熱量略高',
+        }
+      )
     }
     return null
   }

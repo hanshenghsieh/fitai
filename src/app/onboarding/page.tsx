@@ -145,6 +145,14 @@ export default function OnboardingPage() {
       })
       if (goalError) throw new Error(goalError.message)
 
+      const startDate = format(new Date(), 'yyyy-MM-dd')
+      await supabase.from('body_measurements').insert({
+        user_id: user.id,
+        measured_at: startDate,
+        weight_kg: weightKg,
+        body_fat_pct: parseFloat(data.body_fat_pct) || null,
+      })
+
       toast.message(zaijian.generating)
       try {
         const generateRes = await fetch('/api/generate-plan', { method: 'POST' })

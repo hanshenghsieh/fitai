@@ -269,6 +269,21 @@ describe('staple smoke — no meal modifiers', () => {
     assert.equal(foodTypeSubtitle(item, normal), '主食 · 資料庫估算')
   })
 
+  it('菜包 is a single snack bun (~200 kcal), not a combo meal', () => {
+    const item = getP0FoodById('bb_p0_0530')!
+    assert.equal(item.name, '菜包')
+    assert.equal(item.foodType, 'snack')
+    assert.equal(item.supportsSauce, false)
+    const fields = getFoodTypeFieldVisibility(item)
+    assert.equal(fields.sauce, false)
+    assert.equal(fields.rice, false)
+    assert.equal(fields.mealHint, undefined)
+
+    const normal = calculateFoodRecordNutrition(item, defaultFoodRecordDraft(item))
+    assert.equal(normal.calories, 200)
+    assert.ok(normal.calories < 300, '菜包不應接近便當級熱量')
+  })
+
   it('meal combo items still show meal modifiers', () => {
     const hits = searchP0CommonFoods('牛肉麵', 3)
     const item = hits.find(h => h.item.name.includes('牛肉麵'))?.item

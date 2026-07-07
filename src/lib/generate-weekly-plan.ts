@@ -7,9 +7,10 @@ import {
   mealMacroSplit,
 } from '@/lib/goal-calculator'
 import { buildMealCombination, comboToSaved } from '@/lib/meal-combo-engine'
+import { buildDishFirstConvenienceMealsForDay } from '@/lib/recommendation/dish-first/weekly-plan'
 import { getAccessStatus } from '@/lib/subscription-access'
 import { SUBSCRIPTION_ACCESS_FIELDS } from '@/lib/subscription-types'
-import { isAppStoreSafeMode, withSafeModeAccess } from '@/lib/app-store-safe-mode'
+import { withSafeModeAccess } from '@/lib/app-store-safe-mode'
 import { applyWeeklyFeedback } from '@/lib/feedback-adjustments'
 import {
   getLatestWeeklyFeedback,
@@ -37,6 +38,8 @@ interface GenerateWeeklyPlanInput {
   regenReason?: string | null
   profile?: UserProfile | null
   goal?: Goal | null
+  /** Capacitor iOS / review build — unlock plan generation until Apple IAP ships. */
+  iosNativeReview?: boolean
 }
 
 export async function generateWeeklyPlanForUser(
@@ -79,9 +82,10 @@ export async function generateWeeklyPlanForUser(
     .maybeSingle()
 
   const access = withSafeModeAccess(
-    getAccessStatus(profile.created_at, subscription, { userEmail: input.userEmail })
+    getAccessStatus(profile.created_at, subscription, { userEmail: input.userEmail }),
+    { iosNativeReview: input.iosNativeReview }
   )
-  if (!isAppStoreSafeMode() && !access.hasFullAccess) {
+  if (!access.hasFullAccess) {
     return {
       ok: false,
       error: '試用期已結束，請訂閱以繼續生成計畫',
@@ -155,19 +159,28 @@ export async function generateWeeklyPlanForUser(
 
     const meals = [breakfast, lunch, dinner]
 
-    const convenience_meals = (['breakfast', 'lunch', 'dinner'] as const).map(mt => {
-      const t = mealMacroSplit(dayNutrition, mt)
-      const combo = buildMealCombination(
-        mt,
-        t.calories,
-        t.protein,
-        dayIndex,
-        profile!,
-        [...usedByCategory[mt]]
-      )
-      if (combo.items[0]) usedByCategory[mt].add(combo.items[0].name)
-      return comboToSaved(mt, combo)
+    const dishMeals = buildDishFirstConvenienceMealsForDay({
+      nutrition: dayNutrition,
+      dayIndex,
+      weekSeed: dayIndex + nutrition.dailyCalories,
     })
+
+    const convenience_meals =
+      dishMeals.length === 3
+        ? dishMeals
+        : (['breakfast', 'lunch', 'dinner'] as const).map(mt => {
+            const t = mealMacroSplit(dayNutrition, mt)
+            const combo = buildMealCombination(
+              mt,
+              t.calories,
+              t.protein,
+              dayIndex,
+              profile!,
+              [...usedByCategory[mt]]
+            )
+            if (combo.items[0]) usedByCategory[mt].add(combo.items[0].name)
+            return comboToSaved(mt, combo)
+          })
 
     const mealsTotalCalories = meals.reduce((s, m) => s + m.total_calories, 0)
     const mealsProtein = meals.reduce((s, m) => s + m.protein_g, 0)

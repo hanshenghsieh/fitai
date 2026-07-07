@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { format, addMonths } from 'date-fns'
 import { generateWeeklyPlanForUser } from '@/lib/generate-weekly-plan'
+import { shouldGrantFullAccessPreIap } from '@/lib/ios-payment-gate'
 import type { Goal, UserProfile } from '@/types'
 
 export async function POST(req: NextRequest) {
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
       regenReason,
       profile,
       goal,
+      iosNativeReview: shouldGrantFullAccessPreIap(req.headers),
     })
 
     if (!result.ok) {

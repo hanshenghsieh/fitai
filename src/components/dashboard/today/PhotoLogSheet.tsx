@@ -150,6 +150,9 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
         >
           從相簿選擇
         </button>
+        <p className="text-[11px] text-center px-2 leading-relaxed max-w-xs" style={{ color: TODAY.textSecondary }}>
+          AI 估算僅供參考，不能代替專業營養或醫療建議。
+        </p>
       </div>
     </div>
   )

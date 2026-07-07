@@ -94,6 +94,7 @@ import {
   scoreDishTemplateForUserDay,
   type DishRecommendationQueueState,
 } from '@/lib/recommendation/dish-first'
+import type { BrandItem } from '@/lib/recommendation/dish-first/types'
 import { buildRecommendationCoachBullets } from '@/lib/recommendation/recommendation-coach-copy'
 import TodayFoodMore from '@/components/dashboard/today/TodayFoodMore'
 import PhotoLogSheet, { type PhotoLogDraft } from '@/components/dashboard/today/PhotoLogSheet'
@@ -1259,6 +1260,70 @@ export default function TodayOS({
     [dicePreview, mealSlotLegacy, dayState]
   )
 
+  const handleSelectDishBrand = useCallback(
+    (brandItem: BrandItem) => {
+      if (!dicePreview?.dish_recommendation || confirmingRef.current) return
+      confirmingRef.current = true
+      setConfirming(true)
+
+      const variantId =
+        dishVariantByMeal[mealSlotLegacy] ??
+        dicePreview.dish_recommendation.selectedVariantId ??
+        dicePreview.dish_recommendation.variant?.id ??
+        null
+      const variant = variantId ? getDishVariantById(variantId) : dicePreview.dish_recommendation.variant
+
+      const logEntry = buildFoodLogFromDishRecommendation({
+        result: dicePreview.dish_recommendation,
+        selectedVariant: variant,
+        selectedBrandItem: brandItem,
+        slot: activeSlot,
+        id: `dish-brand-${brandItem.id}-${Date.now()}`,
+      })
+
+      const nextLogs = [...foodLogs, logEntry]
+      const nextDna = learnFromLog(userMemory.food_dna ?? foodDna, logEntry)
+      const nextMemory = { ...userMemory, food_logs_today: nextLogs, food_dna: nextDna }
+      onDiceApply({
+        mealType: mealSlotLegacy,
+        selection: suggestionToSelections(dicePreview),
+        dailyRolls: recordMealRoll(appendSeenForMeal(dailyRolls, mealSlotLegacy, dicePreview.id), mealSlotLegacy),
+        mealSuggest: {
+          ...mealSuggest,
+          [mealSlotLegacy]: {
+            current_highlight: dicePreview.highlight,
+            current_highlight_key: dicePreview.highlight_key,
+          },
+        },
+        userMemory: nextMemory,
+        logEntry,
+      })
+      setDicePreviewByMeal(prev => {
+        const next = { ...prev }
+        delete next[mealSlotLegacy]
+        return next
+      })
+      schedulePostureLine(nextLogs, nextMemory, logEntry.calories - mealTargets.calories)
+      toast.message(`記錄 ${logEntry.name}`)
+      confirmingRef.current = false
+      setConfirming(false)
+    },
+    [
+      dicePreview,
+      dishVariantByMeal,
+      activeSlot,
+      foodLogs,
+      userMemory,
+      foodDna,
+      mealSlotLegacy,
+      dailyRolls,
+      mealSuggest,
+      mealTargets.calories,
+      schedulePostureLine,
+      onDiceApply,
+    ]
+  )
+
   const confirmDiceRef = useRef(confirmDice)
   const dicePreviewRef = useRef(dicePreview)
   const allowDiceRef = useRef(dayState.allowDiceAndSuggest)
@@ -1650,6 +1715,8 @@ export default function TodayOS({
                 dayState={dayState}
                 selectedVariantId={dishVariantByMeal[mealSlotLegacy] ?? null}
                 onSelectVariant={handleSelectDishVariant}
+                onSelectBrand={handleSelectDishBrand}
+                brandLogging={confirming}
                 coachBullets={previewCoachBullets}
               />
             ) : (

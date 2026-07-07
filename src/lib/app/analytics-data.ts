@@ -15,7 +15,7 @@ export const PROGRESS_ANALYTICS_LOOKBACK_DAYS = 70
 export interface AnalyticsBundle {
   profileWeightKg: number | null
   measurements: { measured_at: string; weight_kg: number; created_at?: string }[]
-  activeGoal: { target_weight_kg: number | null } | null
+  activeGoal: { target_weight_kg: number | null; start_weight_kg: number | null; start_date: string | null } | null
   checkins: {
     checkin_date: string
     notes?: string | null
@@ -80,7 +80,7 @@ export async function loadAnalyticsBundle(
       .order('created_at', { ascending: true }),
     supabase
       .from('goals')
-      .select('target_weight_kg')
+      .select('target_weight_kg, start_weight_kg, start_date')
       .eq('user_id', userId)
       .eq('is_active', true)
       .order('created_at', { ascending: false })

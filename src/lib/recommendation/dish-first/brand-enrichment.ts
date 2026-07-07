@@ -5,6 +5,22 @@ import { getVariantsForTemplate, normalizeDishLabel } from './catalog'
 import type { BrandItem, DishTemplate } from './types'
 
 const MAX_BRANDS_PER_TEMPLATE = 8
+const RICE_PORTION_LABEL_RE = /(半飯|少飯|正常飯|不飯)$/
+
+function templateHasRicePortionVariants(templateId: string): boolean {
+  return getVariantsForTemplate(templateId).some(
+    v => RICE_PORTION_LABEL_RE.test(v.name) || v.aliases.some(a => RICE_PORTION_LABEL_RE.test(a))
+  )
+}
+
+/** V2 便當店的「雞胸便當半飯」等應走 DishVariant，不要當 BrandItem。 */
+function isRicePortionEstimateItem(item: RecommendationFoodV2, template: DishTemplate): boolean {
+  if (!template.supportsRiceAmount || !templateHasRicePortionVariants(template.id)) return false
+  const itemNorm = normalizeDishLabel(item.name)
+  if (!itemNorm || !RICE_PORTION_LABEL_RE.test(itemNorm)) return false
+  const bases = [template.name, ...template.aliases].map(normalizeDishLabel).filter(Boolean)
+  return bases.some(base => itemNorm.startsWith(base) || itemNorm.includes(base))
+}
 
 function v2SourceType(item: RecommendationFoodV2): BrandItem['sourceType'] {
   if (item.source_type === 'official' || item.confidence_level === 'official') return 'official'
@@ -83,6 +99,7 @@ export function enrichBrandItemsForTemplate(
 
   const v2Hits = getRecommendationFoodsV2()
     .filter(item => item.is_recommendable && matchesDishTemplate(item, template))
+    .filter(item => !isRicePortionEstimateItem(item, template))
     .sort((a, b) => {
       const rank = (x: RecommendationFoodV2) =>
         (x.confidence_level === 'official' ? 100 : 40) + (x.protein ?? 0) * 0.1

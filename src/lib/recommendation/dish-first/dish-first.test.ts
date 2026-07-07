@@ -13,6 +13,7 @@ import { recommendationDisplayName, templateRequiresSpecificVariant } from '@/li
 import { scoreDishTemplateForUserDay, scoreDishVariantForUserDay, pickBestVariantForDay } from '@/lib/recommendation/dish-first/score'
 import { searchDishCatalog } from '@/lib/recommendation/dish-first/search'
 import { buildFoodLogFromDishRecommendation } from '@/lib/recommendation/dish-first/log'
+import { buildDishFirstConvenienceMealsForDay, pickDishHintForMealSlot } from '@/lib/recommendation/dish-first/weekly-plan'
 import { normalizeLegacyFoodItemToDishRecommendation } from '@/lib/recommendation/dish-first/legacy'
 import { searchFoodMenu } from '@/lib/food-search'
 import { getP0FoodById } from '@/lib/nutrition/p0-common-foods/catalog'
@@ -112,13 +113,30 @@ describe('dish-first recommendation roll', () => {
     assert.ok(roll.result!.reasons.length > 0)
   })
 
-  it('reconciles implausible brand calories from macros', () => {
+  it('chicken breast bento uses rice portion variants instead of brand rows', () => {
     const template = getDishTemplateById('dish_chicken_breast_bento')!
+    assert.equal(templateRequiresSpecificVariant(template), true)
+    const variants = getVariantsForTemplate(template.id)
+    const normal = variants.find(v => v.name === '正常飯')
+    const less = variants.find(v => v.name === '少飯')
+    assert.ok(normal, 'expected 正常飯 variant')
+    assert.ok(less, 'expected 少飯 variant')
+    assert.ok(normal!.typicalCalories.mid >= 450, `正常飯 should be ~500+ kcal, got ${normal!.typicalCalories.mid}`)
+    assert.ok(normal!.typicalCalories.mid <= 600)
+    assert.ok(less!.typicalCalories.mid < normal!.typicalCalories.mid)
+
     const brands = getBrandItemsForTemplateResolved(template.id)
-    const normal = brands.find(b => b.itemName.includes('正常飯'))
-    assert.ok(normal, 'expected 正常飯 brand')
-    assert.ok(normal!.calories >= 450, `正常飯 should be ~500+ kcal, got ${normal!.calories}`)
-    assert.ok(normal!.calories <= 600)
+    assert.ok(!brands.some(b => /半飯|少飯|正常飯/.test(b.itemName)), 'rice portions should not appear as brands')
+    assert.ok(brands.some(b => b.brandName === '便當店' && b.itemName === '雞胸便當'))
+  })
+
+  it('prefers less rice chicken breast bento when remaining calories are low', () => {
+    const template = getDishTemplateById('dish_chicken_breast_bento')!
+    const variants = getVariantsForTemplate(template.id)
+    const lowCalDay = dayState({ remainingCalories: 320, proteinGap: 20 })
+    const picked = pickBestVariantForDay(variants, template, lowCalDay)
+    assert.ok(picked)
+    assert.match(picked!.name, /半飯|少飯/)
   })
 
   it('beef noodle includes reference brands from v2 catalog', () => {
@@ -200,6 +218,64 @@ describe('dish-first recommendation roll', () => {
     assert.equal(log.dish_log_meta?.logType, 'dish_variant')
     assert.equal(log.dish_log_meta?.dishVariantId, variant.id)
   })
+
+  it('logs brand as brand_item', () => {
+    const template = getDishTemplateById('dish_chicken_leg_rice')!
+    const brandItems = getBrandItemsForTemplate(template.id)
+    const brand = brandItems.find(b => b.brandName.includes('悟饕')) ?? brandItems[0]
+    assert.ok(brand, 'expected at least one brand for chicken leg rice')
+    const log = buildFoodLogFromDishRecommendation({
+      result: {
+        template,
+        brandItems,
+        score: {
+          total: 0,
+          calorieFit: 0,
+          proteinFit: 0,
+          fatPenalty: 0,
+          adjustability: 0,
+          confidence: 0,
+          variantPenalty: 0,
+        },
+        reasons: [],
+        benefitPoints: [],
+        eatingTips: [],
+      },
+      selectedBrandItem: brand,
+    })
+    assert.equal(log.dish_log_meta?.logType, 'brand_item')
+    assert.equal(log.dish_log_meta?.brandItemId, brand.id)
+    assert.ok(log.name.includes(brand.brandName))
+    assert.equal(log.calories, brand.calories)
+  })
+})
+
+describe('dish-first weekly plan', () => {
+  it('builds three dish-first convenience meals for a day', () => {
+    const meals = buildDishFirstConvenienceMealsForDay({
+      nutrition: { dailyCalories: 1800, proteinGrams: 120, carbsGrams: 180, fatGrams: 60 },
+      dayIndex: 2,
+    })
+    assert.equal(meals.length, 3)
+    assert.equal(meals[0]?.meal_type, 'breakfast')
+    assert.equal(meals[1]?.meal_type, 'lunch')
+    assert.equal(meals[2]?.meal_type, 'dinner')
+    assert.ok(meals.every(m => m.items[0]?.store === '餐點推薦'))
+    assert.ok(meals.every(m => m.total_calories > 0))
+    const names = meals.map(m => m.items[0]?.name)
+    assert.equal(new Set(names).size, names.length, 'each meal slot should get a different dish')
+  })
+
+  it('pickDishHintForMealSlot returns a template name', () => {
+    const hint = pickDishHintForMealSlot({
+      mealSlot: 'lunch',
+      dailyCalories: 1800,
+      proteinGrams: 120,
+      proteinGap: 25,
+    })
+    assert.ok(hint)
+    assert.ok(hint!.length >= 2)
+  })
 })
 
 describe('dish-first search', () => {
@@ -223,6 +299,11 @@ describe('dish-first search', () => {
   it('search 牛奶火鍋 returns milk hot pot variant', () => {
     const hits = searchDishCatalog('牛奶火鍋', 5)
     assert.ok(hits.some(h => h.kind === 'variant' && /牛奶/.test(h.variant?.name ?? '')))
+  })
+
+  it('search 雞胸便當正常飯 returns rice portion variant', () => {
+    const hits = searchDishCatalog('雞胸便當正常飯', 5)
+    assert.ok(hits.some(h => h.kind === 'variant' && h.variant?.name === '正常飯'))
   })
 
   it('search 悟饕雞腿飯 returns brand linked to template', () => {

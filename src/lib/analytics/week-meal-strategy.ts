@@ -1,10 +1,13 @@
 import type { AnalysisSummary } from './analysis-summary'
 import { isRapidWeightLoss } from './weight-pace'
+import type { MealType } from '@/lib/checkin-utils'
+import { pickDishHintForMealSlot } from '@/lib/recommendation/dish-first/weekly-plan'
 
 export interface MealStrategyRow {
   slot: 'breakfast' | 'lunch' | 'dinner' | 'snack'
   slotLabel: string
   instruction: string
+  dishHint?: string
 }
 
 export function generateMealStrategy(summary: AnalysisSummary): MealStrategyRow[] {
@@ -15,9 +18,22 @@ export function generateMealStrategy(summary: AnalysisSummary): MealStrategyRow[
   const sugarHigh = summary.sugarDrinkCount >= 2
   const fiberLow = (summary.fiberGapScore ?? 1) < 0.2
   const rapidLoss = isRapidWeightLoss(summary.weightTrend.deltaKg)
+  const dailyCalories = summary.calorieTrend.target ?? 1800
+  const proteinTarget = summary.proteinTrend.target ?? 120
+
+  function withDishHint(slot: MealType, row: Omit<MealStrategyRow, 'dishHint'>): MealStrategyRow {
+    const dishHint = pickDishHintForMealSlot({
+      mealSlot: slot,
+      dailyCalories,
+      proteinGrams: proteinTarget,
+      proteinGap,
+      seed: slot.charCodeAt(0) * 31 + dailyCalories,
+    })
+    return dishHint ? { ...row, dishHint } : row
+  }
 
   return [
-    {
+    withDishHint('breakfast', {
       slot: 'breakfast',
       slotLabel: '早餐',
       instruction: rapidLoss
@@ -25,8 +41,8 @@ export function generateMealStrategy(summary: AnalysisSummary): MealStrategyRow[
         : proteinGap >= 15
           ? '提高蛋白（+20g 雞蛋或豆漿）'
           : '維持均衡，蛋白優先',
-    },
-    {
+    }),
+    withDishHint('lunch', {
       slot: 'lunch',
       slotLabel: '午餐',
       instruction: rapidLoss
@@ -34,8 +50,8 @@ export function generateMealStrategy(summary: AnalysisSummary): MealStrategyRow[
         : proteinGap >= 10
           ? '正常份量 + 補 25g 蛋白'
           : '正常',
-    },
-    {
+    }),
+    withDishHint('dinner', {
       slot: 'dinner',
       slotLabel: '晚餐',
       instruction: rapidLoss
@@ -43,7 +59,7 @@ export function generateMealStrategy(summary: AnalysisSummary): MealStrategyRow[
         : dinnerHigh
           ? '降低 150 kcal，少油炸'
           : '控制在 600 kcal 內',
-    },
+    }),
     {
       slot: 'snack',
       slotLabel: '點心',

@@ -25,6 +25,8 @@ export interface AnalysisTargets {
   protein_g: number
   water_ml: number
   target_weight_kg: number | null
+  start_weight_kg?: number | null
+  start_date?: string | null
 }
 
 export interface AnalysisCheckinRow {
@@ -223,6 +225,129 @@ export function resolvePreviousWeightKg(measurements: BodyMeasurement[]): number
   return sorted[sorted.length - 2]?.weight_kg ?? null
 }
 
+function weightsNear(a: number, b: number): boolean {
+  return Math.abs(a - b) < 0.05
+}
+
+/** When only one log exists, use goal start weight as the first trend point. */
+export function injectGoalStartWeightBaseline(
+  measurements: BodyMeasurement[],
+  startWeightKg: number | null | undefined,
+  startDate: string | null | undefined
+): BodyMeasurement[] {
+  const sorted = sortMeasurementsChronologically(
+    measurements.filter(m => m.weight_kg != null) as BodyMeasurement[]
+  )
+  if (sorted.length >= 2 || startWeightKg == null || sorted.length === 0) return sorted
+
+  const latest = sorted[sorted.length - 1]!
+  if (weightsNear(startWeightKg, latest.weight_kg!)) return sorted
+  if (sorted.some(m => m.weight_kg != null && weightsNear(m.weight_kg, startWeightKg))) return sorted
+
+  const baselineDay = startDate?.slice(0, 10) ?? sorted[0]!.measured_at.slice(0, 10)
+  const baseline: BodyMeasurement = {
+    id: 'goal-start-weight',
+    user_id: sorted[0]!.user_id,
+    measured_at: baselineDay,
+    weight_kg: startWeightKg,
+    body_fat_pct: null,
+    muscle_mass_kg: null,
+    waist_cm: null,
+    hip_cm: null,
+    chest_cm: null,
+    created_at: `${baselineDay}T00:00:00.000Z`,
+  }
+
+  return sortMeasurementsChronologically([baseline, ...sorted])
+}
+
+function dedupeWeightMeasurements(measurements: BodyMeasurement[]): BodyMeasurement[] {
+  const sorted = sortMeasurementsChronologically(
+    measurements.filter(m => m.weight_kg != null) as BodyMeasurement[]
+  )
+  const out: BodyMeasurement[] = []
+  for (const m of sorted) {
+    const prev = out[out.length - 1]
+    if (
+      prev &&
+      prev.measured_at.slice(0, 10) === m.measured_at.slice(0, 10) &&
+      weightsNear(prev.weight_kg!, m.weight_kg!)
+    ) {
+      continue
+    }
+    out.push(m)
+  }
+  return out
+}
+
+function syntheticTrendAnchor(
+  template: BodyMeasurement,
+  measuredAt: string,
+  weightKg: number
+): BodyMeasurement {
+  return {
+    id: 'weight-trend-anchor',
+    user_id: template.user_id,
+    measured_at: measuredAt,
+    weight_kg: weightKg,
+    body_fat_pct: null,
+    muscle_mass_kg: null,
+    waist_cm: null,
+    hip_cm: null,
+    chest_cm: null,
+    created_at: `${measuredAt}T00:00:00.000Z`,
+  }
+}
+
+/** One point per day (skip duplicate same-weight logs); anchor prior reading at period start when needed. */
+export function buildPeriodWeightTrendMeasurements(
+  measurements: BodyMeasurement[],
+  range: DateRange,
+  startWeightKg?: number | null,
+  startDate?: string | null
+): BodyMeasurement[] {
+  const dedupedAll = dedupeWeightMeasurements(measurements)
+  let inPeriod = measurementsInRange(dedupedAll, range)
+
+  const weightSpread = (rows: BodyMeasurement[]) => {
+    if (rows.length < 2) return 0
+    const ws = rows.map(m => m.weight_kg!)
+    return Math.max(...ws) - Math.min(...ws)
+  }
+
+  if (weightSpread(inPeriod) < 0.05) {
+    const beforePeriod = dedupedAll.filter(m => m.measured_at.slice(0, 10) < range.start)
+    const prior = beforePeriod.at(-1)
+    const anchorWeight = prior?.weight_kg ?? startWeightKg ?? null
+    const latest = inPeriod.at(-1)
+    if (anchorWeight != null && latest && !weightsNear(anchorWeight, latest.weight_kg!)) {
+      const anchorDay = prior?.measured_at.slice(0, 10) ?? startDate?.slice(0, 10) ?? range.start
+      const anchorAt = anchorDay < range.start ? range.start : anchorDay
+      inPeriod = dedupeWeightMeasurements([
+        syntheticTrendAnchor(latest, anchorAt, anchorWeight),
+        ...inPeriod,
+      ])
+    }
+  }
+
+  return inPeriod.slice(-21)
+}
+
+export function hasVisibleWeightTrend(points: { weight: number }[]): boolean {
+  if (points.length < 2) return false
+  const ws = points.map(p => p.weight)
+  return Math.max(...ws) - Math.min(...ws) >= 0.05
+}
+
+export function weightChartYDomain(points: { weight: number }[]): [number, number] {
+  if (points.length === 0) return [60, 80]
+  const weights = points.map(p => p.weight)
+  const min = Math.min(...weights)
+  const max = Math.max(...weights)
+  const pad = Math.max((max - min) * 0.35, 1)
+  return [Math.floor((min - pad) * 10) / 10, Math.ceil((max + pad) * 10) / 10]
+}
+
 function sumLogsDay(logs: FoodLogEntry[], day: string) {
   const dayLogs = logs.filter(l => l.logged_at.slice(0, 10) === day)
   return {
@@ -273,7 +398,17 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
   const allLogs = extractRecentFoodLogsFromCheckins(input.checkins)
   const logs = logsInRange(allLogs, dateRange)
   const periodCheckins = checkinsInRange(input.checkins, dateRange)
-  const periodMeasurements = measurementsInRange(input.measurements, dateRange)
+  const enrichedMeasurements = injectGoalStartWeightBaseline(
+    input.measurements,
+    input.targets.start_weight_kg,
+    input.targets.start_date
+  )
+  const periodTrendMeasurements = buildPeriodWeightTrendMeasurements(
+    enrichedMeasurements,
+    dateRange,
+    input.targets.start_weight_kg,
+    input.targets.start_date
+  )
   const days = enumerateDays(dateRange)
 
   const totalMeals = logs.length
@@ -315,21 +450,21 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
       ? Math.round(loggedProDays.reduce((s, p) => s + p.value, 0) / loggedProDays.length)
       : null
 
-  const weightPoints = periodMeasurements.map((m, idx, arr) => {
+  const weightPoints = periodTrendMeasurements.map((m, idx, arr) => {
     const day = m.measured_at.slice(0, 10)
     const sameDayBefore = arr.slice(0, idx + 1).filter(x => x.measured_at.slice(0, 10) === day).length
     const sameDayTotal = arr.filter(x => x.measured_at.slice(0, 10) === day).length
     const baseLabel = format(parseISO(day), 'M/d')
     return {
       label: sameDayTotal > 1 ? `${baseLabel}·${sameDayBefore}` : baseLabel,
-      weight: m.weight_kg,
+      weight: m.weight_kg as number,
     }
   })
-  const currentKg = input.currentWeightKg ?? periodMeasurements.at(-1)?.weight_kg ?? null
-  const previousKg = resolvePreviousWeightKg(input.measurements)
-  const firstWeight = periodMeasurements[0]?.weight_kg
+  const currentKg = input.currentWeightKg ?? periodTrendMeasurements.at(-1)?.weight_kg ?? null
+  const previousKg = resolvePreviousWeightKg(periodTrendMeasurements)
+  const firstWeight = periodTrendMeasurements[0]?.weight_kg
   const deltaKg =
-    currentKg != null && firstWeight != null && periodMeasurements.length >= 2
+    currentKg != null && firstWeight != null && hasVisibleWeightTrend(weightPoints)
       ? Math.round((currentKg - firstWeight) * 10) / 10
       : null
   const deltaLabel =
@@ -490,7 +625,7 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
     insufficient_data,
     insufficient_reason,
     weightTrend: {
-      sufficient: weightPoints.length >= 2,
+      sufficient: hasVisibleWeightTrend(weightPoints),
       currentKg,
       previousKg,
       targetKg: input.targets.target_weight_kg,

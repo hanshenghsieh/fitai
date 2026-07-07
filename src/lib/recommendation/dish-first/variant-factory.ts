@@ -31,6 +31,11 @@ function v(
 
 /** Additional DishVariants merged into catalog at build time. */
 export const VARIANT_EXTENSIONS: DishVariant[] = [
+  // --- 雞胸便當（飯量為變體，非品牌） ---
+  v('variant_chicken_breast_bento_half', 'dish_chicken_breast_bento', '半飯', { min: 430, mid: 481, max: 530 }, { min: 36, mid: 40, max: 44 }, { min: 10, mid: 13, max: 16 }, { min: 30, mid: 36, max: 42 }, { aliases: ['半飯', '雞胸便當半飯'], tags: ['減脂友善', '高蛋白'], variantHint: '比正常飯穩', recommendedAdjustments: ['醬汁分開'] }),
+  v('variant_chicken_breast_bento_less', 'dish_chicken_breast_bento', '少飯', { min: 390, mid: 436, max: 480 }, { min: 35, mid: 39, max: 43 }, { min: 9, mid: 12, max: 15 }, { min: 22, mid: 28, max: 34 }, { aliases: ['少飯', '雞胸便當少飯'], tags: ['減脂友善', '高蛋白'], variantHint: '熱量快滿時優先', recommendedAdjustments: ['醬汁分開'] }),
+  v('variant_chicken_breast_bento_normal', 'dish_chicken_breast_bento', '正常飯', { min: 490, mid: 545, max: 600 }, { min: 38, mid: 42, max: 46 }, { min: 10, mid: 13, max: 16 }, { min: 42, mid: 50, max: 58 }, { aliases: ['正常飯', '雞胸便當正常飯'], tags: ['高蛋白'], variantHint: '標準份量' }),
+
   // --- 排骨飯 ---
   v('variant_pork_rib_braised', 'dish_pork_rib_rice', '滷排骨飯', { min: 760, mid: 860, max: 980 }, { min: 28, mid: 34, max: 40 }, { min: 28, mid: 36, max: 44 }, { min: 72, mid: 88, max: 102 }, { variantHint: '比較穩', recommendedAdjustments: ['少飯', '醬汁少'] }),
   v('variant_pork_rib_fried', 'dish_pork_rib_rice', '炸排骨飯', { min: 900, mid: 1020, max: 1180 }, { min: 26, mid: 32, max: 38 }, { min: 42, mid: 52, max: 62 }, { min: 78, mid: 95, max: 110 }, { tags: ['炸'], variantHint: '脂肪偏高', recommendedAdjustments: ['少飯', '今天脂肪偏高不建議'] }),

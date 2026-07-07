@@ -140,6 +140,73 @@ describe('analysis-summary', () => {
     assert.ok(summary.insights.some(i => i.tone === 'success'))
   })
 
+  it('shows weight trend from goal start weight when only one log exists', () => {
+    const days = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05']
+    const checkins = days.map(day =>
+      checkin(day, [
+        { name: '早餐', calories: 400, protein_g: 30, slot: 'breakfast' },
+        { name: '午餐', calories: 550, protein_g: 40, slot: 'lunch' },
+        { name: '晚餐', calories: 500, protein_g: 35, slot: 'dinner' },
+      ])
+    )
+    const summary = buildAnalysisSummary({
+      periodType: 'week',
+      anchorDate: new Date('2026-07-05'),
+      todayDate: '2026-07-05',
+      measurements: [
+        {
+          id: '2',
+          user_id: 'u',
+          measured_at: '2026-07-05',
+          weight_kg: 68,
+          body_fat_pct: null,
+          muscle_mass_kg: null,
+          waist_cm: null,
+          hip_cm: null,
+          chest_cm: null,
+          created_at: '2026-07-05T10:00:00Z',
+        },
+      ],
+      checkins,
+      targets: { ...targets, start_weight_kg: 70, start_date: '2026-07-01' },
+      currentWeightKg: 68,
+    })
+    assert.equal(summary.weightTrend.sufficient, true)
+    assert.equal(summary.weightTrend.points.length, 2)
+    assert.equal(summary.weightTrend.currentKg, 68)
+    assert.equal(summary.weightTrend.previousKg, 70)
+  })
+
+  it('dedupes duplicate same-day logs so the trend line is not flat', () => {
+    const days = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05', '2026-07-06', '2026-07-07']
+    const checkins = days.map(day =>
+      checkin(day, [
+        { name: '早餐', calories: 400, protein_g: 30, slot: 'breakfast' },
+        { name: '午餐', calories: 550, protein_g: 40, slot: 'lunch' },
+        { name: '晚餐', calories: 500, protein_g: 35, slot: 'dinner' },
+      ])
+    )
+    const summary = buildAnalysisSummary({
+      periodType: 'week',
+      anchorDate: new Date('2026-07-07'),
+      todayDate: '2026-07-07',
+      measurements: [
+        { id: '1', user_id: 'u', measured_at: '2026-07-06', weight_kg: 68.9, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-06T08:00:00Z' },
+        { id: '2', user_id: 'u', measured_at: '2026-07-07', weight_kg: 67, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-07T08:00:00Z' },
+        { id: '3', user_id: 'u', measured_at: '2026-07-07', weight_kg: 67, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-07T10:00:00Z' },
+        { id: '4', user_id: 'u', measured_at: '2026-07-07', weight_kg: 67, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-07T12:00:00Z' },
+      ],
+      checkins,
+      targets,
+      currentWeightKg: 67,
+    })
+    assert.equal(summary.weightTrend.points.length, 2)
+    assert.equal(summary.weightTrend.points[0]?.weight, 68.9)
+    assert.equal(summary.weightTrend.points[1]?.weight, 67)
+    assert.equal(summary.weightTrend.sufficient, true)
+    assert.equal(summary.weightTrend.deltaKg, -1.9)
+  })
+
   it('shows weight trend when two readings exist on the same day', () => {
     const days = ['2026-06-29', '2026-06-30', '2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05']
     const checkins = days.map(day =>

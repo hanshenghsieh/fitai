@@ -14,13 +14,20 @@ export function hasIosPlatformCookie(cookieHeader: string | null | undefined): b
   return !!cookieHeader?.includes(IOS_PLATFORM_COOKIE)
 }
 
+export type HeaderLike = { get(name: string): string | null | undefined }
+
 /** Server-side: block Stripe checkout / billing portal on iOS TestFlight shell. */
-export function shouldBlockExternalPaymentsOnServer(headers: Headers): boolean {
+export function shouldBlockExternalPaymentsOnServer(headers: HeaderLike): boolean {
   if (isAppStoreSafeMode()) return true
   if (headers.get('x-betterbit-platform') === IOS_PLATFORM_HEADER) return true
   if (hasIosPlatformCookie(headers.get('cookie'))) return true
   if (isCapacitorUserAgent(headers.get('user-agent'))) return true
   return false
+}
+
+/** Server-side: unlock full features on iOS until Apple IAP ships. */
+export function shouldGrantFullAccessPreIap(headers: HeaderLike): boolean {
+  return shouldBlockExternalPaymentsOnServer(headers)
 }
 
 /** Client-side: hide payment CTAs in Capacitor iOS or App Store safe mode builds. */

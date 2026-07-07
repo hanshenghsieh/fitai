@@ -2,7 +2,6 @@
 
 import { resolveMenuFromQuery } from '@/lib/food-menu-lookup'
 import { userLabelMatchesVerified } from '@/lib/nutrition/food-category-guard'
-import { resolveP0FoodByLabel } from '@/lib/nutrition/p0-common-foods/resolve-p0-food'
 import { resolveFreeTextMealClient } from '@/lib/nutrition/search-v2/client-resolve'
 import type { FoodNutritionStatus } from '@/lib/banks/types'
 
@@ -126,29 +125,6 @@ export function resolveOrEstimateFreeTextMeal(
       nutrition_confidence: 'A',
       capture_status: 'resolved',
       explanation: 'food-kb / runtime 官方匹配',
-    }
-  }
-
-  const p0 = resolveP0FoodByLabel(trimmed)
-  if (p0) {
-    return {
-      id: `p0-pending-${p0.id}-${Date.now()}`,
-      name: p0.name,
-      display_label: p0.name,
-      user_input_label: trimmed,
-      matched_item_label: p0.name,
-      match_type: 'p0_common_food_pending_portion',
-      calories: null,
-      protein_g: null,
-      carbs_g: null,
-      fat_g: null,
-      source: 'search',
-      estimated: false,
-      blocked: false,
-      nutrition_status: 'estimated_pending_confirmation',
-      nutrition_confidence: 'B',
-      capture_status: 'resolved',
-      explanation: 'P0 通用食材 — 請確認份量',
     }
   }
 

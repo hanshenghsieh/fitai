@@ -13,7 +13,7 @@ function StrategyCard({
   rows,
 }: {
   title: string
-  rows: { iconName: import('@/components/icons').BBIconName; label: string; instruction: string }[]
+  rows: { iconName: import('@/components/icons').BBIconName; label: string; instruction: string; dishHint?: string }[]
 }) {
   return (
     <BBCard padding={16} className="flex-1 min-w-0">
@@ -30,6 +30,11 @@ function StrategyCard({
             <div className="min-w-0">
               <span style={{ color: 'var(--bb-text-primary)', fontWeight: 600 }}>{row.label}：</span>
               <span style={{ color: 'var(--bb-text-secondary)' }}>{row.instruction}</span>
+              {row.dishHint ? (
+                <p className="text-[12px] mt-1" style={{ color: 'var(--bb-text-accent)', fontWeight: 500 }}>
+                  可參考：{row.dishHint}
+                </p>
+              ) : null}
             </div>
           </li>
         ))}
@@ -55,6 +60,7 @@ export default function WeekStrategyRow({
             iconName: MEAL_SLOT_ICON[m.slot],
             label: m.slotLabel,
             instruction: m.instruction,
+            dishHint: m.dishHint,
           }))}
         />
       )}

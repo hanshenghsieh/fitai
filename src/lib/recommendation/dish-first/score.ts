@@ -70,7 +70,7 @@ export function scoreDishVariantForUserDay(
   let extra = 0
 
   const highCalLabel = /牛奶|麻辣|炸|控肉|壽喜|王子麵|甜不辣|大碗|雙主菜|培根|起司|凱薩/
-  const lowCalLabel = /小份|少飯|清湯|昆布|沙拉|豆腐|青菜|雞胸|地瓜|茶葉蛋|小飯糰|小地瓜/
+  const lowCalLabel = /小份|半飯|少飯|清湯|昆布|沙拉|豆腐|青菜|雞胸|地瓜|茶葉蛋|小飯糰|小地瓜/
   const highProteinLabel = /雞胸|牛肉|海鮮|雞腿|雙倍肉|高蛋白|茶葉蛋/
 
   if (day.remainingCalories <= 350) {

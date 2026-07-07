@@ -1,5 +1,6 @@
 import type { AccessStatus } from '@/lib/subscription-access'
 import { TRIAL_DAYS } from '@/lib/subscription-access'
+import { isCapacitorNative } from '@/lib/capacitor-native'
 
 /**
  * App Store / TestFlight safe mode — hide Stripe, Apple Health placeholders, and payment CTAs.
@@ -13,9 +14,21 @@ export function isAppStoreSafeMode(): boolean {
 /** Alias for iOS App Store review builds. */
 export const isIOSAppStoreBuild = isAppStoreSafeMode
 
-/** Full app access during review — no paywall surfaces that lead to Stripe. */
-export function withSafeModeAccess(access: AccessStatus): AccessStatus {
-  if (!isAppStoreSafeMode()) return access
+export interface ReviewAccessOptions {
+  /** Server-side: Capacitor iOS / review request headers detected. */
+  iosNativeReview?: boolean
+}
+
+function shouldGrantReviewFullAccess(options?: ReviewAccessOptions): boolean {
+  if (isAppStoreSafeMode()) return true
+  if (options?.iosNativeReview) return true
+  if (typeof window !== 'undefined' && isCapacitorNative()) return true
+  return false
+}
+
+/** Full app access during iOS review / pre-IAP — no paywall that leads to Stripe. */
+export function withSafeModeAccess(access: AccessStatus, options?: ReviewAccessOptions): AccessStatus {
+  if (!shouldGrantReviewFullAccess(options)) return access
   return {
     ...access,
     hasFullAccess: true,

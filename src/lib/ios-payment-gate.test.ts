@@ -4,6 +4,7 @@ import {
   hasIosPlatformCookie,
   isCapacitorUserAgent,
   shouldBlockExternalPaymentsOnServer,
+  shouldGrantFullAccessPreIap,
 } from './ios-payment-gate'
 
 describe('ios-payment-gate', () => {
@@ -25,6 +26,11 @@ describe('ios-payment-gate', () => {
   it('blocks external payments for x-betterbit-platform ios', () => {
     const headers = new Headers({ 'x-betterbit-platform': 'ios' })
     assert.equal(shouldBlockExternalPaymentsOnServer(headers), true)
+  })
+
+  it('grants full access pre-IAP for iOS cookie header', () => {
+    const headers = new Headers({ cookie: 'bb_native_ios=1' })
+    assert.equal(shouldGrantFullAccessPreIap(headers), true)
   })
 
   it('allows external payments on plain web headers when safe mode off', () => {

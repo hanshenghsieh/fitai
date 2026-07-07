@@ -20,7 +20,7 @@ import {
   templateRequiresSpecificVariant,
 } from '@/lib/recommendation/dish-first/display'
 import { scoreDishVariantForUserDay } from '@/lib/recommendation/dish-first/score'
-import type { DishVariant } from '@/lib/recommendation/dish-first/types'
+import type { DishVariant, BrandItem } from '@/lib/recommendation/dish-first/types'
 import type { TodayMealState } from '@/lib/engines/next-meal-engine'
 
 interface Props {
@@ -28,6 +28,8 @@ interface Props {
   dayState: TodayMealState
   selectedVariantId?: string | null
   onSelectVariant?: (variantId: string | null) => void
+  onSelectBrand?: (brand: BrandItem) => void
+  brandLogging?: boolean
   coachBullets?: string[]
 }
 
@@ -38,6 +40,8 @@ export default function DishRecommendationCard({
   dayState,
   selectedVariantId,
   onSelectVariant,
+  onSelectBrand,
+  brandLogging = false,
   coachBullets = [],
 }: Props) {
   const dish = suggestion.dish_recommendation
@@ -175,6 +179,11 @@ export default function DishRecommendationCard({
         <div className="space-y-3">
           <p className="text-[13px] px-0.5" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>
             可參考品牌
+            {onSelectBrand ? (
+              <span className="text-[12px] ml-1.5" style={{ color: TODAY.mocha, fontWeight: 400 }}>
+                · 點品牌直接記錄
+              </span>
+            ) : null}
           </p>
           {visibleGroups.map(group => (
             <div key={group.label} className="space-y-2">
@@ -185,27 +194,34 @@ export default function DishRecommendationCard({
               ) : null}
               <ul className="space-y-2">
                 {group.items.map(item => (
-                  <li
-                    key={item.id}
-                    className="rounded-2xl px-4 py-3"
-                    style={{ backgroundColor: TODAY.card }}
-                  >
-                    <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
-                      {formatBrandItemLine(item)}
-                      {item.isSimilar ? (
-                        <span className="text-[12px] ml-1.5" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-                          · 相近選項
-                        </span>
-                      ) : null}
-                    </p>
-                    <p className="text-[13px] mt-1 tabular-nums" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-                      約 {item.calories} kcal
-                      {item.protein != null ? ` · 蛋白質 ${item.protein}g` : ''}
-                    </p>
-                    <p className="text-[12px] mt-1" style={{ color: TODAY.mocha, fontWeight: 500 }}>
-                      {brandSourceLabel(item)}
-                      {item.displayNote && !item.isSimilar ? ` · ${item.displayNote}` : ''}
-                    </p>
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      disabled={!onSelectBrand || brandLogging}
+                      onClick={() => onSelectBrand?.(item)}
+                      className="w-full text-left rounded-2xl px-4 py-3 disabled:opacity-40 touch-manipulation active:opacity-90"
+                      style={{
+                        backgroundColor: TODAY.card,
+                        border: onSelectBrand ? '1.5px solid transparent' : undefined,
+                      }}
+                    >
+                      <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
+                        {formatBrandItemLine(item)}
+                        {item.isSimilar ? (
+                          <span className="text-[12px] ml-1.5" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+                            · 相近選項
+                          </span>
+                        ) : null}
+                      </p>
+                      <p className="text-[13px] mt-1 tabular-nums" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+                        約 {item.calories} kcal
+                        {item.protein != null ? ` · 蛋白質 ${item.protein}g` : ''}
+                      </p>
+                      <p className="text-[12px] mt-1" style={{ color: TODAY.mocha, fontWeight: 500 }}>
+                        {brandSourceLabel(item)}
+                        {item.displayNote && !item.isSimilar ? ` · ${item.displayNote}` : ''}
+                      </p>
+                    </button>
                   </li>
                 ))}
               </ul>

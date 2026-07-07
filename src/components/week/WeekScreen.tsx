@@ -10,6 +10,7 @@ import WeekSummaryHero from './WeekSummaryHero'
 import WeekFocusActionCard from './WeekFocusActionCard'
 import WeekTrendCards from './WeekTrendCards'
 import WeekDailyPerformance from './WeekDailyPerformance'
+import WeekStrategyRow from './WeekStrategyRow'
 
 interface Props {
   summary: WeekSummary
@@ -77,6 +78,8 @@ export default function WeekScreen({ summary, error }: Props) {
       <WeekFocusActionCard action={focusAction} />
 
       <WeekTrendCards summary={summary} />
+
+      <WeekStrategyRow mealStrategy={summary.mealStrategy} workoutStrategy={summary.workoutStrategy} />
 
       <WeekDailyPerformance
         days={summary.dailyScores}

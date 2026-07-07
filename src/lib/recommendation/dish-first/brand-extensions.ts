@@ -79,6 +79,22 @@ export const BRAND_EXTENSIONS: BrandItem[] = [
     aliases: ['悟饕滷雞腿飯'],
     tags: ['便當', '雞腿飯', '滷'],
   },
+  {
+    id: 'brand_bento_chicken_breast',
+    brandName: '便當店',
+    itemName: '雞胸便當',
+    templateId: 'dish_chicken_breast_bento',
+    variantId: 'variant_chicken_breast_bento_normal',
+    calories: 545,
+    protein: 42,
+    fat: 13,
+    carbs: 50,
+    sourceType: 'database_estimate',
+    confidence: 'medium',
+    aliases: ['便當店雞胸便當'],
+    tags: ['便當', '高蛋白', '減脂友善'],
+    note: '一般便當店估算；飯量請選半飯/少飯/正常飯',
+  },
 ]
 
 export const BRAND_EXTENSION_IDS = new Set(BRAND_EXTENSIONS.map(b => b.id))

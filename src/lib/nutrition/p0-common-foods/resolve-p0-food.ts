@@ -19,12 +19,17 @@ export function resolveP0FoodByLabel(
   label: string,
   options?: { minScore?: number }
 ): CommonFoodItem | null {
+  const trimmed = label.trim()
+  const hadStorePrefix = /^(7-11|711|全家|萊爾富)\s*/i.test(trimmed)
   const cleaned = cleanLabelForP0Resolve(label)
   if (!cleaned) return null
 
   const norm = normalizeP0Name(cleaned)
   const exact = getP0FoodByNormalizedLabel(norm)
   if (exact) return exact
+
+  // Store prefix aliases (711竹筍湯) must not fuzzy-resolve after stripping the prefix.
+  if (hadStorePrefix) return null
 
   const minScore = options?.minScore ?? RESOLVE_MIN_SCORE
   const hits = searchP0CommonFoods(cleaned, 5)

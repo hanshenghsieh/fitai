@@ -64,6 +64,8 @@ async function ProgressContent() {
           water_ml: latestTargets.water_ml,
           target_weight_kg:
             bundle.activeGoal?.target_weight_kg ?? currentPlanData?.goal_snapshot?.target_weight ?? null,
+          start_weight_kg: bundle.activeGoal?.start_weight_kg ?? null,
+          start_date: bundle.activeGoal?.start_date ?? null,
         }}
         dayPlansByDate={dayPlansByDate}
         currentWeightKg={latestWeight}

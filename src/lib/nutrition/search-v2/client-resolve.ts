@@ -77,23 +77,6 @@ export function resolveFreeTextMealClient(query: string): TextMealResolveResult 
     return { can_commit: true, action: 'create_official', payload: officialFromKb(kb, trimmed) }
   }
 
-  const p0 = resolveP0FoodByLabel(trimmed)
-  if (p0) {
-    return {
-      can_commit: true,
-      action: 'create_unknown',
-      payload: unknownPayload(trimmed, 'P0 通用食材 — 請確認份量', {
-        name: p0.name,
-        display_label: p0.name,
-        matched_item_label: p0.name,
-        match_type: 'p0_common_food_pending_portion',
-        nutrition_status: 'estimated_pending_confirmation',
-        nutrition_confidence: 'B',
-        capture_status: 'resolved',
-      }),
-    }
-  }
-
   if (isClearlyUnknownQuery(trimmed)) {
     return {
       can_commit: true,
@@ -115,6 +98,31 @@ export function resolveFreeTextMealClient(query: string): TextMealResolveResult 
         explanation: '模糊菜名需 Smart Clarification',
         candidates: [],
       },
+    }
+  }
+
+  const p0 = resolveP0FoodByLabel(trimmed)
+  if (p0 && userLabelMatchesVerified(trimmed, p0.name)) {
+    const genericBun = /^菜包$/.test(trimmed)
+    if (genericBun) {
+      return {
+        can_commit: true,
+        action: 'create_unknown',
+        payload: unknownPayload(trimmed, '完全沒有可信營養資料，建立 Text Only Record。'),
+      }
+    }
+    return {
+      can_commit: true,
+      action: 'create_unknown',
+      payload: unknownPayload(trimmed, 'P0 通用食材 — 請確認份量', {
+        name: p0.name,
+        display_label: p0.name,
+        matched_item_label: p0.name,
+        match_type: 'p0_common_food_pending_portion',
+        nutrition_status: 'estimated_pending_confirmation',
+        nutrition_confidence: 'B',
+        capture_status: 'resolved',
+      }),
     }
   }
 

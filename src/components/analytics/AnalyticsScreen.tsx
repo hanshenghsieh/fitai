@@ -14,6 +14,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
+  YAxis,
 } from 'recharts'
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react'
 import BBIcon from '@/components/icons/BBIcon'
@@ -23,6 +24,7 @@ import EmptyStateCard from '@/components/ui/EmptyStateCard'
 import {
   buildAnalysisSummary,
   shiftAnalysisAnchor,
+  weightChartYDomain,
   type AnalysisCheckinRow,
   type AnalysisDayPlanHint,
   type AnalysisPeriodType,
@@ -166,6 +168,7 @@ export default function AnalyticsScreen({
   }
 
   const lastWeight = summary.weightTrend.points.at(-1)
+  const weightYDomain = weightChartYDomain(summary.weightTrend.points)
 
   return (
     <div className="px-5 app-page-top pb-10 space-y-5 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
@@ -271,13 +274,18 @@ export default function AnalyticsScreen({
             <ResponsiveContainer width="100%" height={120}>
               <LineChart data={summary.weightTrend.points}>
                 <XAxis dataKey="label" hide />
-                <Tooltip />
+                <YAxis hide domain={weightYDomain} />
+                <Tooltip
+                  formatter={(value: number) => [`${value.toFixed(1)} kg`, '體重']}
+                  labelFormatter={label => label}
+                />
                 <Line
                   type="monotone"
                   dataKey="weight"
                   stroke={BB_V2.accent.orange}
                   strokeWidth={2}
                   dot={{ r: 3, fill: BB_V2.accent.orange }}
+                  isAnimationActive={false}
                 />
               </LineChart>
             </ResponsiveContainer>

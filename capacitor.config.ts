@@ -25,8 +25,6 @@ const config: CapacitorConfig = {
     allowNavigation: [
       'betterbit.app',
       '*.betterbit.app',
-      'checkout.stripe.com',
-      '*.stripe.com',
     ],
   },
   ios: {

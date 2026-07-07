@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { Suspense } from 'react'
 import { format, startOfWeek, differenceInDays, subDays, parse } from 'date-fns'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import type { WeeklyPlanData, DayPlan, UserProfile } from '@/types'
 import { colors } from '@/lib/design-system'
 import NotificationPrompt from '@/components/dashboard/NotificationPrompt'
@@ -20,6 +21,7 @@ import { userMemoryFromCheckin } from '@/lib/checkin-utils'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import { generateWeeklyPlanForUser } from '@/lib/generate-weekly-plan'
 import { messageForGeneratePlanError } from '@/lib/generate-plan-errors'
+import { shouldGrantFullAccessPreIap } from '@/lib/ios-payment-gate'
 
 const PLAN_FAILED_LINE = {
   text: GENTLE_ERROR_MESSAGE,
@@ -84,9 +86,13 @@ async function DashboardContent() {
   let planData = weeklyPlan?.plan_data as WeeklyPlanData | null
 
   if ((!weeklyPlan || !planData?.days?.length) && profileRow?.onboarding_completed) {
+    const headerList = await headers()
     const generated = await generateWeeklyPlanForUser(supabase, {
       userId: user.id,
       userEmail: user.email,
+      iosNativeReview: shouldGrantFullAccessPreIap({
+        get: name => headerList.get(name),
+      }),
     })
     if (generated.ok) {
       const refreshed = await supabase
