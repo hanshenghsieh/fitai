@@ -18,12 +18,59 @@ export interface FoodSearchHit {
   foodType?: FoodType
   sourceType?: FoodSourceType
   p0FoodId?: string
+  p0MatchScore?: number
   dishTemplateId?: string
   dishVariantId?: string
   dishBrandItemId?: string
   dishSearchKind?: 'template' | 'variant' | 'brand'
   searchSource: 'official' | 'p0' | 'runtime' | 'dish'
   sourceLabel?: string
+}
+
+const P0_PRIORITY_TYPES: ReadonlySet<FoodType> = new Set(['ingredient', 'staple', 'sauce', 'drink'])
+
+/** Unified ranking — P0 ingredients beat partial dish/menu matches; dish meals beat P0 meals. */
+export function rankFoodSearchHit(hit: FoodSearchHit, query: string): number {
+  const q = normalizeFoodName(query.trim())
+  const name = normalizeFoodName(hit.name)
+  if (!q) return 0
+
+  const p0Score = hit.p0MatchScore ?? 0
+
+  if (hit.searchSource === 'p0' && p0Score >= 72 && hit.foodType && P0_PRIORITY_TYPES.has(hit.foodType)) {
+    if (p0Score >= 95) return 10000 + p0Score
+    if (name === q || name.includes(q)) return 9000 + p0Score
+  }
+
+  if (hit.searchSource === 'dish' && hit.dishSearchKind === 'template' && name === q) {
+    return 9800
+  }
+
+  if (hit.searchSource === 'p0' && p0Score >= 100) return 9600 + p0Score
+  if (hit.searchSource === 'p0' && p0Score >= 95) return 9400 + p0Score
+
+  if (name === q) return 7500
+  if (name.startsWith(q) || q.startsWith(name)) return 6800
+
+  if (hit.searchSource === 'official' || hit.searchSource === 'runtime') {
+    if (name.includes(q) && q.length >= 2) return 4200
+  }
+
+  if (hit.searchSource === 'dish') {
+    if (hit.dishSearchKind === 'template' && name.includes(q)) return 5500
+    if (hit.dishSearchKind === 'variant' && name.includes(q) && q.length >= 3) return 4800
+    return 3000
+  }
+
+  return 1000
+}
+
+function sortFoodSearchHits(query: string, hits: FoodSearchHit[]): FoodSearchHit[] {
+  return [...hits].sort((a, b) => {
+    const diff = rankFoodSearchHit(b, query) - rankFoodSearchHit(a, query)
+    if (diff !== 0) return diff
+    return a.name.localeCompare(b.name, 'zh-Hant')
+  })
 }
 
 function officialToHit(hit: {
@@ -61,12 +108,18 @@ function p0ToHit(item: import('@/lib/nutrition/p0-common-foods/types').CommonFoo
     foodType: item.foodType,
     sourceType: item.sourceType,
     p0FoodId: item.id,
+    p0MatchScore: score,
     searchSource: 'p0',
     sourceLabel: item.sourceType === 'official' ? '官方資料' : '資料庫估算',
   }
 }
 
-/** Client-safe search — official menu first, then P0 common foods. */
+function hitDedupeKey(hit: FoodSearchHit): string {
+  if (hit.p0FoodId) return `p0:${hit.p0FoodId}`
+  return `${hit.searchSource}:${hit.id}`
+}
+
+/** Client-safe search — merges dish, official menu, P0, then re-ranks by match quality. */
 export function searchFoodMenu(query: string, limit = 8): FoodSearchHit[] {
   const q = query.trim().toLowerCase()
   if (!q || q.length < 1) return []
@@ -74,19 +127,23 @@ export function searchFoodMenu(query: string, limit = 8): FoodSearchHit[] {
   const seen = new Set<string>()
   const out: FoodSearchHit[] = []
 
+  const addHit = (hit: FoodSearchHit) => {
+    const key = hitDedupeKey(hit)
+    if (seen.has(key)) return
+    seen.add(key)
+    out.push(hit)
+  }
+
   const dishHits = searchDishCatalog(query, limit)
   for (const hit of dishHits) {
     const template = hit.template
     if (!template) continue
-    const key = `dish:${hit.kind}:${hit.label}`
-    if (seen.has(key)) continue
-    seen.add(key)
     const macros = hit.brandItem
       ? { mid: hit.brandItem.calories, protein: hit.brandItem.protein ?? 0 }
       : hit.variant
         ? { mid: hit.variant.typicalCalories.mid, protein: hit.variant.typicalProtein?.mid ?? 0 }
         : { mid: template.typicalCalories.mid, protein: template.typicalProtein?.mid ?? 0 }
-    out.push({
+    addHit({
       id:
         hit.kind === 'brand'
           ? `dish-brand-${hit.brandItem!.id}`
@@ -110,18 +167,12 @@ export function searchFoodMenu(query: string, limit = 8): FoodSearchHit[] {
 
   const kbHits = searchFoodMenuExtended(query, limit)
   for (const hit of kbHits) {
-    const key = normalizeFoodName(hit.name)
-    if (seen.has(key)) continue
-    seen.add(key)
-    out.push(officialToHit(hit))
+    addHit(officialToHit(hit))
   }
 
   const p0Hits = searchP0CommonFoods(query, limit * 2)
   for (const { item, score } of p0Hits) {
-    const key = normalizeFoodName(item.name)
-    if (seen.has(key)) continue
-    seen.add(key)
-    out.push(p0ToHit(item, score))
+    addHit(p0ToHit(item, score))
   }
 
   if (out.length < limit) {
@@ -143,10 +194,7 @@ export function searchFoodMenu(query: string, limit = 8): FoodSearchHit[] {
       .slice(0, limit)
 
     for (const { item } of scored) {
-      const key = normalizeFoodName(item.name)
-      if (seen.has(key)) continue
-      seen.add(key)
-      out.push({
+      addHit({
         id: item.id,
         name: item.name,
         store: item.store,
@@ -161,5 +209,5 @@ export function searchFoodMenu(query: string, limit = 8): FoodSearchHit[] {
     }
   }
 
-  return out.slice(0, limit)
+  return sortFoodSearchHits(query, out).slice(0, limit)
 }

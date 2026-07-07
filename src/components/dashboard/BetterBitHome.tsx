@@ -227,6 +227,17 @@ export default function BetterBitHome({
     workoutItemsRef.current = workoutItems
   }, [waterMl, userMemory, customEatOut, dailyRolls, mealSuggest, workoutItems])
 
+  const writeFoodCache = useCallback(
+    (logs: FoodLogEntry[]) => {
+      writeFoodLogsSessionCache(logs, trackedDayKey, {
+        calorie_target: todayPlan.daily_targets.calories,
+        protein_target: todayPlan.daily_targets.protein_g,
+        water_ml: waterMlRef.current,
+      })
+    },
+    [trackedDayKey, todayPlan.daily_targets]
+  )
+
   useEffect(() => {
     void preloadDiceMenuBulk()
   }, [])
@@ -466,7 +477,7 @@ export default function BetterBitHome({
           const json = (await res.json()) as { calorie_bank?: CalorieBankRow | null }
           if (json.calorie_bank) setCalorieBank(json.calorie_bank)
           clearFoodLogsSessionCache()
-          writeFoodLogsSessionCache(state.userMemory?.food_logs_today ?? [])
+          writeFoodCache(state.userMemory?.food_logs_today ?? [])
           writeWorkoutItemsSessionCache(state.workoutItems)
         } catch (err) {
           if (err instanceof DOMException && err.name === 'AbortError') {
@@ -486,7 +497,7 @@ export default function BetterBitHome({
         void flushPersist()
       }
     }
-  }, [buildPersistState, weeklyPlanId])
+  }, [buildPersistState, weeklyPlanId, writeFoodCache])
 
   const flushPendingPersist = useCallback(() => {
     if (persistTimerRef.current) {
@@ -497,13 +508,13 @@ export default function BetterBitHome({
       ...persistPatchRef.current,
       userMemory: userMemoryRef.current,
     }
-    writeFoodLogsSessionCache(userMemoryRef.current.food_logs_today ?? [])
+    writeFoodCache(userMemoryRef.current.food_logs_today ?? [])
     writeWorkoutItemsSessionCache(workoutItemsRef.current)
     if (persistFlushingRef.current) {
       persistAbortRef.current?.abort()
     }
     void flushPersist()
-  }, [flushPersist])
+  }, [flushPersist, writeFoodCache])
 
   const persist = useCallback(
     (patch: {
@@ -522,7 +533,7 @@ export default function BetterBitHome({
       if (isFoodLogPatch || isWorkoutPatch) {
         persistTimerRef.current = null
         if (isFoodLogPatch) {
-          writeFoodLogsSessionCache(patch.userMemory!.food_logs_today ?? [])
+          writeFoodCache(patch.userMemory!.food_logs_today ?? [])
         }
         if (isWorkoutPatch) {
           writeWorkoutItemsSessionCache(patch.workoutItems!)
@@ -539,7 +550,7 @@ export default function BetterBitHome({
         void flushPersist()
       }, 300)
     },
-    [flushPersist]
+    [flushPersist, writeFoodCache]
   )
 
   useEffect(() => {
@@ -598,10 +609,10 @@ export default function BetterBitHome({
 
   const handleLogFood = useCallback((logs: FoodLogEntry[], nextMemory: UserMemoryMeta) => {
     userMemoryRef.current = nextMemory
-    writeFoodLogsSessionCache(logs)
+    writeFoodCache(logs)
     startTransition(() => setUserMemory(nextMemory))
     persist({ userMemory: nextMemory })
-  }, [persist])
+  }, [persist, writeFoodCache])
 
   useEffect(() => {
     if (didLocalReconcileRef.current) return
@@ -611,9 +622,9 @@ export default function BetterBitHome({
     if (!foodLogsNeedSync(logs, reconciled)) return
     const nextMemory = { ...userMemoryRef.current, food_logs_today: reconciled }
     userMemoryRef.current = nextMemory
-    writeFoodLogsSessionCache(reconciled)
+    writeFoodCache(reconciled)
     startTransition(() => setUserMemory(nextMemory))
-  }, [])
+  }, [writeFoodCache])
 
   useEffect(() => {
     if (didSessionHydrateRef.current) return

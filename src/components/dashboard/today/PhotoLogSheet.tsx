@@ -2,16 +2,22 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Camera, Loader2, X } from 'lucide-react'
+import { toast } from 'sonner'
 import { TODAY } from '@/lib/today-design'
 import { BB_V2 } from '@/lib/betterbit-v2'
-import { isNativeIOS } from '@/lib/capacitor-native'
 import BBCard from '@/components/ui/BBCard'
 import AppOverlay from '@/components/ui/AppOverlay'
+import {
+  captureFoodPhotoFromCamera,
+  isCapacitorCameraUsable,
+  pickFoodPhotoFromGallery,
+} from '@/lib/native-camera'
 import type { PhotoAccuracyState } from '@/lib/nutrition/photo-log-accuracy'
 import { photoAccuracyDisplayMacros } from '@/lib/nutrition/photo-log-accuracy'
 import type { PhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 import { photoV2UiMessage } from '@/lib/nutrition/search-v2/photo-pipeline'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
+import { isNativeIOS } from '@/lib/capacitor-native'
 
 const ICON_STROKE = TODAY.iconStroke
 const IOS_LITE_CANDIDATE_LIMIT = 3
@@ -56,6 +62,7 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
   const cameraRef = useRef<HTMLInputElement>(null)
   const galleryRef = useRef<HTMLInputElement>(null)
   const [picking, setPicking] = useState(false)
+  const nativeCamera = isCapacitorCameraUsable()
 
   useEffect(() => {
     const clearPicking = () => setPicking(false)
@@ -70,12 +77,38 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
     e.target.value = ''
   }
 
+  async function handleNativePick(mode: 'camera' | 'gallery') {
+    setPicking(true)
+    const result =
+      mode === 'camera' ? await captureFoodPhotoFromCamera() : await pickFoodPhotoFromGallery()
+    setPicking(false)
+    if (result.ok) {
+      onPickFile(result.file)
+      return
+    }
+    if (result.reason === 'denied') {
+      toast.error(mode === 'camera' ? '需要相機權限才能拍照' : '需要相簿權限才能選照片')
+      return
+    }
+    if (result.reason === 'unavailable') {
+      toast.error('無法開啟相機，請稍後再試')
+    }
+  }
+
   function openCamera() {
+    if (nativeCamera) {
+      void handleNativePick('camera')
+      return
+    }
     setPicking(true)
     cameraRef.current?.click()
   }
 
   function openGallery() {
+    if (nativeCamera) {
+      void handleNativePick('gallery')
+      return
+    }
     setPicking(true)
     galleryRef.current?.click()
   }
@@ -97,21 +130,25 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
         </button>
       </div>
       <div className="flex-1 px-5 flex flex-col items-center justify-center gap-6 min-h-[240px] pb-4">
-        <input
-          ref={cameraRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="hidden"
-          onChange={handleFile}
-        />
-        <input
-          ref={galleryRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFile}
-        />
+        {!nativeCamera && (
+          <>
+            <input
+              ref={cameraRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={handleFile}
+            />
+            <input
+              ref={galleryRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFile}
+            />
+          </>
+        )}
 
         <button
           type="button"

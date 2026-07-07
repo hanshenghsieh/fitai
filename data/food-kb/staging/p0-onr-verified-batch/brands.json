@@ -1,0 +1,292 @@
+{
+  "batch_id": "p0-onr-verified-batch",
+  "sprint": "p0-onr-rescue",
+  "phase": "p0_partial",
+  "policy": "zero_hallucination",
+  "generated_at": "2026-07-08T00:00:00.000Z",
+  "goal": "補 P0 partial 品牌的官方 ONR 主餐／飲品（禁止 scaffold placeholder）",
+  "brands": [
+    {
+      "brand_id": "hilife",
+      "canonical_name": "萊爾富",
+      "store_aliases": ["萊爾富", "Hi-Life", "hilife"],
+      "group": "p0_partial",
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "nutrition_source_url": "https://www.hilife.com.tw/productInfo_food.aspx",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.hilife.com.tw/productInfo_food.aspx",
+          "source_name": "萊爾富 官方食品營養標示",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_pdf",
+          "source_url": "https://www.hilife.com.tw/",
+          "source_name": "萊爾富 官網商品頁",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        }
+      ],
+      "target_items": 20,
+      "status": "awaiting_onr_verification",
+      "items": []
+    },
+    {
+      "brand_id": "okmart",
+      "canonical_name": "OK超商",
+      "store_aliases": ["OK超商", "OK mart", "OK Mart", "okmart"],
+      "group": "p0_partial",
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "nutrition_source_url": "https://www.okmart.com.tw/hotProducts_purchase?ID=4",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.okmart.com.tw/hotProducts_purchase?ID=4",
+          "source_name": "OK mart 官方營養專區",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_website",
+          "source_url": "https://www.okmart.com.tw/",
+          "source_name": "OK mart 官網",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        }
+      ],
+      "target_items": 20,
+      "status": "awaiting_onr_verification",
+      "items": []
+    },
+    {
+      "brand_id": "pxmart",
+      "canonical_name": "全聯",
+      "store_aliases": ["全聯", "全聯福利中心", "pxmart", "PX Mart"],
+      "group": "p0_partial",
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "nutrition_source_url": "https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.pxmart.com.tw/exclusive/%E7%BE%8E%E5%91%B3%E5%A0%82",
+          "source_name": "全聯 美味堂官方營養",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_website",
+          "source_url": "https://www.pxmart.com.tw/",
+          "source_name": "全聯福利中心 官網",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        }
+      ],
+      "target_items": 20,
+      "status": "awaiting_onr_verification",
+      "items": []
+    },
+    {
+      "brand_id": "50lan",
+      "canonical_name": "五十嵐",
+      "store_aliases": ["五十嵐", "50嵐", "50lan"],
+      "group": "p0_partial",
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "nutrition_source_url": "https://www.50lan.com/",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.50lan.com/",
+          "source_name": "五十嵐 官網",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "mohw",
+          "source_url": "https://consumer.fda.gov.tw/",
+          "source_name": "衛福部 食品營養標示資料庫（交叉驗證）",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        }
+      ],
+      "target_items": 20,
+      "status": "awaiting_onr_verification",
+      "items": [],
+      "notes": "需人工確認官網是否公開各品項糖分/熱量；無官方數據則標 blocked"
+    },
+    {
+      "brand_id": "ddburger",
+      "canonical_name": "丹丹漢堡",
+      "store_aliases": ["丹丹漢堡", "丹丹漢堡七賢店"],
+      "group": "p0_partial",
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 2,
+      "nutrition_source_url": "https://www.ddburger.com.tw/",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.ddburger.com.tw/",
+          "source_name": "丹丹漢堡 官網",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_website",
+          "source_url": "https://www.ddburger.com.tw/menu",
+          "source_name": "丹丹漢堡 菜單頁",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        }
+      ],
+      "target_items": 20,
+      "status": "awaiting_onr_verification",
+      "items": [],
+      "notes": "已有 2 品項 A/B；本批補 top 18 主餐"
+    },
+    {
+      "brand_id": "chingshin",
+      "canonical_name": "清心福全",
+      "store_aliases": ["清心福全", "清心"],
+      "group": "p0_partial",
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "nutrition_source_url": "https://www.chingshin.tw/",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.chingshin.tw/",
+          "source_name": "清心福全 官網",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "mohw",
+          "source_url": "https://consumer.fda.gov.tw/",
+          "source_name": "衛福部 食品營養標示資料庫",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        }
+      ],
+      "target_items": 20,
+      "status": "awaiting_onr_verification",
+      "items": []
+    },
+    {
+      "brand_id": "coco",
+      "canonical_name": "CoCo都可",
+      "store_aliases": ["CoCo都可", "CoCo", "都可"],
+      "group": "p0_partial",
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "nutrition_source_url": "https://www.coco-tea.com.tw/",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.coco-tea.com.tw/",
+          "source_name": "CoCo都可 官網",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "mohw",
+          "source_url": "https://consumer.fda.gov.tw/",
+          "source_name": "衛福部 食品營養標示資料庫",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        }
+      ],
+      "target_items": 20,
+      "status": "awaiting_onr_verification",
+      "items": []
+    },
+    {
+      "brand_id": "kebuke",
+      "canonical_name": "可不可熟成紅茶",
+      "store_aliases": ["可不可", "可不可熟成紅茶", "kebuke"],
+      "group": "p0_partial",
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "nutrition_source_url": "https://www.kebuke.com/",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.kebuke.com/",
+          "source_name": "可不可 官網",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "mohw",
+          "source_url": "https://consumer.fda.gov.tw/",
+          "source_name": "衛福部 食品營養標示資料庫",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        }
+      ],
+      "target_items": 20,
+      "status": "awaiting_onr_verification",
+      "items": []
+    },
+    {
+      "brand_id": "milkshop",
+      "canonical_name": "迷客夏",
+      "store_aliases": ["迷客夏", "Milkshop"],
+      "group": "p0_partial",
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "nutrition_source_url": "https://www.milkshop.com.tw/",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.milkshop.com.tw/",
+          "source_name": "迷客夏 官網",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "mohw",
+          "source_url": "https://consumer.fda.gov.tw/",
+          "source_name": "衛福部 食品營養標示資料庫",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        }
+      ],
+      "target_items": 20,
+      "status": "awaiting_onr_verification",
+      "items": []
+    },
+    {
+      "brand_id": "burgerking",
+      "canonical_name": "漢堡王",
+      "store_aliases": ["漢堡王", "Burger King", "BK"],
+      "group": "p0_partial",
+      "backfill_status": "partial",
+      "dice_recommendable_main_count": 0,
+      "nutrition_source_url": "https://www.burgerking.com.tw/",
+      "restaurant_sources": [
+        {
+          "priority": "A",
+          "source_type": "official_website",
+          "source_url": "https://www.burgerking.com.tw/",
+          "source_name": "漢堡王台灣 官網",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        },
+        {
+          "priority": "B",
+          "source_type": "official_pdf",
+          "source_url": "https://www.burgerking.com.tw/",
+          "source_name": "漢堡王 營養/過敏原公開文件（待人工定位）",
+          "observed_at": "2026-07-08T00:00:00.000Z"
+        }
+      ],
+      "target_items": 20,
+      "status": "awaiting_onr_verification",
+      "items": []
+    }
+  ]
+}

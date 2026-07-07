@@ -9,7 +9,7 @@ import {
 } from '@/lib/recommendation/dish-first/catalog'
 import { resolveBrandDisplayGroups } from '@/lib/recommendation/dish-first/brand-display'
 import { rollDishFirstRecommendation, getBrandItemsForTemplateResolved } from '@/lib/recommendation/dish-first/engine'
-import { recommendationDisplayName, templateRequiresSpecificVariant } from '@/lib/recommendation/dish-first/display'
+import { recommendationCategoryLine, recommendationDisplayName, templateRequiresSpecificVariant } from '@/lib/recommendation/dish-first/display'
 import { scoreDishTemplateForUserDay, scoreDishVariantForUserDay, pickBestVariantForDay } from '@/lib/recommendation/dish-first/score'
 import { searchDishCatalog } from '@/lib/recommendation/dish-first/search'
 import { buildFoodLogFromDishRecommendation } from '@/lib/recommendation/dish-first/log'
@@ -119,8 +119,12 @@ describe('dish-first recommendation roll', () => {
     const variants = getVariantsForTemplate(template.id)
     const normal = variants.find(v => v.name === '正常飯')
     const less = variants.find(v => v.name === '少飯')
+    const half = variants.find(v => v.name === '半飯')
     assert.ok(normal, 'expected 正常飯 variant')
     assert.ok(less, 'expected 少飯 variant')
+    assert.ok(half, 'expected 半飯 variant')
+    assert.equal(recommendationDisplayName(template, half), '雞胸便當 · 半飯')
+    assert.match(recommendationCategoryLine(template, half)!, /整份便當/)
     assert.ok(normal!.typicalCalories.mid >= 450, `正常飯 should be ~500+ kcal, got ${normal!.typicalCalories.mid}`)
     assert.ok(normal!.typicalCalories.mid <= 600)
     assert.ok(less!.typicalCalories.mid < normal!.typicalCalories.mid)

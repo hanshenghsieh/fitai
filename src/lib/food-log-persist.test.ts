@@ -287,4 +287,60 @@ describe('food log persistence round-trip', () => {
       })
     }
   })
+
+  it('durable offline cache keeps logs when sessionStorage cleared (app restart simulation)', () => {
+    const session = new Map<string, string>()
+    const local = new Map<string, string>()
+    const sessionStorage = {
+      getItem: (k: string) => session.get(k) ?? null,
+      setItem: (k: string, v: string) => session.set(k, v),
+      removeItem: (k: string) => session.delete(k),
+      clear: () => session.clear(),
+      key: () => null,
+      length: 0,
+    }
+    const localStorage = {
+      getItem: (k: string) => local.get(k) ?? null,
+      setItem: (k: string, v: string) => local.set(k, v),
+      removeItem: (k: string) => local.delete(k),
+      clear: () => local.clear(),
+      key: () => null,
+      length: 0,
+    }
+    const originalWindow = globalThis.window
+    const originalSessionStorage = globalThis.sessionStorage
+    const originalLocalStorage = globalThis.localStorage
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: { localStorage, sessionStorage },
+    })
+    Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: sessionStorage })
+    Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: localStorage })
+
+    try {
+      const date = '2099-06-18'
+      const serverLogs = [sampleLog({ id: 'srv-1', name: '白飯', calories: 200 })]
+      const clientLogs = [...serverLogs, sampleLog({ id: 'cli-offline', name: '茶葉蛋', calories: 80 })]
+      writeFoodLogsSessionCache(clientLogs, date, {
+        calorie_target: 1800,
+        protein_target: 120,
+        water_ml: 400,
+      })
+      session.clear()
+
+      const hydrated = resolveFoodLogsFromSession(serverLogs, date)
+      assert.equal(hydrated.length, 2)
+      assert.ok(hydrated.some(l => l.id === 'cli-offline'))
+    } finally {
+      Object.defineProperty(globalThis, 'window', { configurable: true, value: originalWindow })
+      Object.defineProperty(globalThis, 'sessionStorage', {
+        configurable: true,
+        value: originalSessionStorage,
+      })
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      })
+    }
+  })
 })

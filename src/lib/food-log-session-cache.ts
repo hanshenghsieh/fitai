@@ -1,5 +1,13 @@
 import type { FoodLogEntry } from '@/lib/banks/types'
 import { getNutritionDayKey } from '@/lib/timezone'
+import {
+  mergeFoodLogsPreferComplete,
+  readTodayOfflineSnapshot,
+  writeTodayOfflineSnapshot,
+  type TodayOfflineSnapshot,
+} from '@/lib/today-offline-cache'
+
+export type { TodayOfflineSnapshot }
 
 function cacheKey(date = getNutritionDayKey()): string {
   return `bb_food_logs_${date}`
@@ -24,13 +32,25 @@ export function readFoodLogsSessionCache(date = getNutritionDayKey()): FoodLogEn
   }
 }
 
-export function writeFoodLogsSessionCache(logs: FoodLogEntry[], date = getNutritionDayKey()): void {
+export function writeFoodLogsSessionCache(
+  logs: FoodLogEntry[],
+  date = getNutritionDayKey(),
+  snapshot?: Omit<TodayOfflineSnapshot, 'date' | 'food_logs_today' | 'updated_at'>
+): void {
   if (typeof window === 'undefined') return
   try {
     sessionStorage.setItem(cacheKey(date), JSON.stringify(logs))
   } catch {
     // sessionStorage full or private mode — ignore
   }
+  writeTodayOfflineSnapshot({
+    date,
+    food_logs_today: logs,
+    calorie_target: snapshot?.calorie_target,
+    protein_target: snapshot?.protein_target,
+    water_ml: snapshot?.water_ml,
+    updated_at: new Date().toISOString(),
+  })
 }
 
 export function clearFoodLogsSessionCache(date = getNutritionDayKey()): void {
@@ -47,9 +67,12 @@ export function resolveFoodLogsFromSession(
   date = getNutritionDayKey()
 ): FoodLogEntry[] {
   const cached = readFoodLogsSessionCache(date)
-  if (!cached) return serverLogs
-  const serverFp = foodLogIdsFingerprint(serverLogs)
-  const cachedFp = foodLogIdsFingerprint(cached)
-  if (serverFp === cachedFp) return serverLogs
-  return cached
+  const durable = readTodayOfflineSnapshot(date)?.food_logs_today ?? null
+  const merged = mergeFoodLogsPreferComplete(serverLogs, cached, durable)
+  if (merged.length === serverLogs.length) {
+    const serverFp = foodLogIdsFingerprint(serverLogs)
+    const mergedFp = foodLogIdsFingerprint(merged)
+    if (mergedFp === serverFp) return serverLogs
+  }
+  return merged.length >= serverLogs.length ? merged : serverLogs
 }
