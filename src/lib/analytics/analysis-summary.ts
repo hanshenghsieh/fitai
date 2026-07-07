@@ -357,12 +357,19 @@ function buildFullWeightTrendMeasurements(
   measurements: BodyMeasurement[],
   startWeightKg?: number | null,
   startDate?: string | null,
-  profileWeightKg?: number | null
+  profileWeightKg?: number | null,
+  priorWeightKg?: number | null
 ): BodyMeasurement[] {
   const dedupedAll = dedupeWeightMeasurements(
     measurements.filter(m => !isSyntheticWeightMeasurementId(m.id))
   )
-  const initial = resolveInitialWeightPoint(dedupedAll, startWeightKg, startDate, profileWeightKg)
+  const initial = resolveInitialWeightPoint(
+    dedupedAll,
+    startWeightKg,
+    startDate,
+    profileWeightKg,
+    priorWeightKg
+  )
   if (!initial) return dedupedAll
   if (initial.id !== 'goal-start-weight' && initial.id !== 'profile-baseline-weight') return dedupedAll
   return sortMeasurementsChronologically([initial, ...dedupedAll])

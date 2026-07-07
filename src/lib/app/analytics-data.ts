@@ -42,6 +42,41 @@ export function resolveLatestWeightKg(
   return measurements.at(-1)?.weight_kg ?? null
 }
 
+/** Ensure the weight shown in UI exists as a chart row (profile-only readings). */
+export function seedMeasurementsWithVisibleWeight(
+  measurements: BodyMeasurement[],
+  visibleWeightKg: number | null | undefined,
+  userId: string,
+  anchorDay?: string
+): BodyMeasurement[] {
+  if (visibleWeightKg == null || !Number.isFinite(visibleWeightKg)) return measurements
+  const hasWeight = measurements.some(
+    m => m.weight_kg != null && Math.abs(m.weight_kg - visibleWeightKg) < 0.05
+  )
+  if (hasWeight) return measurements
+
+  const day =
+    measurements.filter(m => m.measured_at).at(-1)?.measured_at.slice(0, 10) ??
+    anchorDay ??
+    format(new Date(), 'yyyy-MM-dd')
+
+  return [
+    ...measurements,
+    {
+      id: `visible-weight-${day}-${visibleWeightKg}`,
+      user_id: userId,
+      measured_at: day,
+      weight_kg: visibleWeightKg,
+      body_fat_pct: null,
+      muscle_mass_kg: null,
+      waist_cm: null,
+      hip_cm: null,
+      chest_cm: null,
+      created_at: `${day}T11:59:00.000Z`,
+    },
+  ]
+}
+
 /** Keep measurements in sync with the resolved latest weight (e.g. profile saved but log lagged). */
 export function mergeTodayWeightMeasurement(
   measurements: { id?: string; measured_at: string; weight_kg: number; created_at?: string }[],

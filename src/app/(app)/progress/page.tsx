@@ -12,6 +12,7 @@ import {
   mapWeightRowsToMeasurements,
   PROGRESS_ANALYTICS_LOOKBACK_DAYS,
   resolveLatestWeightKg,
+  seedMeasurementsWithVisibleWeight,
 } from '@/lib/app/analytics-data'
 import { getAppUser } from '@/lib/supabase/app-session'
 
@@ -51,7 +52,12 @@ async function ProgressContent() {
     bundle.profileWeightKg,
     bundle.todayStr
   )
-  const measurements = mapWeightRowsToMeasurements(bundle.measurements, user.id)
+  const measurements = seedMeasurementsWithVisibleWeight(
+    mapWeightRowsToMeasurements(bundle.measurements, user.id),
+    latestWeight,
+    user.id,
+    bundle.todayStr
+  )
 
   return (
     <div className="max-w-lg mx-auto pb-10" style={{ backgroundColor: BB_V2.bg.canvas }}>

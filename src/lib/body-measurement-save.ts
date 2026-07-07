@@ -86,12 +86,24 @@ export async function saveBodyMeasurementForUser(
 }> {
   const measuredAt = body.measured_at ?? getNutritionDayKey()
 
+  const { data: prevProfile } = await supabase
+    .from('user_profiles')
+    .select('weight_kg')
+    .eq('id', userId)
+    .single()
+  const priorWeightKg =
+    prevProfile?.weight_kg != null && Number.isFinite(Number(prevProfile.weight_kg))
+      ? Number(prevProfile.weight_kg)
+      : null
+
   const profileResult = await saveProfileWeight(supabase, userId, body)
   if (profileResult.error) {
     return { error: profileResult.error, profileSaved: false, logSaved: false, historySaved: false }
   }
 
-  const historyResult = await appendWeightHistoryToCheckin(supabase, userId, body.weight_kg)
+  const historyResult = await appendWeightHistoryToCheckin(supabase, userId, body.weight_kg, {
+    priorWeightKg,
+  })
   if (historyResult.error) {
     return {
       error: historyResult.error,
