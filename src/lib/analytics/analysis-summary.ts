@@ -75,7 +75,7 @@ export interface WeightTrendSummary {
   targetKg: number | null
   deltaKg: number | null
   deltaLabel: string | null
-  points: { label: string; weight: number }[]
+  points: { label: string; weight: number; key: string }[]
 }
 
 export interface DailyMetricPoint {
@@ -492,6 +492,24 @@ function dayLabel(day: string): string {
   return format(parseISO(day), 'M/d（EEEEE）', { locale: zhTW })
 }
 
+export function buildWeightTrendPoints(
+  measurements: BodyMeasurement[]
+): { label: string; weight: number; key: string }[] {
+  return measurements.map((m, idx, arr) => {
+    const day = m.measured_at.slice(0, 10)
+    const stamp = m.created_at ?? m.measured_at
+    const baseLabel = format(parseISO(day), 'M/d')
+    const sameDayCount = arr.filter(x => x.measured_at.slice(0, 10) === day).length
+    const sameDayIndex = arr.slice(0, idx + 1).filter(x => x.measured_at.slice(0, 10) === day).length
+    const label = sameDayCount > 1 ? `${baseLabel}·${sameDayIndex}` : baseLabel
+    return {
+      label,
+      weight: m.weight_kg as number,
+      key: `${day}|${stamp}|${m.weight_kg}|${idx}`,
+    }
+  })
+}
+
 export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
   const dateRange = resolveAnalysisDateRange(input.periodType, input.anchorDate)
   const allLogs = extractRecentFoodLogsFromCheckins(input.checkins)
@@ -546,16 +564,7 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
       ? Math.round(loggedProDays.reduce((s, p) => s + p.value, 0) / loggedProDays.length)
       : null
 
-  const weightPoints = periodTrendMeasurements.map((m, idx, arr) => {
-    const stamp = m.created_at ?? m.measured_at
-    const baseLabel = format(parseISO(stamp.slice(0, 10)), 'M/d')
-    const sameStampCount = arr.filter(x => (x.created_at ?? x.measured_at) === stamp).length
-    const sameStampIndex = arr.slice(0, idx + 1).filter(x => (x.created_at ?? x.measured_at) === stamp).length
-    return {
-      label: sameStampCount > 1 ? `${baseLabel}·${sameStampIndex}` : baseLabel,
-      weight: m.weight_kg as number,
-    }
-  })
+  const weightPoints = buildWeightTrendPoints(periodTrendMeasurements)
   const currentKg = input.currentWeightKg ?? periodTrendMeasurements.at(-1)?.weight_kg ?? null
   const previousKg = resolvePreviousWeightKg(periodTrendMeasurements)
   const firstWeight = periodTrendMeasurements[0]?.weight_kg

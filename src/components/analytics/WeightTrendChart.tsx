@@ -15,6 +15,7 @@ import { weightChartYDomain } from '@/lib/analytics/analysis-summary'
 interface Point {
   label: string
   weight: number
+  key?: string
 }
 
 interface Props {
@@ -59,9 +60,13 @@ export default function WeightTrendChart({ points }: Props) {
 
   if (points.length === 0) return null
 
+  const chartData = points.map((point, index) => ({
+    ...point,
+    key: point.key ?? `pt-${index}`,
+  }))
   const weightYDomain = weightChartYDomain(points)
   const lastWeight = points.at(-1)
-  const pointsKey = points.map(p => `${p.label}:${p.weight}`).join('|')
+  const pointsKey = chartData.map(p => p.key).join('|')
 
   return (
     <>
@@ -76,8 +81,8 @@ export default function WeightTrendChart({ points }: Props) {
       >
         {chartWidth > 0 ? (
           <ResponsiveContainer width="100%" height={120} minWidth={chartWidth}>
-            <LineChart data={points} key={`${remountKey}-${pointsKey}`}>
-              <XAxis dataKey="label" hide />
+            <LineChart data={chartData} key={`${remountKey}-${pointsKey}`}>
+              <XAxis dataKey="key" hide />
               <YAxis hide domain={weightYDomain} />
               <Tooltip
                 cursor={{ stroke: BB_V2.divider, strokeWidth: 1, fill: 'transparent' }}
@@ -88,7 +93,10 @@ export default function WeightTrendChart({ points }: Props) {
                   fontSize: 13,
                 }}
                 formatter={(value: number) => [`${value.toFixed(1)} kg`, '體重']}
-                labelFormatter={label => label}
+                labelFormatter={(_, payload) => {
+                  const row = payload?.[0]?.payload as Point | undefined
+                  return row?.label ?? ''
+                }}
               />
               <Line
                 type="monotone"

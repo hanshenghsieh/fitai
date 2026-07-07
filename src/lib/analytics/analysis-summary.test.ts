@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildAnalysisSummary, buildPeriodWeightTrendMeasurements, resolveAnalysisDateRange } from './analysis-summary'
+import { buildAnalysisSummary, buildPeriodWeightTrendMeasurements, buildWeightTrendPoints, resolveAnalysisDateRange } from './analysis-summary'
 import type { AnalysisCheckinRow } from './analysis-summary'
 
 const targets = {
@@ -520,6 +520,21 @@ describe('analysis-summary', () => {
     assert.equal(trend.length, 3)
     assert.equal(trend.some(m => m.id === 'goal-start-weight'), false)
     assert.equal(trend.some(m => m.id === 'weight-trend-anchor'), false)
+  })
+
+  it('assigns unique chart keys for multiple logs on the same day', () => {
+    const points = buildWeightTrendPoints([
+      { id: '1', user_id: 'u', measured_at: '2026-07-07', weight_kg: 71, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-07T08:00:00Z' },
+      { id: '2', user_id: 'u', measured_at: '2026-07-07', weight_kg: 72, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-07T10:00:00Z' },
+      { id: '3', user_id: 'u', measured_at: '2026-07-07', weight_kg: 75, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-07T12:00:00Z' },
+    ])
+    assert.equal(points.length, 3)
+    assert.equal(new Set(points.map(p => p.key)).size, 3)
+    assert.equal(points[0]?.label, '7/7·1')
+    assert.equal(points[1]?.label, '7/7·2')
+    assert.equal(points[2]?.label, '7/7·3')
+    assert.equal(points[0]?.weight, 71)
+    assert.equal(points[2]?.weight, 75)
   })
 
   it('paces weekly water goal by elapsed days in the week', () => {
