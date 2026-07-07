@@ -13,6 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="app-shell" style={{ backgroundColor: TODAY.bg }}>
       <main
         id="app-scroll-root"
+        aria-label="主要內容"
         className="app-scroll-with-nav overflow-y-auto overflow-x-hidden overscroll-y-none"
         style={{ WebkitOverflowScrolling: 'touch', backgroundColor: TODAY.bg }}
       >

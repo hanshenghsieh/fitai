@@ -63,14 +63,14 @@ export default function NotificationPrompt() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 max-w-lg mx-auto px-4 py-3 z-50 border-b"
+      className="fixed top-0 left-0 right-0 max-w-lg mx-auto px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3 z-50 border-b"
       style={{ backgroundColor: colors.bg.elevated, borderColor: colors.border.subtle }}
     >
       <div className="flex items-start gap-3">
         <ZaiJian size="sm" line={line} layout="inline" className="flex-1 min-w-0" />
         <button
           onClick={handleEnableNotifications}
-          className="px-3 py-1.5 rounded-xl text-[12px] font-semibold flex-shrink-0 mt-1"
+          className="px-4 py-2.5 min-h-[44px] rounded-xl text-[13px] font-semibold flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
         >
           好
@@ -80,11 +80,11 @@ export default function NotificationPrompt() {
             localStorage.setItem('notif_dismissed_date', new Date().toISOString().split('T')[0])
             setIsDismissed(true)
           }}
-          className="flex-shrink-0 mt-1"
+          className="flex-shrink-0 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           style={{ color: colors.text.tertiary }}
           aria-label="關閉"
         >
-          <X className="h-4 w-4" />
+          <X className="h-5 w-5" />
         </button>
       </div>
     </div>

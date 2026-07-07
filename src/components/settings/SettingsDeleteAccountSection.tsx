@@ -50,17 +50,21 @@ export default function SettingsDeleteAccountSection() {
 
       {confirmOpen && (
         <div
-          className="fixed inset-0 z-[60] flex items-end justify-center px-5 pb-8"
+          className="fixed inset-0 z-[60] flex items-end justify-center px-5 pb-[max(env(safe-area-inset-bottom),32px)]"
           style={{ backgroundColor: 'rgba(47, 36, 29, 0.22)', backdropFilter: 'blur(4px)' }}
           onClick={() => !deleting && setConfirmOpen(false)}
+          role="presentation"
         >
           <div
             className="w-full max-w-md p-6 space-y-5 rounded-2xl"
             style={{ backgroundColor: colors.bg.elevated, border: `1px solid ${colors.border.subtle}` }}
             onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-account-title"
           >
             <div className="space-y-2">
-              <p className="text-[17px] font-medium" style={{ color: colors.text.primary }}>
+              <p id="delete-account-title" className="text-[17px] font-medium" style={{ color: colors.text.primary }}>
                 確定要刪除帳號？
               </p>
               <p className="text-[14px] leading-relaxed" style={{ color: colors.text.secondary }}>

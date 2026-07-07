@@ -186,7 +186,15 @@ export default function OnboardingPage() {
           <span>認識一下</span>
           <span>{step} / {TOTAL_STEPS}</span>
         </div>
-        <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: BB_V2.bg.surface }}>
+        <div
+          className="h-1 rounded-full overflow-hidden"
+          style={{ backgroundColor: BB_V2.bg.surface }}
+          role="progressbar"
+          aria-valuemin={1}
+          aria-valuemax={TOTAL_STEPS}
+          aria-valuenow={step}
+          aria-label="註冊進度"
+        >
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{ width: `${(step / TOTAL_STEPS) * 100}%`, backgroundColor: BB_V2.accent.orange }}

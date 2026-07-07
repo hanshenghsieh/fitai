@@ -76,7 +76,7 @@ function SegmentControl({
   onChange: (v: AnalysisPeriodType) => void
 }) {
   return (
-    <div className="flex p-1 rounded-full" style={{ backgroundColor: BB_V2.bg.pill }}>
+    <div className="flex p-1 rounded-full" style={{ backgroundColor: BB_V2.bg.pill }} role="group" aria-label="分析期間">
       {PERIODS.map(p => {
         const active = value === p.id
         return (
@@ -84,7 +84,8 @@ function SegmentControl({
             key={p.id}
             type="button"
             onClick={() => onChange(p.id)}
-            className="flex-1 h-9 rounded-full text-[14px] transition-colors"
+            aria-pressed={active}
+            className="flex-1 h-9 min-h-[44px] rounded-full text-[14px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{
               backgroundColor: active ? BB_V2.accent.orange : 'transparent',
               color: active ? '#FFFFFF' : BB_V2.text.secondary,
@@ -409,7 +410,7 @@ export default function AnalyticsScreen({
           type="button"
           aria-label="上一段"
           onClick={() => setAnchorDate(d => shiftAnalysisAnchor(periodType, d, -1))}
-          className="p-2 rounded-full"
+          className="p-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           style={{ color: BB_V2.text.secondary }}
         >
           <ChevronLeft className="h-5 w-5" strokeWidth={BB_V2.iconStroke} />
@@ -421,7 +422,7 @@ export default function AnalyticsScreen({
           type="button"
           aria-label="下一段"
           onClick={() => setAnchorDate(d => shiftAnalysisAnchor(periodType, d, 1))}
-          className="p-2 rounded-full"
+          className="p-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           style={{ color: BB_V2.text.secondary }}
         >
           <ChevronRight className="h-5 w-5" strokeWidth={BB_V2.iconStroke} />

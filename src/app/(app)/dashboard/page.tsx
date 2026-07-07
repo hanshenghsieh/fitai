@@ -8,6 +8,7 @@ import type { WeeklyPlanData, DayPlan, UserProfile } from '@/types'
 import { colors } from '@/lib/design-system'
 import NotificationPrompt from '@/components/dashboard/NotificationPrompt'
 import BetterBitHome from '@/components/dashboard/BetterBitHome'
+import GeneratePlanButton from '@/components/dashboard/GeneratePlanButton'
 import TodayPlanEmpty from '@/components/dashboard/today/TodayPlanEmpty'
 import ZaiJianPanel from '@/components/character/ZaiJianPanel'
 import ZaiJian from '@/components/character/ZaiJian'
@@ -138,8 +139,9 @@ async function DashboardContent() {
       {weeklyPlan?.generation_status === 'generating' && <ZaiJianPanel moment="loading" />}
 
       {weeklyPlan?.generation_status === 'failed' && (
-        <div className="m-4">
+        <div className="m-4 space-y-4">
           <ZaiJian size="md" line={PLAN_FAILED_LINE} layout="bubble" />
+          <GeneratePlanButton />
         </div>
       )}
 

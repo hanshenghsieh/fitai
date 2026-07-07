@@ -30,7 +30,7 @@ export default function BottomNav() {
   const right = sideItems.slice(2)
 
   return (
-    <nav className="app-bottom-nav" style={{ borderTop: `1px solid ${BB_V2.divider}` }}>
+    <nav className="app-bottom-nav" style={{ borderTop: `1px solid ${BB_V2.divider}` }} aria-label="主要導覽">
       <div className="app-bottom-nav__row">
         <div className="flex flex-1 justify-around">
           {left.map(({ href, label, icon: Icon, match }) => {
@@ -41,11 +41,12 @@ export default function BottomNav() {
                 href={href}
                 prefetch
                 onClick={() => dispatchRouteChangeFlush(href)}
-                className="flex flex-col items-center justify-center gap-0.5 min-w-[52px] touch-manipulation"
+                className="flex flex-col items-center justify-center gap-0.5 min-w-[52px] min-h-[44px] touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-lg"
                 style={{ color: active ? BB_V2.accent.orange : BB_V2.text.secondary }}
+                aria-current={active ? 'page' : undefined}
               >
                 <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : BB_V2.iconStroke} />
-                <span className="text-[10px] leading-none" style={{ fontWeight: active ? 600 : 400 }}>
+                <span className="text-[11px] leading-none" style={{ fontWeight: active ? 600 : 400 }}>
                   {label}
                 </span>
               </Link>
@@ -79,11 +80,12 @@ export default function BottomNav() {
                 href={href}
                 prefetch
                 onClick={() => dispatchRouteChangeFlush(href)}
-                className="flex flex-col items-center justify-center gap-0.5 min-w-[52px] touch-manipulation"
+                className="flex flex-col items-center justify-center gap-0.5 min-w-[52px] min-h-[44px] touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-lg"
                 style={{ color: active ? BB_V2.accent.orange : BB_V2.text.secondary }}
+                aria-current={active ? 'page' : undefined}
               >
                 <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : BB_V2.iconStroke} />
-                <span className="text-[10px] leading-none" style={{ fontWeight: active ? 600 : 400 }}>
+                <span className="text-[11px] leading-none" style={{ fontWeight: active ? 600 : 400 }}>
                   {label}
                 </span>
               </Link>

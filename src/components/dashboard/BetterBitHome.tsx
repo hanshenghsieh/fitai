@@ -84,6 +84,12 @@ import Day1GuideBanner, {
   shouldShowDay1Guide,
 } from '@/components/dashboard/today/Day1GuideBanner'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
+import {
+  clearPendingSync,
+  hasPendingSync,
+  isOffline,
+  markPendingSync,
+} from '@/lib/offline-pending-sync'
 import { zaijian } from '@/lib/copy/zaijian'
 import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile } from '@/types'
 
@@ -451,6 +457,11 @@ export default function BetterBitHome({
     if (persistFlushingRef.current) return
     if (Object.keys(persistPatchRef.current).length === 0) return
 
+    if (isOffline()) {
+      markPendingSync(trackedDayKey)
+      return
+    }
+
     persistFlushingRef.current = true
     let sawError = false
 
@@ -479,12 +490,14 @@ export default function BetterBitHome({
           clearFoodLogsSessionCache()
           writeFoodCache(state.userMemory?.food_logs_today ?? [])
           writeWorkoutItemsSessionCache(state.workoutItems)
+          clearPendingSync()
         } catch (err) {
           if (err instanceof DOMException && err.name === 'AbortError') {
             persistPatchRef.current = { ...patch, ...persistPatchRef.current }
             continue
           }
           persistPatchRef.current = { ...patch, ...persistPatchRef.current }
+          markPendingSync(trackedDayKey)
           sawError = true
           break
         }
@@ -492,12 +505,12 @@ export default function BetterBitHome({
     } finally {
       persistFlushingRef.current = false
       persistAbortRef.current = null
-      if (sawError) toast.error(GENTLE_ERROR_MESSAGE)
-      if (Object.keys(persistPatchRef.current).length > 0) {
+      if (sawError && !isOffline()) toast.error(GENTLE_ERROR_MESSAGE)
+      if (Object.keys(persistPatchRef.current).length > 0 && !isOffline()) {
         void flushPersist()
       }
     }
-  }, [buildPersistState, weeklyPlanId, writeFoodCache])
+  }, [buildPersistState, weeklyPlanId, writeFoodCache, trackedDayKey])
 
   const flushPendingPersist = useCallback(() => {
     if (persistTimerRef.current) {
@@ -559,16 +572,24 @@ export default function BetterBitHome({
     const onVisibilityChange = () => {
       if (document.visibilityState === 'hidden') flushPendingPersist()
     }
+    const onOnline = () => flushPendingPersist()
     window.addEventListener('betterbit:route-change', onRouteChange)
     window.addEventListener('pagehide', onPageHide)
+    window.addEventListener('online', onOnline)
     document.addEventListener('visibilitychange', onVisibilityChange)
     return () => {
       window.removeEventListener('betterbit:route-change', onRouteChange)
       window.removeEventListener('pagehide', onPageHide)
+      window.removeEventListener('online', onOnline)
       document.removeEventListener('visibilitychange', onVisibilityChange)
       flushPendingPersist()
     }
   }, [flushPendingPersist])
+
+  useEffect(() => {
+    if (!hasPendingSync(trackedDayKey)) return
+    void flushPendingPersist()
+  }, [flushPendingPersist, trackedDayKey])
 
   const commitWaterMl = useCallback(
     (nextMl: number) => {

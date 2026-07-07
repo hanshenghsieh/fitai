@@ -65,7 +65,7 @@ export default function RecordActionSheet({ open, onClose }: Props) {
               選一種方式記錄今天的飲食
             </p>
           </div>
-          <button type="button" onClick={onClose} className="p-1.5 -mr-1 shrink-0" aria-label="關閉">
+          <button type="button" onClick={onClose} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center -mr-1 shrink-0 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" aria-label="關閉">
             <X className="h-5 w-5" strokeWidth={BB_V2.iconStroke} style={{ color: BB_V2.text.secondary }} />
           </button>
         </div>

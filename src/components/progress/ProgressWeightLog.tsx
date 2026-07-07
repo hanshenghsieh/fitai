@@ -82,7 +82,7 @@ export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSa
             step="0.1"
             value={weight}
             onChange={e => setWeight(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl text-[15px] outline-none"
+            className="w-full px-4 py-3 rounded-xl text-[16px] outline-none"
             style={{
               backgroundColor: BB_V2.bg.pill,
               color: BB_V2.text.primary,

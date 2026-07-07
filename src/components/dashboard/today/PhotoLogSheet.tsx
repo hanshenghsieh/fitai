@@ -125,7 +125,7 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
           <ArrowLeft className="h-4 w-4" strokeWidth={ICON_STROKE} />
           返回
         </button>
-        <button type="button" onClick={onClose} className="p-1.5" aria-label="關閉">
+        <button type="button" onClick={onClose} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" aria-label="關閉">
           <X className="h-5 w-5" strokeWidth={ICON_STROKE} style={{ color: TODAY.textSecondary }} />
         </button>
       </div>
@@ -576,7 +576,7 @@ function ReviewStep({
           <ArrowLeft className="h-4 w-4" strokeWidth={ICON_STROKE} />
           重選照片
         </button>
-        <button type="button" onClick={onClose} className="p-1.5" aria-label="關閉">
+        <button type="button" onClick={onClose} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" aria-label="關閉">
           <X className="h-5 w-5" strokeWidth={ICON_STROKE} style={{ color: TODAY.textSecondary }} />
         </button>
       </div>
@@ -593,7 +593,7 @@ function ReviewStep({
           {draft.previewUrl && !isNativeIOS() ? (
             <img
               src={draft.previewUrl}
-              alt=""
+              alt={draft.name || '食物照片'}
               decoding="async"
               className="absolute inset-0 h-full w-full object-cover"
             />
@@ -648,13 +648,13 @@ function ReviewStep({
         ) : null}
 
         {draft.loading ? (
-          <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
+          <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }} aria-live="polite">
+            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} aria-hidden />
             {draft.previewUrl ? '正在辨識…' : '正在準備照片…'}
           </p>
         ) : draft.matchingNutrition ? (
-          <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} />
+          <p className="text-[14px] flex items-center gap-2" style={{ color: TODAY.textSecondary, fontWeight: 400 }} aria-live="polite">
+            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={ICON_STROKE} aria-hidden />
             載入營養選項…
           </p>
         ) : iosLiteMode && draft.photo_v2 ? (
@@ -797,7 +797,7 @@ function ProcessingStep({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-col flex-1 min-h-[320px]">
       <div className="shrink-0 px-5 pt-5 pb-3 flex items-center justify-end">
-        <button type="button" onClick={onClose} className="p-1.5" aria-label="關閉">
+        <button type="button" onClick={onClose} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" aria-label="關閉">
           <X className="h-5 w-5" strokeWidth={ICON_STROKE} style={{ color: TODAY.textSecondary }} />
         </button>
       </div>

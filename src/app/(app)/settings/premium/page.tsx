@@ -24,7 +24,14 @@ export default async function PremiumPage() {
 
   return (
     <div className="max-w-lg mx-auto" style={{ backgroundColor: colors.bg.canvas }}>
-      <Suspense fallback={null}>
+      <Suspense
+        fallback={
+          <div className="px-5 app-page-top pb-10 animate-pulse space-y-4">
+            <div className="h-8 w-40 rounded-lg" style={{ backgroundColor: colors.bg.elevated }} />
+            <div className="h-48 rounded-2xl" style={{ backgroundColor: colors.bg.elevated }} />
+          </div>
+        }
+      >
         <PremiumScreen access={access} />
       </Suspense>
     </div>

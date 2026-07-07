@@ -52,16 +52,17 @@ export default function LoginPage() {
         >
           <div className="space-y-2">
             <Label htmlFor="email" className="text-[13px]">電子郵件</Label>
-            <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+            <Input id="email" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password" className="text-[13px]">密碼</Label>
-            <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+            <Input id="password" type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl text-[15px] font-semibold disabled:opacity-40"
+            aria-busy={loading}
+            className="w-full py-3 rounded-xl text-[15px] font-semibold disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : '登入'}
