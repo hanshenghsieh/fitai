@@ -55,11 +55,41 @@ export function mergeWeightMeasurementSources(
     const key = keyOf(row)
     if (!seen.has(key)) merged.push(row)
   }
-  return merged.sort((a, b) => {
-    const at = a.created_at ?? a.measured_at
-    const bt = b.created_at ?? b.measured_at
-    return at.localeCompare(bt)
-  })
+  return dedupeSameSaveWeightRows(
+    merged.sort((a, b) => {
+      const at = a.created_at ?? a.measured_at
+      const bt = b.created_at ?? b.measured_at
+      return at.localeCompare(bt)
+    })
+  )
+}
+
+function rowTimestamp(row: WeightMeasurementRow): number {
+  const raw = row.created_at ?? row.measured_at
+  const parsed = Date.parse(raw.length <= 10 ? `${raw}T12:00:00.000Z` : raw)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+/** body_measurements + checkin history for one save often differ by seconds — keep one point. */
+export function dedupeSameSaveWeightRows(rows: WeightMeasurementRow[]): WeightMeasurementRow[] {
+  const out: WeightMeasurementRow[] = []
+  for (const row of rows) {
+    const duplicateIdx = out.findIndex(
+      prev =>
+        prev.measured_at.slice(0, 10) === row.measured_at.slice(0, 10) &&
+        weightsNear(prev.weight_kg, row.weight_kg) &&
+        Math.abs(rowTimestamp(prev) - rowTimestamp(row)) < 120_000
+    )
+    if (duplicateIdx < 0) {
+      out.push(row)
+      continue
+    }
+    const existing = out[duplicateIdx]!
+    if ((row.id && !existing.id) || rowTimestamp(row) >= rowTimestamp(existing)) {
+      out[duplicateIdx] = row.id ? row : existing
+    }
+  }
+  return out
 }
 
 function sleep(ms: number): Promise<void> {

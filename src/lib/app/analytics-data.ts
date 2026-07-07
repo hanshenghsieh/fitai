@@ -42,7 +42,7 @@ export function resolveLatestWeightKg(
   return measurements.at(-1)?.weight_kg ?? null
 }
 
-/** Ensure the weight shown in UI exists as a chart row (profile-only readings). */
+/** Ensure profile-only weight exists as a chart row before the first progress log. */
 export function seedMeasurementsWithVisibleWeight(
   measurements: BodyMeasurement[],
   visibleWeightKg: number | null | undefined,
@@ -50,18 +50,11 @@ export function seedMeasurementsWithVisibleWeight(
   anchorDay?: string
 ): BodyMeasurement[] {
   if (visibleWeightKg == null || !Number.isFinite(visibleWeightKg)) return measurements
-  const hasWeight = measurements.some(
-    m => m.weight_kg != null && Math.abs(m.weight_kg - visibleWeightKg) < 0.05
-  )
-  if (hasWeight) return measurements
+  if (measurements.length > 0) return measurements
 
-  const day =
-    measurements.filter(m => m.measured_at).at(-1)?.measured_at.slice(0, 10) ??
-    anchorDay ??
-    format(new Date(), 'yyyy-MM-dd')
+  const day = anchorDay ?? format(new Date(), 'yyyy-MM-dd')
 
   return [
-    ...measurements,
     {
       id: `visible-weight-${day}-${visibleWeightKg}`,
       user_id: userId,
@@ -72,7 +65,7 @@ export function seedMeasurementsWithVisibleWeight(
       waist_cm: null,
       hip_cm: null,
       chest_cm: null,
-      created_at: `${day}T11:59:00.000Z`,
+      created_at: `${day}T23:59:00.000Z`,
     },
   ]
 }

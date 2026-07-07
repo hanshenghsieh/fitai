@@ -19,7 +19,12 @@ import type { BodyMeasurement } from '@/types'
 import { extractRecentFoodLogsFromCheckins } from '@/lib/food-memory'
 
 export function isSyntheticWeightMeasurementId(id?: string | null): boolean {
-  return id === 'goal-start-weight' || id === 'profile-baseline-weight' || id === 'weight-trend-anchor'
+  return (
+    id === 'goal-start-weight' ||
+    id === 'profile-baseline-weight' ||
+    id === 'weight-trend-anchor' ||
+    id?.startsWith('visible-weight-') === true
+  )
 }
 
 export type AnalysisPeriodType = 'day' | 'week' | 'month'
@@ -312,6 +317,8 @@ function resolveInitialWeightPoint(
 ): BodyMeasurement | null {
   const baselineDay = startDate?.slice(0, 10)
   const latestLog = dedupedAll.at(-1)
+
+  if (dedupedAll.length >= 2) return null
 
   if (startWeightKg != null && baselineDay) {
     const onboardingLog = dedupedAll.find(

@@ -35,4 +35,12 @@ describe('weight-history', () => {
     assert.equal(merged[0]?.weight_kg, 71)
     assert.equal(merged.at(-1)?.weight_kg, 75)
   })
+
+  it('dedupes db and checkin rows from the same save within two minutes', () => {
+    const dbRows = [{ id: 'db-1', measured_at: '2026-07-08', weight_kg: 77, created_at: '2026-07-08T15:30:10.000Z' }]
+    const checkinRows = [{ measured_at: '2026-07-08', weight_kg: 77, created_at: '2026-07-08T15:30:05.000Z' }]
+    const merged = mergeWeightMeasurementSources(dbRows, checkinRows)
+    assert.equal(merged.length, 1)
+    assert.equal(merged[0]?.weight_kg, 77)
+  })
 })

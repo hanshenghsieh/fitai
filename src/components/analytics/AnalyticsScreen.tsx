@@ -40,7 +40,6 @@ import {
   resolveWeightMeasurementsFromSession,
   writeWeightMeasurementsSessionCache,
 } from '@/lib/weight-measurements-session-cache'
-import { seedMeasurementsWithVisibleWeight } from '@/lib/app/analytics-data'
 import ProgressWeightLog from '@/components/progress/ProgressWeightLog'
 
 const WeightTrendChart = dynamic(() => import('@/components/analytics/WeightTrendChart'), {
@@ -229,32 +228,7 @@ export default function AnalyticsScreen({
   const [priorWeightKg, setPriorWeightKg] = useState<number | null>(null)
 
   const userId = measurements[0]?.user_id ?? 'local'
-  const seededServerMeasurements = useMemo(
-    () =>
-      seedMeasurementsWithVisibleWeight(
-        serverMeasurements,
-        effectiveCurrentWeightKg ?? currentWeightKg,
-        userId,
-        todayDate
-      ),
-    [serverMeasurements, effectiveCurrentWeightKg, currentWeightKg, userId, todayDate]
-  )
-  const effectiveMeasurements = useMemo(() => {
-    const base = liveMeasurements ?? seededServerMeasurements
-    return seedMeasurementsWithVisibleWeight(
-      base,
-      effectiveCurrentWeightKg ?? currentWeightKg,
-      userId,
-      todayDate
-    )
-  }, [
-    liveMeasurements,
-    seededServerMeasurements,
-    effectiveCurrentWeightKg,
-    currentWeightKg,
-    userId,
-    todayDate,
-  ])
+  const effectiveMeasurements = liveMeasurements ?? serverMeasurements
 
   const refreshMeasurements = useCallback(
     async (latestWeightKg?: number, clientSnapshot?: BodyMeasurement[]) => {
@@ -270,7 +244,7 @@ export default function AnalyticsScreen({
           clientSnapshot,
           liveMeasurementsRef.current,
           readWeightMeasurementsSessionCache(),
-          seededServerMeasurements,
+          serverMeasurements,
         ]
         const merged = mergeWeightMeasurementsMonotonic(apiRows, ...floor)
         const minExpected = Math.max(...floor.map(f => f?.length ?? 0), 0)
@@ -283,7 +257,7 @@ export default function AnalyticsScreen({
         // ignore — SSR + session cache remain fallback
       }
     },
-    [seededServerMeasurements]
+    [serverMeasurements]
   )
 
   useEffect(() => {
@@ -344,7 +318,7 @@ export default function AnalyticsScreen({
 
   const handleWeightSaved = useCallback(
     async (weightKg: number, savedMeasurements?: BodyMeasurement[]) => {
-      const base = liveMeasurementsRef.current ?? seededServerMeasurements
+      const base = liveMeasurementsRef.current ?? serverMeasurements
       const priorVisible =
         effectiveCurrentWeightKg ??
         base
@@ -358,6 +332,8 @@ export default function AnalyticsScreen({
         !base.some(m => m.weight_kg != null && Math.abs(m.weight_kg - weightKg) < 0.05)
       ) {
         setPriorWeightKg(priorVisible)
+      } else if (Math.abs((priorVisible ?? weightKg) - weightKg) < 0.05) {
+        setPriorWeightKg(null)
       }
       const floor = [base, readWeightMeasurementsSessionCache()]
       const optimistic = appendWeightMeasurementLocal(base, {
@@ -365,11 +341,9 @@ export default function AnalyticsScreen({
         measured_at: todayDate ?? new Date().toISOString().slice(0, 10),
         weight_kg: weightKg,
       })
-      const next = mergeWeightMeasurementsMonotonic(
-        savedMeasurements?.length ? savedMeasurements : optimistic,
-        optimistic,
-        ...floor
-      )
+      const next = savedMeasurements?.length
+        ? mergeWeightMeasurementsMonotonic(savedMeasurements, ...floor)
+        : mergeWeightMeasurementsMonotonic(optimistic, ...floor)
       liveMeasurementsRef.current = next
       writeWeightMeasurementsSessionCache(next)
       setLiveMeasurements(next)
@@ -383,7 +357,7 @@ export default function AnalyticsScreen({
       }
       await refreshMeasurements(weightKg, next)
     },
-    [seededServerMeasurements, refreshMeasurements, userId, todayDate, effectiveCurrentWeightKg]
+    [serverMeasurements, refreshMeasurements, userId, todayDate, effectiveCurrentWeightKg]
   )
 
   if (summary.insufficient_data) {
