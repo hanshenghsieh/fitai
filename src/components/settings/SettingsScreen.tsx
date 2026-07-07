@@ -48,7 +48,6 @@ export default function SettingsScreen({ profile, email, access }: Props) {
     <div className="pb-12">
       <SettingsHeader />
       <SettingsAccountSection
-        profile={profile}
         email={email}
         onRegenPlan={() => void handleRegenPlan()}
         regenLoading={regenLoading}

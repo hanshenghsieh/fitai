@@ -3,6 +3,7 @@ import { getNutritionDayKey } from '@/lib/timezone'
 import { parseCheckinMeta, type CheckinMeta } from '@/lib/checkin-utils'
 
 export type WeightMeasurementRow = {
+  id?: string
   measured_at: string
   weight_kg: number
   created_at?: string

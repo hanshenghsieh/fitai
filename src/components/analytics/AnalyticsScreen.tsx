@@ -1,18 +1,16 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
   Bar,
   BarChart,
   Cell,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ReferenceLine,
   ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
 } from 'recharts'
@@ -24,7 +22,6 @@ import EmptyStateCard from '@/components/ui/EmptyStateCard'
 import {
   buildAnalysisSummary,
   shiftAnalysisAnchor,
-  weightChartYDomain,
   type AnalysisCheckinRow,
   type AnalysisDayPlanHint,
   type AnalysisPeriodType,
@@ -36,7 +33,16 @@ import { buildWorkoutRecommendationStrategy } from '@/lib/recommendation/workout
 import type { BodyMeasurement } from '@/types'
 import { isCapacitorNative } from '@/lib/capacitor-native'
 import { mergeClientBodyMeasurements } from '@/lib/app/analytics-data'
-import ProgressWeightLog from '@/components/progress/ProgressWeightLog'
+import ProgressWeightBlock from '@/components/progress/ProgressWeightBlock'
+
+const WeightTrendChart = dynamic(() => import('@/components/analytics/WeightTrendChart'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full py-8 text-center text-[13px]" style={{ color: BB_V2.text.secondary }}>
+      載入趨勢圖…
+    </div>
+  ),
+})
 
 interface Props {
   measurements: BodyMeasurement[]
@@ -101,28 +107,11 @@ function InsightRow({ tone, title, body }: { tone: 'success' | 'warning' | 'neut
   )
 }
 
-function WeightLogCard({
-  lastWeightKg,
-  onSaved,
-}: {
-  lastWeightKg?: number | null
-  onSaved: (weightKg: number) => void | Promise<void>
-}) {
-  return (
-    <BBCard padding={16}>
-      <ProgressWeightLog embedded lastWeightKg={lastWeightKg} onSaved={onSaved} />
-    </BBCard>
-  )
-}
-
 function WeightTrendSection({
   summary,
 }: {
   summary: ReturnType<typeof buildAnalysisSummary>
 }) {
-  const lastWeight = summary.weightTrend.points.at(-1)
-  const weightYDomain = weightChartYDomain(summary.weightTrend.points)
-
   return (
     <BBCard>
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -149,8 +138,15 @@ function WeightTrendSection({
             </div>
           ) : null}
           <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
-            再記一次，就能看見趨勢。
+            {summary.weightTrend.points.length === 1
+              ? '再記一次，就能看見趨勢。'
+              : '到進步頁上方「記一下體重」開始追蹤。'}
           </p>
+          {summary.weightTrend.points.length === 1 && (
+            <p className="text-[13px] tabular-nums" style={{ color: BB_V2.text.secondary }}>
+              已記 {summary.weightTrend.points.length} 次
+            </p>
+          )}
         </div>
       ) : (
         <>
@@ -170,31 +166,10 @@ function WeightTrendSection({
               </div>
             )}
           </div>
-          <div className="w-full" style={{ minHeight: 120 }}>
-            <ResponsiveContainer width="100%" height={120} minWidth={0}>
-              <LineChart data={summary.weightTrend.points} key={summary.weightTrend.points.length}>
-                <XAxis dataKey="label" hide />
-                <YAxis hide domain={weightYDomain} />
-                <Tooltip
-                  formatter={(value: number) => [`${value.toFixed(1)} kg`, '體重']}
-                  labelFormatter={label => label}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="weight"
-                  stroke={BB_V2.accent.orange}
-                  strokeWidth={2}
-                  dot={{ r: 3, fill: BB_V2.accent.orange }}
-                  isAnimationActive={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          {lastWeight && (
-            <p className="text-[12px] text-right -mt-1" style={{ color: BB_V2.accent.orange, fontWeight: 600 }}>
-              {lastWeight.weight}
-            </p>
-          )}
+          <WeightTrendChart points={summary.weightTrend.points} />
+          <p className="text-[12px] mt-2 text-right" style={{ color: BB_V2.text.secondary }}>
+            共 {summary.weightTrend.points.length} 次紀錄
+          </p>
         </>
       )}
     </BBCard>
@@ -230,10 +205,7 @@ export default function AnalyticsScreen({
       const res = await fetch('/api/measurements', { cache: 'no-store' })
       if (!res.ok) return
       const data = (await res.json()) as { measurements?: BodyMeasurement[] }
-      const merged = mergeClientBodyMeasurements(data.measurements ?? [], checkins, {
-        profileWeightKg: latestWeightKg ?? effectiveCurrentWeightKg ?? null,
-        todayStr: todayDate,
-      })
+      const merged = mergeClientBodyMeasurements(data.measurements ?? [], checkins)
       setLiveMeasurements(merged)
       if (latestWeightKg != null) setLiveCurrentWeightKg(latestWeightKg)
     } catch {
@@ -309,11 +281,11 @@ export default function AnalyticsScreen({
             先記體重，飲食紀錄夠了就能看完整趨勢
           </p>
         </header>
-        <SegmentControl value={periodType} onChange={setPeriodType} />
-        <WeightLogCard
+        <ProgressWeightBlock
           lastWeightKg={summary.weightTrend.previousKg ?? summary.weightTrend.currentKg}
           onSaved={handleWeightSaved}
         />
+        <SegmentControl value={periodType} onChange={setPeriodType} />
         <WeightTrendSection summary={summary} />
         <EmptyStateCard
           title="飲食紀錄還不夠"
@@ -336,12 +308,12 @@ export default function AnalyticsScreen({
         </p>
       </header>
 
-      <SegmentControl value={periodType} onChange={setPeriodType} />
-
-      <WeightLogCard
+      <ProgressWeightBlock
         lastWeightKg={summary.weightTrend.previousKg ?? summary.weightTrend.currentKg}
         onSaved={handleWeightSaved}
       />
+
+      <SegmentControl value={periodType} onChange={setPeriodType} />
 
       <div className="flex items-center justify-between gap-2">
         <button

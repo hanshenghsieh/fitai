@@ -16,7 +16,7 @@ export const PROGRESS_ANALYTICS_LOOKBACK_DAYS = 70
 
 export interface AnalyticsBundle {
   profileWeightKg: number | null
-  measurements: { measured_at: string; weight_kg: number; created_at?: string }[]
+  measurements: { id?: string; measured_at: string; weight_kg: number; created_at?: string }[]
   activeGoal: { target_weight_kg: number | null; start_weight_kg: number | null; start_date: string | null } | null
   checkins: {
     checkin_date: string
@@ -32,7 +32,7 @@ export interface AnalyticsBundle {
 
 /** Prefer today's latest body log, then profile (settings save), then latest historical row. */
 export function resolveLatestWeightKg(
-  measurements: { measured_at: string; weight_kg: number; created_at?: string }[],
+  measurements: { id?: string; measured_at: string; weight_kg: number; created_at?: string }[],
   profileWeightKg: number | null,
   todayStr: string
 ): number | null {
@@ -44,7 +44,7 @@ export function resolveLatestWeightKg(
 
 /** Keep measurements in sync with the resolved latest weight (e.g. profile saved but log lagged). */
 export function mergeTodayWeightMeasurement(
-  measurements: { measured_at: string; weight_kg: number; created_at?: string }[],
+  measurements: { id?: string; measured_at: string; weight_kg: number; created_at?: string }[],
   latestWeightKg: number | null,
   todayStr: string
 ): { measured_at: string; weight_kg: number; created_at?: string }[] {
@@ -74,7 +74,7 @@ export async function loadAnalyticsBundle(
     supabase.from('user_profiles').select('weight_kg').eq('id', userId).single(),
     supabase
       .from('body_measurements')
-      .select('measured_at, weight_kg, created_at')
+      .select('id, measured_at, weight_kg, created_at')
       .eq('user_id', userId)
       .gte('measured_at', since)
       .order('measured_at', { ascending: true })
@@ -131,26 +131,44 @@ export function buildDayPlansByDate(
   return dayPlansByDate
 }
 
+export function mapWeightRowsToMeasurements(
+  rows: WeightMeasurementRow[],
+  userId: string
+): BodyMeasurement[] {
+  return rows.map((row, idx) => ({
+    id: row.id ?? `weight-${row.measured_at}-${row.created_at ?? idx}`,
+    user_id: userId,
+    measured_at: row.measured_at,
+    weight_kg: row.weight_kg,
+    body_fat_pct: null,
+    muscle_mass_kg: null,
+    waist_cm: null,
+    hip_cm: null,
+    chest_cm: null,
+    created_at: row.created_at ?? `${row.measured_at}T12:00:00.000Z`,
+  }))
+}
+
 export function mergeClientBodyMeasurements(
   apiMeasurements: BodyMeasurement[],
-  checkins: { checkin_date: string; notes?: string | null }[],
-  options?: { profileWeightKg?: number | null; todayStr?: string }
+  checkins: { checkin_date: string; notes?: string | null }[]
 ): BodyMeasurement[] {
   const dbRows: WeightMeasurementRow[] = apiMeasurements
     .filter(m => m.weight_kg != null)
     .map(m => ({
+      id: m.id,
       measured_at: m.measured_at,
       weight_kg: m.weight_kg!,
       created_at: m.created_at,
     }))
   const checkinRows = extractWeightHistoryFromCheckins(checkins)
-  let merged = mergeWeightMeasurementSources(dbRows, checkinRows)
-  if (options?.profileWeightKg != null && options.todayStr) {
-    merged = mergeTodayWeightMeasurement(merged, options.profileWeightKg, options.todayStr)
-  }
+  const merged = mergeWeightMeasurementSources(dbRows, checkinRows)
 
   return merged.map((row, idx) => {
     const existing = apiMeasurements.find(
+      m =>
+        m.id && row.id && m.id === row.id
+    ) ?? apiMeasurements.find(
       m =>
         m.measured_at.slice(0, 10) === row.measured_at.slice(0, 10) &&
         m.weight_kg != null &&
@@ -159,7 +177,7 @@ export function mergeClientBodyMeasurements(
     )
     if (existing) return existing
     return {
-      id: `checkin-weight-${row.measured_at}-${row.weight_kg}-${idx}`,
+      id: row.id ?? `checkin-weight-${row.measured_at}-${row.weight_kg}-${idx}`,
       user_id: apiMeasurements[0]?.user_id ?? 'local',
       measured_at: row.measured_at,
       weight_kg: row.weight_kg,

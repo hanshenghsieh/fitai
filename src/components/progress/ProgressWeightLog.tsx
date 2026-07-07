@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
-import { colors } from '@/lib/design-system'
+import { BB_V2 } from '@/lib/betterbit-v2'
 
 interface Props {
   lastWeightKg?: number | null
@@ -14,10 +14,8 @@ interface Props {
 
 export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSaved }: Props) {
   const [expanded, setExpanded] = useState(false)
-  const [showBodyFat, setShowBodyFat] = useState(false)
   const [loading, setLoading] = useState(false)
   const [weight, setWeight] = useState('')
-  const [bodyFat, setBodyFat] = useState('')
   const router = useRouter()
 
   async function handleSubmit() {
@@ -31,18 +29,13 @@ export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSa
       const res = await fetch('/api/measurements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weight_kg: w,
-          body_fat_pct: bodyFat ? parseFloat(bodyFat) : null,
-        }),
+        body: JSON.stringify({ weight_kg: w }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'failed')
 
       setWeight('')
-      setBodyFat('')
       setExpanded(false)
-      setShowBodyFat(false)
       await onSaved?.(w)
       router.refresh()
       toast.message('記下了')
@@ -54,20 +47,13 @@ export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSa
   }
 
   return (
-    <div
-      className={embedded ? 'space-y-3' : 'mx-5 px-4 py-4 rounded-2xl space-y-3'}
-      style={
-        embedded
-          ? undefined
-          : { backgroundColor: colors.bg.elevated, border: `1px solid ${colors.border.subtle}` }
-      }
-    >
+    <div className={embedded ? 'space-y-3' : 'mx-5 px-4 py-4 rounded-2xl space-y-3'}>
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-[15px] font-medium" style={{ color: colors.text.primary }}>
+        <p className="text-[15px] font-medium" style={{ color: BB_V2.text.primary }}>
           記一下體重
         </p>
         {lastWeightKg != null && !expanded && (
-          <span className="text-[13px] tabular-nums" style={{ color: colors.text.tertiary }}>
+          <span className="text-[13px] tabular-nums" style={{ color: BB_V2.text.secondary }}>
             上次 {Number(lastWeightKg).toFixed(1)} kg
           </span>
         )}
@@ -77,8 +63,8 @@ export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSa
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="w-full py-3 rounded-xl text-[15px] font-medium"
-          style={{ backgroundColor: colors.bg.muted, color: colors.text.secondary }}
+          className="w-full py-3 rounded-xl text-[15px] font-medium touch-manipulation"
+          style={{ backgroundColor: BB_V2.bg.pill, color: BB_V2.text.primary }}
         >
           更新
         </button>
@@ -93,42 +79,17 @@ export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSa
             onChange={e => setWeight(e.target.value)}
             className="w-full px-4 py-3 rounded-xl text-[15px] outline-none"
             style={{
-              backgroundColor: colors.bg.muted,
-              color: colors.text.primary,
-              border: `1px solid ${colors.border.subtle}`,
+              backgroundColor: BB_V2.bg.pill,
+              color: BB_V2.text.primary,
+              border: `1px solid ${BB_V2.divider}`,
             }}
           />
-          {!showBodyFat ? (
-            <button
-              type="button"
-              onClick={() => setShowBodyFat(true)}
-              className="text-[13px]"
-              style={{ color: colors.text.tertiary }}
-            >
-              加體脂（選填）
-            </button>
-          ) : (
-            <input
-              type="number"
-              inputMode="decimal"
-              placeholder="體脂 %"
-              step="0.1"
-              value={bodyFat}
-              onChange={e => setBodyFat(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl text-[15px] outline-none"
-              style={{
-                backgroundColor: colors.bg.muted,
-                color: colors.text.primary,
-                border: `1px solid ${colors.border.subtle}`,
-              }}
-            />
-          )}
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => { setExpanded(false); setShowBodyFat(false) }}
-              className="flex-1 py-3 rounded-xl text-[14px] font-medium"
-              style={{ backgroundColor: colors.bg.muted, color: colors.text.secondary }}
+              onClick={() => setExpanded(false)}
+              className="flex-1 py-3 rounded-xl text-[14px] font-medium touch-manipulation"
+              style={{ backgroundColor: BB_V2.bg.pill, color: BB_V2.text.secondary }}
             >
               取消
             </button>
@@ -136,8 +97,8 @@ export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSa
               type="button"
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 py-3 rounded-xl text-[15px] font-medium flex items-center justify-center disabled:opacity-40"
-              style={{ backgroundColor: colors.accent.action, color: colors.bg.elevated }}
+              className="flex-1 py-3 rounded-xl text-[15px] font-medium flex items-center justify-center disabled:opacity-40 touch-manipulation"
+              style={{ backgroundColor: BB_V2.accent.orange, color: '#FFFFFF' }}
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '記一下'}
             </button>

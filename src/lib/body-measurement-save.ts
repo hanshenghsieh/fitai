@@ -1,5 +1,4 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { format, parseISO, subDays } from 'date-fns'
 import { getNutritionDayKey } from '@/lib/timezone'
 import { appendWeightHistoryToCheckin } from '@/lib/weight-history'
 
@@ -23,33 +22,6 @@ export function weightsMatch(a: number, b: number): boolean {
   return Math.abs(a - b) < 0.05
 }
 
-/** Keep prior profile weight in history when user updates — otherwise trend stays at one point. */
-async function backfillPreviousWeightIfMissing(
-  supabase: SupabaseClient,
-  userId: string,
-  previousWeightKg: number,
-  beforeMeasuredAt: string,
-  bodyFatPct?: number | null
-): Promise<void> {
-  const { data: rows, error } = await supabase
-    .from('body_measurements')
-    .select('weight_kg')
-    .eq('user_id', userId)
-
-  if (error) return
-  if (rows?.some(r => r.weight_kg != null && weightsMatch(r.weight_kg, previousWeightKg))) return
-
-  const anchorDay = beforeMeasuredAt.slice(0, 10)
-  const backfillDay = format(subDays(parseISO(anchorDay), 1), 'yyyy-MM-dd')
-
-  await supabase.from('body_measurements').insert({
-    user_id: userId,
-    measured_at: backfillDay,
-    weight_kg: previousWeightKg,
-    body_fat_pct: bodyFatPct ?? null,
-  })
-}
-
 export async function saveProfileWeight(
   supabase: SupabaseClient,
   userId: string,
@@ -70,7 +42,7 @@ export async function saveProfileWeight(
   return { error: null }
 }
 
-/** Best-effort daily log — failures must not block profile weight save. */
+/** Best-effort daily log — always append so each save becomes a chart point. */
 export async function saveBodyMeasurementLog(
   supabase: SupabaseClient,
   userId: string,
@@ -78,38 +50,13 @@ export async function saveBodyMeasurementLog(
 ): Promise<{ error: Error | null }> {
   const measuredAt = body.measured_at ?? getNutritionDayKey()
   const payload = {
+    user_id: userId,
+    measured_at: measuredAt,
     weight_kg: body.weight_kg,
     body_fat_pct: body.body_fat_pct ?? null,
   }
 
-  const { data: existingRows, error: selectError } = await supabase
-    .from('body_measurements')
-    .select('id, weight_kg')
-    .eq('user_id', userId)
-    .eq('measured_at', measuredAt)
-    .order('created_at', { ascending: false })
-    .limit(1)
-
-  if (selectError) return { error: new Error(selectError.message) }
-
-  const latest = existingRows?.[0]
-  if (latest) {
-    if (latest.weight_kg === body.weight_kg) {
-      const { error } = await supabase.from('body_measurements').update(payload).eq('id', latest.id)
-      if (error) return { error: new Error(error.message) }
-      return { error: null }
-    }
-    // Different weight same day — append so progress can draw a trend line.
-    const { error } = await supabase
-      .from('body_measurements')
-      .insert({ user_id: userId, measured_at: measuredAt, ...payload })
-    if (error) return { error: new Error(error.message) }
-    return { error: null }
-  }
-
-  const { error } = await supabase
-    .from('body_measurements')
-    .insert({ user_id: userId, measured_at: measuredAt, ...payload })
+  const { error } = await supabase.from('body_measurements').insert(payload)
   if (error) return { error: new Error(error.message) }
   return { error: null }
 }
@@ -120,25 +67,6 @@ export async function saveBodyMeasurementForUser(
   body: SaveBodyMeasurementInput
 ): Promise<{ error: Error | null; profileSaved: boolean; logSaved: boolean }> {
   const measuredAt = body.measured_at ?? getNutritionDayKey()
-
-  const { data: prevProfile } = await supabase
-    .from('user_profiles')
-    .select('weight_kg, body_fat_pct')
-    .eq('id', userId)
-    .single()
-
-  if (
-    prevProfile?.weight_kg != null &&
-    !weightsMatch(prevProfile.weight_kg, body.weight_kg)
-  ) {
-    await backfillPreviousWeightIfMissing(
-      supabase,
-      userId,
-      prevProfile.weight_kg,
-      measuredAt,
-      prevProfile.body_fat_pct
-    )
-  }
 
   const profileResult = await saveProfileWeight(supabase, userId, body)
   if (profileResult.error) {

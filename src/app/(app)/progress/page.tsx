@@ -9,7 +9,7 @@ import type { WeeklyPlanData } from '@/types'
 import {
   buildDayPlansByDate,
   loadAnalyticsBundle,
-  mergeTodayWeightMeasurement,
+  mapWeightRowsToMeasurements,
   PROGRESS_ANALYTICS_LOOKBACK_DAYS,
   resolveLatestWeightKg,
 } from '@/lib/app/analytics-data'
@@ -51,7 +51,7 @@ async function ProgressContent() {
     bundle.profileWeightKg,
     bundle.todayStr
   )
-  const measurements = mergeTodayWeightMeasurement(bundle.measurements, latestWeight, bundle.todayStr)
+  const measurements = mapWeightRowsToMeasurements(bundle.measurements, user.id)
 
   return (
     <div className="max-w-lg mx-auto pb-10" style={{ backgroundColor: BB_V2.bg.canvas }}>

@@ -140,7 +140,7 @@ describe('analysis-summary', () => {
     assert.ok(summary.insights.some(i => i.tone === 'success'))
   })
 
-  it('shows weight trend from goal start weight when only one log exists', () => {
+  it('does not inject goal start weight when only one log exists', () => {
     const days = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05']
     const checkins = days.map(day =>
       checkin(day, [
@@ -171,13 +171,13 @@ describe('analysis-summary', () => {
       targets: { ...targets, start_weight_kg: 70, start_date: '2026-07-01' },
       currentWeightKg: 68,
     })
-    assert.equal(summary.weightTrend.sufficient, true)
-    assert.equal(summary.weightTrend.points.length, 2)
+    assert.equal(summary.weightTrend.sufficient, false)
+    assert.equal(summary.weightTrend.points.length, 1)
     assert.equal(summary.weightTrend.currentKg, 68)
-    assert.equal(summary.weightTrend.previousKg, 70)
+    assert.equal(summary.weightTrend.previousKg, null)
   })
 
-  it('dedupes duplicate same-day logs so the trend line is not flat', () => {
+  it('keeps each saved log as its own chart point', () => {
     const days = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05', '2026-07-06', '2026-07-07']
     const checkins = days.map(day =>
       checkin(day, [
@@ -200,9 +200,11 @@ describe('analysis-summary', () => {
       targets,
       currentWeightKg: 67,
     })
-    assert.equal(summary.weightTrend.points.length, 2)
+    assert.equal(summary.weightTrend.points.length, 4)
     assert.equal(summary.weightTrend.points[0]?.weight, 68.9)
     assert.equal(summary.weightTrend.points[1]?.weight, 67)
+    assert.equal(summary.weightTrend.points[2]?.weight, 67)
+    assert.equal(summary.weightTrend.points[3]?.weight, 67)
     assert.equal(summary.weightTrend.sufficient, true)
     assert.equal(summary.weightTrend.deltaKg, -1.9)
   })
@@ -245,7 +247,7 @@ describe('analysis-summary', () => {
       { id: '2', user_id: 'u', measured_at: '2026-07-03', weight_kg: 68, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-03T08:00:00Z' },
       { id: '3', user_id: 'u', measured_at: '2026-07-05', weight_kg: 68, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-05T08:00:00Z' },
     ]
-    const trend = buildPeriodWeightTrendMeasurements(measurements, range, 70, '2026-06-01')
+    const trend = buildPeriodWeightTrendMeasurements(measurements, range)
     assert.equal(trend.length, 3)
     assert.equal(trend.some(m => m.id === 'weight-trend-anchor'), false)
   })
