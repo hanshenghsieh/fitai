@@ -57,6 +57,10 @@ import {
   resolveFoodLogsFromSession,
   writeFoodLogsSessionCache,
 } from '@/lib/food-log-session-cache'
+import {
+  resolveWorkoutItemsFromSession,
+  writeWorkoutItemsSessionCache,
+} from '@/lib/workout-items-session-cache'
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
 import { getNutritionDayKey, getPreviousNutritionDayKey } from '@/lib/timezone'
@@ -134,15 +138,16 @@ export default function BetterBitHome({
   const onDashboard = pathname === '/dashboard'
   const [isPending, startTransition] = useTransition()
   const [expandedWorkout, setExpandedWorkout] = useState(false)
-  const [workoutItems, setWorkoutItems] = useState<WorkoutCheckinItem[]>(() =>
-    initWorkoutItems(
-      checkin,
+  const exercises = todayPlan.workout?.main ?? []
+  const [workoutItems, setWorkoutItems] = useState<WorkoutCheckinItem[]>(() => {
+    const planList =
       todayPlan.workout?.main?.map(ex => ({
         exercise_id: ex.exercise_id,
         exercise_name_zh: ex.exercise_name_zh,
       })) ?? []
-    )
-  )
+    const fromServer = initWorkoutItems(checkin, planList)
+    return resolveWorkoutItemsFromSession(fromServer)
+  })
   const [dailyRolls, setDailyRolls] = useState<DailyRollState>(() => dailyRollsFromCheckin(checkin))
   const [mealSuggest, setMealSuggest] = useState<Partial<Record<MealType, MealSuggestState>>>(() =>
     mealSuggestFromCheckin(checkin)
@@ -157,7 +162,6 @@ export default function BetterBitHome({
     return { ...mem, food_logs_today: logs, food_dna: mem.food_dna ?? foodDna }
   })
 
-  const exercises = todayPlan.workout?.main ?? []
   const warmup = todayPlan.workout?.warmup ?? []
   const cooldown = todayPlan.workout?.cooldown ?? []
   const planExerciseList = useMemo(
@@ -463,6 +467,7 @@ export default function BetterBitHome({
           if (json.calorie_bank) setCalorieBank(json.calorie_bank)
           clearFoodLogsSessionCache()
           writeFoodLogsSessionCache(state.userMemory?.food_logs_today ?? [])
+          writeWorkoutItemsSessionCache(state.workoutItems)
         } catch (err) {
           if (err instanceof DOMException && err.name === 'AbortError') {
             persistPatchRef.current = { ...patch, ...persistPatchRef.current }
@@ -493,6 +498,7 @@ export default function BetterBitHome({
       userMemory: userMemoryRef.current,
     }
     writeFoodLogsSessionCache(userMemoryRef.current.food_logs_today ?? [])
+    writeWorkoutItemsSessionCache(workoutItemsRef.current)
     if (persistFlushingRef.current) {
       persistAbortRef.current?.abort()
     }
@@ -512,9 +518,15 @@ export default function BetterBitHome({
       if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
 
       const isFoodLogPatch = patch.userMemory?.food_logs_today !== undefined
-      if (isFoodLogPatch) {
+      const isWorkoutPatch = patch.workoutItems !== undefined
+      if (isFoodLogPatch || isWorkoutPatch) {
         persistTimerRef.current = null
-        writeFoodLogsSessionCache(patch.userMemory!.food_logs_today ?? [])
+        if (isFoodLogPatch) {
+          writeFoodLogsSessionCache(patch.userMemory!.food_logs_today ?? [])
+        }
+        if (isWorkoutPatch) {
+          writeWorkoutItemsSessionCache(patch.workoutItems!)
+        }
         if (persistFlushingRef.current) {
           persistAbortRef.current?.abort()
         }
@@ -532,9 +544,12 @@ export default function BetterBitHome({
 
   useEffect(() => {
     const onRouteChange = () => flushPendingPersist()
+    const onPageHide = () => flushPendingPersist()
     window.addEventListener('betterbit:route-change', onRouteChange)
+    window.addEventListener('pagehide', onPageHide)
     return () => {
       window.removeEventListener('betterbit:route-change', onRouteChange)
+      window.removeEventListener('pagehide', onPageHide)
       flushPendingPersist()
     }
   }, [flushPendingPersist])
@@ -609,8 +624,8 @@ export default function BetterBitHome({
     if (!workoutItemsNeedSync(workoutItemsRef.current, reconciled)) return
     workoutItemsRef.current = reconciled
     setWorkoutItems(reconciled)
-    persist({ workoutItems: reconciled })
-  }, [planExerciseKey, planExerciseList, persist])
+    writeWorkoutItemsSessionCache(reconciled)
+  }, [planExerciseKey, planExerciseList])
 
   const handleClearMealSelection = useCallback((mealType: MealType) => {
     const nextCustom = { ...customEatOutRef.current }
@@ -661,9 +676,10 @@ export default function BetterBitHome({
       )
       workoutItemsRef.current = updated
       setWorkoutItems(updated)
+      writeWorkoutItemsSessionCache(updated)
       persist({ workoutItems: updated })
     })
-  }, [persist])
+  }, [persist, workoutItems])
 
   const isRestDay = exercises.length === 0
   const deleteLogRef = useRef<(id: string) => void>(() => {})

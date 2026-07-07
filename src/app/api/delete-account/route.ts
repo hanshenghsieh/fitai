@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
+import { isAppleIapSubscriptionId } from '@/lib/apple-iap-store'
 
 export async function POST() {
   try {
@@ -21,6 +22,7 @@ export async function POST() {
 
       for (const sub of subs ?? []) {
         if (!sub.stripe_subscription_id) continue
+        if (isAppleIapSubscriptionId(sub.stripe_subscription_id)) continue
         if (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'past_due') {
           await stripe.subscriptions.cancel(sub.stripe_subscription_id)
         }

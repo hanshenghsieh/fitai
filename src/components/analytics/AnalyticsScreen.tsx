@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
   Bar,
@@ -34,6 +34,8 @@ import { buildProgressHeroDisplay } from '@/lib/analytics/progress-display'
 import { buildMealRecommendationStrategy } from '@/lib/recommendation/meal-recommendation-strategy'
 import { buildWorkoutRecommendationStrategy } from '@/lib/recommendation/workout-recommendation-strategy'
 import type { BodyMeasurement } from '@/types'
+import { isCapacitorNative } from '@/lib/capacitor-native'
+import { mergeClientBodyMeasurements } from '@/lib/app/analytics-data'
 import ProgressWeightLog from '@/components/progress/ProgressWeightLog'
 
 interface Props {
@@ -99,6 +101,106 @@ function InsightRow({ tone, title, body }: { tone: 'success' | 'warning' | 'neut
   )
 }
 
+function WeightLogCard({
+  lastWeightKg,
+  onSaved,
+}: {
+  lastWeightKg?: number | null
+  onSaved: (weightKg: number) => void | Promise<void>
+}) {
+  return (
+    <BBCard padding={16}>
+      <ProgressWeightLog embedded lastWeightKg={lastWeightKg} onSaved={onSaved} />
+    </BBCard>
+  )
+}
+
+function WeightTrendSection({
+  summary,
+}: {
+  summary: ReturnType<typeof buildAnalysisSummary>
+}) {
+  const lastWeight = summary.weightTrend.points.at(-1)
+  const weightYDomain = weightChartYDomain(summary.weightTrend.points)
+
+  return (
+    <BBCard>
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <p className="text-[17px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+          體重趨勢
+        </p>
+        {summary.weightTrend.deltaLabel && (
+          <span
+            className="text-[12px] px-2.5 py-1 rounded-full"
+            style={{ backgroundColor: 'rgba(118,182,154,0.15)', color: BB_V2.accent.green, fontWeight: 600 }}
+          >
+            {summary.weightTrend.deltaLabel}
+          </span>
+        )}
+      </div>
+      {!summary.weightTrend.sufficient ? (
+        <div className="py-2 text-center space-y-2">
+          {summary.weightTrend.currentKg != null ? (
+            <div>
+              <p className="text-[12px]" style={{ color: BB_V2.text.secondary }}>目前</p>
+              <p className="text-[22px] tabular-nums" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+                {summary.weightTrend.currentKg.toFixed(1)} kg
+              </p>
+            </div>
+          ) : null}
+          <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
+            再記一次，就能看見趨勢。
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="flex gap-6 mb-4">
+            <div>
+              <p className="text-[12px]" style={{ color: BB_V2.text.secondary }}>目前</p>
+              <p className="text-[22px] tabular-nums" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+                {summary.weightTrend.currentKg?.toFixed(1)} kg
+              </p>
+            </div>
+            {summary.weightTrend.targetKg != null && (
+              <div>
+                <p className="text-[12px]" style={{ color: BB_V2.text.secondary }}>目標</p>
+                <p className="text-[22px] tabular-nums" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+                  {summary.weightTrend.targetKg.toFixed(1)} kg
+                </p>
+              </div>
+            )}
+          </div>
+          <div className="w-full" style={{ minHeight: 120 }}>
+            <ResponsiveContainer width="100%" height={120} minWidth={0}>
+              <LineChart data={summary.weightTrend.points} key={summary.weightTrend.points.length}>
+                <XAxis dataKey="label" hide />
+                <YAxis hide domain={weightYDomain} />
+                <Tooltip
+                  formatter={(value: number) => [`${value.toFixed(1)} kg`, '體重']}
+                  labelFormatter={label => label}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="weight"
+                  stroke={BB_V2.accent.orange}
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: BB_V2.accent.orange }}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          {lastWeight && (
+            <p className="text-[12px] text-right -mt-1" style={{ color: BB_V2.accent.orange, fontWeight: 600 }}>
+              {lastWeight.weight}
+            </p>
+          )}
+        </>
+      )}
+    </BBCard>
+  )
+}
+
 export default function AnalyticsScreen({
   measurements,
   checkins,
@@ -111,6 +213,38 @@ export default function AnalyticsScreen({
   const [periodType, setPeriodType] = useState<AnalysisPeriodType>('week')
   const [anchorDate, setAnchorDate] = useState(() => new Date())
   const [showDetails, setShowDetails] = useState(false)
+  const [liveMeasurements, setLiveMeasurements] = useState<BodyMeasurement[] | null>(null)
+  const [liveCurrentWeightKg, setLiveCurrentWeightKg] = useState<number | null | undefined>(undefined)
+
+  const effectiveMeasurements = liveMeasurements ?? measurements
+  const effectiveCurrentWeightKg =
+    liveCurrentWeightKg !== undefined ? liveCurrentWeightKg : currentWeightKg
+
+  useEffect(() => {
+    setLiveMeasurements(null)
+    setLiveCurrentWeightKg(undefined)
+  }, [measurements, currentWeightKg])
+
+  const refreshMeasurements = useCallback(async (latestWeightKg?: number) => {
+    try {
+      const res = await fetch('/api/measurements', { cache: 'no-store' })
+      if (!res.ok) return
+      const data = (await res.json()) as { measurements?: BodyMeasurement[] }
+      const merged = mergeClientBodyMeasurements(data.measurements ?? [], checkins, {
+        profileWeightKg: latestWeightKg ?? effectiveCurrentWeightKg ?? null,
+        todayStr: todayDate,
+      })
+      setLiveMeasurements(merged)
+      if (latestWeightKg != null) setLiveCurrentWeightKg(latestWeightKg)
+    } catch {
+      // ignore — SSR props remain fallback
+    }
+  }, [checkins, effectiveCurrentWeightKg, todayDate])
+
+  useEffect(() => {
+    if (!isCapacitorNative()) return
+    void refreshMeasurements()
+  }, [refreshMeasurements])
 
   const summary = useMemo(
     () =>
@@ -118,13 +252,22 @@ export default function AnalyticsScreen({
         periodType,
         anchorDate,
         todayDate,
-        measurements,
+        measurements: effectiveMeasurements,
         checkins,
         targets,
         dayPlansByDate,
-        currentWeightKg,
+        currentWeightKg: effectiveCurrentWeightKg,
       }),
-    [periodType, anchorDate, todayDate, measurements, checkins, targets, dayPlansByDate, currentWeightKg]
+    [
+      periodType,
+      anchorDate,
+      todayDate,
+      effectiveMeasurements,
+      checkins,
+      targets,
+      dayPlansByDate,
+      effectiveCurrentWeightKg,
+    ]
   )
 
   const hero = useMemo(() => buildProgressHeroDisplay(summary), [summary])
@@ -150,25 +293,37 @@ export default function AnalyticsScreen({
     { name: '點心', pct: summary.calorieDistribution.snackPct, kcal: summary.calorieDistribution.snackKcal },
   ]
 
+  const handleWeightSaved = useCallback(
+    (weightKg: number) => refreshMeasurements(weightKg),
+    [refreshMeasurements]
+  )
+
   if (summary.insufficient_data) {
     return (
-      <div className="px-5 app-page-top pb-10 space-y-6 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
-        <h1 className="text-[22px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-          進步
-        </h1>
+      <div className="px-5 app-page-top pb-10 space-y-5 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
+        <header>
+          <h1 className="text-[22px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
+            進步
+          </h1>
+          <p className="text-[14px] mt-1" style={{ color: BB_V2.text.secondary }}>
+            先記體重，飲食紀錄夠了就能看完整趨勢
+          </p>
+        </header>
         <SegmentControl value={periodType} onChange={setPeriodType} />
+        <WeightLogCard
+          lastWeightKg={summary.weightTrend.previousKg ?? summary.weightTrend.currentKg}
+          onSaved={handleWeightSaved}
+        />
+        <WeightTrendSection summary={summary} />
         <EmptyStateCard
-          title="還沒有足夠資料"
-          reason={summary.insufficient_reason ?? '先記錄今天第一餐，BetterBit 就能幫你看趨勢。'}
+          title="飲食紀錄還不夠"
+          reason={summary.insufficient_reason ?? '先記錄今天第一餐，BetterBit 就能幫你看熱量趨勢。'}
           ctaLabel="回到今天"
           ctaHref="/dashboard"
         />
       </div>
     )
   }
-
-  const lastWeight = summary.weightTrend.points.at(-1)
-  const weightYDomain = weightChartYDomain(summary.weightTrend.points)
 
   return (
     <div className="px-5 app-page-top pb-10 space-y-5 max-w-lg mx-auto" style={{ fontFamily: BB_V2.font }}>
@@ -182,6 +337,11 @@ export default function AnalyticsScreen({
       </header>
 
       <SegmentControl value={periodType} onChange={setPeriodType} />
+
+      <WeightLogCard
+        lastWeightKg={summary.weightTrend.previousKg ?? summary.weightTrend.currentKg}
+        onSaved={handleWeightSaved}
+      />
 
       <div className="flex items-center justify-between gap-2">
         <button
@@ -220,83 +380,8 @@ export default function AnalyticsScreen({
         </p>
       </BBCard>
 
-      {/* Weight trend */}
-      <BBCard>
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <p className="text-[17px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-            體重趨勢
-          </p>
-          {summary.weightTrend.deltaLabel && (
-            <span
-              className="text-[12px] px-2.5 py-1 rounded-full"
-              style={{ backgroundColor: 'rgba(118,182,154,0.15)', color: BB_V2.accent.green, fontWeight: 600 }}
-            >
-              {summary.weightTrend.deltaLabel}
-            </span>
-          )}
-        </div>
-        {!summary.weightTrend.sufficient ? (
-          <div className="py-4 text-center space-y-2">
-            {summary.weightTrend.currentKg != null ? (
-              <div>
-                <p className="text-[12px]" style={{ color: BB_V2.text.secondary }}>目前</p>
-                <p className="text-[22px] tabular-nums" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-                  {summary.weightTrend.currentKg.toFixed(1)} kg
-                </p>
-              </div>
-            ) : null}
-            <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
-              再記一次，就能看見趨勢。
-            </p>
-            <ProgressWeightLog
-              embedded
-              lastWeightKg={summary.weightTrend.previousKg}
-            />
-          </div>
-        ) : (
-          <>
-            <div className="flex gap-6 mb-4">
-              <div>
-                <p className="text-[12px]" style={{ color: BB_V2.text.secondary }}>目前</p>
-                <p className="text-[22px] tabular-nums" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-                  {summary.weightTrend.currentKg?.toFixed(1)} kg
-                </p>
-              </div>
-              {summary.weightTrend.targetKg != null && (
-                <div>
-                  <p className="text-[12px]" style={{ color: BB_V2.text.secondary }}>目標</p>
-                  <p className="text-[22px] tabular-nums" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
-                    {summary.weightTrend.targetKg.toFixed(1)} kg
-                  </p>
-                </div>
-              )}
-            </div>
-            <ResponsiveContainer width="100%" height={120}>
-              <LineChart data={summary.weightTrend.points}>
-                <XAxis dataKey="label" hide />
-                <YAxis hide domain={weightYDomain} />
-                <Tooltip
-                  formatter={(value: number) => [`${value.toFixed(1)} kg`, '體重']}
-                  labelFormatter={label => label}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="weight"
-                  stroke={BB_V2.accent.orange}
-                  strokeWidth={2}
-                  dot={{ r: 3, fill: BB_V2.accent.orange }}
-                  isAnimationActive={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-            {lastWeight && (
-              <p className="text-[12px] text-right -mt-1" style={{ color: BB_V2.accent.orange, fontWeight: 600 }}>
-                {lastWeight.weight}
-              </p>
-            )}
-          </>
-        )}
-      </BBCard>
+      {/* Weight trend chart */}
+      <WeightTrendSection summary={summary} />
 
       {/* Calorie trend */}
       <BBCard>

@@ -1,3 +1,4 @@
+import { isAppleIapEnabled } from '@/lib/apple-iap-config'
 import { isAppStoreSafeMode } from '@/lib/app-store-safe-mode'
 import { isCapacitorNative } from '@/lib/capacitor-native'
 
@@ -27,7 +28,16 @@ export function shouldBlockExternalPaymentsOnServer(headers: HeaderLike): boolea
 
 /** Server-side: unlock full features on iOS until Apple IAP ships. */
 export function shouldGrantFullAccessPreIap(headers: HeaderLike): boolean {
+  if (isAppleIapEnabled()) return false
   return shouldBlockExternalPaymentsOnServer(headers)
+}
+
+/** Client-side: show Apple IAP subscribe / restore UI on native iOS. */
+export function shouldShowAppleIapClient(): boolean {
+  if (!isAppleIapEnabled()) return false
+  if (typeof window === 'undefined') return false
+  if (isCapacitorNative()) return true
+  return hasIosPlatformCookie(document.cookie)
 }
 
 /** Client-side: hide payment CTAs in Capacitor iOS or App Store safe mode builds. */

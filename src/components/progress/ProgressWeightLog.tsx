@@ -9,9 +9,10 @@ import { colors } from '@/lib/design-system'
 interface Props {
   lastWeightKg?: number | null
   embedded?: boolean
+  onSaved?: (weightKg: number) => void | Promise<void>
 }
 
-export default function ProgressWeightLog({ lastWeightKg, embedded = false }: Props) {
+export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSaved }: Props) {
   const [expanded, setExpanded] = useState(false)
   const [showBodyFat, setShowBodyFat] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -42,6 +43,7 @@ export default function ProgressWeightLog({ lastWeightKg, embedded = false }: Pr
       setBodyFat('')
       setExpanded(false)
       setShowBodyFat(false)
+      await onSaved?.(w)
       router.refresh()
       toast.message('記下了')
     } catch {

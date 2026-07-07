@@ -1,3 +1,4 @@
+import { isAppleIapEnabled } from '@/lib/apple-iap-config'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { TRIAL_DAYS } from '@/lib/subscription-access'
 import { isCapacitorNative } from '@/lib/capacitor-native'
@@ -20,6 +21,7 @@ export interface ReviewAccessOptions {
 }
 
 function shouldGrantReviewFullAccess(options?: ReviewAccessOptions): boolean {
+  if (isAppleIapEnabled()) return false
   if (isAppStoreSafeMode()) return true
   if (options?.iosNativeReview) return true
   if (typeof window !== 'undefined' && isCapacitorNative()) return true

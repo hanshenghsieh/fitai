@@ -2,10 +2,12 @@ import { format, startOfWeek, subDays } from 'date-fns'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getNutritionDayKey } from '@/lib/timezone'
 import type { WeeklyPlanData } from '@/types'
+import type { BodyMeasurement } from '@/types'
 import type { AnalysisDayPlanHint } from '@/lib/analytics/analysis-summary'
 import {
   extractWeightHistoryFromCheckins,
   mergeWeightMeasurementSources,
+  type WeightMeasurementRow,
 } from '@/lib/weight-history'
 
 /** Week view only needs ~4 weeks of check-ins; analytics month nav needs ~10 weeks. */
@@ -48,8 +50,7 @@ export function mergeTodayWeightMeasurement(
 ): { measured_at: string; weight_kg: number; created_at?: string }[] {
   if (latestWeightKg == null) return measurements
   const todayRows = measurements.filter(m => m.measured_at.slice(0, 10) === todayStr)
-  const latestToday = todayRows.at(-1)?.weight_kg
-  if (latestToday === latestWeightKg) return measurements
+  if (todayRows.some(m => Math.abs(m.weight_kg - latestWeightKg) < 0.05)) return measurements
   return [...measurements, { measured_at: todayStr, weight_kg: latestWeightKg }]
 }
 
@@ -128,4 +129,46 @@ export function buildDayPlansByDate(
     }
   }
   return dayPlansByDate
+}
+
+export function mergeClientBodyMeasurements(
+  apiMeasurements: BodyMeasurement[],
+  checkins: { checkin_date: string; notes?: string | null }[],
+  options?: { profileWeightKg?: number | null; todayStr?: string }
+): BodyMeasurement[] {
+  const dbRows: WeightMeasurementRow[] = apiMeasurements
+    .filter(m => m.weight_kg != null)
+    .map(m => ({
+      measured_at: m.measured_at,
+      weight_kg: m.weight_kg!,
+      created_at: m.created_at,
+    }))
+  const checkinRows = extractWeightHistoryFromCheckins(checkins)
+  let merged = mergeWeightMeasurementSources(dbRows, checkinRows)
+  if (options?.profileWeightKg != null && options.todayStr) {
+    merged = mergeTodayWeightMeasurement(merged, options.profileWeightKg, options.todayStr)
+  }
+
+  return merged.map((row, idx) => {
+    const existing = apiMeasurements.find(
+      m =>
+        m.measured_at.slice(0, 10) === row.measured_at.slice(0, 10) &&
+        m.weight_kg != null &&
+        Math.abs(m.weight_kg - row.weight_kg) < 0.05 &&
+        (!row.created_at || m.created_at === row.created_at)
+    )
+    if (existing) return existing
+    return {
+      id: `checkin-weight-${row.measured_at}-${row.weight_kg}-${idx}`,
+      user_id: apiMeasurements[0]?.user_id ?? 'local',
+      measured_at: row.measured_at,
+      weight_kg: row.weight_kg,
+      body_fat_pct: null,
+      muscle_mass_kg: null,
+      waist_cm: null,
+      hip_cm: null,
+      chest_cm: null,
+      created_at: row.created_at ?? `${row.measured_at}T12:00:00.000Z`,
+    }
+  })
 }

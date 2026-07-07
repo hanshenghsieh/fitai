@@ -47,6 +47,16 @@ describe('subscription-access', () => {
     assert.equal(isPremiumSubscription({ status: 'active', subscription_source: 'stripe' }), true)
   })
 
+  it('infers apple_iap from synthetic subscription id', () => {
+    assert.equal(
+      isPremiumSubscription({
+        status: 'active',
+        stripe_subscription_id: 'apple_iap_tx123',
+      }),
+      true
+    )
+  })
+
   it('does not grant premium when trial expired and no subscription', () => {
     const access = getAccessStatus('2020-01-01T00:00:00.000Z', null, {
       userEmail: 'user@example.com',

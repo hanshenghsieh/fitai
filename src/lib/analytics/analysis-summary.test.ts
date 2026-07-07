@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildAnalysisSummary, resolveAnalysisDateRange } from './analysis-summary'
+import { buildAnalysisSummary, buildPeriodWeightTrendMeasurements, resolveAnalysisDateRange } from './analysis-summary'
 import type { AnalysisCheckinRow } from './analysis-summary'
 
 const targets = {
@@ -232,6 +232,22 @@ describe('analysis-summary', () => {
     assert.equal(summary.weightTrend.points.length, 2)
     assert.equal(summary.weightTrend.currentKg, 65)
     assert.equal(summary.weightTrend.previousKg, 70)
+  })
+
+  it('does not inject a synthetic anchor when multiple days already exist in period', () => {
+    const range = {
+      start: '2026-07-01',
+      end: '2026-07-07',
+      label: 'week',
+    }
+    const measurements = [
+      { id: '1', user_id: 'u', measured_at: '2026-07-01', weight_kg: 68, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-01T08:00:00Z' },
+      { id: '2', user_id: 'u', measured_at: '2026-07-03', weight_kg: 68, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-03T08:00:00Z' },
+      { id: '3', user_id: 'u', measured_at: '2026-07-05', weight_kg: 68, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-05T08:00:00Z' },
+    ]
+    const trend = buildPeriodWeightTrendMeasurements(measurements, range, 70, '2026-06-01')
+    assert.equal(trend.length, 3)
+    assert.equal(trend.some(m => m.id === 'weight-trend-anchor'), false)
   })
 
   it('paces weekly water goal by elapsed days in the week', () => {

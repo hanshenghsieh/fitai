@@ -7,8 +7,9 @@ import { Check, Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
 import { getStripePriceId, SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
-import { shouldHideExternalPaymentsClient } from '@/lib/ios-payment-gate'
+import { shouldHideExternalPaymentsClient, shouldShowAppleIapClient } from '@/lib/ios-payment-gate'
 import SettingsSection from './SettingsSection'
+import AppleIapSubscriptionSection from './AppleIapSubscriptionSection'
 
 interface Props {
   access: AccessStatus
@@ -86,6 +87,14 @@ export default function SettingsSubscriptionSection({ access }: Props) {
   }
 
   const isSubscribed = subscription?.status === 'active'
+
+  if (shouldShowAppleIapClient()) {
+    return (
+      <SettingsSection title="會員" description="不是付費牆，是持續照顧。">
+        <AppleIapSubscriptionSection access={access} compact />
+      </SettingsSection>
+    )
+  }
 
   if (shouldHideExternalPaymentsClient()) return null
 

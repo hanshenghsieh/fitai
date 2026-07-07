@@ -18,6 +18,14 @@ import type { FoodLogEntry } from '@/lib/banks/types'
 import type { BodyMeasurement } from '@/types'
 import { extractRecentFoodLogsFromCheckins } from '@/lib/food-memory'
 
+export function isSyntheticWeightMeasurementId(id?: string | null): boolean {
+  return id === 'goal-start-weight' || id === 'weight-trend-anchor'
+}
+
+function countDistinctWeightDays(measurements: BodyMeasurement[]): number {
+  return new Set(measurements.map(m => m.measured_at.slice(0, 10))).size
+}
+
 export type AnalysisPeriodType = 'day' | 'week' | 'month'
 
 export interface AnalysisTargets {
@@ -315,7 +323,7 @@ export function buildPeriodWeightTrendMeasurements(
     return Math.max(...ws) - Math.min(...ws)
   }
 
-  if (weightSpread(inPeriod) < 0.05) {
+  if (weightSpread(inPeriod) < 0.05 && countDistinctWeightDays(inPeriod) < 2) {
     const beforePeriod = dedupedAll.filter(m => m.measured_at.slice(0, 10) < range.start)
     const prior = beforePeriod.at(-1)
     const anchorWeight = prior?.weight_kg ?? startWeightKg ?? null

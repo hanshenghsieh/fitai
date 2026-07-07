@@ -23,4 +23,5 @@ export interface SubscriptionRecord {
 }
 
 /** Production DB may not have subscription_source/plan yet — status alone gates access. */
-export const SUBSCRIPTION_ACCESS_FIELDS = 'status, stripe_subscription_id' as const
+export const SUBSCRIPTION_ACCESS_FIELDS =
+  'status, stripe_subscription_id, subscription_source, plan, current_period_end' as const

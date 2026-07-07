@@ -4,6 +4,7 @@ import {
   type SubscriptionRecord,
   type SubscriptionSource,
 } from '@/lib/subscription-types'
+import { isAppleIapSubscriptionId } from '@/lib/apple-iap-store'
 
 export const TRIAL_DAYS = 14
 
@@ -31,6 +32,15 @@ export function isGrantedPremiumSource(source?: string | null): boolean {
   return GRANTED_SOURCES.has(source)
 }
 
+function inferSubscriptionSource(subscription: SubscriptionRecord): SubscriptionSource | string {
+  if (subscription.subscription_source) return subscription.subscription_source
+  const id = subscription.stripe_subscription_id
+  if (isAppleIapSubscriptionId(id)) return 'apple_iap'
+  if (id?.startsWith('manual_grant_')) return 'manual_grant'
+  if (id?.startsWith('apple_review_demo_')) return 'apple_review_demo'
+  return 'stripe'
+}
+
 export function isAppleReviewDemoEmail(email?: string | null): boolean {
   return email?.toLowerCase() === APPLE_REVIEW_DEMO_EMAIL
 }
@@ -39,9 +49,7 @@ export function isPremiumSubscription(subscription: SubscriptionRecord | null | 
   if (!subscription) return false
 
   const status = subscription.subscription_status ?? subscription.status
-  const source =
-    subscription.subscription_source ??
-    (subscription.stripe_subscription_id?.startsWith('manual_grant_') ? 'manual_grant' : 'stripe')
+  const source = inferSubscriptionSource(subscription)
 
   if (subscription.is_premium === true) return true
   if (!isGrantedPremiumSource(source)) return false

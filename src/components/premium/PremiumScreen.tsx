@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { ChevronLeft, Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
-import { shouldHideExternalPaymentsClient } from '@/lib/ios-payment-gate'
+import { shouldHideExternalPaymentsClient, shouldShowAppleIapClient } from '@/lib/ios-payment-gate'
 import { getStripePriceId, SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
 import {
   PREMIUM_BODY,
@@ -21,6 +21,7 @@ import {
 import { isCapacitorNative } from '@/lib/capacitor-native'
 import LegalLinksRow from '@/components/legal/LegalLinksRow'
 import PremiumTestFlightScreen from '@/components/premium/PremiumTestFlightScreen'
+import AppleIapSubscriptionSection from '@/components/settings/AppleIapSubscriptionSection'
 
 interface Props {
   access: AccessStatus
@@ -41,10 +42,16 @@ function PremiumFeatureList() {
 
 export default function PremiumScreen({ access }: Props) {
   const [hidePayments, setHidePayments] = useState(shouldHideExternalPaymentsClient())
+  const [showAppleIap, setShowAppleIap] = useState(shouldShowAppleIapClient())
 
   useEffect(() => {
     setHidePayments(shouldHideExternalPaymentsClient())
+    setShowAppleIap(shouldShowAppleIapClient())
   }, [])
+
+  if (showAppleIap) {
+    return <AppleIapSubscriptionSection access={access} />
+  }
 
   if (hidePayments) {
     return <PremiumTestFlightScreen />

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Home, CalendarDays, LineChart, User, NotebookPen } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { dispatchOpenRecordSheet } from '@/lib/today-actions'
+import { dispatchRouteChangeFlush } from '@/lib/route-change-flush'
 
 const sideItems = [
   { href: '/dashboard', label: '今日', icon: Home, match: (p: string) => p === '/dashboard' },
@@ -39,6 +40,7 @@ export default function BottomNav() {
                 key={href}
                 href={href}
                 prefetch
+                onClick={() => dispatchRouteChangeFlush(href)}
                 className="flex flex-col items-center justify-center gap-0.5 min-w-[52px] touch-manipulation"
                 style={{ color: active ? BB_V2.accent.orange : BB_V2.text.secondary }}
               >
@@ -76,6 +78,7 @@ export default function BottomNav() {
                 key={href}
                 href={href}
                 prefetch
+                onClick={() => dispatchRouteChangeFlush(href)}
                 className="flex flex-col items-center justify-center gap-0.5 min-w-[52px] touch-manipulation"
                 style={{ color: active ? BB_V2.accent.orange : BB_V2.text.secondary }}
               >
