@@ -47,7 +47,7 @@ export async function saveBodyMeasurementLog(
   supabase: SupabaseClient,
   userId: string,
   body: SaveBodyMeasurementInput
-): Promise<{ error: Error | null }> {
+): Promise<{ error: Error | null; row?: { id: string; measured_at: string; weight_kg: number; created_at: string } }> {
   const measuredAt = body.measured_at ?? getNutritionDayKey()
   const payload = {
     user_id: userId,
@@ -56,28 +56,58 @@ export async function saveBodyMeasurementLog(
     body_fat_pct: body.body_fat_pct ?? null,
   }
 
-  const { error } = await supabase.from('body_measurements').insert(payload)
+  const { data, error } = await supabase
+    .from('body_measurements')
+    .insert(payload)
+    .select('id, measured_at, weight_kg, created_at')
+    .single()
   if (error) return { error: new Error(error.message) }
-  return { error: null }
+  return {
+    error: null,
+    row: {
+      id: data.id,
+      measured_at: data.measured_at,
+      weight_kg: Number(data.weight_kg),
+      created_at: data.created_at,
+    },
+  }
 }
 
 export async function saveBodyMeasurementForUser(
   supabase: SupabaseClient,
   userId: string,
   body: SaveBodyMeasurementInput
-): Promise<{ error: Error | null; profileSaved: boolean; logSaved: boolean }> {
+): Promise<{
+  error: Error | null
+  profileSaved: boolean
+  logSaved: boolean
+  historySaved: boolean
+  row?: { id: string; measured_at: string; weight_kg: number; created_at: string }
+}> {
   const measuredAt = body.measured_at ?? getNutritionDayKey()
 
   const profileResult = await saveProfileWeight(supabase, userId, body)
   if (profileResult.error) {
-    return { error: profileResult.error, profileSaved: false, logSaved: false }
+    return { error: profileResult.error, profileSaved: false, logSaved: false, historySaved: false }
+  }
+
+  const historyResult = await appendWeightHistoryToCheckin(supabase, userId, body.weight_kg)
+  if (historyResult.error) {
+    return {
+      error: historyResult.error,
+      profileSaved: true,
+      logSaved: false,
+      historySaved: false,
+    }
   }
 
   const logResult = await saveBodyMeasurementLog(supabase, userId, { ...body, measured_at: measuredAt })
-  const historyResult = await appendWeightHistoryToCheckin(supabase, userId, body.weight_kg)
+
   return {
     error: null,
     profileSaved: true,
-    logSaved: !logResult.error || !historyResult.error,
+    logSaved: !logResult.error,
+    historySaved: true,
+    row: logResult.row,
   }
 }

@@ -69,6 +69,7 @@ async function ProgressContent() {
         }}
         dayPlansByDate={dayPlansByDate}
         currentWeightKg={latestWeight}
+        profileWeightKg={bundle.profileWeightKg}
         plannedWorkoutTitle={plannedWorkoutTitle}
         todayDate={bundle.todayStr}
       />

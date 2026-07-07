@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
   Bar,
@@ -15,6 +15,7 @@ import {
   YAxis,
 } from 'recharts'
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react'
+import { toast } from 'sonner'
 import BBIcon from '@/components/icons/BBIcon'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import BBCard from '@/components/ui/BBCard'
@@ -32,7 +33,13 @@ import { buildMealRecommendationStrategy } from '@/lib/recommendation/meal-recom
 import { buildWorkoutRecommendationStrategy } from '@/lib/recommendation/workout-recommendation-strategy'
 import type { BodyMeasurement } from '@/types'
 import { isCapacitorNative } from '@/lib/capacitor-native'
-import { mergeClientBodyMeasurements } from '@/lib/app/analytics-data'
+import {
+  appendWeightMeasurementLocal,
+  mergeWeightMeasurementsMonotonic,
+  readWeightMeasurementsSessionCache,
+  resolveWeightMeasurementsFromSession,
+  writeWeightMeasurementsSessionCache,
+} from '@/lib/weight-measurements-session-cache'
 import ProgressWeightLog from '@/components/progress/ProgressWeightLog'
 
 const WeightTrendChart = dynamic(() => import('@/components/analytics/WeightTrendChart'), {
@@ -50,6 +57,7 @@ interface Props {
   targets: AnalysisTargets
   dayPlansByDate?: Record<string, AnalysisDayPlanHint>
   currentWeightKg?: number | null
+  profileWeightKg?: number | null
   plannedWorkoutTitle?: string
   todayDate?: string
 }
@@ -189,6 +197,7 @@ export default function AnalyticsScreen({
   targets,
   dayPlansByDate,
   currentWeightKg,
+  profileWeightKg,
   plannedWorkoutTitle,
   todayDate,
 }: Props) {
@@ -197,28 +206,55 @@ export default function AnalyticsScreen({
   const [showDetails, setShowDetails] = useState(false)
   const [liveMeasurements, setLiveMeasurements] = useState<BodyMeasurement[] | null>(null)
   const [liveCurrentWeightKg, setLiveCurrentWeightKg] = useState<number | null | undefined>(undefined)
+  const liveMeasurementsRef = useRef<BodyMeasurement[] | null>(null)
 
-  const effectiveMeasurements = liveMeasurements ?? measurements
-  const effectiveCurrentWeightKg =
-    liveCurrentWeightKg !== undefined ? liveCurrentWeightKg : currentWeightKg
+  const serverMeasurements = useMemo(
+    () => resolveWeightMeasurementsFromSession(measurements),
+    [measurements]
+  )
+  const effectiveMeasurements = liveMeasurements ?? serverMeasurements
 
   useEffect(() => {
-    setLiveMeasurements(null)
-    setLiveCurrentWeightKg(undefined)
-  }, [measurements, currentWeightKg])
+    liveMeasurementsRef.current = liveMeasurements
+  }, [liveMeasurements])
+  const effectiveCurrentWeightKg =
+    liveCurrentWeightKg !== undefined ? liveCurrentWeightKg : currentWeightKg
+  const profileWeightRef = useRef(profileWeightKg)
+  useEffect(() => {
+    if (profileWeightKg != null) profileWeightRef.current = profileWeightKg
+  }, [profileWeightKg])
+  const trendProfileWeightKg = profileWeightRef.current ?? profileWeightKg
+  const priorWeightRef = useRef<number | null>(null)
 
-  const refreshMeasurements = useCallback(async (latestWeightKg?: number) => {
-    try {
-      const res = await fetch('/api/measurements', { cache: 'no-store' })
-      if (!res.ok) return
-      const data = (await res.json()) as { measurements?: BodyMeasurement[] }
-      const merged = mergeClientBodyMeasurements(data.measurements ?? [], checkins)
-      setLiveMeasurements(merged)
-      if (latestWeightKg != null) setLiveCurrentWeightKg(latestWeightKg)
-    } catch {
-      // ignore — SSR props remain fallback
-    }
-  }, [checkins, effectiveCurrentWeightKg, todayDate])
+  const refreshMeasurements = useCallback(
+    async (latestWeightKg?: number, clientSnapshot?: BodyMeasurement[]) => {
+      try {
+        const res = await fetch('/api/measurements', {
+          cache: 'no-store',
+          credentials: 'same-origin',
+        })
+        if (!res.ok) return
+        const data = (await res.json()) as { measurements?: BodyMeasurement[] }
+        const apiRows = data.measurements ?? []
+        const floor = [
+          clientSnapshot,
+          liveMeasurementsRef.current,
+          readWeightMeasurementsSessionCache(),
+          serverMeasurements,
+        ]
+        const merged = mergeWeightMeasurementsMonotonic(apiRows, ...floor)
+        const minExpected = Math.max(...floor.map(f => f?.length ?? 0), 0)
+        if (minExpected > 0 && merged.length < minExpected) return
+        liveMeasurementsRef.current = merged
+        setLiveMeasurements(merged)
+        writeWeightMeasurementsSessionCache(merged)
+        if (latestWeightKg != null) setLiveCurrentWeightKg(latestWeightKg)
+      } catch {
+        // ignore — SSR + session cache remain fallback
+      }
+    },
+    [serverMeasurements]
+  )
 
   useEffect(() => {
     if (!isCapacitorNative()) return
@@ -236,6 +272,8 @@ export default function AnalyticsScreen({
         targets,
         dayPlansByDate,
         currentWeightKg: effectiveCurrentWeightKg,
+        profileWeightKg: trendProfileWeightKg,
+        priorWeightKg: priorWeightRef.current,
       }),
     [
       periodType,
@@ -246,6 +284,7 @@ export default function AnalyticsScreen({
       targets,
       dayPlansByDate,
       effectiveCurrentWeightKg,
+      trendProfileWeightKg,
     ]
   )
 
@@ -273,8 +312,45 @@ export default function AnalyticsScreen({
   ]
 
   const handleWeightSaved = useCallback(
-    (weightKg: number) => refreshMeasurements(weightKg),
-    [refreshMeasurements]
+    async (weightKg: number, savedMeasurements?: BodyMeasurement[]) => {
+      const userId = measurements[0]?.user_id ?? 'local'
+      const base = liveMeasurementsRef.current ?? serverMeasurements
+      const priorKg = base
+        .filter(m => m.weight_kg != null)
+        .map(m => m.weight_kg as number)
+        .at(-1)
+      if (
+        priorKg != null &&
+        Math.abs(priorKg - weightKg) >= 0.05 &&
+        !base.some(m => m.weight_kg != null && Math.abs(m.weight_kg - weightKg) < 0.05)
+      ) {
+        priorWeightRef.current = priorKg
+      }
+      const floor = [base, readWeightMeasurementsSessionCache()]
+      const optimistic = appendWeightMeasurementLocal(base, {
+        user_id: userId,
+        measured_at: todayDate,
+        weight_kg: weightKg,
+      })
+      const next = mergeWeightMeasurementsMonotonic(
+        savedMeasurements?.length ? savedMeasurements : optimistic,
+        optimistic,
+        ...floor
+      )
+      liveMeasurementsRef.current = next
+      writeWeightMeasurementsSessionCache(next)
+      setLiveMeasurements(next)
+      setLiveCurrentWeightKg(weightKg)
+      if (
+        savedMeasurements &&
+        savedMeasurements.length < next.length &&
+        savedMeasurements.length < base.length + 1
+      ) {
+        toast.error('部分體重紀錄可能未同步，請稍後再試')
+      }
+      await refreshMeasurements(weightKg, next)
+    },
+    [measurements, refreshMeasurements, serverMeasurements, todayDate]
   )
 
   if (summary.insufficient_data) {

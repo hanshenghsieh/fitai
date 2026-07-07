@@ -460,7 +460,7 @@ export default function BetterBitHome({
             credentials: 'same-origin',
             keepalive: true,
             signal: ac.signal,
-            body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId)),
+            body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId, checkin)),
           })
           if (!res.ok) throw new Error()
           const json = (await res.json()) as { calorie_bank?: CalorieBankRow | null }
@@ -545,11 +545,16 @@ export default function BetterBitHome({
   useEffect(() => {
     const onRouteChange = () => flushPendingPersist()
     const onPageHide = () => flushPendingPersist()
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') flushPendingPersist()
+    }
     window.addEventListener('betterbit:route-change', onRouteChange)
     window.addEventListener('pagehide', onPageHide)
+    document.addEventListener('visibilitychange', onVisibilityChange)
     return () => {
       window.removeEventListener('betterbit:route-change', onRouteChange)
       window.removeEventListener('pagehide', onPageHide)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
       flushPendingPersist()
     }
   }, [flushPendingPersist])

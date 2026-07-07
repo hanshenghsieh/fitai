@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getNutritionDayKey } from '@/lib/timezone'
-import { parseCheckinMeta } from '@/lib/checkin-utils'
+import { mergePersistedCheckinNotes, parseCheckinMeta } from '@/lib/checkin-utils'
 import { syncBankFromFoodLogs } from '@/lib/banks/calorie-bank-store'
 import { differenceInDays, format, parseISO, startOfWeek } from 'date-fns'
 import type { WeeklyPlanData, UserProfile } from '@/types'
@@ -75,6 +75,27 @@ export async function GET() {
   return NextResponse.json({ checkin: data ?? null })
 }
 
+async function mergeCheckinBodyWithExistingNotes(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  checkinDate: string,
+  body: Record<string, unknown>
+): Promise<Record<string, unknown>> {
+  if (typeof body.notes !== 'string') return body
+
+  const { data: existing } = await supabase
+    .from('daily_checkins')
+    .select('notes')
+    .eq('user_id', userId)
+    .eq('checkin_date', checkinDate)
+    .maybeSingle()
+
+  return {
+    ...body,
+    notes: mergePersistedCheckinNotes(body.notes, existing),
+  }
+}
+
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -82,13 +103,14 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json()
   const today = getNutritionDayKey()
+  const mergedBody = await mergeCheckinBodyWithExistingNotes(supabase, user.id, today, body)
 
   const { data, error } = await supabase
     .from('daily_checkins')
     .upsert({
       user_id: user.id,
       checkin_date: today,
-      ...body,
+      ...mergedBody,
     }, { onConflict: 'user_id,checkin_date' })
     .select()
     .single()
@@ -113,13 +135,14 @@ export async function PATCH(request: NextRequest) {
 
   const body = await request.json()
   const today = getNutritionDayKey()
+  const mergedBody = await mergeCheckinBodyWithExistingNotes(supabase, user.id, today, body)
 
   const { data, error } = await supabase
     .from('daily_checkins')
     .upsert({
       user_id: user.id,
       checkin_date: today,
-      ...body,
+      ...mergedBody,
     }, { onConflict: 'user_id,checkin_date' })
     .select()
     .single()

@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { saveBodyMeasurementForUser } from '@/lib/body-measurement-save'
 import { evaluateRegenNeed, triggerPlanRegeneration } from '@/lib/plan-regen'
+import { loadBodyMeasurementsForUser } from '@/lib/app/analytics-data'
 
 async function resolveRequestUser(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -24,21 +25,13 @@ async function resolveRequestUser(
   return tokenUser
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await resolveRequestUser(supabase, request)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data } = await supabase
-    .from('body_measurements')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('measured_at', { ascending: true })
-    .limit(52)
-
-  return NextResponse.json({ measurements: data ?? [] })
+  const measurements = await loadBodyMeasurementsForUser(supabase, user.id)
+  return NextResponse.json({ measurements })
 }
 
 export async function POST(request: NextRequest) {
@@ -65,7 +58,7 @@ export async function POST(request: NextRequest) {
     .eq('id', user.id)
     .single()
 
-  const { error } = await saveBodyMeasurementForUser(supabase, user.id, {
+  const { error, logSaved, historySaved, row } = await saveBodyMeasurementForUser(supabase, user.id, {
     weight_kg: weightKg,
     body_fat_pct: Number.isFinite(bodyFatPct as number) ? (bodyFatPct as number) : null,
     measured_at: body.measured_at,
@@ -95,8 +88,15 @@ export async function POST(request: NextRequest) {
     if (!result.ok) regenError = result.error ?? '重算失敗'
   }
 
+  const measurements = await loadBodyMeasurementsForUser(supabase, user.id)
+
   return NextResponse.json({
-    measurement: { weight_kg: weightKg, body_fat_pct: bodyFatPct },
+    measurement: row
+      ? { id: row.id, measured_at: row.measured_at, weight_kg: row.weight_kg, created_at: row.created_at }
+      : { weight_kg: weightKg, body_fat_pct: bodyFatPct },
+    measurements,
+    logSaved,
+    historySaved,
     planRegenerated,
     regenSummary,
     regenError,

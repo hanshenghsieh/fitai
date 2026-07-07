@@ -131,12 +131,44 @@ export function buildDayPlansByDate(
   return dayPlansByDate
 }
 
+export async function loadBodyMeasurementsForUser(
+  supabase: SupabaseClient,
+  userId: string,
+  lookbackDays: number = PROGRESS_ANALYTICS_LOOKBACK_DAYS
+): Promise<BodyMeasurement[]> {
+  const since = format(subDays(new Date(), lookbackDays), 'yyyy-MM-dd')
+
+  const [{ data: dbRows }, { data: checkins }] = await Promise.all([
+    supabase
+      .from('body_measurements')
+      .select('id, measured_at, weight_kg, body_fat_pct, muscle_mass_kg, waist_cm, hip_cm, chest_cm, created_at')
+      .eq('user_id', userId)
+      .gte('measured_at', since)
+      .order('measured_at', { ascending: true })
+      .order('created_at', { ascending: true })
+      .limit(52),
+    supabase
+      .from('daily_checkins')
+      .select('checkin_date, notes')
+      .eq('user_id', userId)
+      .gte('checkin_date', since)
+      .order('checkin_date', { ascending: true }),
+  ])
+
+  const merged = mergeWeightMeasurementSources(
+    dbRows ?? [],
+    extractWeightHistoryFromCheckins(checkins ?? [])
+  )
+
+  return mapWeightRowsToMeasurements(merged, userId)
+}
+
 export function mapWeightRowsToMeasurements(
   rows: WeightMeasurementRow[],
   userId: string
 ): BodyMeasurement[] {
   return rows.map((row, idx) => ({
-    id: row.id ?? `weight-${row.measured_at}-${row.created_at ?? idx}`,
+    id: row.id ?? `weight-${row.measured_at}-${row.created_at ?? 'na'}-${row.weight_kg}-${idx}`,
     user_id: userId,
     measured_at: row.measured_at,
     weight_kg: row.weight_kg,

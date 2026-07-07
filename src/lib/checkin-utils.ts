@@ -294,6 +294,51 @@ export function userMemoryForPersist(memory: UserMemoryMeta | undefined): UserMe
   }
 }
 
+/** Union weight entries so meal sync + weight save never drop each other's points. */
+export function mergeWeightHistoryEntries(
+  existing: WeightHistoryEntry[] | undefined,
+  incoming: WeightHistoryEntry[] | undefined
+): WeightHistoryEntry[] | undefined {
+  if (!existing?.length && !incoming?.length) return undefined
+  const byKey = new Map<string, WeightHistoryEntry>()
+  for (const entry of [...(existing ?? []), ...(incoming ?? [])]) {
+    if (!Number.isFinite(entry.weight_kg)) continue
+    byKey.set(`${entry.logged_at}|${entry.weight_kg}`, entry)
+  }
+  return [...byKey.values()].sort((a, b) => a.logged_at.localeCompare(b.logged_at))
+}
+
+/** Keep weight_history when syncing food/workout — Progress page reads it for trend. */
+export function mergePersistedCheckinNotes(
+  incomingNotes: string | undefined,
+  existingCheckin?: Pick<DailyCheckin, 'notes'> | null
+): string {
+  const existingMeta = parseCheckinMeta(existingCheckin ?? null)
+  let incomingMeta: CheckinMeta = {}
+  if (incomingNotes) {
+    try {
+      incomingMeta = JSON.parse(incomingNotes) as CheckinMeta
+      if (incomingMeta.weight_history?.length === 0) {
+        delete incomingMeta.weight_history
+      }
+    } catch {
+      return incomingNotes
+    }
+  }
+  const mergedHistory = mergeWeightHistoryEntries(
+    existingMeta.weight_history,
+    incomingMeta.weight_history
+  )
+  const existingCount = existingMeta.weight_history?.length ?? 0
+  const mergedCount = mergedHistory?.length ?? 0
+  if (mergedHistory?.length) {
+    incomingMeta = { ...incomingMeta, weight_history: mergedHistory }
+  } else if (existingCount > 0 && mergedCount < existingCount) {
+    incomingMeta = { ...incomingMeta, weight_history: existingMeta.weight_history }
+  }
+  return JSON.stringify(incomingMeta)
+}
+
 export function buildCheckinPayload(
   state: {
     dietItems: DietCheckinItem[]
@@ -305,15 +350,19 @@ export function buildCheckinPayload(
     mealSuggest?: Partial<Record<MealType, MealSuggestState>>
     userMemory?: UserMemoryMeta
   },
-  weeklyPlanId: string | null
+  weeklyPlanId: string | null,
+  existingCheckin?: Pick<DailyCheckin, 'notes'> | null
 ) {
-  const notes = JSON.stringify({
-    meal_modes: state.mealModes,
-    custom_eat_out: state.customEatOut,
-    daily_rolls: state.dailyRolls,
-    meal_suggest: state.mealSuggest,
-    user_memory: userMemoryForPersist(state.userMemory),
-  })
+  const notes = mergePersistedCheckinNotes(
+    JSON.stringify({
+      meal_modes: state.mealModes,
+      custom_eat_out: state.customEatOut,
+      daily_rolls: state.dailyRolls,
+      meal_suggest: state.mealSuggest,
+      user_memory: userMemoryForPersist(state.userMemory),
+    }),
+    existingCheckin
+  )
   return {
     weekly_plan_id: weeklyPlanId,
     diet_items: state.dietItems,

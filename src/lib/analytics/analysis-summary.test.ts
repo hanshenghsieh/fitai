@@ -140,6 +140,45 @@ describe('analysis-summary', () => {
     assert.ok(summary.insights.some(i => i.tone === 'success'))
   })
 
+  it('uses profile weight as first point when it differs from goal start', () => {
+    const days = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05']
+    const checkins = days.map(day =>
+      checkin(day, [
+        { name: '早餐', calories: 400, protein_g: 30, slot: 'breakfast' },
+        { name: '午餐', calories: 550, protein_g: 40, slot: 'lunch' },
+        { name: '晚餐', calories: 500, protein_g: 35, slot: 'dinner' },
+      ])
+    )
+    const summary = buildAnalysisSummary({
+      periodType: 'week',
+      anchorDate: new Date('2026-07-05'),
+      todayDate: '2026-07-05',
+      measurements: [
+        {
+          id: '2',
+          user_id: 'u',
+          measured_at: '2026-07-05',
+          weight_kg: 69,
+          body_fat_pct: null,
+          muscle_mass_kg: null,
+          waist_cm: null,
+          hip_cm: null,
+          chest_cm: null,
+          created_at: '2026-07-05T10:00:00Z',
+        },
+      ],
+      checkins,
+      targets: { ...targets, start_weight_kg: 70, start_date: '2026-06-01' },
+      profileWeightKg: 67.4,
+      currentWeightKg: 69,
+    })
+    assert.equal(summary.weightTrend.sufficient, true)
+    assert.equal(summary.weightTrend.points.length, 2)
+    assert.equal(summary.weightTrend.points[0]?.weight, 67.4)
+    assert.equal(summary.weightTrend.points[1]?.weight, 69)
+    assert.equal(summary.weightTrend.previousKg, 67.4)
+  })
+
   it('uses goal start weight as first point and first update as second', () => {
     const days = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05']
     const checkins = days.map(day =>
@@ -247,6 +286,33 @@ describe('analysis-summary', () => {
     assert.equal(summary.weightTrend.deltaKg, -1.9)
   })
 
+  it('shows goal start plus two same-day updates as three trend points', () => {
+    const days = ['2026-07-06', '2026-07-07', '2026-07-08', '2026-07-09', '2026-07-10', '2026-07-11', '2026-07-12']
+    const checkins = days.map(day =>
+      checkin(day, [
+        { name: '早餐', calories: 400, protein_g: 30, slot: 'breakfast' },
+        { name: '午餐', calories: 550, protein_g: 40, slot: 'lunch' },
+        { name: '晚餐', calories: 500, protein_g: 35, slot: 'dinner' },
+      ])
+    )
+    const summary = buildAnalysisSummary({
+      periodType: 'week',
+      anchorDate: new Date('2026-07-12'),
+      todayDate: '2026-07-12',
+      measurements: [
+        { id: '1', user_id: 'u', measured_at: '2026-07-07', weight_kg: 69, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-07T12:00:00.000Z' },
+        { id: '2', user_id: 'u', measured_at: '2026-07-07', weight_kg: 68.2, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-07T15:00:00.000Z' },
+      ],
+      checkins,
+      targets: { ...targets, start_weight_kg: 70, start_date: '2026-06-01' },
+      currentWeightKg: 68.2,
+    })
+    assert.equal(summary.weightTrend.sufficient, true)
+    assert.equal(summary.weightTrend.points.length, 2)
+    assert.equal(summary.weightTrend.points[0]?.weight, 69)
+    assert.equal(summary.weightTrend.points[1]?.weight, 68.2)
+  })
+
   it('shows weight trend when two readings exist on the same day', () => {
     const days = ['2026-06-29', '2026-06-30', '2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05']
     const checkins = days.map(day =>
@@ -274,7 +340,103 @@ describe('analysis-summary', () => {
     assert.equal(summary.weightTrend.previousKg, 70)
   })
 
-  it('does not inject a synthetic anchor when multiple days already exist in period', () => {
+  it('uses profile weight after restart when logging a new reading', () => {
+    const days = ['2026-07-06', '2026-07-07', '2026-07-08', '2026-07-09', '2026-07-10', '2026-07-11', '2026-07-12']
+    const checkins = days.map(day =>
+      checkin(day, [
+        { name: '早餐', calories: 400, protein_g: 30, slot: 'breakfast' },
+        { name: '午餐', calories: 550, protein_g: 40, slot: 'lunch' },
+        { name: '晚餐', calories: 500, protein_g: 35, slot: 'dinner' },
+      ])
+    )
+    const summary = buildAnalysisSummary({
+      periodType: 'week',
+      anchorDate: new Date('2026-07-12'),
+      todayDate: '2026-07-12',
+      measurements: [
+        {
+          id: '2',
+          user_id: 'u',
+          measured_at: '2026-07-12',
+          weight_kg: 74,
+          body_fat_pct: null,
+          muscle_mass_kg: null,
+          waist_cm: null,
+          hip_cm: null,
+          chest_cm: null,
+          created_at: '2026-07-12T10:00:00Z',
+        },
+      ],
+      checkins,
+      targets: { ...targets, start_weight_kg: 70, start_date: '2026-06-01' },
+      profileWeightKg: 75,
+      currentWeightKg: 74,
+    })
+    assert.equal(summary.weightTrend.points.length, 2)
+    assert.equal(summary.weightTrend.points[0]?.weight, 75)
+    assert.equal(summary.weightTrend.points[1]?.weight, 74)
+    assert.equal(summary.weightTrend.previousKg, 75)
+  })
+
+  it('uses prior visible weight instead of goal start when second log is saved', () => {
+    const days = ['2026-07-06', '2026-07-07', '2026-07-08', '2026-07-09', '2026-07-10', '2026-07-11', '2026-07-12']
+    const checkins = days.map(day =>
+      checkin(day, [
+        { name: '早餐', calories: 400, protein_g: 30, slot: 'breakfast' },
+        { name: '午餐', calories: 550, protein_g: 40, slot: 'lunch' },
+        { name: '晚餐', calories: 500, protein_g: 35, slot: 'dinner' },
+      ])
+    )
+    const summary = buildAnalysisSummary({
+      periodType: 'week',
+      anchorDate: new Date('2026-07-12'),
+      todayDate: '2026-07-12',
+      measurements: [
+        {
+          id: '2',
+          user_id: 'u',
+          measured_at: '2026-07-12',
+          weight_kg: 69.5,
+          body_fat_pct: null,
+          muscle_mass_kg: null,
+          waist_cm: null,
+          hip_cm: null,
+          chest_cm: null,
+          created_at: '2026-07-12T12:00:00Z',
+        },
+      ],
+      checkins,
+      targets: { ...targets, start_weight_kg: 70, start_date: '2026-07-06' },
+      profileWeightKg: 69.5,
+      currentWeightKg: 69.5,
+      priorWeightKg: 74,
+    })
+    assert.equal(summary.weightTrend.sufficient, true)
+    assert.equal(summary.weightTrend.points.length, 2)
+    assert.equal(summary.weightTrend.points[0]?.weight, 74)
+    assert.equal(summary.weightTrend.points[1]?.weight, 69.5)
+    assert.equal(summary.weightTrend.previousKg, 74)
+    assert.equal(summary.weightTrend.deltaKg, -4.5)
+  })
+
+  it('carries pre-period weight into weekly trend when only new log is in range', () => {
+    const range = {
+      start: '2026-07-06',
+      end: '2026-07-12',
+      label: 'week',
+    }
+    const measurements = [
+      { id: '1', user_id: 'u', measured_at: '2026-07-05', weight_kg: 74, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-05T08:00:00Z' },
+      { id: '2', user_id: 'u', measured_at: '2026-07-12', weight_kg: 69.5, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-12T12:00:00Z' },
+    ]
+    const trend = buildPeriodWeightTrendMeasurements(measurements, range, 70, '2026-07-06')
+    assert.equal(trend.length, 2)
+    assert.equal(trend[0]?.weight_kg, 74)
+    assert.equal(trend[1]?.weight_kg, 69.5)
+    assert.equal(trend.some(m => m.id === 'goal-start-weight'), false)
+  })
+
+  it('does not inject goal start when two real logs already exist', () => {
     const range = {
       start: '2026-07-01',
       end: '2026-07-07',
@@ -286,9 +448,8 @@ describe('analysis-summary', () => {
       { id: '3', user_id: 'u', measured_at: '2026-07-05', weight_kg: 68, body_fat_pct: null, muscle_mass_kg: null, waist_cm: null, hip_cm: null, chest_cm: null, created_at: '2026-07-05T08:00:00Z' },
     ]
     const trend = buildPeriodWeightTrendMeasurements(measurements, range, 70, '2026-06-01')
-    assert.equal(trend.length, 4)
-    assert.equal(trend[0]?.id, 'goal-start-weight')
-    assert.equal(trend[0]?.weight_kg, 70)
+    assert.equal(trend.length, 3)
+    assert.equal(trend.some(m => m.id === 'goal-start-weight'), false)
     assert.equal(trend.some(m => m.id === 'weight-trend-anchor'), false)
   })
 

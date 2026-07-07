@@ -2,21 +2,20 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
+import type { BodyMeasurement } from '@/types'
 
 interface Props {
   lastWeightKg?: number | null
   embedded?: boolean
-  onSaved?: (weightKg: number) => void | Promise<void>
+  onSaved?: (weightKg: number, measurements?: BodyMeasurement[]) => void | Promise<void>
 }
 
 export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSaved }: Props) {
   const [expanded, setExpanded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [weight, setWeight] = useState('')
-  const router = useRouter()
 
   async function handleSubmit() {
     const w = parseFloat(weight)
@@ -29,15 +28,21 @@ export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSa
       const res = await fetch('/api/measurements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({ weight_kg: w }),
       })
-      const data = await res.json()
+      const data = (await res.json()) as {
+        error?: string
+        historySaved?: boolean
+        logSaved?: boolean
+        measurements?: BodyMeasurement[]
+      }
       if (!res.ok) throw new Error(data.error || 'failed')
+      if (!data.historySaved && !data.logSaved) throw new Error('體重紀錄同步失敗')
 
       setWeight('')
       setExpanded(false)
-      await onSaved?.(w)
-      router.refresh()
+      await onSaved?.(w, data.measurements)
       toast.message('記下了')
     } catch {
       toast.error('沒記上，再試一次')
