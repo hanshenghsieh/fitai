@@ -33,7 +33,7 @@ import { buildWorkoutRecommendationStrategy } from '@/lib/recommendation/workout
 import type { BodyMeasurement } from '@/types'
 import { isCapacitorNative } from '@/lib/capacitor-native'
 import { mergeClientBodyMeasurements } from '@/lib/app/analytics-data'
-import ProgressWeightBlock from '@/components/progress/ProgressWeightBlock'
+import ProgressWeightLog from '@/components/progress/ProgressWeightLog'
 
 const WeightTrendChart = dynamic(() => import('@/components/analytics/WeightTrendChart'), {
   ssr: false,
@@ -109,8 +109,12 @@ function InsightRow({ tone, title, body }: { tone: 'success' | 'warning' | 'neut
 
 function WeightTrendSection({
   summary,
+  lastWeightKg,
+  onSaved,
 }: {
   summary: ReturnType<typeof buildAnalysisSummary>
+  lastWeightKg?: number | null
+  onSaved: (weightKg: number) => void | Promise<void>
 }) {
   return (
     <BBCard>
@@ -140,7 +144,7 @@ function WeightTrendSection({
           <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
             {summary.weightTrend.points.length === 1
               ? '再記一次，就能看見趨勢。'
-              : '到進步頁上方「記一下體重」開始追蹤。'}
+              : '記一下體重，開始追蹤。'}
           </p>
           {summary.weightTrend.points.length === 1 && (
             <p className="text-[13px] tabular-nums" style={{ color: BB_V2.text.secondary }}>
@@ -172,6 +176,9 @@ function WeightTrendSection({
           </p>
         </>
       )}
+      <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${BB_V2.divider}` }}>
+        <ProgressWeightLog embedded lastWeightKg={lastWeightKg} onSaved={onSaved} />
+      </div>
     </BBCard>
   )
 }
@@ -281,12 +288,12 @@ export default function AnalyticsScreen({
             先記體重，飲食紀錄夠了就能看完整趨勢
           </p>
         </header>
-        <ProgressWeightBlock
+        <SegmentControl value={periodType} onChange={setPeriodType} />
+        <WeightTrendSection
+          summary={summary}
           lastWeightKg={summary.weightTrend.previousKg ?? summary.weightTrend.currentKg}
           onSaved={handleWeightSaved}
         />
-        <SegmentControl value={periodType} onChange={setPeriodType} />
-        <WeightTrendSection summary={summary} />
         <EmptyStateCard
           title="飲食紀錄還不夠"
           reason={summary.insufficient_reason ?? '先記錄今天第一餐，BetterBit 就能幫你看熱量趨勢。'}
@@ -307,11 +314,6 @@ export default function AnalyticsScreen({
           看看最近有沒有變好，以及下一步怎麼做
         </p>
       </header>
-
-      <ProgressWeightBlock
-        lastWeightKg={summary.weightTrend.previousKg ?? summary.weightTrend.currentKg}
-        onSaved={handleWeightSaved}
-      />
 
       <SegmentControl value={periodType} onChange={setPeriodType} />
 
@@ -353,7 +355,11 @@ export default function AnalyticsScreen({
       </BBCard>
 
       {/* Weight trend chart */}
-      <WeightTrendSection summary={summary} />
+      <WeightTrendSection
+        summary={summary}
+        lastWeightKg={summary.weightTrend.previousKg ?? summary.weightTrend.currentKg}
+        onSaved={handleWeightSaved}
+      />
 
       {/* Calorie trend */}
       <BBCard>
