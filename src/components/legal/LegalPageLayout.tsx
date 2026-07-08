@@ -10,22 +10,29 @@ interface Props {
 
 export default function LegalPageLayout({ title, updated, children }: Props) {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: colors.bg.canvas }}>
+    <div
+      className="auth-page-shell min-h-[100dvh] overflow-y-auto overscroll-y-contain"
+      style={{ backgroundColor: colors.bg.canvas }}
+    >
       <header
-        className="sticky top-0 z-10 px-5 py-4 border-b backdrop-blur-sm"
-        style={{ backgroundColor: 'rgba(244, 242, 238, 0.92)', borderColor: colors.border.subtle }}
+        className="sticky top-0 z-10 border-b backdrop-blur-sm px-5 pt-[max(env(safe-area-inset-top,12px),12px)] pb-3"
+        style={{ backgroundColor: 'rgba(244, 242, 238, 0.95)', borderColor: colors.border.subtle }}
       >
-        <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
-          <Link href="/" className="text-[14px]" style={{ color: colors.text.secondary }}>
+        <div className="max-w-2xl mx-auto flex items-center justify-between gap-4 min-h-[44px]">
+          <Link
+            href="/"
+            className="inline-flex items-center min-h-[44px] min-w-[44px] -ml-2 px-2 text-[15px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-lg"
+            style={{ color: colors.text.secondary }}
+          >
             ← 首頁
           </Link>
-          <p className="text-[12px]" style={{ color: colors.text.tertiary }}>
+          <p className="text-[12px] shrink-0" style={{ color: colors.text.tertiary }}>
             {APP_DISPLAY_NAME}
           </p>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-5 py-10 pb-16">
+      <main className="max-w-2xl mx-auto px-5 py-8 pb-[max(env(safe-area-inset-bottom,24px),48px)]">
         <h1 className="text-[26px] font-semibold mb-2" style={{ color: colors.text.primary }}>
           {title}
         </h1>

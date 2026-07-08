@@ -44,7 +44,7 @@ export default function TermsPage() {
           部分功能需付費訂閱。目前 Web 版透過 Stripe 處理付款。試用期與訂閱價格以 App 內顯示為準。
         </p>
         <p>
-          訂閱會自動續期，除非你取消。取消後，通常可继续使用至當期結束。達標免費延長等優惠條件以 App 內說明為準。
+          訂閱會自動續期，除非你取消。取消後，通常可繼續使用至當期結束。達標免費延長等優惠條件以 App 內說明為準。
         </p>
         <p>
           iOS App 上架後，App 內訂閱將遵循 Apple App Store 規範與 Apple 媒體服務條款。
@@ -53,7 +53,7 @@ export default function TermsPage() {
 
       <LegalSection title="智慧財產">
         <p>
-          BetterBit 的介面、文案、算法與資料庫內容受著作權與其他法律保護。未經授權不得複製、修改或商業利用。
+          BetterBit 的介面、文案、演算法與資料庫內容受著作權與其他法律保護。未經授權不得複製、修改或商業利用。
         </p>
       </LegalSection>
 
