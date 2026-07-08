@@ -321,6 +321,10 @@ export default function BetterBitHome({
     const logs = userMemoryRef.current.food_logs_today ?? []
     const filtered = filterFoodLogsForNutritionDay(logs, today)
     if (filtered.length === logs.length) return
+    if (filtered.length === 0) {
+      clearFoodLogsSessionCache(today)
+      clearTodayOfflineSnapshot()
+    }
     const nextMemory = { ...userMemoryRef.current, food_logs_today: filtered }
     userMemoryRef.current = nextMemory
     writeFoodCache(filtered)
@@ -328,6 +332,7 @@ export default function BetterBitHome({
   }, [writeFoodCache])
 
   useEffect(() => {
+    const applyNutritionDayRollover = (nextDay: string) => {
       clearFoodLogsSessionCache(nextDay)
       clearTodayOfflineSnapshot()
       clearPendingSync()
