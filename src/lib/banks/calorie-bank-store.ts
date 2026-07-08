@@ -71,11 +71,12 @@ export async function getCalorieBankRow(
     .maybeSingle()
 
   if (error) {
-    if (isMissingTableError(error.message)) {
-      logCalorieBankError('getCalorieBankRow', error.message, { userId, date, missingTable: true })
-      return null
-    }
-    throw new Error(error.message)
+    logCalorieBankError('getCalorieBankRow', error.message, {
+      userId,
+      date,
+      missingTable: isMissingTableError(error.message),
+    })
+    return null
   }
   return data ? rowFromDb(data as Record<string, unknown>) : null
 }
@@ -94,11 +95,11 @@ export async function getLatestActiveCalorieBank(
     .maybeSingle()
 
   if (error) {
-    if (isMissingTableError(error.message)) {
-      logCalorieBankError('getLatestActiveCalorieBank', error.message, { userId, missingTable: true })
-      return null
-    }
-    throw new Error(error.message)
+    logCalorieBankError('getLatestActiveCalorieBank', error.message, {
+      userId,
+      missingTable: isMissingTableError(error.message),
+    })
+    return null
   }
   return data ? rowFromDb(data as Record<string, unknown>) : null
 }

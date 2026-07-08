@@ -123,7 +123,12 @@ export async function POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle()
 
-  const bank = await maybeSyncCalorieBank(supabase, user.id, data, profile as UserProfile | null)
+  let bank: Awaited<ReturnType<typeof maybeSyncCalorieBank>> = null
+  try {
+    bank = await maybeSyncCalorieBank(supabase, user.id, data, profile as UserProfile | null)
+  } catch (err) {
+    console.error('[checkin] calorie bank sync failed after POST:', err)
+  }
 
   return NextResponse.json({ checkin: data, calorie_bank: bank })
 }
@@ -155,7 +160,12 @@ export async function PATCH(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle()
 
-  const bank = await maybeSyncCalorieBank(supabase, user.id, data, profile as UserProfile | null)
+  let bank: Awaited<ReturnType<typeof maybeSyncCalorieBank>> = null
+  try {
+    bank = await maybeSyncCalorieBank(supabase, user.id, data, profile as UserProfile | null)
+  } catch (err) {
+    console.error('[checkin] calorie bank sync failed after PATCH:', err)
+  }
 
   return NextResponse.json({ checkin: data, calorie_bank: bank })
 }

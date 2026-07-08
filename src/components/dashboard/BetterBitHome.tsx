@@ -211,6 +211,8 @@ export default function BetterBitHome({
   })
   const calorieBankSyncedRef = useRef(false)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const persistRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const persistErrorToastAtRef = useRef(0)
   const persistFlushingRef = useRef(false)
   const persistPatchRef = useRef<{
     workoutItems?: WorkoutCheckinItem[]
@@ -534,7 +536,11 @@ export default function BetterBitHome({
             signal: ac.signal,
             body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId, checkin)),
           })
-          if (!res.ok) throw new Error()
+          if (!res.ok) {
+            const bodyText = await res.text().catch(() => '')
+            console.error('[persist] checkin PATCH failed', res.status, bodyText.slice(0, 300))
+            throw new Error(bodyText || `HTTP ${res.status}`)
+          }
           const json = (await res.json()) as { calorie_bank?: CalorieBankRow | null }
           if (json.calorie_bank) setCalorieBank(json.calorie_bank)
           clearFoodLogsSessionCache()
@@ -555,9 +561,19 @@ export default function BetterBitHome({
     } finally {
       persistFlushingRef.current = false
       persistAbortRef.current = null
-      if (sawError && !isOffline()) toast.error(GENTLE_ERROR_MESSAGE)
+      if (sawError && !isOffline()) {
+        const now = Date.now()
+        if (now - persistErrorToastAtRef.current > 8000) {
+          persistErrorToastAtRef.current = now
+          toast.error(GENTLE_ERROR_MESSAGE)
+        }
+      }
       if (Object.keys(persistPatchRef.current).length > 0 && !isOffline()) {
-        void flushPersist()
+        if (persistRetryTimerRef.current) clearTimeout(persistRetryTimerRef.current)
+        persistRetryTimerRef.current = setTimeout(() => {
+          persistRetryTimerRef.current = null
+          void flushPersist()
+        }, 2500)
       }
     }
   }, [buildPersistState, weeklyPlanId, writeFoodCache, trackedDayKey])
@@ -632,6 +648,10 @@ export default function BetterBitHome({
       window.removeEventListener('pagehide', onPageHide)
       window.removeEventListener('online', onOnline)
       document.removeEventListener('visibilitychange', onVisibilityChange)
+      if (persistRetryTimerRef.current) {
+        clearTimeout(persistRetryTimerRef.current)
+        persistRetryTimerRef.current = null
+      }
       flushPendingPersist()
     }
   }, [flushPendingPersist])
