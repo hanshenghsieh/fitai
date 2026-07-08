@@ -145,6 +145,18 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  input,
+  textarea,
+  select,
+  [contenteditable='true'],
+  [contenteditable=''] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
   }
   html {
     @apply font-sans;
@@ -155,5 +167,12 @@
     @apply text-foreground;
     background-color: #fff9f2;
     overscroll-behavior-y: none;
+  }
+  button,
+  a,
+  [role='button'] {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 }
