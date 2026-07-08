@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { ChevronLeft } from 'lucide-react'
 import { colors } from '@/lib/design-system'
 import {
   PREMIUM_TESTFLIGHT_BODY,
@@ -9,27 +8,12 @@ import {
   PREMIUM_TESTFLIGHT_FOOTNOTE,
   PREMIUM_TESTFLIGHT_SUBTITLE,
 } from '@/lib/premium-narrative'
+import SettingsSubpageHeader from '@/components/settings/SettingsSubpageHeader'
 
 export default function PremiumTestFlightScreen() {
   return (
     <div className="min-h-screen pb-16" style={{ backgroundColor: colors.bg.canvas }}>
-      <div className="px-5 pt-12 pb-6">
-        <Link
-          href="/settings"
-          className="inline-flex items-center gap-1 text-[14px] mb-6"
-          style={{ color: colors.text.tertiary }}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          設定
-        </Link>
-
-        <h1 className="text-[22px] font-medium tracking-tight" style={{ color: colors.text.primary }}>
-          BetterBit 會員
-        </h1>
-        <p className="text-[15px] mt-3 leading-relaxed" style={{ color: colors.text.secondary }}>
-          {PREMIUM_TESTFLIGHT_SUBTITLE}
-        </p>
-      </div>
+      <SettingsSubpageHeader title="BetterBit 會員" subtitle={PREMIUM_TESTFLIGHT_SUBTITLE} />
 
       <div className="px-5 space-y-8">
         <p className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>

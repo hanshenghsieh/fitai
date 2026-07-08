@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { colors } from '@/lib/design-system'
 import { APP_DISPLAY_NAME } from '@/lib/support'
+import LegalBackLink from '@/components/legal/LegalBackLink'
 
 interface Props {
   title: string
@@ -11,28 +12,19 @@ interface Props {
 export default function LegalPageLayout({ title, updated, children }: Props) {
   return (
     <div
-      className="auth-page-shell min-h-[100dvh] overflow-y-auto overscroll-y-contain"
+      className="legal-page-shell min-h-[100dvh] overflow-y-auto overscroll-y-contain"
       style={{ backgroundColor: colors.bg.canvas }}
     >
-      <header
-        className="sticky top-0 z-10 border-b backdrop-blur-sm px-5 pt-[max(env(safe-area-inset-top,12px),12px)] pb-3"
-        style={{ backgroundColor: 'rgba(244, 242, 238, 0.95)', borderColor: colors.border.subtle }}
-      >
-        <div className="max-w-2xl mx-auto flex items-center justify-between gap-4 min-h-[44px]">
-          <Link
-            href="/"
-            className="inline-flex items-center min-h-[44px] min-w-[44px] -ml-2 px-2 text-[15px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-lg"
-            style={{ color: colors.text.secondary }}
-          >
-            ← 首頁
-          </Link>
-          <p className="text-[12px] shrink-0" style={{ color: colors.text.tertiary }}>
+      <header className="legal-page-header px-5">
+        <div className="max-w-2xl mx-auto flex items-center justify-between gap-4 min-h-[48px]">
+          <LegalBackLink />
+          <p className="text-[12px] shrink-0 pr-1" style={{ color: colors.text.tertiary }}>
             {APP_DISPLAY_NAME}
           </p>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-5 py-8 pb-[max(env(safe-area-inset-bottom,24px),48px)]">
+      <main className="legal-page-main max-w-2xl mx-auto px-5 py-8">
         <h1 className="text-[26px] font-semibold mb-2" style={{ color: colors.text.primary }}>
           {title}
         </h1>
@@ -54,6 +46,9 @@ export default function LegalPageLayout({ title, updated, children }: Props) {
           <Link href="/terms" style={{ color: colors.text.secondary }}>服務條款</Link>
           <Link href="/support" style={{ color: colors.text.secondary }}>支援</Link>
         </nav>
+        <p className="mt-8 text-[12px] text-center pb-4" style={{ color: colors.text.tertiary }}>
+          已到底部
+        </p>
       </main>
     </div>
   )

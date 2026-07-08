@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { ChevronLeft, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
 import { shouldHideExternalPaymentsClient, shouldShowAppleIapClient } from '@/lib/ios-payment-gate'
@@ -22,6 +22,7 @@ import { isCapacitorNative } from '@/lib/capacitor-native'
 import LegalLinksRow from '@/components/legal/LegalLinksRow'
 import PremiumTestFlightScreen from '@/components/premium/PremiumTestFlightScreen'
 import AppleIapSubscriptionSection from '@/components/settings/AppleIapSubscriptionSection'
+import SettingsSubpageHeader from '@/components/settings/SettingsSubpageHeader'
 
 interface Props {
   access: AccessStatus
@@ -128,33 +129,24 @@ function PremiumStripeScreen({ access }: Props) {
 
   return (
     <div className="min-h-screen pb-16" style={{ backgroundColor: colors.bg.canvas }}>
-      <div className="px-5 pt-12 pb-6">
-        <Link
-          href="/settings"
-          className="inline-flex items-center gap-1 text-[14px] mb-6"
-          style={{ color: colors.text.tertiary }}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          設定
-        </Link>
-
-        <h1 className="text-[22px] font-medium tracking-tight" style={{ color: colors.text.primary }}>
-          BetterBit Pro
-        </h1>
-        <p className="text-[15px] mt-3 leading-relaxed" style={{ color: colors.text.secondary }}>
-          {premiumPosture(access, isSubscribed)}
-        </p>
-        {isSubscribed && (
-          <p className="text-[14px] mt-2 leading-relaxed" style={{ color: colors.text.secondary }}>
-            {PREMIUM_SUBTITLE_SUBSCRIBED}
-          </p>
-        )}
-        {trialWhisper && !isSubscribed && (
-          <p className="text-[14px] mt-2 leading-relaxed" style={{ color: colors.text.tertiary }}>
-            {trialWhisper}
-          </p>
-        )}
-      </div>
+      <SettingsSubpageHeader
+        title="BetterBit Pro"
+        subtitle={premiumPosture(access, isSubscribed)}
+      />
+      {(isSubscribed || trialWhisper) && (
+        <div className="px-5 -mt-2 pb-4">
+          {isSubscribed && (
+            <p className="text-[14px] leading-relaxed" style={{ color: colors.text.secondary }}>
+              {PREMIUM_SUBTITLE_SUBSCRIBED}
+            </p>
+          )}
+          {trialWhisper && !isSubscribed && (
+            <p className="text-[14px] leading-relaxed" style={{ color: colors.text.tertiary }}>
+              {trialWhisper}
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="px-5 space-y-8">
         {loading ? (

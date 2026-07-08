@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { ChevronLeft, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
 import {
@@ -21,6 +21,7 @@ import {
   premiumTrialWhisper,
 } from '@/lib/premium-narrative'
 import LegalLinksRow from '@/components/legal/LegalLinksRow'
+import SettingsSubpageHeader from '@/components/settings/SettingsSubpageHeader'
 import { createClient } from '@/lib/supabase/client'
 
 interface Props {
@@ -208,22 +209,10 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
 
   return (
     <div className="min-h-screen pb-16" style={{ backgroundColor: colors.bg.canvas }}>
-      <div className="px-5 pt-12 pb-6">
-        <Link
-          href="/settings"
-          className="inline-flex items-center gap-1 text-[14px] mb-6"
-          style={{ color: colors.text.tertiary }}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          設定
-        </Link>
-        <h1 className="text-[22px] font-medium tracking-tight" style={{ color: colors.text.primary }}>
-          BetterBit Pro
-        </h1>
-        <p className="text-[15px] mt-3 leading-relaxed" style={{ color: colors.text.secondary }}>
-          {premiumPosture(access, isSubscribed)}
-        </p>
-      </div>
+      <SettingsSubpageHeader
+        title="BetterBit Pro"
+        subtitle={premiumPosture(access, isSubscribed)}
+      />
       <div className="px-5 space-y-6">
         {content}
         <Link href="/dashboard" className="block text-[14px]" style={{ color: colors.text.tertiary }}>
