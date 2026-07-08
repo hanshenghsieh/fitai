@@ -62,6 +62,7 @@ async function ProgressContent() {
   return (
     <div className="max-w-lg mx-auto pb-10" style={{ backgroundColor: BB_V2.bg.canvas }}>
       <AnalyticsScreen
+        key={user.id}
         measurements={measurements}
         checkins={bundle.checkins}
         targets={{

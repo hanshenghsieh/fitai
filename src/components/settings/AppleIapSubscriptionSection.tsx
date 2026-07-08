@@ -33,9 +33,9 @@ function FeatureList() {
   return (
     <ul className="space-y-2.5">
       {PREMIUM_FEATURES.map(feature => (
-        <li key={feature} className="text-[15px] leading-relaxed flex gap-2" style={{ color: colors.text.secondary }}>
-          <span style={{ color: colors.accent.sage }}>✓</span>
-          <span>{feature}</span>
+        <li key={feature} className="text-[14px] leading-relaxed flex gap-2" style={{ color: colors.text.secondary }}>
+          <span className="shrink-0" style={{ color: colors.accent.sage }}>✓</span>
+          <span className="min-w-0">{feature}</span>
         </li>
       ))}
     </ul>
@@ -91,6 +91,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       toast.error('訂閱尚未開放')
       return
     }
+    if (purchasing) return
     setPurchasing(true)
     try {
       const result = await purchaseAppleIap(userId)
@@ -213,7 +214,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
         title="BetterBit Pro"
         subtitle={premiumPosture(access, isSubscribed)}
       />
-      <div className="px-5 space-y-6">
+        <div className="px-6 space-y-5">
         {content}
         <Link href="/dashboard" className="block text-[14px]" style={{ color: colors.text.tertiary }}>
           回到 Today

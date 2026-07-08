@@ -61,6 +61,22 @@ export async function upsertAppleIapSubscription(
   const { error } = await supabase.from('subscriptions').upsert(row, {
     onConflict: 'stripe_subscription_id',
   })
-  if (error) throw new Error(error.message)
+  if (!error) return row
+
+  // Production may not have subscription_source / plan columns yet.
+  const legacyRow = {
+    user_id: row.user_id,
+    stripe_subscription_id: row.stripe_subscription_id,
+    stripe_customer_id: row.stripe_customer_id,
+    status: row.status,
+    current_period_start: row.current_period_start,
+    current_period_end: row.current_period_end,
+    cancel_at_period_end: row.cancel_at_period_end,
+    updated_at: row.updated_at,
+  }
+  const { error: legacyError } = await supabase.from('subscriptions').upsert(legacyRow, {
+    onConflict: 'stripe_subscription_id',
+  })
+  if (legacyError) throw new Error(legacyError.message)
   return row
 }

@@ -16,6 +16,12 @@ export interface AppleIapPurchaseResult {
 
 let configuredForUser: string | null = null
 
+const PURCHASE_TIMEOUT_MS = 90_000
+
+export function resetAppleIapConfiguration(): void {
+  configuredForUser = null
+}
+
 async function loadPurchases() {
   if (!isNativeIOS()) return null
   try {
@@ -26,6 +32,22 @@ async function loadPurchases() {
   }
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), ms)
+    promise.then(
+      value => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      err => {
+        clearTimeout(timer)
+        reject(err)
+      }
+    )
+  })
+}
+
 export async function configureAppleIap(userId: string): Promise<boolean> {
   if (!isRevenueCatConfigured() || !isNativeIOS()) return false
   if (configuredForUser === userId) return true
@@ -34,10 +56,14 @@ export async function configureAppleIap(userId: string): Promise<boolean> {
   const apiKey = getRevenueCatIosApiKey()
   if (!Purchases || !apiKey) return false
 
-  await Purchases.configure({
-    apiKey,
-    appUserID: userId,
-  })
+  if (configuredForUser == null) {
+    await Purchases.configure({
+      apiKey,
+      appUserID: userId,
+    })
+  } else {
+    await Purchases.logIn({ appUserID: userId })
+  }
   configuredForUser = userId
   return true
 }
@@ -114,10 +140,15 @@ export async function purchaseAppleIap(userId: string): Promise<AppleIapPurchase
   const Purchases = await loadPurchases()
   if (!Purchases) throw new Error('訂閱尚未開放')
 
-  const offerings = await Purchases.getOfferings()
+  const offerings = await withTimeout(
+    Purchases.getOfferings(),
+    PURCHASE_TIMEOUT_MS,
+    '讀取訂閱方案逾時，請稍後再試'
+  )
   const pkg = offerings.current?.availablePackages?.[0]
   if (!pkg) throw new Error('找不到訂閱方案，請稍後再試')
 
+  // Do not timeout the Apple purchase sheet — user may take time to confirm.
   const { customerInfo } = await Purchases.purchasePackage({ aPackage: pkg })
   const entitlement = readEntitlement(customerInfo)
   if (!entitlement?.originalTransactionId) {

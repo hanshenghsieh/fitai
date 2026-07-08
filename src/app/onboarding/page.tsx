@@ -179,10 +179,13 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="auth-page-shell p-4 pt-8 pb-12" style={{ backgroundColor: BB_V2.bg.canvas, fontFamily: BB_V2.font }}>
-      <div className="w-full mx-auto space-y-6" style={{ maxWidth: BB_V2.maxWidth }}>
-        <ZaiJian size="lg" line={pickZaiJianLine(`onboarding_${Math.min(step, 4)}` as 'onboarding_1')} layout="bubble" />
-        <div className="flex justify-between text-[13px]" style={{ color: BB_V2.text.secondary }}>
+    <div
+      className="auth-page-shell px-6 pt-7 pb-10"
+      style={{ backgroundColor: BB_V2.bg.canvas, fontFamily: BB_V2.font }}
+    >
+      <div className="w-full mx-auto space-y-5" style={{ maxWidth: Math.min(BB_V2.maxWidth, 360) }}>
+        <ZaiJian size="md" line={pickZaiJianLine(`onboarding_${Math.min(step, 4)}` as 'onboarding_1')} layout="bubble" />
+        <div className="flex justify-between text-[12px] px-0.5" style={{ color: BB_V2.text.secondary }}>
           <span>認識一下</span>
           <span>{step} / {TOTAL_STEPS}</span>
         </div>

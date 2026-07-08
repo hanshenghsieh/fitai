@@ -57,6 +57,24 @@ describe('subscription-access', () => {
     )
   })
 
+  it('infers manual_grant from synthetic subscription id without source column', () => {
+    assert.equal(
+      isPremiumSubscription({
+        status: 'active',
+        stripe_subscription_id: 'manual_grant_5556336f-1b58-464f-ae42-310338f7c267',
+      }),
+      true
+    )
+    const access = getAccessStatus('2020-01-01T00:00:00.000Z', {
+      status: 'active',
+      stripe_subscription_id: 'manual_grant_5556336f-1b58-464f-ae42-310338f7c267',
+      current_period_end: '2099-12-31T23:59:59.000Z',
+    } as never)
+    assert.equal(access.hasFullAccess, true)
+    assert.equal(access.isSubscribed, true)
+    assert.equal(access.trialExpired, false)
+  })
+
   it('does not grant premium when trial expired and no subscription', () => {
     const access = getAccessStatus('2020-01-01T00:00:00.000Z', null, {
       userEmail: 'user@example.com',

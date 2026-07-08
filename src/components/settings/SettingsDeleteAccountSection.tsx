@@ -25,7 +25,10 @@ export default function SettingsDeleteAccountSection() {
       }
 
       const supabase = createClient()
+      const { clearUserLocalState } = await import('@/lib/clear-user-local-state')
+      clearUserLocalState()
       await supabase.auth.signOut()
+      clearUserLocalState()
       toast.message('帳號已刪除')
       router.push('/')
       router.refresh()

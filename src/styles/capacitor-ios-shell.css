@@ -183,6 +183,8 @@ html.capacitor-ios .auth-page-shell {
   overflow-y: auto;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
 }
 
 /* Auth / onboarding — full viewport, no rubber-band black */

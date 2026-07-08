@@ -39,6 +39,8 @@ export default function RegisterPage() {
       const loginResult = await supabase.auth.signInWithPassword({ email, password })
       if (loginResult.error) throw loginResult.error
 
+      const { clearUserLocalState } = await import('@/lib/clear-user-local-state')
+      clearUserLocalState()
       toast.success('好，認識一下。')
       await new Promise(r => setTimeout(r, 400))
       router.push('/onboarding')

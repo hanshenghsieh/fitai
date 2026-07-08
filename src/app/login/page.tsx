@@ -25,6 +25,8 @@ export default function LoginPage() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
+      const { clearUserLocalState } = await import('@/lib/clear-user-local-state')
+      clearUserLocalState()
       toast.success('回來了。')
       await new Promise(r => setTimeout(r, 400))
       router.push('/dashboard')
