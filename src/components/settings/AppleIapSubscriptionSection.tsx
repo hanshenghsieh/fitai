@@ -101,7 +101,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : '無法完成訂閱'
-      if (!/cancel/i.test(message)) toast.error(message)
+      if (!/cancel|已取消/i.test(message)) toast.error(message)
     } finally {
       setPurchasing(false)
     }
