@@ -1,0 +1,1 @@
+你幫我搞定上 TESTFLIGHT 的東西。請完整閱讀並執行 docs/testflight-mac-handoff/CURSOR_AGENT.md，完成 Archive 上傳 App Store Connect，Build 11（若 ASC 已有 11 則用 12），完成後依 POST_UPLOAD_VERIFY.md 告訴我怎麼驗收。

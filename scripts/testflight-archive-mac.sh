@@ -7,7 +7,7 @@ cd "$ROOT"
 
 PROJECT="ios/App/App.xcodeproj"
 SCHEME="App"
-ARCHIVE_PATH="$ROOT/build/BetterBit-Build${IOS_BUILD_NUMBER:-8}.xcarchive"
+ARCHIVE_PATH="$ROOT/build/BetterBit-Build${IOS_BUILD_NUMBER:-11}.xcarchive"
 
 if ! command -v xcodebuild >/dev/null 2>&1; then
   echo "[FAIL] xcodebuild not found. Run on Mac with Xcode installed."
