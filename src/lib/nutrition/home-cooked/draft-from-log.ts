@@ -11,6 +11,15 @@ export function homeCookedDraftFromLog(log: FoodLogEntry): HomeCookedMealDraft {
       meal_cooking_method: meta.meal_cooking_method,
       meal_oil_level: meta.meal_oil_level,
       sauce_level: meta.sauce_level,
+      quick_adjust: meta.quick_adjust,
+      ingredient_weights: meta.ingredients.map(item => ({
+        raw_label: item.name_zh,
+        food_id: item.food_id,
+        estimated_weight_g: item.estimated_weight_g ?? item.amount,
+        adjusted_weight_g: item.adjusted_weight_g ?? item.amount,
+        confidence: item.confidence ?? 'high',
+        source: item.source ?? 'photo_estimate',
+      })),
       ingredients: meta.ingredients.map(item => {
         const { food } = resolveWholeFoodLabel(item.name_zh)
         return {

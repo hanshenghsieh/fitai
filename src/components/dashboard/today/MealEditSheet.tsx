@@ -48,7 +48,7 @@ export default function MealEditSheet({
       mealLabel={mealLabel}
       log={log}
       title="修正餐點"
-      subtitle="調整份量或營養數字，BetterBit 會重新計算今天狀態。"
+      subtitle="BetterBit 已先幫你估一版，不確定的話直接儲存即可。"
       saveLabel="儲存修正"
       initialManual={initialManual}
       onClose={onClose}

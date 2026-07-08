@@ -24,17 +24,18 @@ import {
   type HomeCookedMealDraft,
   type MealCookingMethod,
   type MealOilLevel,
+  type MealQuickAdjust,
   type SauceLevel,
 } from '@/lib/nutrition/home-cooked'
+import { OIL_LEVEL_OPTIONS } from '@/lib/nutrition/portion-presets'
 import { getHomeCookedFieldVisibility } from '@/lib/nutrition/food-type-ui'
+import MealQuickAdjustPanel from '@/components/dashboard/today/MealQuickAdjustPanel'
 import {
-  DEFAULT_PORTION_GRAMS,
-  gramsForPreset,
-  inferPresetFromGrams,
-  OIL_LEVEL_OPTIONS,
-  PORTION_PRESET_LABELS,
-  type PortionPresetId,
-} from '@/lib/nutrition/portion-presets'
+  applyUserQuickAdjust,
+  hasQuickAdjustableMeal,
+  inferIngredientRole,
+} from '@/lib/nutrition/home-cooked/meal-quick-adjust'
+import { DEFAULT_MEAL_QUICK_ADJUST } from '@/lib/nutrition/home-cooked/meal-portion-presets'
 import AppOverlay from '@/components/ui/AppOverlay'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
@@ -119,7 +120,8 @@ export default function ManualPhotoCorrectionSheet({
   const [portion, setPortion] = useState('')
   const [notes, setNotes] = useState('')
   const [homeDraft, setHomeDraft] = useState<HomeCookedMealDraft | null>(null)
-  const [portionPreset, setPortionPreset] = useState<PortionPresetId>('normal')
+  const [quickAdjust, setQuickAdjust] = useState<MealQuickAdjust>(DEFAULT_MEAL_QUICK_ADJUST)
+  const [gramsOpen, setGramsOpen] = useState(false)
   const initializedForOpenRef = useRef(false)
   const userEditedMacrosRef = useRef(false)
 
@@ -152,7 +154,8 @@ export default function ManualPhotoCorrectionSheet({
     setNotes('')
     setAdvancedOpen(false)
     setHomeDraft(null)
-    setPortionPreset('normal')
+    setQuickAdjust(DEFAULT_MEAL_QUICK_ADJUST)
+    setGramsOpen(false)
   }, [open, initialLabel, initialRestaurant, visualCategory, detectedLabel])
 
   useEffect(() => {
@@ -162,16 +165,39 @@ export default function ManualPhotoCorrectionSheet({
     }
     const next = withSuggestedDefaults(parseMealLabelToDraft(label.trim()))
     setHomeDraft(next)
-    const firstAmount = next.ingredients.find(i => i.food_id != null)?.amount
-    setPortionPreset(inferPresetFromGrams(firstAmount))
+    setQuickAdjust(next.quick_adjust ?? DEFAULT_MEAL_QUICK_ADJUST)
   }, [label])
 
   const homeFields = useMemo(() => (homeDraft ? getHomeCookedFieldVisibility(homeDraft) : null), [homeDraft])
-  const homePreview = useMemo(() => (homeDraft ? calculateHomeCookedMeal(homeDraft) : null), [homeDraft])
   const homeWeightLines = useMemo(
     () => homeDraft?.ingredients.filter(i => i.food_id != null) ?? [],
     [homeDraft]
   )
+  const homePreview = useMemo(() => (homeDraft ? calculateHomeCookedMeal(homeDraft) : null), [homeDraft])
+  const homeRoles = useMemo(
+    () => new Set(homeWeightLines.map(inferIngredientRole)),
+    [homeWeightLines]
+  )
+
+  function handleQuickAdjustChange(next: MealQuickAdjust) {
+    setQuickAdjust(next)
+    setHomeDraft(prev => (prev ? applyUserQuickAdjust(prev, next) : prev))
+  }
+
+  function updateHomeLine(index: number, amount: number | null) {
+    setHomeDraft(prev => {
+      if (!prev) return prev
+      const ingredients = prev.ingredients.map((line, i) =>
+        i === index ? { ...line, amount } : line
+      )
+      const weights = prev.ingredient_weights?.map(w => {
+        const line = ingredients.find(l => l.raw_label === w.raw_label)
+        if (!line || line.amount == null) return w
+        return { ...w, adjusted_weight_g: line.amount, source: 'user_adjusted' as const }
+      })
+      return { ...prev, ingredients, ingredient_weights: weights }
+    })
+  }
 
   const searchCandidates = useMemo(() => {
     const queries = [...new Set([searchQuery.trim(), label.trim()].filter(Boolean))]
@@ -456,153 +482,24 @@ export default function ManualPhotoCorrectionSheet({
             <div className="space-y-3">
               {homeDraft && homeWeightLines.length > 0 ? (
                 <>
+                  <p className="text-[14px] leading-relaxed" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
+                    BetterBit 已先幫你估一版，不確定的話直接儲存即可。
+                  </p>
                   <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-                    先選份量與烹調，BetterBit 會幫你估算整餐營養。
+                    覺得飯比較多？只要按飯多一點。不用知道幾克，系統會自動換算。
                   </p>
 
-                  <div className="flex flex-wrap gap-2">
-                    {(Object.keys(PORTION_PRESET_LABELS) as PortionPresetId[]).map(id => {
-                      const active = portionPreset === id
-                      const chipLabel =
-                        id === 'custom'
-                          ? PORTION_PRESET_LABELS.custom
-                          : `${PORTION_PRESET_LABELS[id]} ${DEFAULT_PORTION_GRAMS[id as Exclude<PortionPresetId, 'custom'>]}g`
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          onClick={() => {
-                            setPortionPreset(id)
-                            if (id === 'custom') return
-                            const grams = gramsForPreset(id)!
-                            setHomeDraft(prev =>
-                              prev
-                                ? {
-                                    ...prev,
-                                    ingredients: prev.ingredients.map(line =>
-                                      line.food_id != null ? { ...line, amount: grams } : line
-                                    ),
-                                  }
-                                : prev
-                            )
-                          }}
-                          className="px-3.5 h-10 rounded-full text-[14px]"
-                          style={{
-                            backgroundColor: active ? BB_V2.accent.orange : BB_V2.bg.canvas,
-                            color: active ? '#fff' : BB_V2.text.secondary,
-                            fontWeight: active ? 600 : 400,
-                          }}
-                        >
-                          {chipLabel}
-                        </button>
-                      )
-                    })}
-                  </div>
-
-                  <section className="space-y-2">
-                    {homeWeightLines.map(line => {
-                      const index = homeDraft.ingredients.indexOf(line)
-                      return (
-                        <div key={line.raw_label} className="flex items-center gap-3">
-                          <span className="flex-1 text-[14px] truncate" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
-                            {line.raw_label}
-                          </span>
-                          <input
-                            type="number"
-                            inputMode="decimal"
-                            value={line.amount ?? ''}
-                            onChange={e => {
-                              const v = e.target.value
-                              setPortionPreset('custom')
-                              setHomeDraft(prev =>
-                                prev
-                                  ? {
-                                      ...prev,
-                                      ingredients: prev.ingredients.map((l, i) =>
-                                        i === index ? { ...l, amount: v === '' ? null : Number(v) } : l
-                                      ),
-                                    }
-                                  : prev
-                              )
-                            }}
-                            className="w-24 h-11 px-3 rounded-xl text-[16px] tabular-nums text-right outline-none"
-                            style={{ backgroundColor: BB_V2.bg.canvas, color: BB_V2.text.primary }}
-                          />
-                          <span className="text-[13px] w-6" style={{ color: BB_V2.text.secondary }}>
-                            {line.unit === 'ml' ? 'ml' : line.unit === 'piece' ? '份' : 'g'}
-                          </span>
-                        </div>
-                      )
-                    })}
-                  </section>
-
-                  {homeFields?.oil ? (
-                    <label className="block space-y-1">
-                      <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>用油量</span>
-                      <div className="flex flex-wrap gap-2">
-                        {OIL_LEVEL_OPTIONS.map(o => (
-                          <button
-                            key={o.id}
-                            type="button"
-                            onClick={() => setHomeDraft(prev => (prev ? { ...prev, meal_oil_level: o.id as MealOilLevel } : prev))}
-                            className="px-3.5 h-10 rounded-full text-[14px]"
-                            style={{
-                              backgroundColor: homeDraft.meal_oil_level === o.id ? BB_V2.accent.orange : BB_V2.bg.canvas,
-                              color: homeDraft.meal_oil_level === o.id ? '#fff' : BB_V2.text.secondary,
-                            }}
-                          >
-                            {o.label}
-                          </button>
-                        ))}
-                      </div>
-                    </label>
+                  {hasQuickAdjustableMeal(homeDraft) ? (
+                    <MealQuickAdjustPanel
+                      value={quickAdjust}
+                      onChange={handleQuickAdjustChange}
+                      showRice={homeRoles.has('rice')}
+                      showMeat={homeRoles.has('meat')}
+                      showSauce={homeRoles.has('sauce')}
+                    />
                   ) : null}
 
-                  {homeFields?.cooking ? (
-                    <label className="block space-y-1">
-                      <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>烹調方式</span>
-                      <div className="flex flex-wrap gap-2">
-                        {COOKING_OPTIONS.map(o => (
-                          <button
-                            key={o.id}
-                            type="button"
-                            onClick={() => setHomeDraft(prev => (prev ? { ...prev, meal_cooking_method: o.id } : prev))}
-                            className="px-3.5 h-10 rounded-full text-[14px]"
-                            style={{
-                              backgroundColor: homeDraft.meal_cooking_method === o.id ? BB_V2.accent.orange : BB_V2.bg.canvas,
-                              color: homeDraft.meal_cooking_method === o.id ? '#fff' : BB_V2.text.secondary,
-                            }}
-                          >
-                            {o.label}
-                          </button>
-                        ))}
-                      </div>
-                    </label>
-                  ) : null}
-
-                  {homeFields?.sauce ? (
-                    <label className="block space-y-1">
-                      <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>醬汁</span>
-                      <div className="flex flex-wrap gap-2">
-                        {SAUCE_OPTIONS.map(o => (
-                          <button
-                            key={o.id}
-                            type="button"
-                            onClick={() => setHomeDraft(prev => (prev ? { ...prev, sauce_level: o.id } : prev))}
-                            className="px-3.5 h-10 rounded-full text-[14px]"
-                            style={{
-                              backgroundColor: homeDraft.sauce_level === o.id ? BB_V2.accent.orange : BB_V2.bg.canvas,
-                              color: homeDraft.sauce_level === o.id ? '#fff' : BB_V2.text.secondary,
-                            }}
-                          >
-                            {o.label}
-                          </button>
-                        ))}
-                      </div>
-                    </label>
-                  ) : null}
-
-                  {homePreview ? (
+                  {homePreview && !hasManualMacros ? (
                     <div className="rounded-2xl px-4 py-3" style={{ backgroundColor: BB_V2.bg.canvas }}>
                       <p className="text-[14px]" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
                         估算約 {homePreview.calories} kcal
@@ -610,6 +507,119 @@ export default function ManualPhotoCorrectionSheet({
                       <p className="text-[12px] mt-1" style={{ color: BB_V2.text.secondary }}>
                         蛋白質 {homePreview.protein_g}g · 碳水 {homePreview.carbs_g}g · 脂肪 {homePreview.fat_g}g
                       </p>
+                    </div>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() => setGramsOpen(v => !v)}
+                    className="flex items-center gap-1 text-[13px]"
+                    style={{ color: BB_V2.text.secondary, fontWeight: 500 }}
+                  >
+                    進階：食材克數
+                    {gramsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </button>
+                  {gramsOpen ? (
+                    <div className="space-y-3">
+                      {homeWeightLines.map(line => {
+                        const index = homeDraft.ingredients.indexOf(line)
+                        const weightMeta = homeDraft.ingredient_weights?.find(w => w.raw_label === line.raw_label)
+                        return (
+                          <div key={line.raw_label} className="space-y-1">
+                            <div className="flex items-center gap-3">
+                              <span className="flex-1 text-[14px] truncate" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
+                                {line.raw_label}
+                              </span>
+                              <input
+                                type="number"
+                                inputMode="decimal"
+                                value={line.amount ?? ''}
+                                onChange={e => {
+                                  const v = e.target.value
+                                  updateHomeLine(index, v === '' ? null : Number(v))
+                                }}
+                                className="w-24 h-11 px-3 rounded-xl text-[16px] tabular-nums text-right outline-none"
+                                style={{ backgroundColor: BB_V2.bg.canvas, color: BB_V2.text.primary }}
+                              />
+                              <span className="text-[13px] w-6" style={{ color: BB_V2.text.secondary }}>
+                                {line.unit === 'ml' ? 'ml' : line.unit === 'piece' ? '份' : 'g'}
+                              </span>
+                            </div>
+                            {weightMeta ? (
+                              <p className="text-[11px] pl-1" style={{ color: BB_V2.text.secondary }}>
+                                系統估 {weightMeta.estimated_weight_g}g
+                                {weightMeta.source === 'user_adjusted' ? ` · 你調成 ${weightMeta.adjusted_weight_g}g` : ''}
+                              </p>
+                            ) : null}
+                          </div>
+                        )
+                      })}
+
+                      {homeFields?.oil ? (
+                        <label className="block space-y-1">
+                          <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>用油量</span>
+                          <div className="flex flex-wrap gap-2">
+                            {OIL_LEVEL_OPTIONS.map(o => (
+                              <button
+                                key={o.id}
+                                type="button"
+                                onClick={() => setHomeDraft(prev => (prev ? { ...prev, meal_oil_level: o.id as MealOilLevel } : prev))}
+                                className="px-3.5 h-10 rounded-full text-[14px]"
+                                style={{
+                                  backgroundColor: homeDraft.meal_oil_level === o.id ? BB_V2.accent.orange : BB_V2.bg.canvas,
+                                  color: homeDraft.meal_oil_level === o.id ? '#fff' : BB_V2.text.secondary,
+                                }}
+                              >
+                                {o.label}
+                              </button>
+                            ))}
+                          </div>
+                        </label>
+                      ) : null}
+
+                      {homeFields?.cooking ? (
+                        <label className="block space-y-1">
+                          <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>烹調方式</span>
+                          <div className="flex flex-wrap gap-2">
+                            {COOKING_OPTIONS.map(o => (
+                              <button
+                                key={o.id}
+                                type="button"
+                                onClick={() => setHomeDraft(prev => (prev ? { ...prev, meal_cooking_method: o.id } : prev))}
+                                className="px-3.5 h-10 rounded-full text-[14px]"
+                                style={{
+                                  backgroundColor: homeDraft.meal_cooking_method === o.id ? BB_V2.accent.orange : BB_V2.bg.canvas,
+                                  color: homeDraft.meal_cooking_method === o.id ? '#fff' : BB_V2.text.secondary,
+                                }}
+                              >
+                                {o.label}
+                              </button>
+                            ))}
+                          </div>
+                        </label>
+                      ) : null}
+
+                      {homeFields?.sauce ? (
+                        <label className="block space-y-1">
+                          <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>醬汁</span>
+                          <div className="flex flex-wrap gap-2">
+                            {SAUCE_OPTIONS.map(o => (
+                              <button
+                                key={o.id}
+                                type="button"
+                                onClick={() => setHomeDraft(prev => (prev ? { ...prev, sauce_level: o.id } : prev))}
+                                className="px-3.5 h-10 rounded-full text-[14px]"
+                                style={{
+                                  backgroundColor: homeDraft.sauce_level === o.id ? BB_V2.accent.orange : BB_V2.bg.canvas,
+                                  color: homeDraft.sauce_level === o.id ? '#fff' : BB_V2.text.secondary,
+                                }}
+                              >
+                                {o.label}
+                              </button>
+                            ))}
+                          </div>
+                        </label>
+                      ) : null}
                     </div>
                   ) : null}
                 </>

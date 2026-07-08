@@ -1,4 +1,5 @@
 import ingredientDb from '@/lib/nutrition/home-cooked/data/ingredient-db.json'
+import { SYNTHETIC_WHOLE_FOODS, getSyntheticWholeFood } from '@/lib/nutrition/home-cooked/synthetic-foods'
 import type { WholeFoodReference } from '@/lib/nutrition/home-cooked/types'
 
 const REGISTRY = new Map<string, WholeFoodReference>(
@@ -10,6 +11,8 @@ export function listWholeFoods(): WholeFoodReference[] {
 }
 
 export function getWholeFoodById(id: string): WholeFoodReference | null {
+  const synthetic = getSyntheticWholeFood(id)
+  if (synthetic) return synthetic
   const key = id.toLowerCase()
   return REGISTRY.get(key) ?? REGISTRY.get(id) ?? null
 }
@@ -29,6 +32,13 @@ export function resolveWholeFoodLabel(rawLabel: string): {
 } {
   const norm = normLabel(rawLabel)
   if (!norm) return { food: null, confidence: 'unmatched' }
+
+  for (const food of Object.values(SYNTHETIC_WHOLE_FOODS)) {
+    if (normLabel(food.name_zh) === norm) return { food, confidence: 'medium' }
+    for (const alias of food.aliases) {
+      if (normLabel(alias) === norm) return { food, confidence: 'medium' }
+    }
+  }
 
   for (const food of REGISTRY.values()) {
     if (normLabel(food.name_zh) === norm) {

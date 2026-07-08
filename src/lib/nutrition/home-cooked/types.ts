@@ -81,6 +81,29 @@ export interface HomeCookedMealDraft {
   meal_cooking_method: MealCookingMethod
   meal_oil_level: MealOilLevel
   sauce_level: SauceLevel
+  quick_adjust?: MealQuickAdjust
+  ingredient_weights?: IngredientWeightMeta[]
+}
+
+export type MealPortionSize = 'small' | 'normal' | 'large'
+export type QuickAmountLevel = 'less' | 'normal' | 'more'
+export type EatenLevel = 'all' | 'half' | 'little_left'
+
+export interface MealQuickAdjust {
+  mealPortion: MealPortionSize
+  riceLevel: QuickAmountLevel
+  meatLevel: QuickAmountLevel
+  sauceAmount: QuickAmountLevel
+  eatenLevel: EatenLevel
+}
+
+export interface IngredientWeightMeta {
+  raw_label: string
+  food_id: string | null
+  estimated_weight_g: number
+  adjusted_weight_g: number
+  confidence: 'high' | 'medium' | 'low' | 'unmatched'
+  source: 'photo_estimate' | 'user_adjusted'
 }
 
 export interface HomeCookedMealTotals {
@@ -104,8 +127,9 @@ export interface HomeCookedMeta {
     Pick<
       IngredientPortionResult,
       'food_id' | 'name_zh' | 'amount' | 'unit' | 'calories' | 'protein_g' | 'carbs_g' | 'fat_g'
-    >
+    > & Partial<Pick<IngredientWeightMeta, 'estimated_weight_g' | 'adjusted_weight_g' | 'confidence' | 'source'>>
   >
+  quick_adjust?: MealQuickAdjust
   resolved_at: string
   source: 'home_cooked_portion'
   nutrition_model: 'BetterBit_whole_food_nutrition_model_expanded_5x'
