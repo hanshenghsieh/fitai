@@ -11,7 +11,7 @@ import {
   APPLE_IAP_PRICE_LABEL,
   isRevenueCatConfigured,
 } from '@/lib/apple-iap-config'
-import { purchaseAppleIap, restoreAppleIap } from '@/lib/apple-iap-client'
+import { purchaseAppleIap, restoreAppleIap, type AppleIapPurchaseStep } from '@/lib/apple-iap-client'
 import {
   PREMIUM_BODY,
   PREMIUM_FEATURES,
@@ -51,11 +51,19 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
   } | null>(null)
   const [loading, setLoading] = useState(true)
   const [purchasing, setPurchasing] = useState(false)
+  const [purchaseStep, setPurchaseStep] = useState<AppleIapPurchaseStep | null>(null)
   const [restoring, setRestoring] = useState(false)
 
   const iapReady = isRevenueCatConfigured()
   const isSubscribed = subscription?.status === 'active' || access.isSubscribed
   const trialWhisper = premiumTrialWhisper(access)
+
+  const purchaseStepLabel: Record<AppleIapPurchaseStep, string> = {
+    configure: '連接付款…',
+    offerings: '讀取方案…',
+    purchase: '等待 Apple 付款…',
+    sync: '同步會員…',
+  }
 
   useEffect(() => {
     void (async () => {
@@ -93,8 +101,14 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
     }
     if (purchasing) return
     setPurchasing(true)
+    setPurchaseStep('configure')
+    const safetyTimer = window.setTimeout(() => {
+      setPurchasing(false)
+      setPurchaseStep(null)
+      toast.error('付款逾時。請確認 TestFlight 為最新 Build，且 Sandbox 已登入')
+    }, 75_000)
     try {
-      const result = await purchaseAppleIap(userId)
+      const result = await purchaseAppleIap(userId, step => setPurchaseStep(step))
       if (result.active) {
         toast.message('訂閱成功，會員功能已啟用。')
         await refreshSubscription()
@@ -103,7 +117,9 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       const message = err instanceof Error ? err.message : '無法完成訂閱'
       if (!/cancel|已取消/i.test(message)) toast.error(message)
     } finally {
+      window.clearTimeout(safetyTimer)
       setPurchasing(false)
+      setPurchaseStep(null)
     }
   }
 
@@ -186,7 +202,13 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
         className="w-full py-3 rounded-xl text-[15px] font-medium disabled:opacity-40"
         style={{ backgroundColor: colors.accent.action, color: colors.bg.elevated }}
       >
-        {purchasing ? '處理中…' : iapReady ? '訂閱 BetterBit Pro' : '訂閱準備中'}
+        {purchasing
+          ? purchaseStep
+            ? purchaseStepLabel[purchaseStep]
+            : '處理中…'
+          : iapReady
+            ? '訂閱 BetterBit Pro'
+            : '訂閱準備中'}
       </button>
       <button
         type="button"

@@ -2,13 +2,26 @@
 
 ## 订阅卡在「處理中」、没有 Apple 付款画面
 
-**原因：** TestFlight Build **没有** RevenueCat native plugin（Build ≤10）。
+**先确认两件事：**
 
-**解决：** 上传 **Build 11+**，确认：
+1. TestFlight App 详情 → Build 号是否 **≥ 12**（不是只重开 App）
+2. 点订阅后按钮文字有没有变：**連接付款… → 讀取方案… → 等待 Apple 付款…**
+   - 若一直只显示「處理中…」= 网页未更新，杀 App 重开
+   - 若 75 秒后出现错误 toast = 看错误内容
+
+**原因 A：** TestFlight Build **没有** RevenueCat native plugin（Build ≤10）
+
+**原因 B：** Mac Archive 时未跑 `npm run testflight:prep` / `cap sync`
+
+**解决：** 上传 **Build 12+**，确认：
 
 ```bash
-grep Revenuecat ios/App/CapApp-SPM/Package.swift
+grep -i Revenuecat ios/App/CapApp-SPM/Package.swift
 ```
+
+**原因 C：** Sandbox 未登入 → 付款画面不出现
+
+**原因 D：** Xcode 缺 **In-App Purchase** capability
 
 ---
 

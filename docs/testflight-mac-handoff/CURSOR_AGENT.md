@@ -6,7 +6,7 @@
 
 ## 你的目标
 
-把 BetterBit iOS App **Archive 并上传到 App Store Connect TestFlight**，Build 号 **11**（若 ASC 已有 11 则用 12）。
+把 BetterBit iOS App **Archive 并上传到 App Store Connect TestFlight**，Build 号 **12**（若 ASC 已有 12 则用 13）。
 
 成功标准：
 

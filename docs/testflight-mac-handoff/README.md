@@ -13,7 +13,7 @@
 | Branch | `main` |
 | Bundle ID | `app.fitai.betterbit` |
 | Marketing Version | `1.0` |
-| **Build Number（本次应上传）** | **`11`** |
+| **Build Number（本次应上传）** | **`12`** |
 | Web 加载 | `https://betterbit.app`（Capacitor remote） |
 | 关键修复 | Build 11 含 **RevenueCat native plugin**（旧 Build 订阅会卡在「處理中」） |
 

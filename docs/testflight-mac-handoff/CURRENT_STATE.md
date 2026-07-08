@@ -36,7 +36,7 @@ NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID=BetterBit Pro
 | 字段 | 值 |
 |------|-----|
 | MARKETING_VERSION | 1.0 |
-| CURRENT_PROJECT_VERSION | **11** |
+| CURRENT_PROJECT_VERSION | **12** |
 | Bundle ID | app.fitai.betterbit |
 
 Build 11 关键变更：`cap sync` 后 `Package.swift` 包含 `@revenuecat/purchases-capacitor`。
