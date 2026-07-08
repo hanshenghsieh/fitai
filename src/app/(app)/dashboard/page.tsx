@@ -149,6 +149,7 @@ async function DashboardContent() {
         <TodayPlanEmpty failed={Boolean(planGenerateError)} errorMessage={planGenerateError} />
       ) : todayPlan ? (
         <BetterBitHome
+          key={todayStr}
           todayPlan={todayPlan}
           checkin={checkin}
           weeklyPlanId={weeklyPlan?.id ?? null}

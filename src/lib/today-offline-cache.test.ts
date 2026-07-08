@@ -9,7 +9,7 @@ import {
 } from '@/lib/today-offline-cache'
 import { resolveFoodLogsFromSession, writeFoodLogsSessionCache } from '@/lib/food-log-session-cache'
 
-function sampleLog(id: string): FoodLogEntry {
+function sampleLog(id: string, date = '2099-06-18'): FoodLogEntry {
   return {
     id,
     name: id,
@@ -17,7 +17,7 @@ function sampleLog(id: string): FoodLogEntry {
     protein_g: 10,
     carbs_g: 10,
     fat_g: 5,
-    logged_at: '2026-06-18T08:00:00.000Z',
+    logged_at: `${date}T08:00:00.000Z`,
     user_declared: true,
     source: 'search',
     capture_status: 'resolved',

@@ -223,10 +223,11 @@ describe('food log persistence round-trip', () => {
 
     try {
       const date = '2099-06-18'
-      const serverLogs = [sampleLog({ id: 'srv-1', name: '白飯', calories: 200 })]
+      const at = `${date}T08:00:00.000Z`
+      const serverLogs = [sampleLog({ id: 'srv-1', name: '白飯', calories: 200, logged_at: at })]
       const clientLogs = [
         ...serverLogs,
-        sampleLog({ id: 'cli-2', name: '茶葉蛋', calories: 80 }),
+        sampleLog({ id: 'cli-2', name: '茶葉蛋', calories: 80, logged_at: at }),
       ]
       writeFoodLogsSessionCache(clientLogs, date)
 
@@ -243,8 +244,10 @@ describe('food log persistence round-trip', () => {
   })
 
   it('tab switch simulation: stale server + fresh session cache keeps new log', () => {
-    const serverLogs = [sampleLog({ id: 'srv-1', name: '白飯', calories: 200 })]
-    const clientLogs = [...serverLogs, sampleLog({ id: 'cli-new', name: '茶葉蛋', calories: 80 })]
+    const date = '2099-06-18'
+    const at = `${date}T08:00:00.000Z`
+    const serverLogs = [sampleLog({ id: 'srv-1', name: '白飯', calories: 200, logged_at: at })]
+    const clientLogs = [...serverLogs, sampleLog({ id: 'cli-new', name: '茶葉蛋', calories: 80, logged_at: at })]
 
     const store = new Map<string, string>()
     const storage = {
@@ -319,8 +322,9 @@ describe('food log persistence round-trip', () => {
 
     try {
       const date = '2099-06-18'
-      const serverLogs = [sampleLog({ id: 'srv-1', name: '白飯', calories: 200 })]
-      const clientLogs = [...serverLogs, sampleLog({ id: 'cli-offline', name: '茶葉蛋', calories: 80 })]
+      const at = `${date}T08:00:00.000Z`
+      const serverLogs = [sampleLog({ id: 'srv-1', name: '白飯', calories: 200, logged_at: at })]
+      const clientLogs = [...serverLogs, sampleLog({ id: 'cli-offline', name: '茶葉蛋', calories: 80, logged_at: at })]
       writeFoodLogsSessionCache(clientLogs, date, {
         calorie_target: 1800,
         protein_target: 120,

@@ -1,5 +1,6 @@
 import type { FoodLogEntry } from '@/lib/banks/types'
 import { getNutritionDayKey } from '@/lib/timezone'
+import { filterFoodLogsForNutritionDay } from '@/lib/nutrition-day-food-logs'
 import {
   mergeFoodLogsPreferComplete,
   readTodayOfflineSnapshot,
@@ -66,13 +67,16 @@ export function resolveFoodLogsFromSession(
   serverLogs: FoodLogEntry[],
   date = getNutritionDayKey()
 ): FoodLogEntry[] {
+  const serverForDay = filterFoodLogsForNutritionDay(serverLogs, date)
   const cached = readFoodLogsSessionCache(date)
   const durable = readTodayOfflineSnapshot(date)?.food_logs_today ?? null
-  const merged = mergeFoodLogsPreferComplete(serverLogs, cached, durable)
-  if (merged.length === serverLogs.length) {
-    const serverFp = foodLogIdsFingerprint(serverLogs)
+  const cachedForDay = cached ? filterFoodLogsForNutritionDay(cached, date) : null
+  const durableForDay = durable ? filterFoodLogsForNutritionDay(durable, date) : null
+  const merged = mergeFoodLogsPreferComplete(serverForDay, cachedForDay, durableForDay)
+  if (merged.length === serverForDay.length) {
+    const serverFp = foodLogIdsFingerprint(serverForDay)
     const mergedFp = foodLogIdsFingerprint(merged)
-    if (mergedFp === serverFp) return serverLogs
+    if (mergedFp === serverFp) return serverForDay
   }
-  return merged.length >= serverLogs.length ? merged : serverLogs
+  return merged.length >= serverForDay.length ? merged : serverForDay
 }

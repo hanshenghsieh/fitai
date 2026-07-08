@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition, useCallback, useEffect, useRef, useMemo } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { CheckCircle2, Circle, ChevronDown, ChevronUp, Play } from 'lucide-react'
 import {
   buildCheckinPayload,
@@ -57,6 +57,7 @@ import {
   resolveFoodLogsFromSession,
   writeFoodLogsSessionCache,
 } from '@/lib/food-log-session-cache'
+import { clearTodayOfflineSnapshot } from '@/lib/today-offline-cache'
 import {
   resolveWorkoutItemsFromSession,
   writeWorkoutItemsSessionCache,
@@ -64,6 +65,7 @@ import {
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
 import { getNutritionDayKey, getPreviousNutritionDayKey } from '@/lib/timezone'
+import { filterFoodLogsForNutritionDay } from '@/lib/nutrition-day-food-logs'
 import { addWaterMl, resetWaterMl, resolveDailyWaterGoalMl, setWaterMl as applyWaterTotal } from '@/lib/water-log'
 import { TODAY } from '@/lib/today-design'
 import TodayWaterLog from '@/components/dashboard/today/TodayWaterLog'
@@ -141,6 +143,7 @@ export default function BetterBitHome({
   initialFoodLogs = [],
 }: Props) {
   const pathname = usePathname()
+  const router = useRouter()
   const onDashboard = pathname === '/dashboard'
   const [isPending, startTransition] = useTransition()
   const [expandedWorkout, setExpandedWorkout] = useState(false)
@@ -314,15 +317,57 @@ export default function BetterBitHome({
   )
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
+    const today = getNutritionDayKey()
+    const logs = userMemoryRef.current.food_logs_today ?? []
+    const filtered = filterFoodLogsForNutritionDay(logs, today)
+    if (filtered.length === logs.length) return
+    const nextMemory = { ...userMemoryRef.current, food_logs_today: filtered }
+    userMemoryRef.current = nextMemory
+    writeFoodCache(filtered)
+    startTransition(() => setUserMemory(nextMemory))
+  }, [writeFoodCache])
+
+  useEffect(() => {
+      clearFoodLogsSessionCache(nextDay)
+      clearTodayOfflineSnapshot()
+      clearPendingSync()
+
+      const emptyMemory: UserMemoryMeta = {
+        ...userMemoryRef.current,
+        food_logs_today: [],
+      }
+      userMemoryRef.current = emptyMemory
+      startTransition(() => {
+        setUserMemory(emptyMemory)
+        setTrackedDayKey(nextDay)
+        setWaterMl(0)
+        setCalorieBank(null)
+      })
+      waterMlRef.current = 0
+      calorieBankSyncedRef.current = false
+      didSessionHydrateRef.current = false
+      didLocalReconcileRef.current = false
+      persistPatchRef.current = {}
+      router.refresh()
+    }
+
+    const checkRollover = () => {
       const today = getNutritionDayKey()
       if (today === trackedDayKey) return
-      setTrackedDayKey(today)
-      waterMlRef.current = 0
-      setWaterMl(0)
-    }, 60_000)
-    return () => window.clearInterval(interval)
-  }, [trackedDayKey])
+      applyNutritionDayRollover(today)
+    }
+
+    checkRollover()
+    const interval = window.setInterval(checkRollover, 60_000)
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') checkRollover()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [trackedDayKey, router])
 
   const intakeSummary = useMemo(() => {
     const caloriesLogged = sumLoggedCalories(displayFoodLogs)

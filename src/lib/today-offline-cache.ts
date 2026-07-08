@@ -42,6 +42,17 @@ export function readTodayOfflineSnapshot(date = getNutritionDayKey()): TodayOffl
   }
 }
 
+export function clearTodayOfflineSnapshot(): void {
+  const storage = readStorage()
+  if (!storage) return
+  try {
+    storage.removeItem(STORAGE_KEY)
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('storage'))
+  } catch {
+    // ignore
+  }
+}
+
 export function hasTodayOfflineSnapshot(date = getNutritionDayKey()): boolean {
   return readTodayOfflineSnapshot(date) != null
 }
