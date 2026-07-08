@@ -9,7 +9,6 @@ import { parseGeneratePlanError } from '@/lib/api-errors'
 import SettingsHeader from './SettingsHeader'
 import SettingsAccountSection from './SettingsAccountSection'
 import SettingsPremiumTeaser from './SettingsPremiumTeaser'
-import SettingsHealthSection from './SettingsHealthSection'
 import SettingsNotificationsSection from './SettingsNotificationsSection'
 import SettingsPrivacySection from './SettingsPrivacySection'
 import SettingsSupportSection from './SettingsSupportSection'
@@ -53,7 +52,6 @@ export default function SettingsScreen({ profile, email, access }: Props) {
         regenLoading={regenLoading}
       />
       <SettingsPremiumTeaser access={access} />
-      <SettingsHealthSection />
       <SettingsNotificationsSection />
       <SettingsPrivacySection />
       <SettingsSupportSection />
