@@ -5,10 +5,12 @@ import { X, Scale, ChevronDown, ChevronUp } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import AppOverlay from '@/components/ui/AppOverlay'
 import type { ManualNutritionInput } from '@/lib/nutrition/unknown-food-flow'
+import { getHomeCookedFieldVisibility } from '@/lib/nutrition/food-type-ui'
 import {
   calculateHomeCookedMeal,
   isHomeCookedDraftComplete,
   parseMealLabelToDraft,
+  withSuggestedDefaults,
   type DetectedIngredientLine,
   type HomeCookedMealDraft,
   type MealCookingMethod,
@@ -146,44 +148,22 @@ export default function IngredientPortionSheet({
     if (initializedForOpenRef.current) return
     initializedForOpenRef.current = true
 
-    const nextDraft = initialDraft ?? parseMealLabelToDraft(mealLabel)
+    const nextDraft = withSuggestedDefaults(initialDraft ?? parseMealLabelToDraft(mealLabel))
     setDraft(nextDraft)
-    const nextWeightLines = nextDraft.ingredients.filter(i => i.food_id != null)
-    const hasManualSeed =
+    setAdvancedOpen(false)
+    setCalories(initialManual?.calories != null ? String(initialManual.calories) : '')
+    setProtein(initialManual?.protein_g != null ? String(initialManual.protein_g) : '')
+    setFat(initialManual?.fat_g != null ? String(initialManual.fat_g) : '')
+    setCarbs(initialManual?.carbs_g != null ? String(initialManual.carbs_g) : '')
+    if (
       initialManual?.calories != null ||
       initialManual?.protein_g != null ||
       initialManual?.fat_g != null ||
       initialManual?.carbs_g != null
-    const nextPreview = calculateHomeCookedMeal(nextDraft)
-    setAdvancedOpen(nextWeightLines.length > 1)
-    setCalories(
-      initialManual?.calories != null
-        ? String(initialManual.calories)
-        : nextPreview && !hasManualSeed
-          ? String(nextPreview.calories)
-          : ''
-    )
-    setProtein(
-      initialManual?.protein_g != null
-        ? String(initialManual.protein_g)
-        : nextPreview && !hasManualSeed
-          ? String(nextPreview.protein_g)
-          : ''
-    )
-    setFat(
-      initialManual?.fat_g != null
-        ? String(initialManual.fat_g)
-        : nextPreview && !hasManualSeed
-          ? String(nextPreview.fat_g)
-          : ''
-    )
-    setCarbs(
-      initialManual?.carbs_g != null
-        ? String(initialManual.carbs_g)
-        : nextPreview && !hasManualSeed
-          ? String(nextPreview.carbs_g)
-          : ''
-    )
+    ) {
+      userEditedMacrosRef.current = true
+      setAdvancedOpen(true)
+    }
     const firstAmount = nextDraft.ingredients.find(i => i.food_id != null)?.amount
     setPortionPreset(inferPresetFromGrams(firstAmount))
   }, [open, mealLabel, initialDraft, initialManual])
@@ -195,90 +175,64 @@ export default function IngredientPortionSheet({
   const noDbMatch = weightLines.length === 0
   const singleWeightLine = weightLines.length === 1
   const isComposite = weightLines.length > 1
+  const fields = useMemo(() => getHomeCookedFieldVisibility(draft), [draft])
 
   const preview = useMemo(() => calculateHomeCookedMeal(draft), [draft])
   const canSaveWeight = isHomeCookedDraftComplete(draft)
 
-  useEffect(() => {
-    if (!open || !preview || userEditedMacrosRef.current) return
-    setCalories(String(preview.calories))
-    setProtein(String(preview.protein_g))
-    setFat(String(preview.fat_g))
-    setCarbs(String(preview.carbs_g))
-  }, [open, preview])
-
   const hasManualOverride =
-    parseNum(calories) != null ||
-    parseNum(protein) != null ||
-    parseNum(fat) != null ||
-    parseNum(carbs) != null
+    userEditedMacrosRef.current &&
+    (parseNum(calories) != null ||
+      parseNum(protein) != null ||
+      parseNum(fat) != null ||
+      parseNum(carbs) != null)
 
   function updateLine(index: number, patch: Partial<DetectedIngredientLine>) {
-    setDraft(prev => {
-      const next = {
-        ...prev,
-        ingredients: prev.ingredients.map((line, i) => (i === index ? { ...line, ...patch } : line)),
-      }
-      const manual =
-        parseNum(calories) != null ||
-        parseNum(protein) != null ||
-        parseNum(fat) != null ||
-        parseNum(carbs) != null
-      if (!manual) {
-        const totals = calculateHomeCookedMeal(next)
-        if (totals) {
-          setCalories(String(totals.calories))
-          setProtein(String(totals.protein_g))
-          setFat(String(totals.fat_g))
-          setCarbs(String(totals.carbs_g))
-        }
-      }
-      return next
-    })
+    setDraft(prev => ({
+      ...prev,
+      ingredients: prev.ingredients.map((line, i) => (i === index ? { ...line, ...patch } : line)),
+    }))
   }
 
   function applyPortionPreset(preset: PortionPresetId) {
     setPortionPreset(preset)
     if (preset === 'custom') return
     const grams = gramsForPreset(preset)!
-    let nextDraft = draft
     if (singleWeightLine) {
       const index = draft.ingredients.indexOf(weightLines[0]!)
-      nextDraft = {
-        ...draft,
-        ingredients: draft.ingredients.map((line, i) => (i === index ? { ...line, amount: grams } : line)),
-      }
+      updateLine(index, { amount: grams })
     } else if (weightLines.length > 0) {
-      nextDraft = {
-        ...draft,
-        ingredients: draft.ingredients.map(line =>
+      setDraft(prev => ({
+        ...prev,
+        ingredients: prev.ingredients.map(line =>
           line.food_id != null ? { ...line, amount: grams } : line
         ),
-      }
-    }
-    setDraft(nextDraft)
-    const nextPreview = calculateHomeCookedMeal(nextDraft)
-    if (nextPreview && !hasManualOverride) {
-      setCalories(String(nextPreview.calories))
-      setProtein(String(nextPreview.protein_g))
-      setFat(String(nextPreview.fat_g))
-      setCarbs(String(nextPreview.carbs_g))
+      }))
     }
   }
 
   function handleSave() {
-    if ((hasManualOverride || noDbMatch) && onManualSave) {
+    if (hasManualOverride && onManualSave) {
       onManualSave({
         calories: parseNum(calories),
         protein_g: parseNum(protein),
         fat_g: parseNum(fat),
         carbs_g: parseNum(carbs),
-        portion: noDbMatch
-          ? mealLabel
-          : weightLines
-              .filter(l => l.amount)
-              .map(l => `${l.name_zh} ${l.amount}${unitLabel(l.unit)}`)
-              .join('、'),
+        portion: weightLines
+          .filter(l => l.amount)
+          .map(l => `${l.name_zh} ${l.amount}${unitLabel(l.unit)}`)
+          .join('、'),
+        source_note: 'manual_override',
+      })
+      return
+    }
+    if (noDbMatch && onManualSave) {
+      onManualSave({
+        calories: parseNum(calories),
+        protein_g: parseNum(protein),
+        fat_g: parseNum(fat),
+        carbs_g: parseNum(carbs),
+        portion: mealLabel,
         source_note: 'manual_override',
       })
       return
@@ -353,135 +307,145 @@ export default function IngredientPortionSheet({
                 資料庫尚無「{mealLabel}」的對應食材。
               </p>
               <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-                請直接填寫熱量與營養素，BetterBit 會標記為手動記錄並計入今日。
+                請展開下方進階欄位，手動填寫營養素。
               </p>
-              <div className="space-y-3 pt-1">
-                {macroField('熱量', calories, setCalories, 'kcal')}
-                {macroField('蛋白質', protein, setProtein, 'g')}
-                {macroField('碳水', carbs, setCarbs, 'g')}
-                {macroField('脂肪', fat, setFat, 'g')}
-              </div>
             </section>
-          ) : null}
-
-          {!noDbMatch ? (
+          ) : (
             <>
               {isComposite ? (
                 <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-                  已辨識 {weightLines.length} 項食材。先確認整餐營養素，需要時再展開調整各項份量。
+                  已辨識 {weightLines.length} 項食材，選份量與烹調方式後會自動估算。
                 </p>
               ) : null}
 
-              <div className="grid grid-cols-2 gap-3">
+              {weightLines.length > 0 ? (
+                <ChipRow
+                  label={fields.portionLabel}
+                  options={(Object.keys(PORTION_PRESET_LABELS) as PortionPresetId[]).map(id => ({
+                    id,
+                    label:
+                      id === 'custom'
+                        ? PORTION_PRESET_LABELS.custom
+                        : `${PORTION_PRESET_LABELS[id]} ${DEFAULT_PORTION_GRAMS[id as Exclude<PortionPresetId, 'custom'>]}g`,
+                  }))}
+                  value={portionPreset}
+                  onChange={applyPortionPreset}
+                />
+              ) : null}
+
+              {weightLines.length > 0 ? (
+                <section className="space-y-2">
+                  <p className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
+                    食材重量
+                  </p>
+                  {weightLines.map(line => {
+                    const index = draft.ingredients.indexOf(line)
+                    return (
+                      <div key={`${line.raw_label}-${index}`} className="flex items-center gap-3">
+                        <span className="flex-1 text-[15px] truncate" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
+                          {line.raw_label}
+                        </span>
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          placeholder="150"
+                          value={line.amount ?? ''}
+                          onChange={e => {
+                            const v = e.target.value
+                            setPortionPreset('custom')
+                            updateLine(index, { amount: v === '' ? null : Number(v) })
+                          }}
+                          className="w-24 h-12 px-3 rounded-xl text-[16px] tabular-nums text-right outline-none"
+                          style={{
+                            backgroundColor: BB_V2.bg.canvas,
+                            color: BB_V2.text.primary,
+                            border: `1px solid ${BB_V2.divider}`,
+                          }}
+                        />
+                        <span className="text-[14px] w-6 shrink-0" style={{ color: BB_V2.text.secondary }}>
+                          {unitLabel(line.unit)}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </section>
+              ) : null}
+
+              {fields.oil ? (
+                <ChipRow
+                  label="用油量"
+                  options={OIL_LEVEL_OPTIONS.map(o => ({ id: o.id, label: o.label }))}
+                  value={draft.meal_oil_level}
+                  onChange={meal_oil_level => setDraft(prev => ({ ...prev, meal_oil_level }))}
+                />
+              ) : null}
+
+              {fields.cooking ? (
+                <ChipRow
+                  label="烹調方式"
+                  options={COOKING_OPTIONS}
+                  value={draft.meal_cooking_method}
+                  onChange={meal_cooking_method => setDraft(prev => ({ ...prev, meal_cooking_method }))}
+                />
+              ) : null}
+
+              {fields.sauce ? (
+                <ChipRow
+                  label="醬汁"
+                  options={SAUCE_OPTIONS}
+                  value={draft.sauce_level}
+                  onChange={sauce_level => setDraft(prev => ({ ...prev, sauce_level }))}
+                />
+              ) : null}
+
+              {preview && !hasManualOverride ? (
+                <section
+                  className="rounded-2xl px-4 py-3"
+                  style={{ backgroundColor: BB_V2.bg.canvas, border: `1px solid ${BB_V2.divider}` }}
+                >
+                  <p className="text-[14px]" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
+                    估算約 {preview.calories} kcal
+                  </p>
+                  <p className="text-[12px] mt-1" style={{ color: BB_V2.text.secondary }}>
+                    蛋白質 {preview.protein_g}g · 碳水 {preview.carbs_g}g · 脂肪 {preview.fat_g}g
+                  </p>
+                </section>
+              ) : null}
+            </>
+          )}
+
+          <section>
+            <button
+              type="button"
+              onClick={() => setAdvancedOpen(v => !v)}
+              className="flex items-center gap-1.5 text-[13px] w-full"
+              style={{ color: BB_V2.text.secondary, fontWeight: 500 }}
+            >
+              {advancedOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              進階：手動修正營養素
+            </button>
+            {advancedOpen ? (
+              <div className="space-y-3 mt-3">
                 {macroField('熱量', calories, setCalories, 'kcal')}
                 {macroField('蛋白質', protein, setProtein, 'g')}
                 {macroField('碳水', carbs, setCarbs, 'g')}
                 {macroField('脂肪', fat, setFat, 'g')}
+                <p className="text-[11px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+                  只有在你主動填寫時，才會覆蓋上方的份量估算。
+                </p>
               </div>
-
-              {preview && !hasManualOverride ? (
-                <p className="text-[12px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-                  依食材與份量估算；手動修改上方數字會優先採用。
-                </p>
-              ) : hasManualOverride ? (
-                <p className="text-[12px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-                  已使用手動營養素，略過食材估算。
-                </p>
-              ) : null}
-
-              <button
-                type="button"
-                onClick={() => setAdvancedOpen(v => !v)}
-                className="flex items-center gap-1 text-[13px] py-1"
-                style={{ color: BB_V2.text.secondary, fontWeight: 500 }}
-              >
-                {advancedOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                {isComposite ? '調整食材份量與烹調' : '調整份量與烹調'}
-              </button>
-
-              {advancedOpen ? (
-                <div className="space-y-5">
-                  {weightLines.length > 0 ? (
-                    <ChipRow
-                      label="快速份量"
-                      options={(Object.keys(PORTION_PRESET_LABELS) as PortionPresetId[]).map(id => ({
-                        id,
-                        label:
-                          id === 'custom'
-                            ? PORTION_PRESET_LABELS.custom
-                            : `${PORTION_PRESET_LABELS[id]} ${DEFAULT_PORTION_GRAMS[id as Exclude<PortionPresetId, 'custom'>]}g`,
-                      }))}
-                      value={portionPreset}
-                      onChange={applyPortionPreset}
-                    />
-                  ) : null}
-
-                  <section className="space-y-2">
-                    <p className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
-                      食材重量
-                    </p>
-                    {weightLines.map(line => {
-                      const index = draft.ingredients.indexOf(line)
-                      return (
-                        <div key={`${line.raw_label}-${index}`} className="flex items-center gap-3">
-                          <span className="flex-1 text-[15px] truncate" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
-                            {line.raw_label}
-                          </span>
-                          <input
-                            type="number"
-                            inputMode="decimal"
-                            placeholder="150"
-                            value={line.amount ?? ''}
-                            onChange={e => {
-                              const v = e.target.value
-                              setPortionPreset('custom')
-                              updateLine(index, { amount: v === '' ? null : Number(v) })
-                            }}
-                            className="w-24 h-12 px-3 rounded-xl text-[16px] tabular-nums text-right outline-none"
-                            style={{
-                              backgroundColor: BB_V2.bg.canvas,
-                              color: BB_V2.text.primary,
-                              border: `1px solid ${BB_V2.divider}`,
-                            }}
-                          />
-                          <span className="text-[14px] w-6 shrink-0" style={{ color: BB_V2.text.secondary }}>
-                            {unitLabel(line.unit)}
-                          </span>
-                        </div>
-                      )
-                    })}
-                  </section>
-
-                  <ChipRow
-                    label="用油量"
-                    options={OIL_LEVEL_OPTIONS.map(o => ({ id: o.id, label: o.label }))}
-                    value={draft.meal_oil_level}
-                    onChange={meal_oil_level => setDraft(prev => ({ ...prev, meal_oil_level }))}
-                  />
-
-                  <ChipRow
-                    label="烹調方式"
-                    options={COOKING_OPTIONS}
-                    value={draft.meal_cooking_method}
-                    onChange={meal_cooking_method => setDraft(prev => ({ ...prev, meal_cooking_method }))}
-                  />
-
-                  <ChipRow
-                    label="醬汁"
-                    options={SAUCE_OPTIONS}
-                    value={draft.sauce_level}
-                    onChange={sauce_level => setDraft(prev => ({ ...prev, sauce_level }))}
-                  />
-                </div>
-              ) : null}
-            </>
-          ) : null}
+            ) : null}
+          </section>
         </div>
 
         <div className="px-5 pt-3 pb-8 space-y-2">
           <button
             type="button"
-            disabled={noDbMatch ? !hasManualOverride || !onManualSave : !canSaveWeight && !hasManualOverride}
+            disabled={
+              noDbMatch
+                ? !hasManualOverride || !onManualSave
+                : !canSaveWeight && !hasManualOverride
+            }
             onClick={handleSave}
             className="w-full h-12 rounded-[20px] text-[15px] flex items-center justify-center gap-2 disabled:opacity-40"
             style={{ backgroundColor: BB_V2.accent.orange, color: '#FFFFFF', fontWeight: 600 }}

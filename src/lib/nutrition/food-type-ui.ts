@@ -119,3 +119,33 @@ export const FOOD_TYPE_LABELS: Record<FoodType, string> = {
   drink: '飲料',
   snack: '零食',
 }
+
+/** Home-cooked / composite meals — hide oil & sauce for drinks; staples skip fry options. */
+export function getHomeCookedFieldVisibility(draft: {
+  ingredients: Array<{ raw_label: string; category: string; unit: string }>
+}): {
+  portionLabel: string
+  oil: boolean
+  cooking: boolean
+  sauce: boolean
+} {
+  const lines = draft.ingredients.filter(i => i.raw_label.trim())
+  const drinkLike =
+    lines.length > 0 &&
+    lines.every(
+      l =>
+        l.unit === 'ml' ||
+        /茶|咖啡|奶|飲|汁|可樂|汽水|拿鐵|美式|紅茶|綠茶|奶茶|豆漿/.test(l.raw_label)
+    )
+  if (drinkLike) {
+    return { portionLabel: '容量', oil: false, cooking: false, sauce: false }
+  }
+
+  const stapleOnly =
+    lines.length === 1 && (lines[0]?.category === 'carb' || /飯|麵|粥|吐司|饅頭/.test(lines[0]?.raw_label ?? ''))
+  if (stapleOnly) {
+    return { portionLabel: '份量', oil: false, cooking: false, sauce: false }
+  }
+
+  return { portionLabel: '份量', oil: true, cooking: true, sauce: true }
+}

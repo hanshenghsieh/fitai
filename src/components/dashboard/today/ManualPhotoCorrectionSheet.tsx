@@ -18,9 +18,23 @@ import { buildPhotoAiMeta } from '@/lib/nutrition/photo-manual-correction'
 import {
   calculateHomeCookedMeal,
   isCompositeMealLabel,
+  isHomeCookedDraftComplete,
   parseMealLabelToDraft,
   withSuggestedDefaults,
+  type HomeCookedMealDraft,
+  type MealCookingMethod,
+  type MealOilLevel,
+  type SauceLevel,
 } from '@/lib/nutrition/home-cooked'
+import { getHomeCookedFieldVisibility } from '@/lib/nutrition/food-type-ui'
+import {
+  DEFAULT_PORTION_GRAMS,
+  gramsForPreset,
+  inferPresetFromGrams,
+  OIL_LEVEL_OPTIONS,
+  PORTION_PRESET_LABELS,
+  type PortionPresetId,
+} from '@/lib/nutrition/portion-presets'
 import AppOverlay from '@/components/ui/AppOverlay'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
@@ -64,6 +78,21 @@ const CATEGORY_LABELS: Record<FoodCategory, string> = {
   unknown: '不確定',
 }
 
+const COOKING_OPTIONS: { id: MealCookingMethod; label: string }[] = [
+  { id: 'boiled', label: '水煮' },
+  { id: 'steamed', label: '蒸' },
+  { id: 'grilled', label: '烤' },
+  { id: 'stir_fried', label: '炒' },
+  { id: 'deep_fried', label: '炸' },
+]
+
+const SAUCE_OPTIONS: { id: SauceLevel; label: string }[] = [
+  { id: 'none', label: '無' },
+  { id: 'light', label: '少' },
+  { id: 'normal', label: '正常' },
+  { id: 'heavy', label: '多' },
+]
+
 export default function ManualPhotoCorrectionSheet({
   open,
   initialLabel,
@@ -89,8 +118,10 @@ export default function ManualPhotoCorrectionSheet({
   const [sodium, setSodium] = useState('')
   const [portion, setPortion] = useState('')
   const [notes, setNotes] = useState('')
+  const [homeDraft, setHomeDraft] = useState<HomeCookedMealDraft | null>(null)
+  const [portionPreset, setPortionPreset] = useState<PortionPresetId>('normal')
   const initializedForOpenRef = useRef(false)
-  const manualPrefilledRef = useRef(false)
+  const userEditedMacrosRef = useRef(false)
 
   const visualCategory = visualParse.visual_category
   const detectedLabel = visualParse.detected_label
@@ -98,7 +129,7 @@ export default function ManualPhotoCorrectionSheet({
   useEffect(() => {
     if (!open) {
       initializedForOpenRef.current = false
-      manualPrefilledRef.current = false
+      userEditedMacrosRef.current = false
       return
     }
     if (initializedForOpenRef.current) return
@@ -120,26 +151,27 @@ export default function ManualPhotoCorrectionSheet({
     setPortion('')
     setNotes('')
     setAdvancedOpen(false)
+    setHomeDraft(null)
+    setPortionPreset('normal')
   }, [open, initialLabel, initialRestaurant, visualCategory, detectedLabel])
 
-  const compositeDraft = useMemo(() => {
-    if (!isCompositeMealLabel(label.trim())) return null
-    return withSuggestedDefaults(parseMealLabelToDraft(label.trim()))
+  useEffect(() => {
+    if (!isCompositeMealLabel(label.trim())) {
+      setHomeDraft(null)
+      return
+    }
+    const next = withSuggestedDefaults(parseMealLabelToDraft(label.trim()))
+    setHomeDraft(next)
+    const firstAmount = next.ingredients.find(i => i.food_id != null)?.amount
+    setPortionPreset(inferPresetFromGrams(firstAmount))
   }, [label])
 
-  const homeEstimate = useMemo(() => {
-    if (!compositeDraft) return null
-    return calculateHomeCookedMeal(compositeDraft)
-  }, [compositeDraft])
-
-  useEffect(() => {
-    if (!open || mode !== 'manual' || manualPrefilledRef.current || !homeEstimate) return
-    manualPrefilledRef.current = true
-    setCalories(String(homeEstimate.calories))
-    setProtein(String(homeEstimate.protein_g))
-    setFat(String(homeEstimate.fat_g))
-    setCarbs(String(homeEstimate.carbs_g))
-  }, [open, mode, homeEstimate])
+  const homeFields = useMemo(() => (homeDraft ? getHomeCookedFieldVisibility(homeDraft) : null), [homeDraft])
+  const homePreview = useMemo(() => (homeDraft ? calculateHomeCookedMeal(homeDraft) : null), [homeDraft])
+  const homeWeightLines = useMemo(
+    () => homeDraft?.ingredients.filter(i => i.food_id != null) ?? [],
+    [homeDraft]
+  )
 
   const searchCandidates = useMemo(() => {
     const queries = [...new Set([searchQuery.trim(), label.trim()].filter(Boolean))]
@@ -171,12 +203,21 @@ export default function ManualPhotoCorrectionSheet({
 
   const photoAi = buildPhotoAiMeta(visualParse, originalCandidates)
 
+  const hasManualMacros =
+    userEditedMacrosRef.current &&
+    (parseNum(calories) != null ||
+      parseNum(protein) != null ||
+      parseNum(fat) != null ||
+      parseNum(carbs) != null)
+
   const canCommit =
     mode === 'search'
       ? Boolean(selectedCandidate)
       : mode === 'unknown'
         ? label.trim().length > 0
-        : parseNum(calories) != null ||
+        : hasManualMacros ||
+          (homeDraft != null && isHomeCookedDraftComplete(homeDraft) && homePreview != null) ||
+          parseNum(calories) != null ||
           parseNum(protein) != null ||
           parseNum(fat) != null ||
           parseNum(carbs) != null
@@ -200,17 +241,30 @@ export default function ManualPhotoCorrectionSheet({
     }
 
     if (mode === 'manual') {
-      const nutrition: ManualNutritionInput = {
-        calories: parseNum(calories),
-        protein_g: parseNum(protein),
-        fat_g: parseNum(fat),
-        carbs_g: parseNum(carbs),
-        fiber_g: parseNum(fiber),
-        sugar_g: parseNum(sugar),
-        sodium_mg: parseNum(sodium),
-        portion: portion.trim() || undefined,
-        notes: notes.trim() || undefined,
-      }
+      const usePortionEstimate = homeDraft && homePreview && isHomeCookedDraftComplete(homeDraft) && !hasManualMacros
+      const nutrition: ManualNutritionInput = usePortionEstimate
+        ? {
+            calories: homePreview.calories,
+            protein_g: homePreview.protein_g,
+            fat_g: homePreview.fat_g,
+            carbs_g: homePreview.carbs_g,
+            portion: homeWeightLines
+              .filter(l => l.amount)
+              .map(l => `${l.name_zh} ${l.amount}${l.unit === 'ml' ? 'ml' : l.unit === 'piece' ? '份' : 'g'}`)
+              .join('、'),
+            notes: notes.trim() || undefined,
+          }
+        : {
+            calories: parseNum(calories),
+            protein_g: parseNum(protein),
+            fat_g: parseNum(fat),
+            carbs_g: parseNum(carbs),
+            fiber_g: parseNum(fiber),
+            sugar_g: parseNum(sugar),
+            sodium_mg: parseNum(sodium),
+            portion: portion.trim() || undefined,
+            notes: notes.trim() || undefined,
+          }
       onCommit({
         mode: 'user_entered',
         label: trimmedLabel,
@@ -244,7 +298,10 @@ export default function ManualPhotoCorrectionSheet({
           inputMode="decimal"
           min={0}
           value={value}
-          onChange={e => onChange(e.target.value)}
+          onChange={e => {
+            userEditedMacrosRef.current = true
+            onChange(e.target.value)
+          }}
           className="flex-1 bg-transparent text-base outline-none min-w-0 tabular-nums"
           style={{ color: BB_V2.text.primary }}
           placeholder="—"
@@ -397,66 +454,215 @@ export default function ManualPhotoCorrectionSheet({
 
           {mode === 'manual' && (
             <div className="space-y-3">
-              {compositeDraft && homeEstimate ? (
-                <div
-                  className="rounded-2xl px-4 py-3 space-y-2"
-                  style={{ backgroundColor: BB_V2.bg.canvas, border: `1px solid ${BB_V2.divider}` }}
-                >
-                  <p className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
-                    依偵測到的食材估算（可再手動調整）
+              {homeDraft && homeWeightLines.length > 0 ? (
+                <>
+                  <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+                    先選份量與烹調，BetterBit 會幫你估算整餐營養。
                   </p>
-                  <ul className="text-[13px] space-y-1" style={{ color: BB_V2.text.secondary }}>
-                    {compositeDraft.ingredients.map(line => (
-                      <li key={line.raw_label}>
-                        · {line.raw_label}
-                        {line.food_id && line.amount != null ? ` · 約 ${line.amount}${line.unit === 'piece' ? '份' : 'g'}` : ''}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-              <div className="grid grid-cols-2 gap-3">
-                {field('熱量', calories, setCalories, 'kcal')}
-                {field('蛋白質', protein, setProtein, 'g')}
-                {field('脂肪', fat, setFat, 'g')}
-                {field('碳水', carbs, setCarbs, 'g')}
-              </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {(Object.keys(PORTION_PRESET_LABELS) as PortionPresetId[]).map(id => {
+                      const active = portionPreset === id
+                      const chipLabel =
+                        id === 'custom'
+                          ? PORTION_PRESET_LABELS.custom
+                          : `${PORTION_PRESET_LABELS[id]} ${DEFAULT_PORTION_GRAMS[id as Exclude<PortionPresetId, 'custom'>]}g`
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => {
+                            setPortionPreset(id)
+                            if (id === 'custom') return
+                            const grams = gramsForPreset(id)!
+                            setHomeDraft(prev =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    ingredients: prev.ingredients.map(line =>
+                                      line.food_id != null ? { ...line, amount: grams } : line
+                                    ),
+                                  }
+                                : prev
+                            )
+                          }}
+                          className="px-3.5 h-10 rounded-full text-[14px]"
+                          style={{
+                            backgroundColor: active ? BB_V2.accent.orange : BB_V2.bg.canvas,
+                            color: active ? '#fff' : BB_V2.text.secondary,
+                            fontWeight: active ? 600 : 400,
+                          }}
+                        >
+                          {chipLabel}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  <section className="space-y-2">
+                    {homeWeightLines.map(line => {
+                      const index = homeDraft.ingredients.indexOf(line)
+                      return (
+                        <div key={line.raw_label} className="flex items-center gap-3">
+                          <span className="flex-1 text-[14px] truncate" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
+                            {line.raw_label}
+                          </span>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            value={line.amount ?? ''}
+                            onChange={e => {
+                              const v = e.target.value
+                              setPortionPreset('custom')
+                              setHomeDraft(prev =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      ingredients: prev.ingredients.map((l, i) =>
+                                        i === index ? { ...l, amount: v === '' ? null : Number(v) } : l
+                                      ),
+                                    }
+                                  : prev
+                              )
+                            }}
+                            className="w-24 h-11 px-3 rounded-xl text-[16px] tabular-nums text-right outline-none"
+                            style={{ backgroundColor: BB_V2.bg.canvas, color: BB_V2.text.primary }}
+                          />
+                          <span className="text-[13px] w-6" style={{ color: BB_V2.text.secondary }}>
+                            {line.unit === 'ml' ? 'ml' : line.unit === 'piece' ? '份' : 'g'}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </section>
+
+                  {homeFields?.oil ? (
+                    <label className="block space-y-1">
+                      <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>用油量</span>
+                      <div className="flex flex-wrap gap-2">
+                        {OIL_LEVEL_OPTIONS.map(o => (
+                          <button
+                            key={o.id}
+                            type="button"
+                            onClick={() => setHomeDraft(prev => (prev ? { ...prev, meal_oil_level: o.id as MealOilLevel } : prev))}
+                            className="px-3.5 h-10 rounded-full text-[14px]"
+                            style={{
+                              backgroundColor: homeDraft.meal_oil_level === o.id ? BB_V2.accent.orange : BB_V2.bg.canvas,
+                              color: homeDraft.meal_oil_level === o.id ? '#fff' : BB_V2.text.secondary,
+                            }}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </label>
+                  ) : null}
+
+                  {homeFields?.cooking ? (
+                    <label className="block space-y-1">
+                      <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>烹調方式</span>
+                      <div className="flex flex-wrap gap-2">
+                        {COOKING_OPTIONS.map(o => (
+                          <button
+                            key={o.id}
+                            type="button"
+                            onClick={() => setHomeDraft(prev => (prev ? { ...prev, meal_cooking_method: o.id } : prev))}
+                            className="px-3.5 h-10 rounded-full text-[14px]"
+                            style={{
+                              backgroundColor: homeDraft.meal_cooking_method === o.id ? BB_V2.accent.orange : BB_V2.bg.canvas,
+                              color: homeDraft.meal_cooking_method === o.id ? '#fff' : BB_V2.text.secondary,
+                            }}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </label>
+                  ) : null}
+
+                  {homeFields?.sauce ? (
+                    <label className="block space-y-1">
+                      <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>醬汁</span>
+                      <div className="flex flex-wrap gap-2">
+                        {SAUCE_OPTIONS.map(o => (
+                          <button
+                            key={o.id}
+                            type="button"
+                            onClick={() => setHomeDraft(prev => (prev ? { ...prev, sauce_level: o.id } : prev))}
+                            className="px-3.5 h-10 rounded-full text-[14px]"
+                            style={{
+                              backgroundColor: homeDraft.sauce_level === o.id ? BB_V2.accent.orange : BB_V2.bg.canvas,
+                              color: homeDraft.sauce_level === o.id ? '#fff' : BB_V2.text.secondary,
+                            }}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </label>
+                  ) : null}
+
+                  {homePreview ? (
+                    <div className="rounded-2xl px-4 py-3" style={{ backgroundColor: BB_V2.bg.canvas }}>
+                      <p className="text-[14px]" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
+                        估算約 {homePreview.calories} kcal
+                      </p>
+                      <p className="text-[12px] mt-1" style={{ color: BB_V2.text.secondary }}>
+                        蛋白質 {homePreview.protein_g}g · 碳水 {homePreview.carbs_g}g · 脂肪 {homePreview.fat_g}g
+                      </p>
+                    </div>
+                  ) : null}
+                </>
+              ) : (
+                <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+                  找不到可拆分的食材資料。請展開進階欄位手動填寫營養素，或改用「搜尋可信資料」。
+                </p>
+              )}
+
               <button
                 type="button"
                 onClick={() => setAdvancedOpen(v => !v)}
                 className="flex items-center gap-1 text-[13px]"
                 style={{ color: BB_V2.text.secondary, fontWeight: 500 }}
               >
-                進階欄位
+                進階：手動修正營養素
                 {advancedOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </button>
               {advancedOpen && (
-                <div className="grid grid-cols-2 gap-3">
-                  {field('纖維', fiber, setFiber, 'g')}
-                  {field('糖', sugar, setSugar, 'g')}
-                  {field('鈉', sodium, setSodium, 'mg')}
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    {field('熱量', calories, setCalories, 'kcal')}
+                    {field('蛋白質', protein, setProtein, 'g')}
+                    {field('脂肪', fat, setFat, 'g')}
+                    {field('碳水', carbs, setCarbs, 'g')}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {field('纖維', fiber, setFiber, 'g')}
+                    {field('糖', sugar, setSugar, 'g')}
+                    {field('鈉', sodium, setSodium, 'mg')}
+                  </div>
+                  <label className="block space-y-1">
+                    <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>份量說明</span>
+                    <input
+                      type="text"
+                      value={portion}
+                      onChange={e => setPortion(e.target.value)}
+                      className="w-full px-4 py-3 text-base outline-none rounded-2xl"
+                      style={{ backgroundColor: BB_V2.bg.canvas, color: BB_V2.text.primary }}
+                    />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>備註</span>
+                    <input
+                      type="text"
+                      value={notes}
+                      onChange={e => setNotes(e.target.value)}
+                      className="w-full px-4 py-3 text-base outline-none rounded-2xl"
+                      style={{ backgroundColor: BB_V2.bg.canvas, color: BB_V2.text.primary }}
+                    />
+                  </label>
                 </div>
               )}
-              <label className="block space-y-1">
-                <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>份量說明</span>
-                <input
-                  type="text"
-                  value={portion}
-                  onChange={e => setPortion(e.target.value)}
-                  className="w-full px-4 py-3 text-base outline-none rounded-2xl"
-                  style={{ backgroundColor: BB_V2.bg.canvas, color: BB_V2.text.primary }}
-                />
-              </label>
-              <label className="block space-y-1">
-                <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>備註</span>
-                <input
-                  type="text"
-                  value={notes}
-                  onChange={e => setNotes(e.target.value)}
-                  className="w-full px-4 py-3 text-base outline-none rounded-2xl"
-                  style={{ backgroundColor: BB_V2.bg.canvas, color: BB_V2.text.primary }}
-                />
-              </label>
             </div>
           )}
 
