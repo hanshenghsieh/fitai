@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { X, ChevronDown, ChevronUp, Search } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { searchNutritionV2Client } from '@/lib/nutrition/search-v2/search-client'
@@ -15,6 +15,12 @@ import type { ManualNutritionInput } from '@/lib/nutrition/unknown-food-flow'
 import type { SearchV2Candidate } from '@/lib/nutrition/search-v2/types'
 import type { ManualPhotoCorrectionResult } from '@/lib/nutrition/photo-manual-correction'
 import { buildPhotoAiMeta } from '@/lib/nutrition/photo-manual-correction'
+import {
+  calculateHomeCookedMeal,
+  isCompositeMealLabel,
+  parseMealLabelToDraft,
+  withSuggestedDefaults,
+} from '@/lib/nutrition/home-cooked'
 import AppOverlay from '@/components/ui/AppOverlay'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
@@ -83,13 +89,25 @@ export default function ManualPhotoCorrectionSheet({
   const [sodium, setSodium] = useState('')
   const [portion, setPortion] = useState('')
   const [notes, setNotes] = useState('')
+  const initializedForOpenRef = useRef(false)
+  const manualPrefilledRef = useRef(false)
+
+  const visualCategory = visualParse.visual_category
+  const detectedLabel = visualParse.detected_label
 
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      initializedForOpenRef.current = false
+      manualPrefilledRef.current = false
+      return
+    }
+    if (initializedForOpenRef.current) return
+    initializedForOpenRef.current = true
+
     setMode('search')
     setLabel(initialLabel)
     setRestaurant(initialRestaurant ?? '')
-    setCategory(visualParse.visual_category)
+    setCategory(visualCategory)
     setSearchQuery(initialLabel)
     setSelectedCandidate(null)
     setCalories('')
@@ -102,7 +120,26 @@ export default function ManualPhotoCorrectionSheet({
     setPortion('')
     setNotes('')
     setAdvancedOpen(false)
-  }, [open, initialLabel, initialRestaurant, visualParse])
+  }, [open, initialLabel, initialRestaurant, visualCategory, detectedLabel])
+
+  const compositeDraft = useMemo(() => {
+    if (!isCompositeMealLabel(label.trim())) return null
+    return withSuggestedDefaults(parseMealLabelToDraft(label.trim()))
+  }, [label])
+
+  const homeEstimate = useMemo(() => {
+    if (!compositeDraft) return null
+    return calculateHomeCookedMeal(compositeDraft)
+  }, [compositeDraft])
+
+  useEffect(() => {
+    if (!open || mode !== 'manual' || manualPrefilledRef.current || !homeEstimate) return
+    manualPrefilledRef.current = true
+    setCalories(String(homeEstimate.calories))
+    setProtein(String(homeEstimate.protein_g))
+    setFat(String(homeEstimate.fat_g))
+    setCarbs(String(homeEstimate.carbs_g))
+  }, [open, mode, homeEstimate])
 
   const searchCandidates = useMemo(() => {
     const queries = [...new Set([searchQuery.trim(), label.trim()].filter(Boolean))]
@@ -360,6 +397,24 @@ export default function ManualPhotoCorrectionSheet({
 
           {mode === 'manual' && (
             <div className="space-y-3">
+              {compositeDraft && homeEstimate ? (
+                <div
+                  className="rounded-2xl px-4 py-3 space-y-2"
+                  style={{ backgroundColor: BB_V2.bg.canvas, border: `1px solid ${BB_V2.divider}` }}
+                >
+                  <p className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>
+                    依偵測到的食材估算（可再手動調整）
+                  </p>
+                  <ul className="text-[13px] space-y-1" style={{ color: BB_V2.text.secondary }}>
+                    {compositeDraft.ingredients.map(line => (
+                      <li key={line.raw_label}>
+                        · {line.raw_label}
+                        {line.food_id && line.amount != null ? ` · 約 ${line.amount}${line.unit === 'piece' ? '份' : 'g'}` : ''}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
               <div className="grid grid-cols-2 gap-3">
                 {field('熱量', calories, setCalories, 'kcal')}
                 {field('蛋白質', protein, setProtein, 'g')}
@@ -383,7 +438,7 @@ export default function ManualPhotoCorrectionSheet({
                 </div>
               )}
               <label className="block space-y-1">
-                <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>份量 / serving</span>
+                <span className="text-[13px]" style={{ color: BB_V2.text.secondary, fontWeight: 500 }}>份量說明</span>
                 <input
                   type="text"
                   value={portion}

@@ -168,6 +168,12 @@ describe('P0 catalog connectivity audit', () => {
       assert.equal(ctx.kind, 'p0', `expected P0 portion for ${q}, got ${ctx.kind}`)
     }
   })
+
+  it('composite labels use home_cooked flow instead of single P0 staple', () => {
+    const ctx = resolvePortionContextFromLabel('白飯 + 日式咖哩雞肉 + 紅蘿蔔 + 馬鈴薯')
+    assert.equal(ctx.kind, 'home_cooked')
+    assert.ok(ctx.kind === 'home_cooked' && ctx.draft.ingredients.length >= 2)
+  })
 })
 
 describe('meal edit resolves P0 by label', () => {

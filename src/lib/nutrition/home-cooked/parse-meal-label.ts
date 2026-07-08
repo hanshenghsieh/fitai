@@ -2,7 +2,16 @@ import { resolveWholeFoodLabel } from '@/lib/nutrition/home-cooked/whole-food-re
 import { defaultAmountForCategory } from '@/lib/nutrition/home-cooked/cooking-adjustments'
 import type { DetectedIngredientLine, HomeCookedMealDraft, SauceLevel } from '@/lib/nutrition/home-cooked/types'
 
-const SPLIT_RE = /[+＋、,，/／|｜\n]+/
+export const COMPOSITE_MEAL_SPLIT_RE = /[+＋、,，/／|｜\n]+/
+
+/** Multi-ingredient labels (咖哩飯、便當配菜) must not resolve as a single P0 staple. */
+export function isCompositeMealLabel(mealLabel: string): boolean {
+  const parts = mealLabel
+    .split(COMPOSITE_MEAL_SPLIT_RE)
+    .map(s => s.trim())
+    .filter(Boolean)
+  return parts.length > 1
+}
 
 function inferSauceLevel(mealLabel: string, ingredients: DetectedIngredientLine[]): SauceLevel {
   const text = `${mealLabel} ${ingredients.map(i => i.raw_label).join(' ')}`
@@ -13,7 +22,7 @@ function inferSauceLevel(mealLabel: string, ingredients: DetectedIngredientLine[
 /** Parse composite meal label into ingredient lines with IngredientDB matches. */
 export function parseMealLabelToDraft(mealLabel: string): HomeCookedMealDraft {
   const parts = mealLabel
-    .split(SPLIT_RE)
+    .split(COMPOSITE_MEAL_SPLIT_RE)
     .map(s => s.trim())
     .filter(Boolean)
 

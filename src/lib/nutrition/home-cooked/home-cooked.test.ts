@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { parseMealLabelToDraft } from './parse-meal-label.ts'
+import { isCompositeMealLabel, parseMealLabelToDraft } from './parse-meal-label.ts'
 import { calculateHomeCookedMeal, isHomeCookedDraftComplete } from './portion-calculator.ts'
 import { resolveWholeFoodLabel } from './whole-food-registry.ts'
 import { lookupMealOilGrams } from './cooking-adjustments.ts'
@@ -12,6 +12,11 @@ describe('home-cooked portion flow (BetterBit XLSX model)', () => {
     assert.ok(draft.ingredients.some(i => i.food_id === 'sf001'))
     assert.ok(draft.ingredients.some(i => i.food_id === 'so001'))
     assert.ok(draft.ingredients.some(i => i.food_id === 'vg004'))
+  })
+
+  it('detects composite meal labels', () => {
+    assert.equal(isCompositeMealLabel('白飯 + 日式咖哩雞肉 + 紅蘿蔔'), true)
+    assert.equal(isCompositeMealLabel('白飯'), false)
   })
 
   it('calculates 200g salmon from IngredientDB SF001', () => {

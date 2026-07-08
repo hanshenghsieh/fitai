@@ -1,5 +1,5 @@
 import type { FoodLogEntry } from '@/lib/banks/types'
-import { parseMealLabelToDraft } from '@/lib/nutrition/home-cooked/parse-meal-label'
+import { isCompositeMealLabel, parseMealLabelToDraft } from '@/lib/nutrition/home-cooked/parse-meal-label'
 import type { HomeCookedMealDraft } from '@/lib/nutrition/home-cooked/types'
 import { defaultFoodRecordDraft } from './calculate'
 import { foodRecordDraftFromLog } from './draft-from-log'
@@ -15,13 +15,15 @@ export function resolvePortionContextFromLabel(label: string): PortionContext {
   const cleaned = cleanLabelForP0Resolve(label)
   if (!cleaned) return { kind: 'unresolved', label }
 
-  const p0 = resolveP0FoodByLabel(cleaned)
-  if (p0) {
-    return {
-      kind: 'p0',
-      item: p0,
-      draft: defaultFoodRecordDraft(p0),
-      label: cleaned,
+  if (!isCompositeMealLabel(cleaned)) {
+    const p0 = resolveP0FoodByLabel(cleaned)
+    if (p0) {
+      return {
+        kind: 'p0',
+        item: p0,
+        draft: defaultFoodRecordDraft(p0),
+        label: cleaned,
+      }
     }
   }
 
@@ -37,14 +39,15 @@ export function resolvePortionContextFromLabel(label: string): PortionContext {
 export function resolvePortionContextFromLog(log: FoodLogEntry): PortionContext {
   const label = log.display_label ?? log.name
   const draftFromMeta = foodRecordDraftFromLog(log)
-  const p0 = resolveP0FoodByLabel(label)
-
-  if (p0) {
-    return {
-      kind: 'p0',
-      item: p0,
-      draft: draftFromMeta ?? defaultFoodRecordDraft(p0),
-      label,
+  if (!isCompositeMealLabel(label)) {
+    const p0 = resolveP0FoodByLabel(label)
+    if (p0) {
+      return {
+        kind: 'p0',
+        item: p0,
+        draft: draftFromMeta ?? defaultFoodRecordDraft(p0),
+        label,
+      }
     }
   }
 
