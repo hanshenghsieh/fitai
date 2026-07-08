@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { Lock } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
-import { shouldHideExternalPaymentsClient } from '@/lib/ios-payment-gate'
+import { shouldBypassSubscriptionPaywallClient } from '@/lib/ios-payment-gate'
+import { SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
 
 interface Props {
   access: AccessStatus
@@ -15,7 +16,8 @@ interface Props {
 }
 
 export default function UpgradeGate({ access, feature, children, preview }: Props) {
-  if (shouldHideExternalPaymentsClient() || access.hasFullAccess) return <>{children}</>
+  // Pre-IAP TestFlight only — once Apple IAP is on, paywall must show.
+  if (shouldBypassSubscriptionPaywallClient() || access.hasFullAccess) return <>{children}</>
 
   if (preview) {
     return (
@@ -32,11 +34,11 @@ export default function UpgradeGate({ access, feature, children, preview }: Prop
             上面是你在試用期累積的趨勢。訂閱後可持續追蹤{feature}。
           </p>
           <Link
-            href="/settings"
+            href="/settings/premium"
             className="inline-block px-6 py-2.5 rounded-xl font-semibold text-white text-sm"
             style={{ backgroundColor: colors.accent.action }}
           >
-            訂閱 NT$299 / 月
+            訂閱 {SUBSCRIPTION_PRICE_LABEL}
           </Link>
         </div>
       </div>
@@ -57,11 +59,11 @@ export default function UpgradeGate({ access, feature, children, preview }: Prop
             試用結束後，訂閱可持續獲得每週自動重算的個人化計畫、進度分析與計畫調整。
           </p>
           <Link
-            href="/settings"
+            href="/settings/premium"
             className="inline-block px-6 py-2.5 rounded-xl font-semibold text-white text-sm"
             style={{ backgroundColor: colors.accent.action }}
           >
-            訂閱 NT$299 / 月
+            訂閱 {SUBSCRIPTION_PRICE_LABEL}
           </Link>
         </div>
       </div>

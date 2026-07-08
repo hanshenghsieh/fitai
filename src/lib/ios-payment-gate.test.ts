@@ -5,6 +5,7 @@ import {
   hasIosPlatformCookie,
   isCapacitorUserAgent,
   shouldBlockExternalPaymentsOnServer,
+  shouldBypassSubscriptionPaywallClient,
   shouldGrantFullAccessPreIap,
   shouldShowAppleIapClient,
 } from './ios-payment-gate'
@@ -85,5 +86,17 @@ describe('ios-payment-gate', () => {
 
   it('does not show Apple IAP UI on server', () => {
     assert.equal(shouldShowAppleIapClient(), false)
+  })
+
+  it('does not bypass paywall when Apple IAP is enabled on iOS cookie', () => {
+    const prev = process.env.NEXT_PUBLIC_APPLE_IAP_ENABLED
+    process.env.NEXT_PUBLIC_APPLE_IAP_ENABLED = 'true'
+    try {
+      // server/no window → shouldShowAppleIapClient false, but bypass must not waive paywall solely due to IAP flag
+      assert.equal(shouldBypassSubscriptionPaywallClient(), false)
+    } finally {
+      if (prev === undefined) delete process.env.NEXT_PUBLIC_APPLE_IAP_ENABLED
+      else process.env.NEXT_PUBLIC_APPLE_IAP_ENABLED = prev
+    }
   })
 })

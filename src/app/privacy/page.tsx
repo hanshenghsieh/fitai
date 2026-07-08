@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           <li>食物照片：若你使用拍照記錄，照片會上傳以供 AI 估算營養（你可選擇不使用）</li>
           <li>訂閱資料：Stripe 付款與訂閱狀態（我們不儲存完整信用卡號）</li>
           <li>推播 token：若你開啟通知，我們儲存裝置推播識別碼</li>
-          <li>健康資料（選填）：INBODY 報告、體重歷史；Apple Health 連線功能尚未正式啟用</li>
+          <li>健康資料（選填）：體重歷史；目前版本不含 Apple Health／INBODY 帳號同步</li>
         </ul>
       </LegalSection>
 

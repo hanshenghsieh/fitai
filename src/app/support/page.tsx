@@ -41,7 +41,9 @@ export default function SupportPage() {
           <div>
             <p className="font-medium" style={{ color: colors.text.primary }}>如何取消訂閱？</p>
             <p>
-              登入後前往「設定」→「會員」，可管理或取消訂閱。若透過 Stripe 付款，取消後仍可使用至當期結束。
+              <strong>iPhone App：</strong>「設定 → Apple ID → 訂閱項目」管理或取消；亦可在 App「設定 → 會員」使用還原購買。
+              <br />
+              <strong>網站：</strong>登入後前往「設定 → 會員」管理帳單。取消後仍可使用至當期結束。
             </p>
           </div>
           <div>

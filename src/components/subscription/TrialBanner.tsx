@@ -3,14 +3,16 @@
 import Link from 'next/link'
 import { colors } from '@/lib/design-system'
 import { TRIAL_DAYS, type AccessStatus } from '@/lib/subscription-access'
-import { shouldHideExternalPaymentsClient } from '@/lib/ios-payment-gate'
+import { shouldBypassSubscriptionPaywallClient } from '@/lib/ios-payment-gate'
+import { SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
 
 interface Props {
   access: AccessStatus
 }
 
 export default function TrialBanner({ access }: Props) {
-  if (shouldHideExternalPaymentsClient() || access.isSubscribed) return null
+  // Pre-IAP TestFlight bypass only — after Apple IAP is on, show subscribe CTAs.
+  if (shouldBypassSubscriptionPaywallClient() || access.isSubscribed) return null
 
   if (access.isTrial) {
     return (
@@ -21,7 +23,7 @@ export default function TrialBanner({ access }: Props) {
         <p className="text-[13px] leading-relaxed flex-1" style={{ color: colors.text.secondary }}>
           試用還剩 {access.trialDaysLeft} 天 · 少煩「今天吃什麼」就是進步
         </p>
-        <Link href="/settings" className="text-[12px] font-medium flex-shrink-0" style={{ color: colors.accent.action }}>
+        <Link href="/settings/premium" className="text-[12px] font-medium flex-shrink-0" style={{ color: colors.accent.action }}>
           訂閱
         </Link>
       </div>
@@ -36,14 +38,14 @@ export default function TrialBanner({ access }: Props) {
       >
         <p className="text-[14px] font-medium" style={{ color: colors.text.primary }}>{TRIAL_DAYS} 天試用完了</p>
         <p className="text-[13px]" style={{ color: colors.text.secondary }}>
-          NT$299 / 月，比一次營養諮詢便宜。要繼續少煩決策嗎？
+          {SUBSCRIPTION_PRICE_LABEL}，比一次營養諮詢便宜。要繼續少煩決策嗎？
         </p>
         <Link
-          href="/settings"
+          href="/settings/premium"
           className="inline-block text-[12px] font-medium px-4 py-2"
           style={{ backgroundColor: colors.accent.action, color: colors.bg.elevated, borderRadius: 12 }}
         >
-          訂閱 NT$299 / 月
+          訂閱 {SUBSCRIPTION_PRICE_LABEL}
         </Link>
       </div>
     )

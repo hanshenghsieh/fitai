@@ -4,9 +4,9 @@ import { TRIAL_DAYS } from '@/lib/subscription-access'
 import { isCapacitorNative } from '@/lib/capacitor-native'
 
 /**
- * App Store / TestFlight safe mode — hide Stripe, Apple Health placeholders, and payment CTAs.
- * Set NEXT_PUBLIC_APP_STORE_SAFE_MODE=true on iOS review builds (Vercel Production env).
- * Web builds leave this unset or false.
+ * App Store / TestFlight safe mode — hide Stripe when forced.
+ * Prefer enabling Apple IAP (`NEXT_PUBLIC_APPLE_IAP_ENABLED=true`) for formal review.
+ * Safe mode alone without IAP grants full access (legacy TestFlight path).
  */
 export function isAppStoreSafeMode(): boolean {
   return process.env.NEXT_PUBLIC_APP_STORE_SAFE_MODE === 'true'

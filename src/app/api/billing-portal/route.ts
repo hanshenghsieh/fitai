@@ -6,7 +6,10 @@ import { shouldBlockExternalPaymentsOnServer } from '@/lib/ios-payment-gate'
 
 export async function POST(req: NextRequest) {
   if (shouldBlockExternalPaymentsOnServer(req.headers)) {
-    return NextResponse.json({ error: '訂閱即將開放' }, { status: 503 })
+    return NextResponse.json(
+      { error: 'iOS App 請在 App Store 管理訂閱', code: 'USE_APPLE_IAP' },
+      { status: 403 }
+    )
   }
 
   try {

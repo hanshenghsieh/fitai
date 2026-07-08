@@ -37,7 +37,8 @@ export const PREMIUM_TESTFLIGHT_BODY =
 
 export const PREMIUM_TESTFLIGHT_FEATURES = PREMIUM_FEATURES
 
-export const PREMIUM_TESTFLIGHT_FOOTNOTE = '正式版本將支援 App Store 訂閱。'
+export const PREMIUM_TESTFLIGHT_FOOTNOTE =
+  '若此畫面仍顯示封測說明，代表 App Store 訂閱開關尚未開啟。正式審核版請使用 App Store 訂閱。'
 
 export function premiumTrialWhisper(access: AccessStatus): string | null {
   if (!access.isTrial || access.isSubscribed) return null

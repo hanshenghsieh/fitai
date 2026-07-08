@@ -8,7 +8,13 @@ import { shouldBlockExternalPaymentsOnServer } from '@/lib/ios-payment-gate'
 const syncSchema = z.object({
   originalTransactionId: z.string().min(4).max(256),
   productId: z.string().max(128).optional(),
-  expiresAt: z.string().datetime().optional().nullable(),
+  expiresAt: z
+    .string()
+    .optional()
+    .nullable()
+    .refine(v => v == null || v === '' || !Number.isNaN(Date.parse(v)), {
+      message: 'Invalid expiresAt',
+    }),
   isRestore: z.boolean().optional(),
 })
 
@@ -36,11 +42,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
     }
 
+    const expiresRaw = parsed.data.expiresAt
+    const expiresAt =
+      expiresRaw == null || expiresRaw === ''
+        ? null
+        : new Date(expiresRaw).toISOString()
+
     const row = await upsertAppleIapSubscription(supabase, {
       userId: user.id,
       originalTransactionId: parsed.data.originalTransactionId || user.id,
       productId: parsed.data.productId,
-      expiresAt: parsed.data.expiresAt,
+      expiresAt,
     })
 
     return NextResponse.json({

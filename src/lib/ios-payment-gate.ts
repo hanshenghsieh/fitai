@@ -17,7 +17,7 @@ export function hasIosPlatformCookie(cookieHeader: string | null | undefined): b
 
 export type HeaderLike = { get(name: string): string | null | undefined }
 
-/** Server-side: block Stripe checkout / billing portal on iOS TestFlight shell. */
+/** Server-side: block Stripe checkout / billing portal on iOS App shell. */
 export function shouldBlockExternalPaymentsOnServer(headers: HeaderLike): boolean {
   if (isAppStoreSafeMode()) return true
   if (headers.get('x-betterbit-platform') === IOS_PLATFORM_HEADER) return true
@@ -26,7 +26,10 @@ export function shouldBlockExternalPaymentsOnServer(headers: HeaderLike): boolea
   return false
 }
 
-/** Server-side: unlock full features on iOS until Apple IAP ships. */
+/**
+ * Server-side: unlock full features on iOS until Apple IAP ships.
+ * When IAP is enabled, paywall + entitlement rules apply normally.
+ */
 export function shouldGrantFullAccessPreIap(headers: HeaderLike): boolean {
   if (isAppleIapEnabled()) return false
   return shouldBlockExternalPaymentsOnServer(headers)
@@ -40,10 +43,23 @@ export function shouldShowAppleIapClient(): boolean {
   return hasIosPlatformCookie(document.cookie)
 }
 
-/** Client-side: hide payment CTAs in Capacitor iOS or App Store safe mode builds. */
+/**
+ * Client-side: hide Stripe / external payment CTAs.
+ * Native iOS never shows Stripe. Web may still show Stripe.
+ * Does NOT hide Apple IAP UI.
+ */
 export function shouldHideExternalPaymentsClient(): boolean {
   if (isAppStoreSafeMode()) return true
   if (typeof window === 'undefined') return false
   if (isCapacitorNative()) return true
   return hasIosPlatformCookie(document.cookie)
+}
+
+/**
+ * Pre-IAP TestFlight: hide paywalls and grant free access.
+ * Once Apple IAP is enabled, paywalls must show (route to Apple IAP).
+ */
+export function shouldBypassSubscriptionPaywallClient(): boolean {
+  if (shouldShowAppleIapClient()) return false
+  return shouldHideExternalPaymentsClient()
 }
