@@ -20,7 +20,9 @@ const PASSWORD = process.env.BB_E2E_PASSWORD ?? ''
 const HEADLESS = process.env.BB_E2E_HEADLESS !== 'false'
 
 const TEST_FOOD_NAME = 'E2E 茶葉蛋'
+const DECOY_FOOD_NAME = 'E2E 保留餐'
 const TEST_LOG_ID = `e2e-food-${Date.now()}`
+const DECOY_LOG_ID = `e2e-decoy-${Date.now()}`
 
 function fail(msg) {
   console.error(`FAIL: ${msg}`)
@@ -84,18 +86,30 @@ async function login(page) {
 
 async function seedFoodLog(page) {
   const before = await apiCheckin(page)
-  const existingLogs = foodLogsFromCheckin(before).filter(l => l.id !== TEST_LOG_ID)
+  const existingLogs = foodLogsFromCheckin(before).filter(
+    l => l.id !== TEST_LOG_ID && l.id !== DECOY_LOG_ID
+  )
+  const now = new Date().toISOString()
   const testLog = {
     id: TEST_LOG_ID,
     name: TEST_FOOD_NAME,
     calories: 80,
     protein_g: 7,
-    logged_at: new Date().toISOString(),
+    logged_at: now,
+    user_declared: true,
+    source: 'search',
+  }
+  const decoyLog = {
+    id: DECOY_LOG_ID,
+    name: DECOY_FOOD_NAME,
+    calories: 120,
+    protein_g: 8,
+    logged_at: now,
     user_declared: true,
     source: 'search',
   }
   const notes = JSON.stringify({
-    user_memory: { food_logs_today: [...existingLogs, testLog] },
+    user_memory: { food_logs_today: [...existingLogs, testLog, decoyLog] },
   })
   await apiPatchCheckin(page, {
     diet_items: before.checkin?.diet_items ?? [],
@@ -105,10 +119,10 @@ async function seedFoodLog(page) {
   })
   const after = await apiCheckin(page)
   const logs = foodLogsFromCheckin(after)
-  if (!logs.some(l => l.id === TEST_LOG_ID)) {
-    fail('PATCH did not persist test food log')
+  if (!logs.some(l => l.id === TEST_LOG_ID) || !logs.some(l => l.id === DECOY_LOG_ID)) {
+    fail('PATCH did not persist test food logs')
   }
-  pass('seeded food log via PATCH')
+  pass('seeded two food logs via PATCH')
 }
 
 async function verifySessionCache(page, step) {
@@ -166,9 +180,69 @@ async function tabSwitch(page) {
   pass('switched progress → dashboard tabs')
 }
 
-async function cleanup(page) {
+async function simulateClientDelete(page) {
   const current = await apiCheckin(page)
   const logs = foodLogsFromCheckin(current).filter(l => l.id !== TEST_LOG_ID)
+  if (!logs.some(l => l.id === DECOY_LOG_ID)) {
+    fail('delete simulation: decoy log missing before delete')
+  }
+  let notesObj = {}
+  try {
+    notesObj = current.checkin?.notes ? JSON.parse(current.checkin.notes) : {}
+  } catch {
+    notesObj = {}
+  }
+  notesObj = {
+    ...notesObj,
+    user_memory: { ...(notesObj.user_memory ?? {}), food_logs_today: logs },
+  }
+  await apiPatchCheckin(page, {
+    diet_items: current.checkin?.diet_items ?? [],
+    workout_items: current.checkin?.workout_items ?? [],
+    water_ml: current.checkin?.water_ml ?? 0,
+    notes: JSON.stringify(notesObj),
+  })
+  await page.evaluate(
+    ({ logs, decoyId }) => {
+      const day = new Date().toISOString().slice(0, 10)
+      sessionStorage.setItem(`bb_food_logs_${day}`, JSON.stringify(logs))
+      localStorage.setItem(
+        'bb_today_offline_v1',
+        JSON.stringify({
+          date: day,
+          food_logs_today: logs,
+          updated_at: new Date().toISOString(),
+        })
+      )
+      return logs.some(l => l.id === decoyId)
+    },
+    { logs, decoyId: DECOY_LOG_ID }
+  )
+  pass('simulated client delete (PATCH + session + durable cache)')
+}
+
+async function verifyDeletedAfterNavigation(page, step) {
+  await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'networkidle2', timeout: 60000 })
+  await sleep(1500)
+  const apiLogs = foodLogsFromCheckin(await apiCheckin(page))
+  if (apiLogs.some(l => l.id === TEST_LOG_ID)) {
+    fail(`${step}: deleted log still in API`)
+  }
+  if (!apiLogs.some(l => l.id === DECOY_LOG_ID)) {
+    fail(`${step}: decoy log missing from API after delete`)
+  }
+  const bodyText = await page.evaluate(() => document.body.innerText)
+  if (bodyText.includes(TEST_FOOD_NAME)) {
+    fail(`${step}: deleted food still visible in UI`)
+  }
+  pass(`${step}: deleted log stays gone after navigation`)
+}
+
+async function cleanup(page) {
+  const current = await apiCheckin(page)
+  const logs = foodLogsFromCheckin(current).filter(
+    l => l.id !== TEST_LOG_ID && l.id !== DECOY_LOG_ID
+  )
   let notesObj = {}
   try {
     notesObj = current.checkin?.notes ? JSON.parse(current.checkin.notes) : {}
@@ -232,6 +306,20 @@ async function main() {
     await verifyOnDashboard(page, 'after reload')
     report.steps.push('verify_reload')
 
+    await simulateClientDelete(page)
+    report.steps.push('delete')
+
+    await tabSwitch(page)
+    report.steps.push('tab_switch_after_delete')
+
+    await verifyDeletedAfterNavigation(page, 'after delete + tab switch')
+    report.steps.push('verify_delete_persist')
+
+    await page.reload({ waitUntil: 'networkidle2' })
+    await sleep(1500)
+    await verifyDeletedAfterNavigation(page, 'after delete + reload')
+    report.steps.push('verify_delete_reload')
+
     await cleanup(page)
     report.steps.push('cleanup')
 
@@ -245,7 +333,7 @@ Base URL: ${report.baseUrl}
 
 ## Result
 
-**PASS** — all ${report.steps.length} steps completed.
+**PASS** — all ${report.steps.length} steps completed (add, tab switch, reload, **delete**, tab switch after delete).
 
 ## Steps
 

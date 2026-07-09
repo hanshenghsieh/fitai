@@ -120,7 +120,7 @@ describe('today offline cache', () => {
     }
   })
 
-  it('resolveFoodLogsFromSession merges durable cache when session cleared on reload', () => {
+  it('resolveFoodLogsFromSession prefers durable cache when session cleared on reload', () => {
     const mock = mockBrowserStorage()
     try {
       const date = '2099-06-18'
@@ -128,9 +128,9 @@ describe('today offline cache', () => {
       mock.session.clear()
 
       const resolved = resolveFoodLogsFromSession([sampleLog('srv-1')], date)
-      assert.equal(resolved.length, 3)
+      assert.equal(resolved.length, 2)
       assert.ok(resolved.some(l => l.id === 'dur-1'))
-      assert.ok(resolved.some(l => l.id === 'srv-1'))
+      assert.ok(!resolved.some(l => l.id === 'srv-1'))
     } finally {
       mock.restore()
     }
