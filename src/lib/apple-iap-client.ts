@@ -59,14 +59,27 @@ function toNativePayload<T>(value: T): T {
   }
 }
 
+function ascProductUnavailableError(): Error {
+  return new Error(
+    'Apple 抓不到訂閱商品 betterbit_pro_monthly。請到 App Store Connect 確認：① 付費 App 協議已生效 ② 訂閱已設價格+本地化 ③ Product ID 完全一致。新建商品可能需等數小時。'
+  )
+}
+
 function humanizePurchaseError(err: unknown): Error {
   if (!(err instanceof Error)) return new Error('無法完成訂閱')
   const msg = err.message || ''
   if (/cancel/i.test(msg) || /PurchaseCancelledError/i.test(msg) || /user cancelled/i.test(msg)) {
     return new Error('已取消購買')
   }
+  if (
+    /could not be fetched from App Store Connect|offerings empty|why-are-offerings-empty|issue with your configuration|ConfigurationError|None of the products registered/i.test(
+      msg
+    )
+  ) {
+    return ascProductUnavailableError()
+  }
   if (/ProductNotAvailable|not available|PRODUCT_NOT_AVAILABLE|products not found/i.test(msg)) {
-    return new Error('App Store 商品尚未可用。請確認 ASC 有 betterbit_pro_monthly，並用 Sandbox 帳號')
+    return ascProductUnavailableError()
   }
   if (/network|offline|timed out|timeout|逾時/i.test(msg)) {
     return returnTimeoutMessage(msg)
@@ -209,18 +222,7 @@ type PurchaseTarget =
 async function resolvePurchaseTarget(Purchases: PurchasesClient): Promise<PurchaseTarget> {
   const productId = APPLE_IAP_PRODUCT_ID
 
-  const offerings = await withTimeout(
-    Purchases.getOfferings(),
-    OFFERINGS_TIMEOUT_MS,
-    '讀取訂閱方案逾時。請確認 RevenueCat Offering 已設 Current'
-  )
-  const fromOffering =
-    offerings.current?.availablePackages?.find(pkg => pkg.product?.identifier === productId) ??
-    offerings.current?.availablePackages?.[0]
-  if (fromOffering?.product?.identifier) {
-    return { kind: 'package', value: fromOffering }
-  }
-
+  // Prefer direct StoreKit product fetch — avoids RevenueCat offerings config error spam.
   const direct = await withTimeout(
     Purchases.getProducts({ productIdentifiers: [productId] }),
     OFFERINGS_TIMEOUT_MS,
@@ -231,9 +233,23 @@ async function resolvePurchaseTarget(Purchases: PurchasesClient): Promise<Purcha
     return { kind: 'product', value: fromDirect }
   }
 
-  throw new Error(
-    `找不到商品 ${productId}。請確認 App Store Connect + RevenueCat Offering`
-  )
+  try {
+    const offerings = await withTimeout(
+      Purchases.getOfferings(),
+      OFFERINGS_TIMEOUT_MS,
+      '讀取訂閱方案逾時。請確認 RevenueCat Offering 已設 Current'
+    )
+    const fromOffering =
+      offerings.current?.availablePackages?.find(pkg => pkg.product?.identifier === productId) ??
+      offerings.current?.availablePackages?.[0]
+    if (fromOffering?.product?.identifier) {
+      return { kind: 'package', value: fromOffering }
+    }
+  } catch (err) {
+    throw humanizePurchaseError(err)
+  }
+
+  throw ascProductUnavailableError()
 }
 
 async function executePurchase(Purchases: PurchasesClient, target: PurchaseTarget) {
