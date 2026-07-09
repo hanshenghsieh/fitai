@@ -72,6 +72,24 @@ describe('nutrition day food logs', () => {
     assert.deepEqual(filtered.map(l => l.id), ['wed'])
   })
 
+  it('resolveFoodLogsFromSession prefers local cache over stale server after delete', () => {
+    const mock = mockBrowserStorage()
+    try {
+      const wed = '2099-06-18'
+      const at = `${wed}T08:00:00.000Z`
+      const serverLogs = [
+        sampleLog({ id: 'a', logged_at: at }),
+        sampleLog({ id: 'b', logged_at: at }),
+      ]
+      writeFoodLogsSessionCache([sampleLog({ id: 'a', logged_at: at })], wed)
+      const resolved = resolveFoodLogsFromSession(serverLogs, wed)
+      assert.equal(resolved.length, 1)
+      assert.equal(resolved[0]?.id, 'a')
+    } finally {
+      mock.restore()
+    }
+  })
+
   it('resolveFoodLogsFromSession drops stale cached logs when server is empty', () => {
     const mock = mockBrowserStorage()
     try {

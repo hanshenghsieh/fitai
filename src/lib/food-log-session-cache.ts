@@ -72,11 +72,9 @@ export function resolveFoodLogsFromSession(
   const durable = readTodayOfflineSnapshot(date)?.food_logs_today ?? null
   const cachedForDay = cached ? filterFoodLogsForNutritionDay(cached, date) : null
   const durableForDay = durable ? filterFoodLogsForNutritionDay(durable, date) : null
-  const merged = mergeFoodLogsPreferComplete(serverForDay, cachedForDay, durableForDay)
-  if (merged.length === serverForDay.length) {
-    const serverFp = foodLogIdsFingerprint(serverForDay)
-    const mergedFp = foodLogIdsFingerprint(merged)
-    if (mergedFp === serverFp) return serverForDay
-  }
-  return merged.length >= serverForDay.length ? merged : serverForDay
+
+  // Local cache is source of truth when present — union with server would undo deletions.
+  if (cachedForDay != null) return cachedForDay
+  if (durableForDay != null) return durableForDay
+  return serverForDay
 }
