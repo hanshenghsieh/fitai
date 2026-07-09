@@ -213,6 +213,8 @@ export default function BetterBitHome({
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const persistRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const persistErrorToastAtRef = useRef(0)
+  const persistShowErrorToastRef = useRef(false)
+  const persistBackgroundFailCountRef = useRef(0)
   const persistFlushingRef = useRef(false)
   const persistPatchRef = useRef<{
     workoutItems?: WorkoutCheckinItem[]
@@ -531,7 +533,7 @@ export default function BetterBitHome({
           const res = await fetch('/api/checkin', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
+            credentials: 'include',
             keepalive: true,
             signal: ac.signal,
             body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId, checkin)),
@@ -539,6 +541,11 @@ export default function BetterBitHome({
           if (!res.ok) {
             const bodyText = await res.text().catch(() => '')
             console.error('[persist] checkin PATCH failed', res.status, bodyText.slice(0, 300))
+            if (res.status === 401) {
+              clearPendingSync()
+              persistPatchRef.current = {}
+              break
+            }
             throw new Error(bodyText || `HTTP ${res.status}`)
           }
           const json = (await res.json()) as { calorie_bank?: CalorieBankRow | null }
@@ -562,12 +569,24 @@ export default function BetterBitHome({
       persistFlushingRef.current = false
       persistAbortRef.current = null
       if (sawError && !isOffline()) {
-        const now = Date.now()
-        if (now - persistErrorToastAtRef.current > 8000) {
-          persistErrorToastAtRef.current = now
-          toast.error(GENTLE_ERROR_MESSAGE)
+        if (persistShowErrorToastRef.current) {
+          const now = Date.now()
+          if (now - persistErrorToastAtRef.current > 8000) {
+            persistErrorToastAtRef.current = now
+            toast.error(GENTLE_ERROR_MESSAGE)
+          }
+        } else {
+          persistBackgroundFailCountRef.current += 1
+          if (persistBackgroundFailCountRef.current >= 5) {
+            clearPendingSync()
+            persistPatchRef.current = {}
+            persistBackgroundFailCountRef.current = 0
+          }
         }
+      } else if (!sawError) {
+        persistBackgroundFailCountRef.current = 0
       }
+      persistShowErrorToastRef.current = false
       if (Object.keys(persistPatchRef.current).length > 0 && !isOffline()) {
         if (persistRetryTimerRef.current) clearTimeout(persistRetryTimerRef.current)
         persistRetryTimerRef.current = setTimeout(() => {
@@ -579,6 +598,10 @@ export default function BetterBitHome({
   }, [buildPersistState, weeklyPlanId, writeFoodCache, trackedDayKey])
 
   const flushPendingPersist = useCallback(() => {
+    const hasPatch = Object.keys(persistPatchRef.current).length > 0
+    const pending = hasPendingSync(trackedDayKey)
+    if (!hasPatch && !pending) return
+
     if (persistTimerRef.current) {
       clearTimeout(persistTimerRef.current)
       persistTimerRef.current = null
@@ -592,8 +615,9 @@ export default function BetterBitHome({
     if (persistFlushingRef.current) {
       persistAbortRef.current?.abort()
     }
+    persistShowErrorToastRef.current = false
     void flushPersist()
-  }, [flushPersist, writeFoodCache])
+  }, [flushPersist, writeFoodCache, trackedDayKey])
 
   const persist = useCallback(
     (patch: {
@@ -620,12 +644,14 @@ export default function BetterBitHome({
         if (persistFlushingRef.current) {
           persistAbortRef.current?.abort()
         }
+        persistShowErrorToastRef.current = true
         void flushPersist()
         return
       }
 
       persistTimerRef.current = setTimeout(() => {
         persistTimerRef.current = null
+        persistShowErrorToastRef.current = true
         void flushPersist()
       }, 300)
     },
