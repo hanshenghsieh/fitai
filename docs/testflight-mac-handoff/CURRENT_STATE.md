@@ -1,24 +1,23 @@
-# Windows 端已完成状态（2026-07-08）
+# Windows 端已完成狀態（2026-07-09）
 
 ## Git
 
-| 项目 | 值 |
+| 項目 | 值 |
 |------|-----|
 | Remote | `https://github.com/hanshenghsieh/fitai.git` |
 | Branch | `main` |
-| 最新相关 commit | `5357332` — Include RevenueCat native plugin in iOS shell |
-| 前一笔 | `65d9575` — Fix permanent premium gate, account cache bleed, IAP hang |
+| 最新相關 commit | `d3ed294` — Fix IAP configure hang: native plugin check, Build 13, committed capacitor config |
+| 前幾筆 | `8b782cf` IAP configure fix · `5357332` RevenueCat native plugin · `65d9575` premium gate / cache bleed |
 
-Mac 执行：`git pull origin main`
+Mac 執行：`git pull origin main`
 
 ---
 
-## Vercel Production（已 deploy Ready）
+## Vercel Production（已 deploy）
 
 - https://betterbit.app
-- https://www.betterbit.app
 
-**IAP 相关 env 已设（Production + Preview）：**
+**IAP 相關 env 已設（Production）：**
 
 ```
 NEXT_PUBLIC_APPLE_IAP_ENABLED=true
@@ -27,54 +26,45 @@ NEXT_PUBLIC_APPLE_IAP_PRODUCT_ID=betterbit_pro_monthly
 NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID=BetterBit Pro
 ```
 
-⚠️ Entitlement ID 必须是 **`BetterBit Pro`**（跟 RevenueCat Dashboard Identifier 一致，不是 `premium`）。
+⚠️ Entitlement ID 必須是 **`BetterBit Pro`**（不是 `premium`）。
 
 ---
 
-## iOS Build
+## iOS Build（Mac 要上傳的目標）
 
-| 字段 | 值 |
+| 欄位 | 值 |
 |------|-----|
 | MARKETING_VERSION | 1.0 |
-| CURRENT_PROJECT_VERSION | **12** |
+| CURRENT_PROJECT_VERSION | **13** |
 | Bundle ID | app.fitai.betterbit |
 
-Build 11 关键变更：`cap sync` 后 `Package.swift` 包含 `@revenuecat/purchases-capacitor`。
+Build 13 關鍵變更：
 
-旧 Build（≤10）问题：网页显示「订阅」但原生无 RevenueCat → 点击后卡在「處理中」。
+- `ios/App/App/capacitor.config.json` 納入 git，`packageClassList` 含 `PurchasesPlugin`
+- `project.pbxproj` 已加 **In-App Purchase** capability
+- `Package.swift` 含 `@revenuecat/purchases-capacitor`
+
+Build 12 問題：訂閱卡在「連接付款…」40 秒逾時 → 原生 Purchases 插件未載入。
 
 ---
 
-## RevenueCat（Dashboard 已设）
+## RevenueCat（Dashboard 已設）
 
-- App：BetterBit (App Store) / `app.fitai.betterbit`
 - Product：`betterbit_pro_monthly`
-- Entitlement：**BetterBit Pro**（Identifier）
-- Offering：`default` → Monthly package → `betterbit_pro_monthly`
-- In-app purchase key + App Store Connect API：已绿勾
-
-Product 可能显示 **Could not check** — Sandbox 仍常可测。
+- Entitlement：**BetterBit Pro**
+- Offering：`default` → Monthly → `betterbit_pro_monthly`
 
 ---
 
-## App Store Connect
+## Mac 任務
 
-- 订阅 `betterbit_pro_monthly`：状态 **准备提交**（正常，送审 App 时一起勾）
-- Sandbox 测试员：已建（例：`kevinkknn84@gmail.com`）
-
----
-
-## 已修 Bug（在 betterbit.app，TestFlight 新 Build 后完整生效）
-
-1. 永久会员仍显示「试用期已结束」→ subscription 查询兼容旧 DB schema
-2. 换帐号仍看到旧餐点 → logout/login 清 local cache
-3. 注册 onboarding 贴边 → 边距微调
-4. IAP 订阅卡在處理中 → **需 Build 11+ 含 RevenueCat native plugin**
+1. `git pull` + `npm run testflight:prep`
+2. Archive + Upload **Build 13**（ASC 已有 13 則用 14）
+3. 回報 Ready to Test 後，用戶 iPhone 裝新 Build 測 Sandbox 訂閱
 
 ---
 
-## Mac 不需要在 Windows 做的事
+## Mac 不需要做的事
 
-- Vercel redeploy（已完成）
-- RevenueCat Dashboard 改设定（已完成）
-- Supabase migration（可选，程式已 workaround）
+- Vercel redeploy（Windows 已完成）
+- RevenueCat Dashboard 改設定（已完成）

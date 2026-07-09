@@ -1,82 +1,104 @@
-# Mac Cursor Agent 任务书
+# Mac Cursor Agent 任務書
 
-> 复制给用户看的唯一指令：**「你幫我搞定上 TESTFLIGHT 的東西，照 `docs/testflight-mac-handoff/` 做。」**
-
----
-
-## 你的目标
-
-把 BetterBit iOS App **Archive 并上传到 App Store Connect TestFlight**，Build 号 **12**（若 ASC 已有 12 则用 13）。
-
-成功标准：
-
-- App Store Connect TestFlight 出现新 Build，状态 **Ready to Test**
-- 真机可安装，打开后加载 `https://betterbit.app`
-- **设定 → 会员 → 订阅** 能弹出 Apple Sandbox 付款画面（不再无限「處理中」）
+> 複製給 Mac Cursor 的指令見 [`MAC_ONE_LINER.txt`](./MAC_ONE_LINER.txt)
 
 ---
 
-## 前置条件（Mac 必须有）
+## 你的目標
+
+把 BetterBit iOS App **Archive 並上傳到 App Store Connect TestFlight**，Build 號 **13**（若 ASC 已有 13 則用 14）。
+
+成功標準：
+
+- App Store Connect TestFlight 出現新 Build，狀態 **Ready to Test**
+- 真機可安裝，打開後載入 `https://betterbit.app`
+- **設定 → 會員 → 訂閱** 能進入「讀取方案… → 等待 Apple 付款…」並彈出 **Apple Sandbox 付款畫面**（不再卡在「連接付款…」或 40 秒逾時）
+
+---
+
+## 背景（為什麼一定要 Build 13）
+
+Build 12 訂閱卡在「連接付款…」根因：
+
+1. `capacitor.config.json` 的 `packageClassList` 缺 `PurchasesPlugin`（Archive 前沒 cap sync）
+2. Xcode 缺 **In-App Purchase** capability
+
+Windows 已修（commit `d3ed294` 或之後）：
+
+- `ios/App/App/capacitor.config.json` 已納入 git（含 `PurchasesPlugin`）
+- `project.pbxproj` 已加 In-App Purchase + `CURRENT_PROJECT_VERSION = 13`
+- 網頁端 `apple-iap-client.ts` 會用 `Capacitor.isPluginAvailable('Purchases')` 快速失敗，不再空等
+
+**Build 12 無法只靠網頁更新修好，必須重新 Archive 上傳 Build 13。**
+
+---
+
+## 前置條件（Mac 必須有）
 
 - [ ] macOS + **Xcode**（含 Command Line Tools）
-- [ ] **Apple Developer** 帐号，Team 能签名 `app.fitai.betterbit`
+- [ ] **Apple Developer** 帳號，Team 能簽名 `app.fitai.betterbit`
 - [ ] **Node.js 18+** 和 npm
-- [ ] 网络可访问 GitHub、npm、App Store Connect
+- [ ] 網路可訪問 GitHub、npm、App Store Connect
 
 ---
 
-## 自动执行流程
+## 自動執行流程
 
-### Step 1 — 拉最新代码
+### Step 1 — 拉最新程式碼
 
 ```bash
-git clone https://github.com/hanshenghsieh/fitai.git fitness-app
-cd fitness-app
+cd fitness-app   # 若已 clone；否則 git clone https://github.com/hanshenghsieh/fitai.git fitness-app && cd fitness-app
 git checkout main
 git pull origin main
 git log -1 --oneline
 ```
 
-预期最新 commit 含：`Include RevenueCat native plugin in iOS shell` 或之后。
+預期最新 commit 含：`Fix IAP configure hang` 或 `d3ed294` 之後。
 
-### Step 2 — 安装依赖
+### Step 2 — 安裝依賴
 
 ```bash
 npm ci
 ```
 
-若无 `.env.local` 不影响 Archive（App 加载远程 betterbit.app）。
+無 `.env.local` 不影響 Archive（App 載入遠端 betterbit.app）。
 
-### Step 3 — Prep（必跑）
+### Step 3 — Prep（必跑，不可跳過）
 
 ```bash
 npm run testflight:prep
 ```
 
-这会：
+這會：
 
-1. 检查 iOS `CURRENT_PROJECT_VERSION = 11`
+1. 檢查 iOS `CURRENT_PROJECT_VERSION = 13`
 2. 跑 `npm test`
 3. 跑 `npm run build`
 4. 跑 `npx cap sync ios`
+5. 驗證 `capacitor.config.json` 含 `PurchasesPlugin`
 
-**验证 RevenueCat 已 sync 进 iOS：**
+**驗證 RevenueCat 已 sync 進 iOS：**
 
 ```bash
 grep -i Revenuecat ios/App/CapApp-SPM/Package.swift
+grep PurchasesPlugin ios/App/App/capacitor.config.json
 ```
 
-必须看到 `RevenuecatPurchasesCapacitor`。没有则 `npx cap sync ios` 再跑一次。
+兩者都必須有輸出。沒有則 `npx cap sync ios` 再跑一次。
 
-### Step 4 — 检查 Build 号冲突
+### Step 4 — 檢查 Build 號衝突
 
 ```bash
 grep CURRENT_PROJECT_VERSION ios/App/App.xcodeproj/project.pbxproj | head -2
 ```
 
-若 App Store Connect 已有 Build 11，把 `project.pbxproj` 里两处 `CURRENT_PROJECT_VERSION` 改成 **12**，并改 `scripts/testflight-prep.mjs` 的 `EXPECTED_BUILD`，再 commit（可选）或直接本地 Archive。
+若 App Store Connect **已有 Build 13**：
 
-### Step 5 — Xcode 设定
+1. 把 `project.pbxproj` 裡兩處 `CURRENT_PROJECT_VERSION = 13` 改成 **14**
+2. 改 `scripts/testflight-prep.mjs` 的 `EXPECTED_BUILD` 為 `'14'`
+3. 再跑 `npm run testflight:prep`
+
+### Step 5 — Xcode 設定
 
 ```bash
 open ios/App/App.xcodeproj
@@ -85,63 +107,67 @@ open ios/App/App.xcodeproj
 在 Xcode：
 
 1. Target **App** → **Signing & Capabilities**
-   - Team：选开发者 Team
+   - Team：選開發者 Team
    - Bundle Identifier：`app.fitai.betterbit`
-   - 加 **In-App Purchase** capability（若没有）
-2. **General** → Version `1.0`，Build `11`（或 12）
-3. 顶部设备选 **Any iOS Device (arm64)**
+   - 確認有 **In-App Purchase** capability（repo 已加，若 Xcode 沒顯示請手動 Add Capability）
+2. **General** → Version `1.0`，Build `13`（或 14）
+3. 頂部設備選 **Any iOS Device (arm64)**
 
-### Step 6 — Archive
+### Step 6 — Archive 並上傳
 
-**方式 A — 脚本：**
+**方式 A — 腳本：**
 
 ```bash
 bash scripts/testflight-archive-mac.sh
-open build/BetterBit-Build11.xcarchive
+open build/BetterBit-Build13.xcarchive
 ```
+
+Organizer → **Distribute App** → **App Store Connect** → **Upload**
 
 **方式 B — Xcode GUI：**
 
-Product → **Archive** → Organizer 打开后 **Distribute App** → **App Store Connect** → **Upload**
+Product → **Archive** → Organizer → **Distribute App** → **App Store Connect** → **Upload**
 
-### Step 7 — 回报用户
+### Step 7 — 回報用戶
 
-上传成功后告诉用户：
+上傳成功後告訴用戶：
 
-- Build 号（11 或 12）
-- App Store Connect 链接
-- 预计 Processing 时间（5–30 分钟）
-- 请 iPhone TestFlight 更新后按 `POST_UPLOAD_VERIFY.md` 测订阅
+- 實際 Build 號（13 或 14）
+- App Store Connect 處理狀態
+- 預計 Processing 時間（5–30 分鐘）
+- iPhone TestFlight 更新後按 [`POST_UPLOAD_VERIFY.md`](./POST_UPLOAD_VERIFY.md) 測訂閱
 
 ---
 
 ## 不要做的事
 
-- ❌ 不要在 Mac 上改 Vercel env（Windows / Vercel Dashboard 已设）
+- ❌ 不要在 Mac 上改 Vercel env（Windows / Vercel Dashboard 已設）
 - ❌ 不要改 `capacitor.config.ts` 的 server.url（保持 betterbit.app）
-- ❌ 不要用 Sandbox API key 替换 RevenueCat **Public** `appl_` key
+- ❌ 不要用 Sandbox API key 替換 RevenueCat **Public** `appl_` key
+- ❌ 不要跳過 `npm run testflight:prep` 直接 Archive
 - ❌ 不要 force push main
 
 ---
 
-## 若 Archive 失败
+## 若 Archive 失敗
 
-见 [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md)，常见：
+見 [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md)，常見：
 
 - Signing / Provisioning profile
 - 缺 In-App Purchase capability
-- `npm test` 失败 → 修 test 或报告 blocker
-- Build 号与 ASC 重复 → bump build number
+- `npm test` 失敗 → 修 test 或回報 blocker
+- Build 號與 ASC 重複 → bump build number
 
 ---
 
-## 相关路径
+## 相關路徑
 
 ```
-ios/App/App.xcodeproj          Xcode 专案
+ios/App/App.xcodeproj              Xcode 專案
+ios/App/App/capacitor.config.json  含 packageClassList + PurchasesPlugin（已納入 git）
 ios/App/CapApp-SPM/Package.swift   Capacitor plugins（含 RevenueCat）
-scripts/testflight-prep.mjs    prep 脚本
-scripts/testflight-archive-mac.sh  Archive 脚本
-capacitor.config.ts            remote URL = betterbit.app
-src/lib/apple-iap-client.ts    IAP 购买逻辑
+scripts/testflight-prep.mjs        prep 腳本（EXPECTED_BUILD=13）
+scripts/testflight-archive-mac.sh  Archive 腳本
+capacitor.config.ts                remote URL = betterbit.app
+src/lib/apple-iap-client.ts        IAP 購買邏輯
 ```
