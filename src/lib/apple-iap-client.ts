@@ -1,6 +1,7 @@
 'use client'
 
 import { Capacitor } from '@capacitor/core'
+import { Purchases } from '@revenuecat/purchases-capacitor'
 import { isNativeIOS } from '@/lib/capacitor-native'
 import {
   APPLE_IAP_ENTITLEMENT_ID,
@@ -20,22 +21,17 @@ export type AppleIapPurchaseStep = 'configure' | 'offerings' | 'purchase' | 'syn
 
 let configuredForUser: string | null = null
 
-const CONFIGURE_TIMEOUT_MS = 12_000
-const OFFERINGS_TIMEOUT_MS = 18_000
+const PLUGIN_PROBE_TIMEOUT_MS = 4_000
+const CONFIGURE_TIMEOUT_MS = 15_000
+const OFFERINGS_TIMEOUT_MS = 20_000
 const PURCHASE_SHEET_TIMEOUT_MS = 90_000
 
 export function resetAppleIapConfiguration(): void {
   configuredForUser = null
 }
 
-async function loadPurchases() {
-  if (!isNativeIOS()) return null
-  try {
-    const mod = await import('@revenuecat/purchases-capacitor')
-    return mod.Purchases
-  } catch {
-    return null
-  }
+export function isPurchasesNativePluginAvailable(): boolean {
+  return isNativeIOS() && Capacitor.isPluginAvailable('Purchases')
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
@@ -76,7 +72,7 @@ function humanizePurchaseError(err: unknown): Error {
     return returnTimeoutMessage(msg)
   }
   if (/plugin|unimplemented|not implemented|Web not supported|web/i.test(msg)) {
-    return new Error('付款模組未載入。請安裝 TestFlight 最新 Build（含 RevenueCat），不是只更新網頁')
+    return new Error('付款模組未載入。請安裝 TestFlight Build 13（Mac 需跑 testflight:prep 後 Archive）')
   }
   return err
 }
@@ -86,25 +82,45 @@ function returnTimeoutMessage(msg: string): Error {
   return new Error('操作逾時。請確認已登入 Sandbox，並安裝最新 TestFlight Build')
 }
 
+function assertNativePurchaseEnvironment(): void {
+  if (!isNativeIOS()) {
+    throw new Error('請在 iPhone App 內訂閱，不要用瀏覽器')
+  }
+  if (!Capacitor.isNativePlatform()) {
+    throw new Error('付款模組未載入。請在 iPhone App 內操作')
+  }
+  if (!isPurchasesNativePluginAvailable()) {
+    throw new Error(
+      '付款原生模組未安裝。Mac 請執行 npm run testflight:prep 後重新 Archive 上傳 Build 13'
+    )
+  }
+}
+
+async function probePurchasesPlugin(): Promise<void> {
+  await withTimeout(
+    Purchases.isConfigured(),
+    PLUGIN_PROBE_TIMEOUT_MS,
+    '付款模組無回應。請安裝 TestFlight Build 13（含 RevenueCat 原生插件）'
+  )
+}
+
 export async function configureAppleIap(userId: string): Promise<boolean> {
   if (!isRevenueCatConfigured() || !isNativeIOS()) return false
   if (configuredForUser === userId) return true
 
-  const Purchases = await loadPurchases()
   const apiKey = getRevenueCatIosApiKey()
-  if (!Purchases || !apiKey) return false
+  if (!apiKey) return false
 
-  if (!Capacitor.isNativePlatform()) {
-    throw new Error('付款模組未載入。請在 iPhone App 內操作，不要用 Safari')
-  }
+  assertNativePurchaseEnvironment()
 
   try {
-    // Do NOT call getAppUserID before configure — it can hang on native when SDK is not ready.
+    await probePurchasesPlugin()
+
     if (configuredForUser == null) {
       await withTimeout(
         Purchases.configure({ apiKey, appUserID: userId }),
         CONFIGURE_TIMEOUT_MS,
-        '初始化付款逾時。請安裝 TestFlight Build 12（含 RevenueCat 原生插件）'
+        '初始化付款逾時。Mac Archive 前請跑 npm run testflight:prep，並確認 Xcode 已開 In-App Purchase'
       )
     } else {
       await withTimeout(
@@ -116,11 +132,11 @@ export async function configureAppleIap(userId: string): Promise<boolean> {
 
     const status = await withTimeout(
       Purchases.isConfigured(),
-      5_000,
-      '付款模組無回應。Mac 需重新 Archive 上傳 Build 12'
+      PLUGIN_PROBE_TIMEOUT_MS,
+      '付款模組初始化後無回應。請安裝 TestFlight Build 13'
     )
     if (!status.isConfigured) {
-      throw new Error('付款模組初始化失敗。請安裝 TestFlight Build 12')
+      throw new Error('付款模組初始化失敗。請安裝最新 TestFlight Build')
     }
 
     configuredForUser = userId
@@ -166,7 +182,11 @@ async function syncToBackend(payload: {
 }) {
   const res = await fetch('/api/apple-iap/sync', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-betterbit-platform': 'ios',
+    },
     body: JSON.stringify({
       originalTransactionId: payload.originalTransactionId,
       productId: payload.productId,
@@ -180,10 +200,26 @@ async function syncToBackend(payload: {
   }
 }
 
-type PurchasesClient = NonNullable<Awaited<ReturnType<typeof loadPurchases>>>
+type PurchasesClient = typeof Purchases
 
-async function resolveStoreProduct(Purchases: PurchasesClient) {
+type PurchaseTarget =
+  | { kind: 'package'; value: { identifier: string; product: { identifier: string } } }
+  | { kind: 'product'; value: { identifier: string } }
+
+async function resolvePurchaseTarget(Purchases: PurchasesClient): Promise<PurchaseTarget> {
   const productId = APPLE_IAP_PRODUCT_ID
+
+  const offerings = await withTimeout(
+    Purchases.getOfferings(),
+    OFFERINGS_TIMEOUT_MS,
+    '讀取訂閱方案逾時。請確認 RevenueCat Offering 已設 Current'
+  )
+  const fromOffering =
+    offerings.current?.availablePackages?.find(pkg => pkg.product?.identifier === productId) ??
+    offerings.current?.availablePackages?.[0]
+  if (fromOffering?.product?.identifier) {
+    return { kind: 'package', value: fromOffering }
+  }
 
   const direct = await withTimeout(
     Purchases.getProducts({ productIdentifiers: [productId] }),
@@ -191,42 +227,40 @@ async function resolveStoreProduct(Purchases: PurchasesClient) {
     '讀取 App Store 商品逾時。請確認 Sandbox 已登入'
   )
   const fromDirect = direct.products?.[0]
-  if (fromDirect?.identifier) return fromDirect
-
-  const offerings = await withTimeout(
-    Purchases.getOfferings(),
-    OFFERINGS_TIMEOUT_MS,
-    '讀取訂閱方案逾時。請確認 RevenueCat Offering 已設 Current'
-  )
-  const pkg = offerings.current?.availablePackages?.[0]
-  if (pkg?.product?.identifier) return pkg.product
+  if (fromDirect?.identifier) {
+    return { kind: 'product', value: fromDirect }
+  }
 
   throw new Error(
     `找不到商品 ${productId}。請確認 App Store Connect + RevenueCat Offering`
   )
 }
 
-async function purchaseStoreProduct(
-  Purchases: PurchasesClient,
-  product: { identifier: string }
-) {
-  const nativeProduct = toNativePayload(product)
-  const purchaseResult = await withTimeout(
-    Purchases.purchaseStoreProduct({ product: nativeProduct }),
+async function executePurchase(Purchases: PurchasesClient, target: PurchaseTarget) {
+  if (target.kind === 'package') {
+    return withTimeout(
+      Purchases.purchasePackage({ aPackage: toNativePayload(target.value) }),
+      PURCHASE_SHEET_TIMEOUT_MS,
+      '等待 Apple 付款逾時。請到「設定 → 開發人員 → Sandbox」登入測試帳號後重試'
+    )
+  }
+
+  return withTimeout(
+    Purchases.purchaseStoreProduct({ product: toNativePayload(target.value) }),
     PURCHASE_SHEET_TIMEOUT_MS,
     '等待 Apple 付款逾時。請到「設定 → 開發人員 → Sandbox」登入測試帳號後重試'
   )
-  return purchaseResult
 }
 
 export async function getAppleIapStatus(userId: string): Promise<AppleIapPurchaseResult> {
   const ready = await configureAppleIap(userId)
   if (!ready) return { active: false }
 
-  const Purchases = await loadPurchases()
-  if (!Purchases) return { active: false }
-
-  const { customerInfo } = await Purchases.getCustomerInfo()
+  const { customerInfo } = await withTimeout(
+    Purchases.getCustomerInfo(),
+    OFFERINGS_TIMEOUT_MS,
+    '讀取會員狀態逾時'
+  )
   const entitlement = readEntitlement(customerInfo)
   if (!entitlement?.originalTransactionId) return { active: false }
 
@@ -247,16 +281,11 @@ export async function purchaseAppleIap(
     const ready = await configureAppleIap(userId)
     if (!ready) throw new Error('訂閱尚未開放')
 
-    const Purchases = await loadPurchases()
-    if (!Purchases) {
-      throw new Error('付款模組未載入。請安裝最新 TestFlight Build')
-    }
-
     onStep?.('offerings')
-    const storeProduct = await resolveStoreProduct(Purchases)
+    const target = await resolvePurchaseTarget(Purchases)
 
     onStep?.('purchase')
-    const purchaseResult = await purchaseStoreProduct(Purchases, storeProduct)
+    const purchaseResult = await executePurchase(Purchases, target)
     const entitlement = readEntitlement(purchaseResult.customerInfo)
     if (!entitlement?.originalTransactionId) {
       throw new Error('購買未完成')
@@ -284,9 +313,6 @@ export async function restoreAppleIap(userId: string): Promise<AppleIapPurchaseR
   try {
     const ready = await configureAppleIap(userId)
     if (!ready) throw new Error('還原購買尚未開放')
-
-    const Purchases = await loadPurchases()
-    if (!Purchases) throw new Error('付款模組未載入。請安裝最新 TestFlight Build')
 
     const { customerInfo } = await withTimeout(
       Purchases.restorePurchases(),

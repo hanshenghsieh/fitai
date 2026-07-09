@@ -102,11 +102,6 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
     if (purchasing) return
     setPurchasing(true)
     setPurchaseStep('configure')
-    const safetyTimer = window.setTimeout(() => {
-      setPurchasing(false)
-      setPurchaseStep(null)
-      toast.error('付款逾時。請確認 TestFlight 為最新 Build，且 Sandbox 已登入')
-    }, 40_000)
     try {
       const result = await purchaseAppleIap(userId, step => setPurchaseStep(step))
       if (result.active) {
@@ -117,7 +112,6 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       const message = err instanceof Error ? err.message : '無法完成訂閱'
       if (!/cancel|已取消/i.test(message)) toast.error(message)
     } finally {
-      window.clearTimeout(safetyTimer)
       setPurchasing(false)
       setPurchaseStep(null)
     }

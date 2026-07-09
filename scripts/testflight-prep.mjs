@@ -9,7 +9,7 @@ import { join } from 'node:path'
 
 const root = join(import.meta.dirname, '..')
 const pbxproj = join(root, 'ios/App/App.xcodeproj/project.pbxproj')
-const EXPECTED_BUILD = process.env.IOS_BUILD_NUMBER?.trim() || '12'
+const EXPECTED_BUILD = process.env.IOS_BUILD_NUMBER?.trim() || '13'
 
 function run(cmd, opts = {}) {
   console.log(`\n> ${cmd}`)
@@ -49,6 +49,12 @@ function checkCapacitorServer() {
   } else {
     console.log('[OK] Capacitor server → betterbit.app')
   }
+  if (!cfg.includes('PurchasesPlugin')) {
+    console.error('[FAIL] capacitor.config.json missing PurchasesPlugin in packageClassList')
+    console.error('       Run: npx cap sync ios — then archive again')
+    process.exit(1)
+  }
+  console.log('[OK] capacitor.config.json includes PurchasesPlugin')
 }
 
 console.log('=== TestFlight prep ===\n')
