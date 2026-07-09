@@ -20,9 +20,9 @@ export type AppleIapPurchaseStep = 'configure' | 'offerings' | 'purchase' | 'syn
 
 let configuredForUser: string | null = null
 
-const CONFIGURE_TIMEOUT_MS = 15_000
-const OFFERINGS_TIMEOUT_MS = 20_000
-const PURCHASE_SHEET_TIMEOUT_MS = 60_000
+const CONFIGURE_TIMEOUT_MS = 12_000
+const OFFERINGS_TIMEOUT_MS = 18_000
+const PURCHASE_SHEET_TIMEOUT_MS = 90_000
 
 export function resetAppleIapConfiguration(): void {
   configuredForUser = null
@@ -86,25 +86,6 @@ function returnTimeoutMessage(msg: string): Error {
   return new Error('操作逾時。請確認已登入 Sandbox，並安裝最新 TestFlight Build')
 }
 
-async function assertNativePurchasesBridge(Purchases: NonNullable<Awaited<ReturnType<typeof loadPurchases>>>): Promise<void> {
-  if (!Capacitor.isNativePlatform()) {
-    throw new Error('付款模組未載入。請在 iPhone App 內操作，不要用 Safari')
-  }
-  try {
-    await withTimeout(
-      Purchases.getAppUserID(),
-      8_000,
-      '付款模組無回應。請安裝最新 TestFlight Build（需含 RevenueCat 原生插件）'
-    )
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    if (/Web not supported|not implemented|unimplemented/i.test(msg)) {
-      throw new Error('付款模組未載入。Mac 需重新 Archive 上傳含 RevenueCat 的 Build')
-    }
-    throw err
-  }
-}
-
 export async function configureAppleIap(userId: string): Promise<boolean> {
   if (!isRevenueCatConfigured() || !isNativeIOS()) return false
   if (configuredForUser === userId) return true
@@ -113,13 +94,17 @@ export async function configureAppleIap(userId: string): Promise<boolean> {
   const apiKey = getRevenueCatIosApiKey()
   if (!Purchases || !apiKey) return false
 
+  if (!Capacitor.isNativePlatform()) {
+    throw new Error('付款模組未載入。請在 iPhone App 內操作，不要用 Safari')
+  }
+
   try {
-    await assertNativePurchasesBridge(Purchases)
+    // Do NOT call getAppUserID before configure — it can hang on native when SDK is not ready.
     if (configuredForUser == null) {
       await withTimeout(
         Purchases.configure({ apiKey, appUserID: userId }),
         CONFIGURE_TIMEOUT_MS,
-        '初始化付款逾時。請安裝最新 TestFlight Build 後重試'
+        '初始化付款逾時。請安裝 TestFlight Build 12（含 RevenueCat 原生插件）'
       )
     } else {
       await withTimeout(
@@ -128,6 +113,16 @@ export async function configureAppleIap(userId: string): Promise<boolean> {
         '切換付款帳號逾時，請重試'
       )
     }
+
+    const status = await withTimeout(
+      Purchases.isConfigured(),
+      5_000,
+      '付款模組無回應。Mac 需重新 Archive 上傳 Build 12'
+    )
+    if (!status.isConfigured) {
+      throw new Error('付款模組初始化失敗。請安裝 TestFlight Build 12')
+    }
+
     configuredForUser = userId
     return true
   } catch (err) {

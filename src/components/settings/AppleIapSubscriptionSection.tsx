@@ -106,7 +106,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       setPurchasing(false)
       setPurchaseStep(null)
       toast.error('付款逾時。請確認 TestFlight 為最新 Build，且 Sandbox 已登入')
-    }, 75_000)
+    }, 40_000)
     try {
       const result = await purchaseAppleIap(userId, step => setPurchaseStep(step))
       if (result.active) {
