@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { upsertAppleIapSubscription } from '@/lib/apple-iap-store'
 import { isAppleIapEnabled } from '@/lib/apple-iap-config'
 import { shouldBlockExternalPaymentsOnServer } from '@/lib/ios-payment-gate'
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         ? null
         : new Date(expiresRaw).toISOString()
 
-    const row = await upsertAppleIapSubscription(supabase, {
+    const row = await upsertAppleIapSubscription(createAdminClient(), {
       userId: user.id,
       originalTransactionId: parsed.data.originalTransactionId || user.id,
       productId: parsed.data.productId,

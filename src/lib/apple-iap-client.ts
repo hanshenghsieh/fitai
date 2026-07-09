@@ -84,6 +84,9 @@ function humanizePurchaseError(err: unknown): Error {
   if (/network|offline|timed out|timeout|逾時/i.test(msg)) {
     return returnTimeoutMessage(msg)
   }
+  if (/row-level security|violates row-level security/i.test(msg)) {
+    return new Error('會員狀態同步失敗。請按「還原購買」重試，無需再付費')
+  }
   if (/plugin|unimplemented|not implemented|Web not supported|web/i.test(msg)) {
     return new Error('付款模組未載入。請安裝 TestFlight Build 13（Mac 需跑 testflight:prep 後 Archive）')
   }
