@@ -13,9 +13,9 @@
 | Branch | `main` |
 | Bundle ID | `app.fitai.betterbit` |
 | Marketing Version | `1.0` |
-| **Build Number（本次应上传）** | **`12`** |
+| **Build Number（本次应上传）** | **`15`** |
 | Web 加载 | `https://betterbit.app`（Capacitor remote） |
-| 关键修复 | Build 11 含 **RevenueCat native plugin**（旧 Build 订阅会卡在「處理中」） |
+| 关键修复 | Build 15 含 **Visual V2** + IAP native plugin（PurchasesPlugin） |
 
 ---
 
@@ -47,7 +47,7 @@ bash scripts/testflight-archive-mac.sh
 ## 上传前 Xcode 必查（2 分钟）
 
 1. **Signing & Capabilities** → Team 选对 → **In-App Purchase** capability 存在  
-2. **General → Identity** → Version `1.0` / Build **`11`**（若 ASC 已有 11，改成 **12** 再上传）  
+2. **General → Identity** → Version `1.0` / Build **`15`**（若 ASC 已有 15，改成 **16** 再上传）  
 3. Scheme = **App**，Destination = **Any iOS Device (arm64)**
 
 ---

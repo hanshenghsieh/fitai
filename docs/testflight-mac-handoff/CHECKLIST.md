@@ -11,7 +11,7 @@
 
 - [ ] `npm run testflight:prep` 全部通过
 - [ ] `grep Revenuecat ios/App/CapApp-SPM/Package.swift` 有结果
-- [ ] Build number = **11**（或 ASC 冲突时用 12）
+- [ ] Build number = **15**（或 ASC 冲突时用 16）
 
 ## C. Xcode
 
