@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { parseFoodImage } from '@/lib/claude/client'
 
 export const maxDuration = 60
@@ -33,24 +34,27 @@ async function readImageFromRequest(request: NextRequest): Promise<{ imageBase64
   return { imageBase64, mimeType: mimeType || 'image/jpeg' }
 }
 
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
 export async function POST(request: NextRequest) {
   try {
     if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
-      return NextResponse.json({ error: '拍照辨識尚未設定' }, { status: 503 })
+      return jsonWithCors({ error: '拍照辨識尚未設定' }, request, { status: 503 })
     }
 
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireApiUser(request)
+    if (!auth.ok) return auth.response
 
     const { imageBase64, mimeType } = await readImageFromRequest(request)
     const { data } = await parseFoodImage(imageBase64, mimeType)
 
-    return NextResponse.json({ success: true, data })
+    return jsonWithCors({ success: true, data }, request)
   } catch (err) {
     console.error('Food photo parse error:', err)
     const message = err instanceof Error ? err.message : '辨識失敗，改用搜尋或常吃？'
     const status = message === 'Missing image' ? 400 : 500
-    return NextResponse.json({ error: message }, { status })
+    return jsonWithCors({ error: message }, request, { status })
   }
 }

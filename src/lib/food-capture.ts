@@ -1,6 +1,7 @@
 import type { FoodDna, FrequentFood } from '@/lib/food-memory'
 import { isNativeIOS } from '@/lib/capacitor-native'
 import type { PhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
+import { apiFetch } from '@/lib/api/client'
 
 const PHOTO_PARSE_TIMEOUT_MS = 45_000
 
@@ -183,10 +184,9 @@ export async function uploadFoodPhotoFile(file: File): Promise<PhotoParseResult>
 
   let res: Response
   try {
-    res = await fetch('/api/food-photo', {
+    res = await apiFetch('/api/food-photo', {
       method: 'POST',
       body: formData,
-      credentials: 'include',
       signal: controller.signal,
     })
   } catch (err) {
@@ -224,10 +224,9 @@ export async function parseFoodPhotoDataUrl(
 
   let res: Response
   try {
-    res = await fetch('/api/food-photo', {
+    res = await apiFetch('/api/food-photo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({
         imageBase64: base64,
         mimeType: mimeType.includes('jpeg') ? 'image/jpeg' : mimeType,
@@ -265,10 +264,9 @@ export async function fetchPhotoMatch(
 
   let res: Response
   try {
-    res = await fetch('/api/food-photo/match', {
+    res = await apiFetch('/api/food-photo/match', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({
         label,
         store: opts?.store,

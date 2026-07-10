@@ -9,6 +9,7 @@ import { getStripePriceId, SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
 import ZaiJian from '@/components/character/ZaiJian'
 import { shouldHideExternalPaymentsClient } from '@/lib/ios-payment-gate'
+import { apiFetch } from '@/lib/api/client'
 
 export default function SubscriptionManager() {
   const searchParams = useSearchParams()
@@ -40,7 +41,7 @@ export default function SubscriptionManager() {
 
   async function loadSubscriptionStatus() {
     try {
-      const res = await fetch('/api/get-subscription')
+      const res = await apiFetch('/api/get-subscription')
       if (res.ok) {
         const data = await res.json()
         setSubscription(data.subscription)
@@ -59,7 +60,7 @@ export default function SubscriptionManager() {
     }
     setSubscribing(true)
     try {
-      const res = await fetch('/api/create-subscription', {
+      const res = await apiFetch('/api/create-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priceId }),
@@ -78,7 +79,7 @@ export default function SubscriptionManager() {
   async function handleBillingPortal() {
     setPortalLoading(true)
     try {
-      const res = await fetch('/api/billing-portal', { method: 'POST' })
+      const res = await apiFetch('/api/billing-portal', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
       if (data.url) window.location.href = data.url
@@ -92,7 +93,7 @@ export default function SubscriptionManager() {
   async function handleCancel() {
     setCanceling(true)
     try {
-      const res = await fetch('/api/cancel-subscription', { method: 'POST' })
+      const res = await apiFetch('/api/cancel-subscription', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
       toast.success(data.message || '已取消')

@@ -7,6 +7,7 @@ import {
   type PhotoSettings,
   type UserSettingsPreferences,
 } from '@/lib/settings/user-settings-types'
+import { apiFetch } from '@/lib/api/client'
 
 const CONFIDENCE_SCORE_THRESHOLD = 70
 
@@ -19,7 +20,7 @@ export function invalidatePhotoSettingsCache(): void {
 export async function loadPhotoSettingsRuntime(): Promise<PhotoSettings> {
   if (cachedPhotoSettings) return cachedPhotoSettings
   try {
-    const res = await fetch('/api/settings/preferences')
+    const res = await apiFetch('/api/settings/preferences')
     if (res.ok) {
       const data = (await res.json()) as { preferences?: UserSettingsPreferences | null }
       cachedPhotoSettings = mergePreferences(data.preferences).photo ?? DEFAULT_PHOTO_SETTINGS

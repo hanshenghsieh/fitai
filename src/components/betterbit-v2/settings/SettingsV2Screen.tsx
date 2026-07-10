@@ -30,6 +30,7 @@ import V2SettingsProCard from '@/components/betterbit-v2/settings/V2SettingsProC
 import V2SettingsSwitch from '@/components/betterbit-v2/settings/V2SettingsSwitch'
 import V2SettingsLogoutButton from '@/components/betterbit-v2/settings/V2SettingsLogoutButton'
 import SettingsDeleteAccountSection from '@/components/settings/SettingsDeleteAccountSection'
+import { apiFetch } from '@/lib/api/client'
 
 interface Props {
   access: AccessStatus
@@ -50,7 +51,7 @@ export default function SettingsV2Screen({ access, appVersion }: Props) {
 
   useEffect(() => {
     if (bypassPaywall || access.isSubscribed) return
-    void fetch('/api/get-subscription')
+    void apiFetch('/api/get-subscription')
       .then(r => (r.ok ? r.json() : null))
       .then(data => setIsSubscribed(data?.subscription?.status === 'active'))
       .catch(() => {})

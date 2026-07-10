@@ -1,48 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server'
-import type { User } from '@supabase/supabase-js'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { saveBodyMeasurementForUser } from '@/lib/body-measurement-save'
 import { evaluateRegenNeed, triggerPlanRegeneration } from '@/lib/plan-regen'
 import { loadBodyMeasurementsForUser } from '@/lib/app/analytics-data'
 
-async function resolveRequestUser(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  request: NextRequest
-): Promise<User | null> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (user) return user
-
-  const token = request.headers.get('Authorization')?.match(/^Bearer\s+(.+)$/i)?.[1]
-  if (!token) return null
-
-  const {
-    data: { user: tokenUser },
-    error,
-  } = await supabase.auth.getUser(token)
-  if (error || !tokenUser) return null
-  return tokenUser
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
 }
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
-  const user = await resolveRequestUser(supabase, request)
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const measurements = await loadBodyMeasurementsForUser(supabase, user.id)
-  return NextResponse.json({ measurements })
+  return jsonWithCors({ measurements }, request)
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const user = await resolveRequestUser(supabase, request)
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const body = await request.json()
   const weightKg = typeof body.weight_kg === 'number' ? body.weight_kg : parseFloat(body.weight_kg)
   if (!Number.isFinite(weightKg) || weightKg <= 0) {
-    return NextResponse.json({ error: 'Invalid weight_kg' }, { status: 400 })
+    return jsonWithCors({ error: 'Invalid weight_kg' }, request, { status: 400 })
   }
 
   const bodyFatPct =
@@ -64,7 +48,7 @@ export async function POST(request: NextRequest) {
     measured_at: body.measured_at,
   })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return jsonWithCors({ error: error.message }, request, { status: 500 })
 
   const regenDecision = evaluateRegenNeed(
     {
@@ -90,15 +74,18 @@ export async function POST(request: NextRequest) {
 
   const measurements = await loadBodyMeasurementsForUser(supabase, user.id)
 
-  return NextResponse.json({
-    measurement: row
-      ? { id: row.id, measured_at: row.measured_at, weight_kg: row.weight_kg, created_at: row.created_at }
-      : { weight_kg: weightKg, body_fat_pct: bodyFatPct },
-    measurements,
-    logSaved,
-    historySaved,
-    planRegenerated,
-    regenSummary,
-    regenError,
-  })
+  return jsonWithCors(
+    {
+      measurement: row
+        ? { id: row.id, measured_at: row.measured_at, weight_kg: row.weight_kg, created_at: row.created_at }
+        : { weight_kg: weightKg, body_fat_pct: bodyFatPct },
+      measurements,
+      logSaved,
+      historySaved,
+      planRegenerated,
+      regenSummary,
+      regenError,
+    },
+    request
+  )
 }

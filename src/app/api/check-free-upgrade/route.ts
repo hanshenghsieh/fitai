@@ -1,16 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { stripe } from '@/lib/stripe'
 import { countQualifiedDaysInMonth } from '@/lib/checkin-utils'
 
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const auth = await requireApiUser(req)
+    if (!auth.ok) return auth.response
+    const { user, supabase } = auth
 
     const lastMonth = new Date()
     lastMonth.setMonth(lastMonth.getMonth() - 1)
@@ -39,11 +41,11 @@ export async function GET(req: NextRequest) {
       .single()
 
     if (!subscription) {
-      return NextResponse.json({
+      return jsonWithCors({
         qualifies: false,
         message: '還沒有訂閱',
         completedDays,
-      })
+      }, req)
     }
 
     if (qualifiesForFreeUpgrade && subscription.stripe_subscription_id) {
@@ -66,23 +68,23 @@ export async function GET(req: NextRequest) {
           free_month_end: nextBillingDate.toISOString(),
         })
 
-        return NextResponse.json({
+        return jsonWithCors({
           success: true,
           qualifies: true,
           completedDays,
           message: `🎉 恭喜！達標 ${completedDays} 天，下月免費升級！`,
-        })
+        }, req)
       } catch (stripeErr) {
         console.error('Stripe update error:', stripeErr)
-        return NextResponse.json({
+        return jsonWithCors({
           qualifies: true,
           completedDays,
           message: `達標 ${completedDays} 天，符合免費升級資格，請聯繫客服處理`,
-        })
+        }, req)
       }
     }
 
-    return NextResponse.json({
+    return jsonWithCors({
       qualifies: false,
       completedDays,
       requiredDays: 20,
@@ -90,11 +92,12 @@ export async function GET(req: NextRequest) {
       message: completedDays > 0
         ? `還差 ${20 - completedDays} 天達成免費升級 💪`
         : '加油！堅持達標 20 天即可免費升級',
-    })
+    }, req)
   } catch (err) {
     console.error('Error checking free upgrade:', err)
-    return NextResponse.json(
+    return jsonWithCors(
       { error: err instanceof Error ? err.message : 'Failed' },
+      req,
       { status: 500 }
     )
   }

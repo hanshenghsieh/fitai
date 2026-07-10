@@ -1,23 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
+
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
 
 export async function POST(req: NextRequest) {
   try {
     const { email, password, displayName } = await req.json()
 
     if (!email || !password || !displayName) {
-      return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+      return jsonWithCors({ error: 'Missing fields' }, req, { status: 400 })
     }
 
     const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
     const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!SUPABASE_URL || !SERVICE_KEY) {
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+      return jsonWithCors({ error: 'Server configuration error' }, req, { status: 500 })
     }
 
     console.log('Creating user:', email)
 
-    // Create user via admin API
     const signupRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
       method: 'POST',
       headers: {
@@ -45,7 +49,6 @@ export async function POST(req: NextRequest) {
 
     const userId = userData.id
 
-    // Create profile
     console.log('Creating profile...')
     await fetch(`${SUPABASE_URL}/rest/v1/user_profiles`, {
       method: 'POST',
@@ -61,10 +64,10 @@ export async function POST(req: NextRequest) {
     })
 
     console.log('Profile created, returning success')
-    return NextResponse.json({ userId, email })
+    return jsonWithCors({ userId, email }, req)
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Registration failed'
     console.error('Registration error:', msg)
-    return NextResponse.json({ error: msg }, { status: 400 })
+    return jsonWithCors({ error: msg }, req, { status: 400 })
   }
 }

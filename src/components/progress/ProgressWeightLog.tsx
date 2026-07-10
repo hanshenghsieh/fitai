@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { BodyMeasurement } from '@/types'
+import { apiFetch } from '@/lib/api/client'
 
 interface Props {
   lastWeightKg?: number | null
@@ -25,7 +26,7 @@ export default function ProgressWeightLog({ lastWeightKg, embedded = false, onSa
     }
     setLoading(true)
     try {
-      const res = await fetch('/api/measurements', {
+      const res = await apiFetch('/api/measurements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',

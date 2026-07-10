@@ -10,6 +10,7 @@ import { GrowthPostCard } from '@/growth/components/GrowthPostCard'
 import { GrowthSetupBanner } from '@/growth/components/GrowthSetupBanner'
 import { GrowthCollectorPanel } from '@/growth/components/GrowthCollectorPanel'
 import type { GrowthDashboardStats, GrowthPost } from '@/growth/types'
+import { apiFetch } from '@/lib/api/client'
 
 const EMPTY_STATS: GrowthDashboardStats = {
   todayFound: 0,
@@ -51,7 +52,7 @@ export function GrowthDashboard() {
     setLoading(true)
     setSetupError(null)
     try {
-      const res = await fetch('/api/growth/posts')
+      const res = await apiFetch('/api/growth/posts')
       const data = await res.json()
       if (!res.ok) {
         if (data.code === 'GROWTH_TABLE_MISSING') {

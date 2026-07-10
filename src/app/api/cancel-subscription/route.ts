@@ -1,12 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { cancelSubscription } from '@/lib/stripe'
 
-export async function POST() {
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
+export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireApiUser(request)
+    if (!auth.ok) return auth.response
+    const { user, supabase } = auth
 
     const { data: sub } = await supabase
       .from('subscriptions')
@@ -18,7 +23,7 @@ export async function POST() {
       .single()
 
     if (!sub?.stripe_subscription_id) {
-      return NextResponse.json({ error: 'No active subscription' }, { status: 404 })
+      return jsonWithCors({ error: 'No active subscription' }, request, { status: 404 })
     }
 
     await cancelSubscription(sub.stripe_subscription_id)
@@ -28,11 +33,12 @@ export async function POST() {
       .update({ cancel_at_period_end: true, updated_at: new Date().toISOString() })
       .eq('stripe_subscription_id', sub.stripe_subscription_id)
 
-    return NextResponse.json({ success: true, message: '已設定於本期結束後取消，期間內仍可使用。' })
+    return jsonWithCors({ success: true, message: '已設定於本期結束後取消，期間內仍可使用。' }, request)
   } catch (err) {
     console.error('Cancel subscription error:', err)
-    return NextResponse.json(
+    return jsonWithCors(
       { error: err instanceof Error ? err.message : 'Failed to cancel' },
+      request,
       { status: 500 }
     )
   }

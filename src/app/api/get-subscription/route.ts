@@ -1,15 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { countQualifiedDaysInMonth } from '@/lib/checkin-utils'
 
-export async function GET() {
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+export async function GET(request: NextRequest) {
+  try {
+    const auth = await requireApiUser(request)
+    if (!auth.ok) return auth.response
+    const { user, supabase } = auth
 
     const { data: subscription } = await supabase
       .from('subscriptions')
@@ -36,17 +38,21 @@ export async function GET() {
 
     const completedDays = countQualifiedDaysInMonth(checkins ?? [], year, month)
 
-    return NextResponse.json({
-      subscription: subscription || null,
-      freeUpgrade: {
-        completedDays,
-        qualifies: completedDays >= 20,
+    return jsonWithCors(
+      {
+        subscription: subscription || null,
+        freeUpgrade: {
+          completedDays,
+          qualifies: completedDays >= 20,
+        },
       },
-    })
+      request
+    )
   } catch (err) {
     console.error('Error getting subscription:', err)
-    return NextResponse.json(
+    return jsonWithCors(
       { error: err instanceof Error ? err.message : 'Failed' },
+      request,
       { status: 500 }
     )
   }

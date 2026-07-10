@@ -1,21 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { stripe } from '@/lib/stripe'
 import { getAppUrl } from '@/lib/app-url'
 import { shouldBlockExternalPaymentsOnServer } from '@/lib/ios-payment-gate'
 
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
 export async function POST(req: NextRequest) {
   if (shouldBlockExternalPaymentsOnServer(req.headers)) {
-    return NextResponse.json(
+    return jsonWithCors(
       { error: 'iOS App 請在 App Store 管理訂閱', code: 'USE_APPLE_IAP' },
+      req,
       { status: 403 }
     )
   }
 
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireApiUser(req)
+    if (!auth.ok) return auth.response
+    const { user, supabase } = auth
 
     const { data: sub } = await supabase
       .from('subscriptions')
@@ -26,7 +32,7 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (!sub?.stripe_customer_id) {
-      return NextResponse.json({ error: 'No billing account' }, { status: 404 })
+      return jsonWithCors({ error: 'No billing account' }, req, { status: 404 })
     }
 
     const appUrl = getAppUrl()
@@ -35,11 +41,12 @@ export async function POST(req: NextRequest) {
       return_url: `${appUrl}/settings/premium`,
     })
 
-    return NextResponse.json({ url: session.url })
+    return jsonWithCors({ url: session.url }, req)
   } catch (err) {
     console.error('Billing portal error:', err)
-    return NextResponse.json(
+    return jsonWithCors(
       { error: err instanceof Error ? err.message : 'Failed to open portal' },
+      req,
       { status: 500 }
     )
   }

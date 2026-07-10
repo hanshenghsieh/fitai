@@ -41,6 +41,7 @@ import {
   writeWeightMeasurementsSessionCache,
 } from '@/lib/weight-measurements-session-cache'
 import ProgressWeightLog from '@/components/progress/ProgressWeightLog'
+import { apiFetch } from '@/lib/api/client'
 
 const WeightTrendChart = dynamic(() => import('@/components/analytics/WeightTrendChart'), {
   ssr: false,
@@ -234,7 +235,7 @@ export default function AnalyticsScreen({
   const refreshMeasurements = useCallback(
     async (latestWeightKg?: number, clientSnapshot?: BodyMeasurement[]) => {
       try {
-        const res = await fetch('/api/measurements', {
+        const res = await apiFetch('/api/measurements', {
           cache: 'no-store',
           credentials: 'same-origin',
         })

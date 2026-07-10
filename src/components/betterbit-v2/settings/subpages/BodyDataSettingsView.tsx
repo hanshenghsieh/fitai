@@ -24,6 +24,7 @@ import {
   V2VisualMetricTile,
   V2VisualInfoBar,
 } from '@/components/betterbit-v2/settings/visual-v2/V2SettingsVisualPrimitives'
+import { apiFetch } from '@/lib/api/client'
 
 function formatDisplayDate(iso: string) {
   const d = iso.slice(0, 10)
@@ -72,7 +73,7 @@ export default function BodyDataSettingsView({ initial }: { initial: SettingsBun
   const { isDirty, markSaved } = useSettingsDirtyTracker(currentFormSnapshot)
 
   async function refreshMeasurements() {
-    const res = await fetch('/api/measurements')
+    const res = await apiFetch('/api/measurements')
     if (!res.ok) return
     const data = await res.json()
     if (data.measurements) {
@@ -99,7 +100,7 @@ export default function BodyDataSettingsView({ initial }: { initial: SettingsBun
       return null
     },
     onSave: async () => {
-      const res = await fetch('/api/settings/body', {
+      const res = await apiFetch('/api/settings/body', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -126,7 +127,7 @@ export default function BodyDataSettingsView({ initial }: { initial: SettingsBun
     }
     setAdding(true)
     try {
-      const res = await fetch('/api/settings/body', {
+      const res = await apiFetch('/api/settings/body', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -159,7 +160,7 @@ export default function BodyDataSettingsView({ initial }: { initial: SettingsBun
 
   async function handleDelete(id: string) {
     if (!confirm('確定刪除這筆量測紀錄？')) return
-    const res = await fetch(`/api/measurements/${id}`, { method: 'DELETE' })
+    const res = await apiFetch(`/api/measurements/${id}`, { method: 'DELETE' })
     const data = await res.json()
     if (!res.ok) {
       toast.error(data.error || '刪除失敗')
@@ -316,7 +317,7 @@ function EditMeasurementModal({
     }
     setSaving(true)
     try {
-      const res = await fetch(`/api/measurements/${measurement.id}`, {
+      const res = await apiFetch(`/api/measurements/${measurement.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

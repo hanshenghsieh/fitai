@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { GROWTH_PLATFORMS, detectPlatformFromUrl } from '@/growth/types/platforms'
+import { apiFetch } from '@/lib/api/client'
 
 export function NewGrowthPostForm() {
   const router = useRouter()
@@ -43,7 +44,7 @@ export function NewGrowthPostForm() {
 
     setLoading(true)
     try {
-      const res = await fetch('/api/growth/collect/import', {
+      const res = await apiFetch('/api/growth/collect/import', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

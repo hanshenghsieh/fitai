@@ -6,6 +6,7 @@ import { useSettingsDirtyTracker, useSettingsSave } from '@/hooks/useSettingsFor
 import { BB_V2 } from '@/lib/betterbit-v2'
 import V2SettingsSubpageShell from './V2SettingsSubpageShell'
 import V2SettingsFormCard from './V2SettingsFormCard'
+import { apiFetch } from '@/lib/api/client'
 
 const LANGUAGES = [
   { value: 'zh-TW', label: '繁體中文', available: true },
@@ -21,7 +22,7 @@ export default function LanguageSettingsView({ initial }: { initial: SettingsBun
 
   const { saving, save: handleSave } = useSettingsSave({
     onSave: async () => {
-      const res = await fetch('/api/settings/preferences', {
+      const res = await apiFetch('/api/settings/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language }),

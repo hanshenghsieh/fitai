@@ -1,24 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { PROFILE_SELECT, loadSettingsBundle } from '@/lib/app/settings-data'
 
-export async function GET() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
+export async function GET(request: NextRequest) {
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const bundle = await loadSettingsBundle(supabase, user.id, user)
-  return NextResponse.json(bundle)
+  return jsonWithCors(bundle, request)
 }
 
 export async function PATCH(request: NextRequest) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const body = await request.json()
   const patch: Record<string, unknown> = {}
@@ -58,7 +59,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   if (!Object.keys(patch).length) {
-    return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+    return jsonWithCors({ error: 'No fields to update' }, request, { status: 400 })
   }
 
   patch.updated_at = new Date().toISOString()
@@ -74,8 +75,9 @@ export async function PATCH(request: NextRequest) {
     if (error.message.includes('settings_preferences')) {
       const { settings_preferences: _prefs, ...profilePatch } = patch
       if (Object.keys(profilePatch).length <= 1) {
-        return NextResponse.json(
+        return jsonWithCors(
           { error: 'settings_preferences column missing — run migration 004', clientOnly: true },
+          request,
           { status: 503 }
         )
       }
@@ -85,11 +87,11 @@ export async function PATCH(request: NextRequest) {
         .eq('id', user.id)
         .select(PROFILE_SELECT.replace(', settings_preferences', ''))
         .single()
-      if (fbErr) return NextResponse.json({ error: fbErr.message }, { status: 500 })
-      return NextResponse.json({ profile: fallback, preferencesClientOnly: true })
+      if (fbErr) return jsonWithCors({ error: fbErr.message }, request, { status: 500 })
+      return jsonWithCors({ profile: fallback, preferencesClientOnly: true }, request)
     }
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return jsonWithCors({ error: error.message }, request, { status: 500 })
   }
 
-  return NextResponse.json({ profile: data })
+  return jsonWithCors({ profile: data }, request)
 }

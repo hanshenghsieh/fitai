@@ -1,13 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { getNutritionDayKey } from '@/lib/timezone'
 import { mergePersistedCheckinNotes, parseCheckinMeta } from '@/lib/checkin-utils'
 import { syncBankFromFoodLogs } from '@/lib/banks/calorie-bank-store'
 import { differenceInDays, format, parseISO, startOfWeek } from 'date-fns'
 import type { WeeklyPlanData, UserProfile } from '@/types'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 async function resolveDailyTargets(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: SupabaseClient,
   userId: string,
   nutritionDate: string
 ): Promise<{ calories: number; protein_g: number; fat_g: number; carbs_g: number } | null> {
@@ -39,7 +41,7 @@ async function resolveDailyTargets(
 }
 
 async function maybeSyncCalorieBank(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: SupabaseClient,
   userId: string,
   checkin: { notes?: string | null },
   profile: UserProfile | null
@@ -59,10 +61,14 @@ async function maybeSyncCalorieBank(
   })
 }
 
-export async function GET() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
+export async function GET(request: NextRequest) {
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const today = getNutritionDayKey()
   const { data } = await supabase
@@ -72,11 +78,11 @@ export async function GET() {
     .eq('checkin_date', today)
     .single()
 
-  return NextResponse.json({ checkin: data ?? null })
+  return jsonWithCors({ checkin: data ?? null }, request)
 }
 
 async function mergeCheckinBodyWithExistingNotes(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: SupabaseClient,
   userId: string,
   checkinDate: string,
   body: Record<string, unknown>
@@ -97,9 +103,9 @@ async function mergeCheckinBodyWithExistingNotes(
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const body = await request.json()
   const today = getNutritionDayKey()
@@ -107,15 +113,18 @@ export async function POST(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('daily_checkins')
-    .upsert({
-      user_id: user.id,
-      checkin_date: today,
-      ...mergedBody,
-    }, { onConflict: 'user_id,checkin_date' })
+    .upsert(
+      {
+        user_id: user.id,
+        checkin_date: today,
+        ...mergedBody,
+      },
+      { onConflict: 'user_id,checkin_date' }
+    )
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return jsonWithCors({ error: error.message }, request, { status: 500 })
 
   const { data: profile } = await supabase
     .from('user_profiles')
@@ -130,13 +139,13 @@ export async function POST(request: NextRequest) {
     console.error('[checkin] calorie bank sync failed after POST:', err)
   }
 
-  return NextResponse.json({ checkin: data, calorie_bank: bank })
+  return jsonWithCors({ checkin: data, calorie_bank: bank }, request)
 }
 
 export async function PATCH(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const body = await request.json()
   const today = getNutritionDayKey()
@@ -144,15 +153,18 @@ export async function PATCH(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('daily_checkins')
-    .upsert({
-      user_id: user.id,
-      checkin_date: today,
-      ...mergedBody,
-    }, { onConflict: 'user_id,checkin_date' })
+    .upsert(
+      {
+        user_id: user.id,
+        checkin_date: today,
+        ...mergedBody,
+      },
+      { onConflict: 'user_id,checkin_date' }
+    )
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return jsonWithCors({ error: error.message }, request, { status: 500 })
 
   const { data: profile } = await supabase
     .from('user_profiles')
@@ -167,5 +179,5 @@ export async function PATCH(request: NextRequest) {
     console.error('[checkin] calorie bank sync failed after PATCH:', err)
   }
 
-  return NextResponse.json({ checkin: data, calorie_bank: bank })
+  return jsonWithCors({ checkin: data, calorie_bank: bank }, request)
 }

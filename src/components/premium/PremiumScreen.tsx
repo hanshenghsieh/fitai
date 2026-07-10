@@ -14,6 +14,7 @@ import AppleIapSubscriptionSection from '@/components/settings/AppleIapSubscript
 import ProSubscriptionV2View from '@/components/betterbit-v2/ProSubscriptionV2View'
 import ProPaymentSuccessV2View from '@/components/betterbit-v2/ProPaymentSuccessV2View'
 import ProActiveStatusV2View from '@/components/betterbit-v2/ProActiveStatusV2View'
+import { apiFetch } from '@/lib/api/client'
 
 interface Props {
   access: AccessStatus
@@ -60,7 +61,7 @@ function PremiumStripeV2Screen({ access }: Props) {
   const renewalDate = formatProRenewalDate(subscription?.current_period_end)
 
   useEffect(() => {
-    void fetch('/api/get-subscription')
+    void apiFetch('/api/get-subscription')
       .then(r => (r.ok ? r.json() : null))
       .then(data => setSubscription(data?.subscription ?? null))
       .finally(() => setLoading(false))
@@ -69,7 +70,7 @@ function PremiumStripeV2Screen({ access }: Props) {
   useEffect(() => {
     if (searchParams.get('subscribed') === '1') {
       setView('success')
-      void fetch('/api/get-subscription')
+      void apiFetch('/api/get-subscription')
         .then(r => (r.ok ? r.json() : null))
         .then(data => setSubscription(data?.subscription ?? null))
     }
@@ -90,7 +91,7 @@ function PremiumStripeV2Screen({ access }: Props) {
     setPurchasedPlan(plan)
     setSubscribing(true)
     try {
-      const res = await fetch('/api/create-subscription', {
+      const res = await apiFetch('/api/create-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priceId }),
@@ -107,7 +108,7 @@ function PremiumStripeV2Screen({ access }: Props) {
 
   async function handleBillingPortal() {
     try {
-      const res = await fetch('/api/billing-portal', { method: 'POST' })
+      const res = await apiFetch('/api/billing-portal', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
       if (data.url) window.location.href = data.url

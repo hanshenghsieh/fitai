@@ -10,6 +10,7 @@ import {
   shouldShowAppleIapClient,
 } from '@/lib/ios-payment-gate'
 import { SUBSCRIPTION_PRICE_MONTHLY } from '@/lib/subscription-pricing'
+import { apiFetch } from '@/lib/api/client'
 
 interface Props {
   access: AccessStatus
@@ -28,7 +29,7 @@ export default function SettingsPremiumTeaser({ access }: Props) {
 
   useEffect(() => {
     if (bypassPaywall || access.isSubscribed) return
-    void fetch('/api/get-subscription')
+    void apiFetch('/api/get-subscription')
       .then(r => (r.ok ? r.json() : null))
       .then(data => setIsSubscribed(data?.subscription?.status === 'active'))
       .catch(() => {})

@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 import { colors } from '@/lib/design-system'
 import type { WeeklyFeedback } from '@/types'
+import { apiFetch } from '@/lib/api/client'
 
 const selectedStyle = {
   border: `2px solid ${colors.accent.action}`,
@@ -30,7 +31,7 @@ export default function WeeklyFeedbackForm({ existing }: { existing: WeeklyFeedb
   async function handleSubmit() {
     setLoading(true)
     try {
-      const res = await fetch('/api/weekly-feedback', {
+      const res = await apiFetch('/api/weekly-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

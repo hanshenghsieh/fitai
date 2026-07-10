@@ -10,6 +10,7 @@ import { BB_V2 } from '@/lib/betterbit-v2'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import SettingsSection from './SettingsSection'
 import SettingsRow from './SettingsRow'
+import { apiFetch } from '@/lib/api/client'
 
 export default function SettingsDeleteAccountSection({ compact = false }: { compact?: boolean }) {
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -19,7 +20,7 @@ export default function SettingsDeleteAccountSection({ compact = false }: { comp
   async function handleDeleteAccount() {
     setDeleting(true)
     try {
-      const res = await fetch('/api/delete-account', { method: 'POST' })
+      const res = await apiFetch('/api/delete-account', { method: 'POST' })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error(typeof data.error === 'string' ? data.error : GENTLE_ERROR_MESSAGE)

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { colors } from '@/lib/design-system'
 import type { WeeklyFeedback } from '@/types'
+import { apiFetch } from '@/lib/api/client'
 
 type WeekFeel = 'steady' | 'messy' | 'tired'
 type MoveFeel = 'moved' | 'right' | 'barely'
@@ -82,7 +83,7 @@ export default function WeekReflection({ existing, showPrompt }: Props) {
   async function submit(week: WeekFeel, move: MoveFeel) {
     setSubmitting(true)
     try {
-      const res = await fetch('/api/weekly-feedback', {
+      const res = await apiFetch('/api/weekly-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payloadFor(week, move)),

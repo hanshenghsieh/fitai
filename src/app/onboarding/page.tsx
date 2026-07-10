@@ -16,6 +16,7 @@ import { pickZaiJianLine, zaijian } from '@/lib/copy/zaijian'
 import ZaiJian from '@/components/character/ZaiJian'
 import { OnboardingCard, OnboardingChip } from '@/components/onboarding/OnboardingChip'
 import type { ActivityLevel, FitnessLevel, Goal, UserProfile } from '@/types'
+import { apiFetch } from '@/lib/api/client'
 
 const TOTAL_STEPS = 3
 
@@ -155,7 +156,7 @@ export default function OnboardingPage() {
 
       toast.message(zaijian.generating)
       try {
-        const generateRes = await fetch('/api/generate-plan', { method: 'POST' })
+        const generateRes = await apiFetch('/api/generate-plan', { method: 'POST' })
         const result = await generateRes.json()
         if (!generateRes.ok) throw new Error(result.error || 'plan failed')
         toast.success('計畫已就緒，照著做就好。')

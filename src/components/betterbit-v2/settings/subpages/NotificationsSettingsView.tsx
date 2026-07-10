@@ -29,6 +29,7 @@ import {
   V2VisualPickerSheet,
   useVisualPicker,
 } from '@/components/betterbit-v2/settings/visual-v2/V2SettingsVisualPrimitives'
+import { apiFetch } from '@/lib/api/client'
 
 const WEEKDAYS = [
   { value: '0', label: '週日' },
@@ -98,7 +99,7 @@ export default function NotificationsSettingsView({ initial }: { initial: Settin
 
   const { saving, save: handleSave } = useSettingsSave({
     onSave: async () => {
-      const res = await fetch('/api/settings/preferences', {
+      const res = await apiFetch('/api/settings/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notifications: n }),

@@ -8,6 +8,7 @@ import { Loader2, Plus, ChevronDown, ChevronUp } from 'lucide-react'
 import { colors, cardStyle } from '@/lib/design-system'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import ZaiJian from '@/components/character/ZaiJian'
+import { apiFetch } from '@/lib/api/client'
 
 interface Props {
   lastWeightKg?: number | null
@@ -27,7 +28,7 @@ export default function MeasurementForm({ lastWeightKg }: Props) {
     }
     setLoading(true)
     try {
-      const res = await fetch('/api/measurements', {
+      const res = await apiFetch('/api/measurements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

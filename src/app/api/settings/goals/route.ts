@@ -1,6 +1,7 @@
 import { addDays, format } from 'date-fns'
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { GOAL_SELECT, PROFILE_SELECT, loadSettingsBundle } from '@/lib/app/settings-data'
 import { generateWeeklyPlanForUser } from '@/lib/generate-weekly-plan'
 import type { GoalType } from '@/types'
@@ -13,28 +14,28 @@ const VALID_GOAL_TYPES: GoalType[] = [
   'body_recomp',
 ]
 
-export async function GET() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
+export async function GET(request: NextRequest) {
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const bundle = await loadSettingsBundle(supabase, user.id, user)
-  return NextResponse.json({ goal: bundle.goal, preferences: bundle.preferences, profile: bundle.profile })
+  return jsonWithCors({ goal: bundle.goal, preferences: bundle.preferences, profile: bundle.profile }, request)
 }
 
 export async function PATCH(request: NextRequest) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const body = await request.json()
   const goalType = body.goal_type as GoalType | undefined
   if (goalType && !VALID_GOAL_TYPES.includes(goalType)) {
-    return NextResponse.json({ error: 'Invalid goal_type' }, { status: 400 })
+    return jsonWithCors({ error: 'Invalid goal_type' }, request, { status: 400 })
   }
 
   const targetDays =
@@ -70,7 +71,7 @@ export async function PATCH(request: NextRequest) {
       .eq('id', existing.id)
       .select(GOAL_SELECT)
       .single()
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) return jsonWithCors({ error: error.message }, request, { status: 500 })
     goalRow = data
   } else {
     const { data: profile } = await supabase
@@ -93,7 +94,7 @@ export async function PATCH(request: NextRequest) {
       })
       .select(GOAL_SELECT)
       .single()
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) return jsonWithCors({ error: error.message }, request, { status: 500 })
     goalRow = data
   }
 
@@ -129,5 +130,5 @@ export async function PATCH(request: NextRequest) {
 
   const { data: profile } = await supabase.from('user_profiles').select(PROFILE_SELECT).eq('id', user.id).single()
 
-  return NextResponse.json({ goal: goalRow, profile, planRegenerated, regenError })
+  return jsonWithCors({ goal: goalRow, profile, planRegenerated, regenError }, request)
 }

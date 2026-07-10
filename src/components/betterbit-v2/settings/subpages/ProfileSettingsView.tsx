@@ -31,6 +31,7 @@ import {
   useVisualPicker,
 } from '@/components/betterbit-v2/settings/visual-v2/V2SettingsVisualPrimitives'
 import SettingsDeleteAccountSection from '@/components/settings/SettingsDeleteAccountSection'
+import { apiFetch } from '@/lib/api/client'
 
 const GENDER_OPTIONS = [
   { value: 'male', label: '男' },
@@ -140,7 +141,7 @@ export default function ProfileSettingsView({ initial }: { initial: SettingsBund
         age = initial.profile.age
       }
 
-      const res = await fetch('/api/settings/profile', {
+      const res = await apiFetch('/api/settings/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

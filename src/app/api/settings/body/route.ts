@@ -1,18 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { loadBodyMeasurementsForUser } from '@/lib/app/analytics-data'
 import { saveBodyMeasurementForUser, validateBodyMetrics } from '@/lib/body-measurement-save'
 
 type RouteCtx = { params: Promise<{ id: string }> }
 
-export async function PATCH(request: NextRequest, ctx: RouteCtx) {
-  const { id } = await ctx.params
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
 
+export async function PATCH(request: NextRequest, ctx: RouteCtx) {
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
+
+  const { id } = await ctx.params
   const body = await request.json()
   const patch: Record<string, unknown> = {}
   if (body.weight_kg != null) patch.weight_kg = Number(body.weight_kg)
@@ -23,7 +26,7 @@ export async function PATCH(request: NextRequest, ctx: RouteCtx) {
 
   if (patch.weight_kg != null) {
     const err = validateBodyMetrics(Number(patch.weight_kg), patch.body_fat_pct as number | null)
-    if (err) return NextResponse.json({ error: err }, { status: 400 })
+    if (err) return jsonWithCors({ error: err }, request, { status: 400 })
   }
 
   const { data, error } = await supabase
@@ -34,7 +37,7 @@ export async function PATCH(request: NextRequest, ctx: RouteCtx) {
     .select('*')
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return jsonWithCors({ error: error.message }, request, { status: 500 })
 
   const measurements = await loadBodyMeasurementsForUser(supabase, user.id)
   const latest = measurements.at(-1)
@@ -49,19 +52,17 @@ export async function PATCH(request: NextRequest, ctx: RouteCtx) {
       .eq('id', user.id)
   }
 
-  return NextResponse.json({ measurement: data, measurements })
+  return jsonWithCors({ measurement: data, measurements }, request)
 }
 
-export async function DELETE(_request: NextRequest, ctx: RouteCtx) {
-  const { id } = await ctx.params
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function DELETE(request: NextRequest, ctx: RouteCtx) {
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
+  const { id } = await ctx.params
   const { error } = await supabase.from('body_measurements').delete().eq('id', id).eq('user_id', user.id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return jsonWithCors({ error: error.message }, request, { status: 500 })
 
   const measurements = await loadBodyMeasurementsForUser(supabase, user.id)
   const latest = measurements.at(-1)
@@ -75,15 +76,13 @@ export async function DELETE(_request: NextRequest, ctx: RouteCtx) {
       .eq('id', user.id)
   }
 
-  return NextResponse.json({ measurements })
+  return jsonWithCors({ measurements }, request)
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const body = await request.json()
   const weightKg = Number(body.weight_kg)
@@ -93,7 +92,7 @@ export async function POST(request: NextRequest) {
     body.muscle_mass_kg != null && body.muscle_mass_kg !== '' ? Number(body.muscle_mass_kg) : null
 
   const validation = validateBodyMetrics(weightKg, bodyFatPct)
-  if (validation) return NextResponse.json({ error: validation }, { status: 400 })
+  if (validation) return jsonWithCors({ error: validation }, request, { status: 400 })
 
   const result = await saveBodyMeasurementForUser(supabase, user.id, {
     weight_kg: weightKg,
@@ -101,7 +100,7 @@ export async function POST(request: NextRequest) {
     measured_at: body.measured_at,
   })
 
-  if (result.error) return NextResponse.json({ error: result.error.message }, { status: 500 })
+  if (result.error) return jsonWithCors({ error: result.error.message }, request, { status: 500 })
 
   if (waistCm != null || muscleMassKg != null) {
     if (result.row?.id) {
@@ -116,5 +115,5 @@ export async function POST(request: NextRequest) {
   }
 
   const measurements = await loadBodyMeasurementsForUser(supabase, user.id)
-  return NextResponse.json({ measurements, profileSaved: result.profileSaved })
+  return jsonWithCors({ measurements, profileSaved: result.profileSaved }, request)
 }

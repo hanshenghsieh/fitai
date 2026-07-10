@@ -6,6 +6,7 @@ import { CheckCircle2, Circle, Play, ChevronDown, ChevronUp, Droplets, Flame, Du
 import { Progress } from '@/components/ui/progress'
 import { getConvenienceItems, type ConvenienceItem } from '@/lib/convenience-store-menu'
 import type { DayPlan, DailyCheckin, DietCheckinItem, WorkoutCheckinItem } from '@/types'
+import { apiFetch } from '@/lib/api/client'
 
 interface Props {
   todayPlan: DayPlan
@@ -93,7 +94,7 @@ export default function DailyCheckinView({ todayPlan, checkin, weeklyPlanId }: P
 
   async function saveCheckin(updates: Partial<{ diet_items: DietCheckinItem[]; workout_items: WorkoutCheckinItem[]; water_ml: number; is_completed?: boolean }>) {
     try {
-      await fetch('/api/checkin', {
+      await apiFetch('/api/checkin', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

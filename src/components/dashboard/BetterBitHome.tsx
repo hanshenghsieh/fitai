@@ -100,6 +100,7 @@ import {
 } from '@/lib/offline-pending-sync'
 import { zaijian } from '@/lib/copy/zaijian'
 import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile } from '@/types'
+import { apiFetch } from '@/lib/api/client'
 
 interface GoalSnapshot {
   current_body_fat?: number | null
@@ -274,7 +275,7 @@ export default function BetterBitHome({
     const yesterday = getPreviousNutritionDayKey()
 
     void Promise.all([
-      fetch('/api/calorie-bank', {
+      apiFetch('/api/calorie-bank', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -289,13 +290,13 @@ export default function BetterBitHome({
           date: getNutritionDayKey(),
         }),
       }),
-      fetch(`/api/calorie-bank?date=${yesterday}`),
+      apiFetch(`/api/calorie-bank?date=${yesterday}`),
     ])
       .then(async ([postRes, prevRes]) => {
         const postJson = (await postRes.json()) as { bank?: CalorieBankRow | null }
         if (postJson.bank) setCalorieBank(postJson.bank)
         else if (!postRes.ok) {
-          const getRes = await fetch('/api/calorie-bank')
+          const getRes = await apiFetch('/api/calorie-bank')
           const getJson = (await getRes.json()) as { bank?: CalorieBankRow | null }
           if (getJson.bank) setCalorieBank(getJson.bank)
         }
@@ -547,10 +548,9 @@ export default function BetterBitHome({
 
         const state = buildPersistState(patch)
         try {
-          const res = await fetch('/api/checkin', {
+          const res = await apiFetch('/api/checkin', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
             keepalive: true,
             signal: ac.signal,
             body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId, checkin)),

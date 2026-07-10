@@ -26,6 +26,7 @@ import {
   labelOf,
   labelsOf,
 } from '@/components/betterbit-v2/settings/visual-v2/V2SettingsVisualPrimitives'
+import { apiFetch } from '@/lib/api/client'
 
 const RESTRICTIONS = [
   { value: 'no_beef', label: '不吃牛' },
@@ -117,7 +118,7 @@ export default function DietPreferencesSettingsView({ initial }: { initial: Sett
 
   const { saving, save: handleSave } = useSettingsSave({
     onSave: async () => {
-      const profileRes = await fetch('/api/settings/profile', {
+      const profileRes = await apiFetch('/api/settings/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -137,7 +138,7 @@ export default function DietPreferencesSettingsView({ initial }: { initial: Sett
         throw new Error(d.error || 'profile save failed')
       }
 
-      const prefRes = await fetch('/api/settings/preferences', {
+      const prefRes = await apiFetch('/api/settings/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

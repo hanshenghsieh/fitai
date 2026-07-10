@@ -1,7 +1,8 @@
 export const dynamic = 'force-dynamic'
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { getNutritionDayKey } from '@/lib/timezone'
 import {
   getCalorieBankRow,
@@ -14,12 +15,14 @@ function num(v: unknown): number {
   return Number.isFinite(n) ? n : 0
 }
 
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const dateParam = request.nextUrl.searchParams.get('date')
   const date =
@@ -27,15 +30,13 @@ export async function GET(request: NextRequest) {
       ? dateParam
       : getNutritionDayKey()
   const row = await getCalorieBankRow(supabase, user.id, date)
-  return NextResponse.json({ bank: row })
+  return jsonWithCors({ bank: row }, request)
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const body = await request.json().catch(() => ({}))
   const date = typeof body.date === 'string' ? body.date : getNutritionDayKey()
@@ -49,10 +50,10 @@ export async function POST(request: NextRequest) {
   const actualCarbsG = num(body.actual_carbs_g)
 
   if (calories <= 0) {
-    return NextResponse.json({ error: 'normal_target_kcal required' }, { status: 400 })
+    return jsonWithCors({ error: 'normal_target_kcal required' }, request, { status: 400 })
   }
   if (actualKcal < 0) {
-    return NextResponse.json({ error: 'actual_kcal required' }, { status: 400 })
+    return jsonWithCors({ error: 'actual_kcal required' }, request, { status: 400 })
   }
 
   const { data: profile } = await supabase
@@ -74,14 +75,15 @@ export async function POST(request: NextRequest) {
   })
 
   if (!bank || !bank.persisted) {
-    return NextResponse.json(
+    return jsonWithCors(
       {
         error: 'calorie_bank table missing or write failed — run supabase/migrations/20250618120000_calorie_bank.sql',
         bank,
       },
+      request,
       { status: 503 }
     )
   }
 
-  return NextResponse.json({ bank })
+  return jsonWithCors({ bank }, request)
 }

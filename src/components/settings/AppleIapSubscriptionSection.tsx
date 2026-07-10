@@ -21,6 +21,7 @@ import ProActiveStatusV2View, {
   openAppleSubscriptionManagement,
 } from '@/components/betterbit-v2/ProActiveStatusV2View'
 import { createClient } from '@/lib/supabase/client'
+import { apiFetch } from '@/lib/api/client'
 
 type SubscriptionView = 'paywall' | 'success' | 'active'
 
@@ -70,7 +71,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       } = await supabase.auth.getUser()
       setUserId(user?.id ?? null)
 
-      const res = await fetch('/api/get-subscription')
+      const res = await apiFetch('/api/get-subscription')
       if (res.ok) {
         const data = await res.json()
         setSubscription(data.subscription)
@@ -86,7 +87,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
   }, [loading, isSubscribed, view])
 
   async function refreshSubscription() {
-    const res = await fetch('/api/get-subscription')
+    const res = await apiFetch('/api/get-subscription')
     if (res.ok) {
       const data = await res.json()
       setSubscription(data.subscription)

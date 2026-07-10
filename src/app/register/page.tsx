@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react'
 import { colors } from '@/lib/design-system'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
 import ZaiJian from '@/components/character/ZaiJian'
+import { apiFetch } from '@/lib/api/client'
 
 export default function RegisterPage() {
   const [displayName, setDisplayName] = useState('')
@@ -28,7 +29,7 @@ export default function RegisterPage() {
     setLoading(true)
     const supabase = createClient()
     try {
-      const signupRes = await fetch('/api/auth/register', {
+      const signupRes = await apiFetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, displayName }),

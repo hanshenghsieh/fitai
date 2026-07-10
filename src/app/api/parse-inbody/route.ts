@@ -1,17 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { parseInBodyImage } from '@/lib/claude/client'
+
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireApiUser(request)
+    if (!auth.ok) return auth.response
+    const { user, supabase } = auth
 
     const { storagePath } = await request.json()
-    if (!storagePath) return NextResponse.json({ error: 'Missing storagePath' }, { status: 400 })
+    if (!storagePath) return jsonWithCors({ error: 'Missing storagePath' }, request, { status: 400 })
 
-    // Download image from Supabase Storage
     const { data: fileData, error: downloadError } = await supabase.storage
       .from('inbody-uploads')
       .download(storagePath)
@@ -23,14 +27,12 @@ export async function POST(request: NextRequest) {
 
     const { data: parsed } = await parseInBodyImage(base64, mimeType)
 
-    // Update inbody_uploads record
     const { error: updateError } = await supabase.from('inbody_uploads')
       .update({ parsed_data: parsed, parsing_status: 'success' })
       .eq('user_id', user.id)
       .eq('storage_path', storagePath)
     if (updateError) throw updateError
 
-    // Auto-update user profile with parsed values (if confidence >= medium)
     if (parsed.confidence !== 'low') {
       const profileUpdates: Record<string, number> = {}
       if (parsed.weight_kg) profileUpdates.weight_kg = parsed.weight_kg
@@ -41,7 +43,6 @@ export async function POST(request: NextRequest) {
         await supabase.from('user_profiles').update(profileUpdates).eq('id', user.id)
       }
 
-      // Save body measurement
       await supabase.from('body_measurements').insert({
         user_id: user.id,
         measured_at: new Date().toISOString().split('T')[0],
@@ -52,9 +53,9 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    return NextResponse.json({ success: true, data: parsed })
+    return jsonWithCors({ success: true, data: parsed }, request)
   } catch (err) {
     console.error('InBody parse error:', err)
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Parse failed' }, { status: 500 })
+    return jsonWithCors({ error: err instanceof Error ? err.message : 'Parse failed' }, request, { status: 500 })
   }
 }

@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken, onMessage } from 'firebase/messaging'
+import { apiFetch } from '@/lib/api/client'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -56,7 +57,7 @@ export async function requestNotificationPermission(userId: string) {
     })
 
     if (token && userId) {
-      await fetch('/api/save-push-token', {
+      await apiFetch('/api/save-push-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, token }),

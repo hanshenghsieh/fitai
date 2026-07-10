@@ -1,20 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { storesInText } from '@/lib/dice-store-names'
 import { createPhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 import { buildPhotoMatchSnapshot } from '@/lib/nutrition/photo-match-snapshot'
 
 export const maxDuration = 30
 
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireApiUser(request)
+    if (!auth.ok) return auth.response
 
     const { label, store, photo_id } = await request.json()
     const trimmed = typeof label === 'string' ? label.trim() : ''
-    if (!trimmed) return NextResponse.json({ error: 'Missing label' }, { status: 400 })
+    if (!trimmed) return jsonWithCors({ error: 'Missing label' }, request, { status: 400 })
 
     const resolvedStore =
       typeof store === 'string' && store.trim() ? store.trim() : storesInText(trimmed)?.[0]
@@ -31,14 +35,18 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    return NextResponse.json({
-      success: true,
-      photo_v2: buildPhotoMatchSnapshot(v2),
-    })
+    return jsonWithCors(
+      {
+        success: true,
+        photo_v2: buildPhotoMatchSnapshot(v2),
+      },
+      request
+    )
   } catch (err) {
     console.error('Food photo match error:', err)
-    return NextResponse.json(
+    return jsonWithCors(
       { error: err instanceof Error ? err.message : '比對失敗' },
+      request,
       { status: 500 }
     )
   }

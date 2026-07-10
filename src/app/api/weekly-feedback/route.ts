@@ -1,29 +1,36 @@
 export const dynamic = 'force-dynamic'
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { saveWeeklyFeedback } from '@/lib/weekly-feedback-store'
 import { format, startOfWeek } from 'date-fns'
 import { getAppUrl } from '@/lib/app-url'
 
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase, accessToken } = auth
 
   const body = await request.json()
   const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
 
   const { data, error } = await saveWeeklyFeedback(supabase, user.id, weekStart, body)
 
-  if (error) return NextResponse.json({ error }, { status: 500 })
+  if (error) return jsonWithCors({ error }, request, { status: 500 })
 
   const appUrl = getAppUrl()
-  const cookie = request.headers.get('cookie') || ''
   fetch(`${appUrl}/api/generate-plan`, {
     method: 'POST',
-    headers: { cookie },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
   }).catch(err => console.error('Plan regen after feedback failed:', err))
 
-  return NextResponse.json({ feedback: data, message: '回饋已收到，下週計畫將依此調整' })
+  return jsonWithCors({ feedback: data, message: '回饋已收到，下週計畫將依此調整' }, request)
 }

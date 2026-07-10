@@ -1,15 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
+
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
 
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await req.json()
     if (!userId) {
-      return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
+      return jsonWithCors({ error: 'Missing userId' }, req, { status: 400 })
     }
 
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     if (!serviceKey) {
-      return NextResponse.json({ error: 'Service key not configured' }, { status: 500 })
+      return jsonWithCors({ error: 'Service key not configured' }, req, { status: 500 })
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -28,14 +33,15 @@ export async function POST(req: NextRequest) {
     if (!res.ok) {
       const error = await res.text()
       console.error('Confirm email error:', error)
-      return NextResponse.json({ error: 'Failed to confirm email' }, { status: res.status })
+      return jsonWithCors({ error: 'Failed to confirm email' }, req, { status: res.status })
     }
 
-    return NextResponse.json({ success: true })
+    return jsonWithCors({ success: true }, req)
   } catch (err) {
     console.error('Confirm email error:', err)
-    return NextResponse.json(
+    return jsonWithCors(
       { error: err instanceof Error ? err.message : 'Unknown error' },
+      req,
       { status: 500 }
     )
   }

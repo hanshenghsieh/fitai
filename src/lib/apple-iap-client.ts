@@ -9,6 +9,7 @@ import {
   getRevenueCatIosApiKey,
   isRevenueCatConfigured,
 } from '@/lib/apple-iap-config'
+import { apiFetch } from '@/lib/api/client'
 
 export interface AppleIapPurchaseResult {
   active: boolean
@@ -196,9 +197,8 @@ async function syncToBackend(payload: {
   expiresAt?: string | null
   isRestore?: boolean
 }) {
-  const res = await fetch('/api/apple-iap/sync', {
+  const res = await apiFetch('/api/apple-iap/sync', {
     method: 'POST',
-    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       'x-betterbit-platform': 'ios',

@@ -1,25 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { mergePreferences, type UserSettingsPreferences } from '@/lib/settings/user-settings-types'
 import { loadSettingsBundle } from '@/lib/app/settings-data'
 
-export async function GET() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
+export async function GET(request: NextRequest) {
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const bundle = await loadSettingsBundle(supabase, user.id, user)
-  return NextResponse.json({ preferences: bundle.preferences })
+  return jsonWithCors({ preferences: bundle.preferences }, request)
 }
 
 export async function PATCH(request: NextRequest) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireApiUser(request)
+  if (!auth.ok) return auth.response
+  const { user, supabase } = auth
 
   const body = (await request.json()) as Partial<UserSettingsPreferences>
   const { data: current } = await supabase
@@ -44,13 +45,14 @@ export async function PATCH(request: NextRequest) {
 
   if (error) {
     if (error.message.includes('settings_preferences')) {
-      return NextResponse.json(
+      return jsonWithCors(
         { error: 'settings_preferences column missing — run migration 004', clientOnly: true, preferences: merged },
+        request,
         { status: 503 }
       )
     }
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return jsonWithCors({ error: error.message }, request, { status: 500 })
   }
 
-  return NextResponse.json({ preferences: merged })
+  return jsonWithCors({ preferences: merged }, request)
 }

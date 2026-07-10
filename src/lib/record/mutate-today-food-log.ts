@@ -1,5 +1,6 @@
 import type { DailyCheckin } from '@/types'
 import type { FoodLogEntry } from '@/lib/banks/types'
+import { apiFetch } from '@/lib/api/client'
 import {
   buildCheckinPayload,
   initDietItems,
@@ -9,7 +10,7 @@ import {
 } from '@/lib/checkin-utils'
 
 async function fetchTodayCheckin(): Promise<DailyCheckin | null> {
-  const res = await fetch('/api/checkin', { credentials: 'include' })
+  const res = await apiFetch('/api/checkin')
   if (!res.ok) throw new Error('無法載入今日紀錄')
   const json = (await res.json()) as { checkin: DailyCheckin | null }
   return json.checkin
@@ -40,10 +41,9 @@ export async function patchTodayFoodLogs(
     checkin
   )
 
-  const res = await fetch('/api/checkin', {
+  const res = await apiFetch('/api/checkin', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(payload),
   })
 

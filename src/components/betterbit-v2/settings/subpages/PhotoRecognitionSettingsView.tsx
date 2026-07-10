@@ -25,6 +25,7 @@ import {
   useVisualPicker,
   labelOf,
 } from '@/components/betterbit-v2/settings/visual-v2/V2SettingsVisualPrimitives'
+import { apiFetch } from '@/lib/api/client'
 
 const RECOGNITION_MODES = [
   { value: 'fast', label: '快速' },
@@ -68,7 +69,7 @@ export default function PhotoRecognitionSettingsView({ initial }: { initial: Set
 
   const { saving, save: handleSave } = useSettingsSave({
     onSave: async () => {
-      const res = await fetch('/api/settings/preferences', {
+      const res = await apiFetch('/api/settings/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ photo: p }),

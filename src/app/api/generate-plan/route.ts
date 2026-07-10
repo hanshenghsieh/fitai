@@ -1,9 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
+import { createServiceClient } from '@/lib/supabase/server'
 import { format, addMonths } from 'date-fns'
 import { generateWeeklyPlanForUser } from '@/lib/generate-weekly-plan'
 import { shouldGrantFullAccessPreIap } from '@/lib/ios-payment-gate'
 import type { Goal, UserProfile } from '@/types'
+
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,21 +20,19 @@ export async function POST(req: NextRequest) {
       cronAuth === `Bearer ${process.env.CRON_SECRET}` &&
       !!cronUserId
 
-    const supabase = isCron ? await createServiceClient() : await createClient()
-
+    let supabase
     let userId: string
     let userEmail: string | null = null
+
     if (isCron) {
+      supabase = await createServiceClient()
       userId = cronUserId!
     } else {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) {
-        return NextResponse.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 })
-      }
-      userId = user.id
-      userEmail = user.email ?? null
+      const auth = await requireApiUser(req)
+      if (!auth.ok) return auth.response
+      supabase = auth.supabase
+      userId = auth.user.id
+      userEmail = auth.user.email ?? null
     }
 
     let profile: UserProfile | null = null
@@ -65,14 +69,15 @@ export async function POST(req: NextRequest) {
     })
 
     if (!result.ok) {
-      return NextResponse.json({ error: result.error, code: result.code }, { status: result.status })
+      return jsonWithCors({ error: result.error, code: result.code }, req, { status: result.status })
     }
 
-    return NextResponse.json({ success: true, data: result.data })
+    return jsonWithCors({ success: true, data: result.data }, req)
   } catch (err) {
     console.error('Error generating plan:', err)
-    return NextResponse.json(
+    return jsonWithCors(
       { error: err instanceof Error ? err.message : 'Failed to generate plan' },
+      req,
       { status: 500 }
     )
   }

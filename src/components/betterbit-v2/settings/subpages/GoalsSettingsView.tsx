@@ -48,6 +48,7 @@ import {
   useVisualPicker,
 } from '@/components/betterbit-v2/settings/visual-v2/V2SettingsVisualPrimitives'
 import V2SettingsSwitch from '@/components/betterbit-v2/settings/V2SettingsSwitch'
+import { apiFetch } from '@/lib/api/client'
 
 const GOAL_TYPES = [
   { value: 'lose_fat', label: '減脂' },
@@ -217,7 +218,7 @@ export default function GoalsSettingsView({ initial }: { initial: SettingsBundle
     },
     onSave: async () => {
       const daysNum = targetDays === 'auto' ? null : Number(targetDays)
-      const res = await fetch('/api/settings/goals', {
+      const res = await apiFetch('/api/settings/goals', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

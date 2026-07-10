@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import type { CollectedPost, CollectorRunResult, CollectorStatus } from '@/growth/collectors/types'
 import { formatGrowthPostTime } from '@/growth/components/format-time'
+import { apiFetch } from '@/lib/api/client'
 
 const CAPABILITY_LABELS: Record<CollectorStatus['capability'], string> = {
   automated_search: '可自動搜尋',
@@ -33,7 +34,7 @@ export function GrowthCollectorPanel({ onImported }: GrowthCollectorPanelProps) 
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
   const loadStatuses = useCallback(async () => {
-    const res = await fetch('/api/growth/collectors')
+    const res = await apiFetch('/api/growth/collectors')
     const data = await res.json()
     if (res.ok) setStatuses(data.collectors)
   }, [])
@@ -53,7 +54,7 @@ export function GrowthCollectorPanel({ onImported }: GrowthCollectorPanelProps) 
     setPreviewPosts([])
     setSelected(new Set())
     try {
-      const res = await fetch('/api/growth/collect/search', {
+      const res = await apiFetch('/api/growth/collect/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ keywords: kw }),
@@ -80,7 +81,7 @@ export function GrowthCollectorPanel({ onImported }: GrowthCollectorPanelProps) 
     }
     setFetching(true)
     try {
-      const res = await fetch('/api/growth/collect/fetch-url', {
+      const res = await apiFetch('/api/growth/collect/fetch-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: fetchUrl.trim(), keyword: fetchKeyword || undefined }),
@@ -111,7 +112,7 @@ export function GrowthCollectorPanel({ onImported }: GrowthCollectorPanelProps) 
     }
     setImporting(true)
     try {
-      const res = await fetch('/api/growth/collect/import', {
+      const res = await apiFetch('/api/growth/collect/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ posts }),

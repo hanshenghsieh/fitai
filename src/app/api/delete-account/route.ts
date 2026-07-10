@@ -1,15 +1,19 @@
-import { NextResponse } from 'next/server'
-import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+import { requireApiUser } from '@/lib/api/auth'
+import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
+import { createAdminClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 import { isAppleIapSubscriptionId } from '@/lib/apple-iap-store'
 
-export async function POST() {
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsOptions(request)
+}
+
+export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const auth = await requireApiUser(request)
+    if (!auth.ok) return auth.response
+    const { user } = auth
 
     const admin = createAdminClient()
     const userId = user.id
@@ -47,14 +51,15 @@ export async function POST() {
 
     const { error } = await admin.auth.admin.deleteUser(userId)
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return jsonWithCors({ error: error.message }, request, { status: 500 })
     }
 
-    return NextResponse.json({ success: true })
+    return jsonWithCors({ success: true }, request)
   } catch (err) {
     console.error('Delete account error:', err)
-    return NextResponse.json(
+    return jsonWithCors(
       { error: err instanceof Error ? err.message : 'Failed to delete account' },
+      request,
       { status: 500 }
     )
   }

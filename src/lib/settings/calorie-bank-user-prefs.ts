@@ -2,6 +2,7 @@ import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import { getTodayExcessKcal } from '@/lib/calorie-bank-v2-ui'
 import { clampDailyAdjust, isRecoveryActive } from '@/lib/engines/calorie-bank-engine'
 import { mergePreferences, type UserSettingsPreferences } from '@/lib/settings/user-settings-types'
+import { apiFetch } from '@/lib/api/client'
 
 let cachedUserPrefs: UserSettingsPreferences | null = null
 
@@ -12,7 +13,7 @@ export function invalidateUserPreferencesCache(): void {
 export async function loadUserPreferencesClient(): Promise<UserSettingsPreferences> {
   if (cachedUserPrefs) return cachedUserPrefs
   try {
-    const res = await fetch('/api/settings/preferences')
+    const res = await apiFetch('/api/settings/preferences')
     if (res.ok) {
       const data = (await res.json()) as { preferences?: UserSettingsPreferences | null }
       cachedUserPrefs = mergePreferences(data.preferences)

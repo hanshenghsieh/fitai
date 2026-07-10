@@ -13,6 +13,7 @@ import { BB_V2 } from '@/lib/betterbit-v2'
 import V2SettingsSubpageShell from './V2SettingsSubpageShell'
 import V2SettingsFormCard from './V2SettingsFormCard'
 import V2SettingsField, { V2SettingsInput } from './V2SettingsField'
+import { apiFetch } from '@/lib/api/client'
 
 export default function ChangePasswordView({ initial }: { initial: SettingsBundle }) {
   const [current, setCurrent] = useState('')
@@ -52,7 +53,7 @@ export default function ChangePasswordView({ initial }: { initial: SettingsBundl
 
     setSaving(true)
     try {
-      const res = await fetch('/api/auth/change-password', {
+      const res = await apiFetch('/api/auth/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ current_password: current, new_password: next, confirm_password: confirm }),

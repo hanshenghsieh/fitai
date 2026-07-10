@@ -10,6 +10,7 @@ import { getStripePriceId, SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
 import { shouldHideExternalPaymentsClient, shouldShowAppleIapClient } from '@/lib/ios-payment-gate'
 import SettingsSection from './SettingsSection'
 import AppleIapSubscriptionSection from './AppleIapSubscriptionSection'
+import { apiFetch } from '@/lib/api/client'
 
 interface Props {
   access: AccessStatus
@@ -40,7 +41,7 @@ export default function SettingsSubscriptionSection({ access }: Props) {
 
   async function loadSubscriptionStatus() {
     try {
-      const res = await fetch('/api/get-subscription')
+      const res = await apiFetch('/api/get-subscription')
       if (res.ok) {
         const data = await res.json()
         setSubscription(data.subscription)
@@ -57,7 +58,7 @@ export default function SettingsSubscriptionSection({ access }: Props) {
     }
     setSubscribing(true)
     try {
-      const res = await fetch('/api/create-subscription', {
+      const res = await apiFetch('/api/create-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priceId }),
@@ -75,7 +76,7 @@ export default function SettingsSubscriptionSection({ access }: Props) {
   async function handleBillingPortal() {
     setPortalLoading(true)
     try {
-      const res = await fetch('/api/billing-portal', { method: 'POST' })
+      const res = await apiFetch('/api/billing-portal', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
       if (data.url) window.location.href = data.url

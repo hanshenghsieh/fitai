@@ -10,6 +10,7 @@ import type { GrowthPost } from '@/growth/types'
 import { GROWTH_REPLY_TYPE_LABELS, GROWTH_STATUS_LABELS } from '@/growth/types'
 import { scoreColor, statusBadgeClass } from '@/growth/components/GrowthStatsBar'
 import { formatGrowthPostTime, formatGrowthPostTimeAgo } from '@/growth/components/format-time'
+import { apiFetch } from '@/lib/api/client'
 
 interface GrowthPostCardProps {
   post: GrowthPost
@@ -32,7 +33,7 @@ export function GrowthPostCard({ post, onUpdate }: GrowthPostCardProps) {
   async function patchPost(action: string, extra?: Record<string, string>) {
     setLoading(action)
     try {
-      const res = await fetch(`/api/growth/posts/${post.id}`, {
+      const res = await apiFetch(`/api/growth/posts/${post.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, ...extra }),
