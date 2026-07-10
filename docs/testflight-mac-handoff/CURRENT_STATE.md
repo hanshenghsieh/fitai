@@ -8,8 +8,8 @@
 |------|-----|
 | Remote | `https://github.com/hanshenghsieh/fitai.git` |
 | Branch | `main` |
-| 目標 Build | **15** |
-| Windows 事前工作 | ✅ build 號已設 · testflight:prep 已跑過 · 待 push 後 Mac pull |
+| 最新 commit | `d43a61e` — Build 15 handoff，Windows testflight:prep 已驗證 |
+| 前幾筆 | `8e319c9` Build 14 · `d082c2b` Visual V2 |
 
 Mac 執行：`git pull origin main`
 
