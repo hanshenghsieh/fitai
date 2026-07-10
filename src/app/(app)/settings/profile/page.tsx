@@ -1,9 +1,8 @@
+'use client'
+
 import ProfileSettingsView from '@/components/betterbit-v2/settings/subpages/ProfileSettingsView'
-import { requireSettingsBundle } from '@/lib/app/require-settings-bundle'
+import SettingsSubpageClient from '@/features/settings/SettingsSubpageClient'
 
-export const dynamic = 'force-dynamic'
-
-export default async function ProfileSettingsPage() {
-  const bundle = await requireSettingsBundle()
-  return <ProfileSettingsView initial={bundle} />
+export default function ProfileSettingsPage() {
+  return <SettingsSubpageClient>{bundle => <ProfileSettingsView initial={bundle} />}</SettingsSubpageClient>
 }

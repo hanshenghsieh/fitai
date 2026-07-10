@@ -1,9 +1,12 @@
+'use client'
+
 import InterfaceSettingsView from '@/components/betterbit-v2/settings/subpages/InterfaceSettingsView'
-import { requireSettingsBundle } from '@/lib/app/require-settings-bundle'
+import SettingsSubpageClient from '@/features/settings/SettingsSubpageClient'
 
-export const dynamic = 'force-dynamic'
-
-export default async function InterfaceSettingsPage() {
-  const bundle = await requireSettingsBundle()
-  return <InterfaceSettingsView initial={bundle} />
+export default function InterfaceSettingsPage() {
+  return (
+    <SettingsSubpageClient>
+      {bundle => <InterfaceSettingsView initial={bundle} />}
+    </SettingsSubpageClient>
+  )
 }

@@ -1,9 +1,8 @@
+'use client'
+
 import BodyDataSettingsView from '@/components/betterbit-v2/settings/subpages/BodyDataSettingsView'
-import { requireSettingsBundle } from '@/lib/app/require-settings-bundle'
+import SettingsSubpageClient from '@/features/settings/SettingsSubpageClient'
 
-export const dynamic = 'force-dynamic'
-
-export default async function BodyDataSettingsPage() {
-  const bundle = await requireSettingsBundle()
-  return <BodyDataSettingsView initial={bundle} />
+export default function BodyDataSettingsPage() {
+  return <SettingsSubpageClient>{bundle => <BodyDataSettingsView initial={bundle} />}</SettingsSubpageClient>
 }

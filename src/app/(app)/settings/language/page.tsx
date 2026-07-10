@@ -1,9 +1,12 @@
+'use client'
+
 import LanguageSettingsView from '@/components/betterbit-v2/settings/subpages/LanguageSettingsView'
-import { requireSettingsBundle } from '@/lib/app/require-settings-bundle'
+import SettingsSubpageClient from '@/features/settings/SettingsSubpageClient'
 
-export const dynamic = 'force-dynamic'
-
-export default async function LanguageSettingsPage() {
-  const bundle = await requireSettingsBundle()
-  return <LanguageSettingsView initial={bundle} />
+export default function LanguageSettingsPage() {
+  return (
+    <SettingsSubpageClient>
+      {bundle => <LanguageSettingsView initial={bundle} />}
+    </SettingsSubpageClient>
+  )
 }

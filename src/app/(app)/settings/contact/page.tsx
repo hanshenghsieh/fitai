@@ -1,9 +1,8 @@
+'use client'
+
 import ContactSupportView from '@/components/betterbit-v2/settings/subpages/ContactSupportView'
-import { requireSettingsBundle } from '@/lib/app/require-settings-bundle'
+import SettingsSubpageClient from '@/features/settings/SettingsSubpageClient'
 
-export const dynamic = 'force-dynamic'
-
-export default async function ContactSupportPage() {
-  const bundle = await requireSettingsBundle()
-  return <ContactSupportView initial={bundle} />
+export default function ContactSupportPage() {
+  return <SettingsSubpageClient>{bundle => <ContactSupportView initial={bundle} />}</SettingsSubpageClient>
 }

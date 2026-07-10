@@ -1,3 +1,5 @@
+'use client'
+
 import AboutBetterBitView from '@/components/betterbit-v2/settings/subpages/AboutBetterBitView'
 import packageJson from '../../../../../package.json'
 

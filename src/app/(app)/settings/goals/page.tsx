@@ -1,9 +1,8 @@
+'use client'
+
 import GoalsSettingsView from '@/components/betterbit-v2/settings/subpages/GoalsSettingsView'
-import { requireSettingsBundle } from '@/lib/app/require-settings-bundle'
+import SettingsSubpageClient from '@/features/settings/SettingsSubpageClient'
 
-export const dynamic = 'force-dynamic'
-
-export default async function GoalsSettingsPage() {
-  const bundle = await requireSettingsBundle()
-  return <GoalsSettingsView initial={bundle} />
+export default function GoalsSettingsPage() {
+  return <SettingsSubpageClient>{bundle => <GoalsSettingsView initial={bundle} />}</SettingsSubpageClient>
 }

@@ -1,5 +1,5 @@
-import V2SettingsLoadingSkeleton from '@/components/betterbit-v2/settings/V2SettingsLoadingSkeleton'
+import SettingsV2Skeleton from '@/features/settings/SettingsV2Skeleton'
 
 export default function SettingsLoading() {
-  return <V2SettingsLoadingSkeleton />
+  return <SettingsV2Skeleton />
 }

@@ -2,7 +2,7 @@
 
 **Branch:** `feature/local-hybrid-build16`  
 **Date:** 2026-07-10  
-**Build 15:** Untouched on `main` (remote wrapper TestFlight upload in progress)
+**Build 15:** Uploaded to TestFlight (remote wrapper); `main` unchanged by Build 16 branch
 
 ---
 
@@ -50,7 +50,6 @@
 
 ## Not started (per plan)
 
-- **1D-4** Settings client loader
 - **1E** Capacitor production local assets (no `server.url`)
 - **1F** Local cache abstraction
 - **1G** V2 skeletons / OfflineShell / testflight:prep update
@@ -134,4 +133,68 @@ Yes — revert branch `feature/local-hybrid-build16`; `main` / Build 15 unaffect
 
 ---
 
-**1D-4:** Settings client loader (next).
+## Sub-phase 1D-4 — Settings Client Loader (2026-07-10)
+
+| Item | Status |
+|------|--------|
+| `src/features/settings/useSettingsData.ts` | Done |
+| `src/features/settings/settings-data-loader.ts` | Done |
+| `src/features/settings/SettingsPageClient.tsx` | Done |
+| `SettingsSubpageClient` / `PremiumPageClient` | Done |
+| `SettingsV2Skeleton` / error / refreshing | Done |
+| `settings/page.tsx` + 12 subpages | Client-only, no RSC |
+| Pro card / IAP read-only | Preserved |
+| Build / tests | PASS (698) |
+
+### Settings RSC blockers
+
+**Before:** `force-dynamic` on main + 11 subpages; `getAppUser` / `requireSettingsBundle` / server Supabase on main, bundle subpages, premium  
+**After:** None in Settings routes — pure `'use client'` shells  
+**Remaining:** None in Settings routes
+
+### Settings subpages
+
+| Route | Exists | Client loader |
+|-------|--------|---------------|
+| `/settings/profile` | Yes | Yes |
+| `/settings/goals` | Yes | Yes |
+| `/settings/body` | Yes | Yes |
+| `/settings/notifications` | Yes | Yes |
+| `/settings/photo` | Yes (not `photo-recognition`) | Yes |
+| `/settings/diet` | Yes | Yes |
+| `/settings/interface` | Yes | Yes |
+| `/settings/language` | Yes | Yes |
+| `/settings/help` | Yes | Static client (no bundle) |
+| `/settings/contact` | Yes | Yes |
+| `/settings/about` | Yes | Static client (version only) |
+| `/settings/password` | Yes (not `security/password`) | Yes |
+| `/settings/premium` | Yes | Yes (`PremiumPageClient`) |
+| `/settings/invite` | Yes | Static client (coming soon) |
+
+---
+
+## Sub-phase 1D Final Gate (2026-07-10)
+
+All four primary app pages client-loader complete. Gate **PASS**.
+
+| Page | Client shell | Client loader | Skeleton | Error | Refreshing | RSC blockers | `/api` + credentials |
+|------|-------------|---------------|----------|-------|------------|--------------|----------------------|
+| Today (`/dashboard`) | Yes | Yes | Yes | Yes | Yes | None in route | 0 |
+| Record (`/weekly`) | Yes | Yes | Yes | Yes | Yes | None in route | 0 |
+| Analysis (`/progress`) | Yes | Yes | Yes | Yes | Yes | None in route | 0 |
+| Settings (`/settings`) | Yes | Yes | Yes | Yes | Yes | None in routes | 0 |
+
+| Gate check | Result |
+|------------|--------|
+| `npm run build` | PASS |
+| `npm test` | PASS (698) |
+| `fetch('/api/` in src | **0** |
+| `credentials: include` in src | **0** |
+| Capacitor / iOS touched | **No** |
+| Production deploy | **Not deployed** |
+
+**Orphaned (non-blocking):** `dashboard/generate-plan-action.ts` (`'use server'`, unused) — cleanup phase
+
+---
+
+**Next:** **1E** — Local bundled assets / `output: export` / `server.url` removal feasibility (do not start until explicitly approved)

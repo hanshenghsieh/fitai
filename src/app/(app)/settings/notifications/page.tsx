@@ -1,9 +1,12 @@
+'use client'
+
 import NotificationsSettingsView from '@/components/betterbit-v2/settings/subpages/NotificationsSettingsView'
-import { requireSettingsBundle } from '@/lib/app/require-settings-bundle'
+import SettingsSubpageClient from '@/features/settings/SettingsSubpageClient'
 
-export const dynamic = 'force-dynamic'
-
-export default async function NotificationsSettingsPage() {
-  const bundle = await requireSettingsBundle()
-  return <NotificationsSettingsView initial={bundle} />
+export default function NotificationsSettingsPage() {
+  return (
+    <SettingsSubpageClient>
+      {bundle => <NotificationsSettingsView initial={bundle} />}
+    </SettingsSubpageClient>
+  )
 }
