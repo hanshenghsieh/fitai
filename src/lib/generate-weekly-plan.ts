@@ -27,6 +27,8 @@ import {
   recoveryTargetsForDayOffsets,
 } from '@/lib/engines/calorie-bank-engine'
 import type { Goal, UserProfile, WeeklyFeedback, WeeklyPlanData } from '@/types'
+import { mergePreferences, type UserSettingsPreferences } from '@/lib/settings/user-settings-types'
+import { goalPlanOptionsFromPreferences } from '@/lib/fat-loss-pace'
 
 export type GenerateWeeklyPlanResult =
   | { ok: true; data: WeeklyPlanData }
@@ -106,8 +108,32 @@ export async function generateWeeklyPlanForUser(
       ? (latestFeedback as WeeklyFeedback)
       : null
 
-  const goalPlan = calculateGoalPlan(profile, goal)
-  const baseNutrition = calculateNutritionTargets(profile, goal)
+  const settingsPrefs = mergePreferences(
+    (profile as UserProfile & { settings_preferences?: UserSettingsPreferences | null })
+      .settings_preferences
+  )
+  const planOptions = goalPlanOptionsFromPreferences(settingsPrefs)
+
+  const goalPlan = calculateGoalPlan(profile, goal, planOptions)
+  let baseNutrition = calculateNutritionTargets(profile, goal, planOptions)
+
+  if (planOptions.calorie_mode === 'manual') {
+    baseNutrition = {
+      dailyCalories:
+        settingsPrefs.manual_calorie_target != null
+          ? settingsPrefs.manual_calorie_target
+          : baseNutrition.dailyCalories,
+      proteinGrams:
+        settingsPrefs.manual_protein_g != null
+          ? settingsPrefs.manual_protein_g
+          : baseNutrition.proteinGrams,
+      carbsGrams:
+        settingsPrefs.manual_carbs_g != null ? settingsPrefs.manual_carbs_g : baseNutrition.carbsGrams,
+      fatGrams:
+        settingsPrefs.manual_fat_g != null ? settingsPrefs.manual_fat_g : baseNutrition.fatGrams,
+    }
+  }
+
   const { nutrition, coachNoteExtra, workoutModifier } = applyWeeklyFeedback(
     baseNutrition,
     feedbackForAdjust

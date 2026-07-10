@@ -112,6 +112,23 @@ html[data-app-overlay='open'] .app-bottom-nav {
   padding-bottom: max(var(--app-safe-bottom), 20px);
 }
 
+.app-overlay-backdrop--fullscreen {
+  justify-content: stretch;
+  align-items: stretch;
+  pointer-events: auto;
+}
+
+.app-overlay-backdrop--fullscreen .app-overlay-scrim {
+  display: none;
+}
+
+.app-overlay-backdrop--fullscreen .app-overlay-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: v2-calorie-bank-slide-up 240ms ease-out forwards;
+}
+
 .app-overlay-dialog-card {
   width: 100%;
   max-width: 28rem;

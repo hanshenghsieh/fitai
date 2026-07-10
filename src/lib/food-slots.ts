@@ -89,18 +89,7 @@ export function normalizeFoodLogSlot(log: {
   if (raw === 'meal1' || raw === 'meal2' || raw === 'meal3' || raw === 'before_sleep') {
     return raw
   }
-  if (raw === 'other') {
-    if (log.logged_at) {
-      try {
-        const d = new Date(log.logged_at)
-        const hour = d.getHours() + d.getMinutes() / 60
-        if (!Number.isNaN(hour)) return inferSlotFromHour(hour)
-      } catch {
-        /* fall through */
-      }
-    }
-    return 'meal3'
-  }
+  if (raw === 'other') return 'other'
   if (raw === 'breakfast') return 'meal1'
   if (raw === 'lunch') return 'meal2'
   if (raw === 'dinner') return 'meal3'

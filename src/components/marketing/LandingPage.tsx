@@ -2,66 +2,92 @@
 
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { colors } from '@/lib/design-system'
+import { BB_V2 } from '@/lib/betterbit-v2'
+import V2PageBackground from '@/components/betterbit-v2/V2PageBackground'
+import V2PrimaryButton from '@/components/betterbit-v2/V2PrimaryButton'
+import V2Card from '@/components/betterbit-v2/V2Card'
+import { SUBSCRIPTION_PRICE_MONTHLY } from '@/lib/subscription-pricing'
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: colors.bg.canvas }}>
-      <header className="px-6 pt-14 pb-12 space-y-8">
-        <div className="text-center space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: colors.accent.action }}>
-            科學健康引擎
+    <V2PageBackground className="min-h-[100dvh]">
+      <div className="max-w-lg mx-auto px-[18px] pt-14 pb-16 space-y-10">
+        <div className="text-center space-y-4">
+          <p className="text-[12px] font-semibold tracking-wide uppercase" style={{ color: BB_V2.accent.green }}>
+            BetterBit
           </p>
-          <h1 className="text-[28px] font-semibold leading-tight" style={{ color: colors.text.primary }}>
-            照著做就好
+          <h1 className="text-[28px] leading-tight" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
+            外食減脂不用算，BetterBit 幫你算好
           </h1>
-          <p className="text-[15px] leading-relaxed px-2" style={{ color: colors.text.secondary }}>
-            依你的體重、體脂與目標，自動算出熱量缺口、蛋白質與運動量，<br />
-            設計每日三餐與課表。你不用自己想。
+          <p className="text-[16px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+            拍一餐、看懂今天還能吃多少，讓每一次外食都更接近目標。
           </p>
         </div>
-        <div className="flex flex-col gap-3 max-w-sm mx-auto">
-          <Link
-            href="/register"
-            className="flex items-center justify-center gap-2 py-4 rounded-2xl text-[17px] font-semibold"
-            style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
+
+        <V2Card padding="24px" className="text-center space-y-3">
+          <div
+            className="mx-auto w-[220px] h-[420px] rounded-[32px] border-[6px]"
+            style={{ borderColor: BB_V2.text.deepGreen, background: BB_V2.bg.pill }}
           >
-            免費試用 14 天
-            <ArrowRight className="h-5 w-5" />
+            <div className="p-4 space-y-2 text-left">
+              <p className="text-[11px]" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
+                BetterBit
+              </p>
+              <p className="text-[20px] leading-snug" style={{ fontWeight: 700 }}>
+                今天
+              </p>
+              <p className="text-[12px]" style={{ color: BB_V2.text.secondary }}>
+                剩餘可吃 · 蛋白質 · 推薦
+              </p>
+            </div>
+          </div>
+          <p className="text-[12px]" style={{ color: BB_V2.text.muted }}>
+            App Store 高級感 UI · Visual V2
+          </p>
+        </V2Card>
+
+        <div className="space-y-3">
+          <Link href="/register" className="block">
+            <V2PrimaryButton>開始使用 · 14 天免費試用</V2PrimaryButton>
           </Link>
-          <Link href="/login" className="text-center text-[13px] py-2" style={{ color: colors.text.tertiary }}>
-            已有帳號？登入
+          <Link
+            href="/login"
+            className="flex items-center justify-center gap-2 py-3 text-[15px]"
+            style={{ color: BB_V2.text.secondary }}
+          >
+            已有帳號？登入 <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-      </header>
 
-      <section className="px-6 py-10 space-y-4">
-        {[
-          { title: '個人化計畫', desc: '輸入體態與生活型態，系統算出每日該吃多少、動多少。' },
-          { title: '外食也能執行', desc: '7-11、全家真實 SKU，每餐對齊熱量與蛋白質目標。' },
-          { title: '每週自動調整', desc: '依體重變化與回饋，下週計畫會更新，不用自己重算。' },
-        ].map(item => (
-          <div
-            key={item.title}
-            className="rounded-2xl p-5"
-            style={{ backgroundColor: colors.bg.elevated, border: `1px solid ${colors.border.subtle}` }}
-          >
-            <h3 className="font-semibold text-[15px] mb-1" style={{ color: colors.text.primary }}>{item.title}</h3>
-            <p className="text-[13px] leading-relaxed" style={{ color: colors.text.secondary }}>{item.desc}</p>
-          </div>
-        ))}
-      </section>
+        <div className="space-y-3">
+          {[
+            { title: '拍照記錄', desc: 'AI 估算熱量與三大營養素，不用填表。' },
+            { title: '外食也能執行', desc: '台灣品牌菜單對齊熱量與蛋白質目標。' },
+            { title: 'BetterBit Pro', desc: `${SUBSCRIPTION_PRICE_MONTHLY} 起 · 完整減脂工具。` },
+          ].map(item => (
+            <V2Card key={item.title} padding="16px 18px">
+              <h3 className="text-[15px] mb-1" style={{ fontWeight: 600 }}>
+                {item.title}
+              </h3>
+              <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+                {item.desc}
+              </p>
+            </V2Card>
+          ))}
+        </div>
 
-      <section className="px-6 pb-16 text-center space-y-4">
-        <p className="text-[12px] leading-relaxed" style={{ color: colors.text.tertiary }}>
-          再健只是介面。背後是完整的營養與運動計算。
-        </p>
-        <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[12px]">
-          <Link href="/privacy" style={{ color: colors.text.tertiary }}>隱私權政策</Link>
-          <Link href="/terms" style={{ color: colors.text.tertiary }}>服務條款</Link>
-          <Link href="/support" style={{ color: colors.text.tertiary }}>支援</Link>
+        <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[12px] pt-4">
+          <Link href="/privacy" style={{ color: BB_V2.text.muted }}>
+            隱私權政策
+          </Link>
+          <Link href="/terms" style={{ color: BB_V2.text.muted }}>
+            服務條款
+          </Link>
+          <Link href="/support" style={{ color: BB_V2.text.muted }}>
+            支援
+          </Link>
         </nav>
-      </section>
-    </div>
+      </div>
+    </V2PageBackground>
   )
 }

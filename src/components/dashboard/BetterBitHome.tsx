@@ -20,17 +20,17 @@ import {
   type DailyRollState,
 } from '@/lib/checkin-utils'
 import { toast } from 'sonner'
-import TodayHeader from '@/components/dashboard/today/TodayHeader'
-import TodayPosture from '@/components/dashboard/today/TodayPosture'
-import TodayHero, { filterPendingNutritionLogs } from '@/components/dashboard/v2/TodayHero'
+import TodayV2Dashboard from '@/components/betterbit-v2/TodayV2Dashboard'
 import TodayOS from '@/components/dashboard/TodayOS'
 import NutritionConfirmationSheet from '@/components/dashboard/today/NutritionConfirmationSheet'
 import MealEditSheet from '@/components/dashboard/today/MealEditSheet'
 import { patchFoodRecordOnLog } from '@/lib/nutrition/p0-common-foods/apply-to-log'
 import type { CommonFoodItem, FoodRecordDraft } from '@/lib/nutrition/p0-common-foods/types'
 import PendingNutritionQueueSheet from '@/components/dashboard/today/PendingNutritionQueueSheet'
+import { filterPendingNutritionLogs } from '@/lib/nutrition/food-log-display'
 import AppOverlay from '@/components/ui/AppOverlay'
 import { enrichFoodLog } from '@/lib/food-log-macros'
+import type { FoodSlot } from '@/lib/food-slots'
 import {
   applyManualNutritionToLog,
   enqueueUnknownFromLog,
@@ -46,8 +46,14 @@ import {
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { FoodDna } from '@/lib/food-memory'
-import { isRecoveryActive, resolveDailyExcessDriver } from '@/lib/engines/calorie-bank-engine'
+import { isRecoveryActive, resolveDailyExcessDriver, calorieFloorFromGender } from '@/lib/engines/calorie-bank-engine'
 import { previewCalorieBankFromLogs } from '@/lib/banks/preview-calorie-bank'
+import {
+  applyCalorieBankUserPrefs,
+  isCalorieBankEnabled,
+  loadUserPreferencesClient,
+} from '@/lib/settings/calorie-bank-user-prefs'
+import type { UserSettingsPreferences } from '@/lib/settings/user-settings-types'
 import { sumLoggedCalories, sumLoggedProtein, computeTodayMealState } from '@/lib/engines/next-meal-engine'
 import { sumLoggedCarbs, sumLoggedFat } from '@/lib/food-log-macros'
 import { foodLogsNeedSync, reconcileFoodLogsToday } from '@/lib/food-log-reconcile'
@@ -200,6 +206,7 @@ export default function BetterBitHome({
   const [trackedDayKey, setTrackedDayKey] = useState(() => getNutritionDayKey())
   const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(null)
   const [previousDayBank, setPreviousDayBank] = useState<CalorieBankRow | null>(null)
+  const [userPrefs, setUserPrefs] = useState<UserSettingsPreferences | null>(null)
   const [recordSheetOpen, setRecordSheetOpen] = useState(false)
   const [showDay1Guide, setShowDay1Guide] = useState(false)
   const recordUrlHandledRef = useRef(false)
@@ -256,6 +263,10 @@ export default function BetterBitHome({
   }, [])
 
   useEffect(() => {
+    void loadUserPreferencesClient().then(setUserPrefs).catch(() => {})
+  }, [])
+
+  useEffect(() => {
     if (calorieBankSyncedRef.current) return
     calorieBankSyncedRef.current = true
     const logs = initialFoodLogs.length ? initialFoodLogs : displayFoodLogs
@@ -296,7 +307,7 @@ export default function BetterBitHome({
 
   const effectiveCalorieBank = useMemo(() => {
     if (!profile?.id) return calorieBank
-    return previewCalorieBankFromLogs({
+    const raw = previewCalorieBankFromLogs({
       userId: profile.id,
       logs: displayFoodLogs,
       dailyTargets: {
@@ -309,7 +320,13 @@ export default function BetterBitHome({
       previousDayBank,
       persistedTodayBank: calorieBank,
     })
-  }, [profile, displayFoodLogs, todayPlan.daily_targets, previousDayBank, calorieBank])
+    return applyCalorieBankUserPrefs(raw, userPrefs, calorieFloorFromGender(profile.gender))
+  }, [profile, displayFoodLogs, todayPlan.daily_targets, previousDayBank, calorieBank, userPrefs])
+
+  const displayCalorieBank = useMemo(
+    () => (isCalorieBankEnabled(userPrefs) ? effectiveCalorieBank : null),
+    [effectiveCalorieBank, userPrefs]
+  )
 
   const waterTargetMl = useMemo(
     () =>
@@ -962,21 +979,17 @@ export default function BetterBitHome({
     setConfirmLog(null)
   }, [])
 
+  const handleMoveLogSlot = useCallback(
+    (logId: string, slot: FoodSlot) => {
+      patchFoodLog(logId, { slot })
+      toast.message('已移動餐點')
+    },
+    [patchFoodLog]
+  )
+
   return (
     <>
-      <TodayHeader trialDaysLeft={trialDaysLeft} />
-      <TodayPosture line={postureLine} />
-      {showDay1Guide && onDashboard ? (
-        <div className="px-5 max-w-[640px] mx-auto">
-          <Day1GuideBanner
-            onDismiss={() => {
-              dismissDay1Guide()
-              setShowDay1Guide(false)
-            }}
-          />
-        </div>
-      ) : null}
-      <TodayHero
+      <TodayV2Dashboard
         caloriesLogged={intakeSummary.caloriesLogged}
         caloriesTarget={intakeSummary.caloriesTarget}
         proteinLogged={intakeSummary.proteinLogged}
@@ -987,8 +1000,9 @@ export default function BetterBitHome({
         effectiveMealCalTarget={intakeSummary.effectiveMealCalTarget}
         proteinGap={intakeSummary.proteinGap}
         overTarget={intakeSummary.overTarget}
-        calorieBank={effectiveCalorieBank}
+        calorieBank={displayCalorieBank}
         excessDriver={intakeSummary.excessDriver}
+        calorieFloor={calorieFloorFromGender(profile?.gender)}
         foodLogs={displayFoodLogs}
         hasDicePreview={mealUiState.hasDicePreview}
         mealActionsLoading={mealUiState.rolling || mealUiState.confirming}
@@ -999,9 +1013,9 @@ export default function BetterBitHome({
         onPhotoLog={onDashboard ? dispatchOpenPhotoSheet : undefined}
         onReroll={onDashboard ? dispatchRollDice : undefined}
         showReroll={mealUiState.hasDicePreview}
+        onMoveLog={handleMoveLogSlot}
+        onEditLog={setEditLog}
         onDeleteLog={handleDeleteLog}
-        onEditLog={log => setEditLog(log)}
-        onConfirmNutrition={openNutritionConfirmation}
         onOpenPendingQueue={() => setPendingQueueOpen(true)}
         interstitial={
           onDashboard ? (
@@ -1032,6 +1046,17 @@ export default function BetterBitHome({
           ) : undefined
         }
       />
+
+      {showDay1Guide && onDashboard ? (
+        <div className="px-[18px] max-w-[640px] mx-auto -mt-2">
+          <Day1GuideBanner
+            onDismiss={() => {
+              dismissDay1Guide()
+              setShowDay1Guide(false)
+            }}
+          />
+        </div>
+      ) : null}
 
       {onDashboard ? (
       <div className="px-5 pb-6 max-w-[640px] mx-auto space-y-6" style={{ fontFamily: TODAY.font }}>

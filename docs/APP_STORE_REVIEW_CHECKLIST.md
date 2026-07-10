@@ -82,7 +82,7 @@ STRIPE_WEBHOOK_SECRET=...
 1. App 記錄（Bundle ID `app.fitai.betterbit`）
 2. Subscription Group + 自動續訂商品  
    - Product ID：**`betterbit_pro_monthly`**（須與 env 一致）  
-   - 價格：台灣約 NT$299／月  
+   - 價格：台灣約 NT$190／月（年繳 NT$980／年）  
 3. Xcode Capability：**In-App Purchase**
 4. RevenueCat：iOS app + entitlement `premium` + Current Offering 挂上 package
 5. Sandbox 測試員帳號

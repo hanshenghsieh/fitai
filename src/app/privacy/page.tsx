@@ -24,7 +24,7 @@ export default function PrivacyPage() {
           <li>個人檔案：暱稱、性別、年齡、身高、體重、體脂、目標、飲食偏好、器材與生活節奏</li>
           <li>使用紀錄：每日飲食、運動、喝水、打卡與週回饋</li>
           <li>食物照片：若你使用拍照記錄，照片會上傳以供 AI 估算營養（你可選擇不使用）</li>
-          <li>訂閱資料：Stripe 付款與訂閱狀態（我們不儲存完整信用卡號）</li>
+          <li>訂閱資料：Apple In-App Purchase／Stripe 付款與訂閱狀態（由 RevenueCat 協助管理 iOS 訂閱；我們不儲存完整信用卡號）</li>
           <li>推播 token：若你開啟通知，我們儲存裝置推播識別碼</li>
           <li>健康資料（選填）：體重歷史；目前版本不含 Apple Health／INBODY 帳號同步</li>
         </ul>
@@ -42,7 +42,8 @@ export default function PrivacyPage() {
       <LegalSection title="第三方服務">
         <ul className="list-disc pl-5 space-y-1">
           <li><strong>Supabase</strong> — 帳號、資料庫與檔案儲存</li>
-          <li><strong>Stripe</strong> — 訂閱付款處理</li>
+          <li><strong>Stripe</strong> — Web 版訂閱付款</li>
+          <li><strong>Apple / RevenueCat</strong> — iOS App 內訂閱與 entitlement 狀態</li>
           <li><strong>Firebase</strong> — 推播通知（若啟用）</li>
           <li><strong>Anthropic</strong> — 食物照片與 INBODY 報告解析（AI）</li>
           <li><strong>Vercel</strong> — 網站與 API 託管</li>

@@ -2,13 +2,13 @@ export const dynamic = 'force-dynamic'
 
 import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
-import { BB_V2 } from '@/lib/betterbit-v2'
-import AnalyticsScreen from '@/components/analytics/AnalyticsScreen'
-import ProgressLoading from './loading'
+import AnalysisV2Screen from '@/components/analysis/AnalysisV2Screen'
+import AnalysisV2Skeleton from '@/components/analysis/AnalysisV2Skeleton'
 import type { WeeklyPlanData } from '@/types'
 import {
   buildDayPlansByDate,
   loadAnalyticsBundle,
+  loadBodyMeasurementsForUser,
   mapWeightRowsToMeasurements,
   PROGRESS_ANALYTICS_LOOKBACK_DAYS,
   resolveLatestWeightKg,
@@ -24,7 +24,6 @@ async function ProgressContent() {
   const dayPlansByDate = buildDayPlansByDate(bundle.weeklyPlans)
 
   let latestTargets = { calories: 1800, protein_g: 120, water_ml: 2000 }
-  let plannedWorkoutTitle: string | undefined
 
   const currentWeekPlan = bundle.weeklyPlans.find(p => p.week_start === bundle.weekStart)
   const currentPlanData = currentWeekPlan?.plan_data as WeeklyPlanData | null
@@ -43,9 +42,7 @@ async function ProgressContent() {
     }
   }
 
-  if (todayPlan?.workout?.type_zh) {
-    plannedWorkoutTitle = todayPlan.workout.type_zh
-  }
+  const bodyMeasurements = await loadBodyMeasurementsForUser(supabase, user.id, PROGRESS_ANALYTICS_LOOKBACK_DAYS)
 
   const latestWeight = resolveLatestWeightKg(
     bundle.measurements,
@@ -53,40 +50,38 @@ async function ProgressContent() {
     bundle.todayStr
   )
   const measurements = seedMeasurementsWithVisibleWeight(
-    mapWeightRowsToMeasurements(bundle.measurements, user.id),
+    bodyMeasurements.length > 0
+      ? bodyMeasurements
+      : mapWeightRowsToMeasurements(bundle.measurements, user.id),
     latestWeight,
     user.id,
     bundle.todayStr
   )
 
   return (
-    <div className="max-w-lg mx-auto pb-10" style={{ backgroundColor: BB_V2.bg.canvas }}>
-      <AnalyticsScreen
-        key={user.id}
-        measurements={measurements}
-        checkins={bundle.checkins}
-        targets={{
-          calories: latestTargets.calories,
-          protein_g: latestTargets.protein_g,
-          water_ml: latestTargets.water_ml,
-          target_weight_kg:
-            bundle.activeGoal?.target_weight_kg ?? currentPlanData?.goal_snapshot?.target_weight ?? null,
-          start_weight_kg: bundle.activeGoal?.start_weight_kg ?? null,
-          start_date: bundle.activeGoal?.start_date ?? null,
-        }}
-        dayPlansByDate={dayPlansByDate}
-        currentWeightKg={latestWeight}
-        profileWeightKg={bundle.profileWeightKg}
-        plannedWorkoutTitle={plannedWorkoutTitle}
-        todayDate={bundle.todayStr}
-      />
-    </div>
+    <AnalysisV2Screen
+      todayStr={bundle.todayStr}
+      measurements={measurements}
+      checkins={bundle.checkins}
+      targets={{
+        calories: latestTargets.calories,
+        protein_g: latestTargets.protein_g,
+        water_ml: latestTargets.water_ml,
+        target_weight_kg:
+          bundle.activeGoal?.target_weight_kg ?? currentPlanData?.goal_snapshot?.target_weight ?? null,
+        start_weight_kg: bundle.activeGoal?.start_weight_kg ?? null,
+        start_date: bundle.activeGoal?.start_date ?? null,
+      }}
+      dayPlansByDate={dayPlansByDate}
+      currentWeightKg={latestWeight}
+      profileWeightKg={bundle.profileWeightKg}
+    />
   )
 }
 
 export default function ProgressPage() {
   return (
-    <Suspense fallback={<ProgressLoading />}>
+    <Suspense fallback={<AnalysisV2Skeleton />}>
       <ProgressContent />
     </Suspense>
   )

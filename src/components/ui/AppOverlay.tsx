@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { setAppOverlayOpen } from '@/lib/today-actions'
 
-export type AppOverlayVariant = 'sheet' | 'dialog'
+export type AppOverlayVariant = 'sheet' | 'dialog' | 'fullscreen'
 
 type Props = {
   open: boolean

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Noto_Sans_TC } from 'next/font/google'
 import './globals.css'
+import '@/styles/betterbit-v2.css'
 import '@/styles/capacitor-ios-shell.css'
 import { Toaster } from '@/components/ui/sonner'
 import CapacitorShell from '@/components/capacitor/CapacitorShell'

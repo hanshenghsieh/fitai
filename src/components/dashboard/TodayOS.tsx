@@ -53,13 +53,20 @@ import {
   type FoodDna,
 } from '@/lib/food-memory'
 import {
-  defaultFoodSlot,
   mealHoursFromLogs,
   logMatchesFoodSlot,
   normalizeFoodLogSlot,
   customEatOutMealTypeForSlot,
   type FoodSlot,
 } from '@/lib/food-slots'
+import {
+  loadPhotoSettingsRuntime,
+  resolvePhotoMealSlotFromLogs,
+  shouldRequirePhotoConfirmation,
+  isLowConfidencePhotoResult,
+} from '@/lib/settings/photo-settings-runtime'
+import type { PhotoSettings } from '@/lib/settings/user-settings-types'
+import { DEFAULT_PHOTO_SETTINGS } from '@/lib/settings/user-settings-types'
 import { getTaipeiHour, getNutritionDayKey } from '@/lib/timezone'
 import {
   rollMealSuggestion,
@@ -444,9 +451,19 @@ export default function TodayOS({
 
   const foodLogs = userMemory.food_logs_today ?? []
 
+  const [photoSettings, setPhotoSettings] = useState<PhotoSettings>(DEFAULT_PHOTO_SETTINGS)
+
+  useEffect(() => {
+    void loadPhotoSettingsRuntime().then(setPhotoSettings).catch(() => {})
+  }, [])
+
   const activeSlot = useMemo<FoodSlot>(
-    () => defaultFoodSlot(getTaipeiHour(), mealHoursFromLogs(recentFoodLogs)),
-    [recentFoodLogs]
+    () =>
+      resolvePhotoMealSlotFromLogs(photoSettings, getTaipeiHour(), [
+        ...recentFoodLogs,
+        ...foodLogs,
+      ]),
+    [recentFoodLogs, foodLogs, photoSettings]
   )
   const mealSlotLegacy = useMemo(
     () => mealTypeForFoodSlot(activeSlot, userMemory.work_schedule ?? 'standard'),
@@ -1009,6 +1026,7 @@ export default function TodayOS({
         capture_status: payload.capture_status,
         nutrition_status: payload.nutrition_status,
         nutrition_confidence: payload.nutrition_confidence,
+        slot: activeSlot,
         nutrition_accuracy_meta: meta
           ? {
               accuracy_level: meta.accuracy_level,
@@ -1019,10 +1037,36 @@ export default function TodayOS({
             }
           : undefined,
       })
+      const logEntry = {
+        id: payload.id,
+        name: payload.display_label ?? payload.name,
+        display_label: payload.display_label ?? payload.name,
+        calories: payload.calories,
+        protein_g: payload.protein_g,
+        nutrition_status: payload.nutrition_status,
+        nutrition_confidence: payload.nutrition_confidence,
+        slot: activeSlot,
+        source: 'photo' as const,
+        logged_at: new Date().toISOString(),
+      }
+      const needsConfirm = shouldRequirePhotoConfirmation(photoSettings.confirm_mode, {
+        nutrition_confidence: payload.nutrition_confidence,
+        nutrition_status: payload.nutrition_status,
+      })
+      if (photoSettings.low_confidence_alert && isLowConfidencePhotoResult({
+        nutrition_confidence: payload.nutrition_confidence,
+        nutrition_status: payload.nutrition_status,
+      })) {
+        toast.message('這餐信心較低，建議你再確認一下')
+      }
+      if (needsConfirm) {
+        onOpenNutritionConfirmation?.(logEntry as FoodLogEntry)
+      }
       closePhotoSheet()
+      setPhotoSaving(false)
     }
     void fileToDataUrl(photoDraft.file).then(finish)
-  }, [photoDraft, photoSaving, commitLog, closePhotoSheet])
+  }, [photoDraft, photoSaving, commitLog, closePhotoSheet, activeSlot, photoSettings, onOpenNutritionConfirmation])
 
   const handleManualPhotoCorrection = useCallback(
     (result: ManualPhotoCorrectionResult) => {
@@ -1060,14 +1104,20 @@ export default function TodayOS({
         setManualPhotoOpen(false)
         closePhotoSheet()
         setPhotoSaving(false)
-        if (entry.nutrition_status === 'unknown') {
+        const needsConfirm =
+          result.mode === 'unknown_photo' ||
+          shouldRequirePhotoConfirmation(photoSettings.confirm_mode, {
+            nutrition_confidence: entry.nutrition_confidence,
+            nutrition_status: entry.nutrition_status,
+          })
+        if (needsConfirm || entry.nutrition_status === 'unknown') {
           enqueueUnknownFromLog(entry)
           onOpenNutritionConfirmation?.(entry)
         }
       }
       void fileToDataUrl(photoDraft.file).then(finish)
     },
-    [photoDraft, commitLog, activeSlot, closePhotoSheet, onOpenNutritionConfirmation]
+    [photoDraft, commitLog, activeSlot, closePhotoSheet, onOpenNutritionConfirmation, photoSettings]
   )
 
   const rollDice = useCallback(() => {

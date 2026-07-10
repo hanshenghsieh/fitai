@@ -8,9 +8,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { colors } from '@/lib/design-system'
+import { BB_V2 } from '@/lib/betterbit-v2'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
-import ZaiJian from '@/components/character/ZaiJian'
+import V2PageBackground from '@/components/betterbit-v2/V2PageBackground'
+import V2Card from '@/components/betterbit-v2/V2Card'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -44,38 +45,52 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="auth-page-shell flex items-center justify-center p-4" style={{ backgroundColor: colors.bg.canvas }}>
+    <V2PageBackground className="min-h-[100dvh] flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        <ZaiJian size="lg" line={{ text: '回來了。', expression: 'normal', subtext: '今天吃什麼？' }} layout="bubble" />
-        <form
-          onSubmit={handleLogin}
-          className="rounded-2xl p-6 space-y-4"
-          style={{ backgroundColor: colors.bg.elevated, border: `1px solid ${colors.border.subtle}` }}
-        >
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-[13px]">電子郵件</Label>
-            <Input id="email" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-[13px]">密碼</Label>
-            <Input id="password" type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            aria-busy={loading}
-            className="w-full py-3 rounded-xl text-[15px] font-semibold disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-            style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : '登入'}
-          </button>
-          <p className="text-[13px] text-center" style={{ color: colors.text.tertiary }}>
-            還沒有帳號？{' '}
-            <Link href="/register" style={{ color: colors.accent.action }}>註冊</Link>
+        <div className="text-center space-y-2">
+          <h1 className="text-[24px]" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
+            回來了。今天吃什麼？
+          </h1>
+          <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
+            登入 BetterBit，繼續你的減脂節奏。
           </p>
-        </form>
-        <Link href="/" className="block text-center text-[13px]" style={{ color: colors.text.tertiary }}>← 首頁</Link>
+        </div>
+        <V2Card padding="24px">
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-[13px]">
+                電子郵件
+              </Label>
+              <Input id="email" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-[13px]">
+                密碼
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit" disabled={loading} className="v2-btn-primary w-full disabled:opacity-40">
+              {loading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : '登入'}
+            </button>
+            <p className="text-[13px] text-center" style={{ color: BB_V2.text.muted }}>
+              還沒有帳號？{' '}
+              <Link href="/register" style={{ color: BB_V2.accent.green, fontWeight: 600 }}>
+                註冊
+              </Link>
+            </p>
+          </form>
+        </V2Card>
+        <Link href="/" className="block text-center text-[13px]" style={{ color: BB_V2.text.muted }}>
+          ← 首頁
+        </Link>
       </div>
-    </div>
+    </V2PageBackground>
   )
 }

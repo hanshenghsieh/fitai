@@ -41,13 +41,13 @@ export default function TermsPage() {
 
       <LegalSection title="訂閱與付款">
         <p>
-          部分功能需付費訂閱。目前 Web 版透過 Stripe 處理付款。試用期與訂閱價格以 App 內顯示為準。
+          部分功能需付費訂閱（BetterBit Pro）。Web 版可透過 Stripe 付款；iOS App 內訂閱使用 Apple In-App Purchase（App Store 訂閱），並由 RevenueCat 管理訂閱狀態。
         </p>
         <p>
-          訂閱會自動續期，除非你取消。取消後，通常可繼續使用至當期結束。達標免費延長等優惠條件以 App 內說明為準。
+          目前方案：月繳 NT$190／月、年繳 NT$980／年（以 App 內與 App Store 顯示為準）。試用期與實際扣款金額以你裝置上的方案為準。
         </p>
         <p>
-          iOS App 上架後，App 內訂閱將遵循 Apple App Store 規範與 Apple 媒體服務條款。
+          訂閱會自動續期，除非你取消。iOS 訂閱可在 iPhone「設定 → Apple ID → 訂閱項目」管理；Web 訂閱可在帳號設定中管理。
         </p>
       </LegalSection>
 

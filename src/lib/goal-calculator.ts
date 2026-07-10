@@ -1,5 +1,14 @@
 import { differenceInDays, parseISO, format } from 'date-fns'
 import type { UserProfile, Goal, GoalType } from '@/types'
+import {
+  analyzePaceGoal,
+  resolveFatLossPace,
+  type FatLossPace,
+  type GoalPlanOptions,
+  type GoalPlanWarnings,
+} from '@/lib/fat-loss-pace'
+
+export type { GoalPlanOptions, GoalPlanWarnings, FatLossPace }
 
 export interface NutritionTargets {
   dailyCalories: number
@@ -23,6 +32,8 @@ export interface GoalPlan extends NutritionTargets {
   dailyDeficit: number
   projectedEndDate: string
   coachSummary: string
+  fatLossPace?: FatLossPace
+  warnings?: GoalPlanWarnings
 }
 
 const ACTIVITY_MULTIPLIERS: Record<string, number> = {
@@ -71,18 +82,12 @@ function daysInGoal(goal: Goal): number {
   return Math.max(7, differenceInDays(parseISO(goal.end_date), parseISO(goal.start_date)))
 }
 
-function deficitFromFatGoal(fatKg: number, days: number, minDaily: number, maxDaily: number): number {
-  if (fatKg <= 0 || days <= 0) return 0
-  const required = Math.round((fatKg * 7700) / days)
-  return Math.min(maxDaily, Math.max(minDaily, required))
-}
-
-function calorieFloor(profile: UserProfile): number {
-  return profile.gender === 'female' ? 1200 : 1500
-}
-
-/** 依身高體重體脂與目標，嚴格計算每日熱量與巨量營養素 */
-export function calculateGoalPlan(profile: UserProfile, goal: Goal): GoalPlan {
+/** 依身高體重體脂、目標與減脂節奏，計算每日熱量與巨量營養素 */
+export function calculateGoalPlan(
+  profile: UserProfile,
+  goal: Goal,
+  options?: GoalPlanOptions
+): GoalPlan {
   const tdee = calculateTDEE(profile)
   const bmr = calculateBMR(profile)
   const weight = profile.weight_kg ?? 70
@@ -96,7 +101,7 @@ export function calculateGoalPlan(profile: UserProfile, goal: Goal): GoalPlan {
     Math.round((leanMass / (1 - targetBf / 100)) * 10) / 10
 
   const targetFatMass = targetWeight * (targetBf / 100)
-  const fatMassToChange = fatMass - targetFatMass // 正=需減脂
+  const fatMassToChange = fatMass - targetFatMass
   const days = daysInGoal(goal)
   const weeks = days / 7
   const fatToLoseKg = Math.max(0, fatMassToChange)
@@ -106,52 +111,68 @@ export function calculateGoalPlan(profile: UserProfile, goal: Goal): GoalPlan {
   let dailyDeficit = 0
   let weeklyChangeKg = 0
   let coachSummary = ''
+  let daysInGoal = days
+  let projectedEndDate = format(parseISO(goal.end_date), 'yyyy-MM-dd')
+  let proteinGrams = Math.round(leanMass * 1.8)
+  let fatLossPace: FatLossPace | undefined
+  let warnings: GoalPlanWarnings | undefined
 
   const goalType = goal.goal_type as GoalType
+  const paceOptions: GoalPlanOptions = {
+    fat_loss_pace: resolveFatLossPace(options?.fat_loss_pace),
+    calorie_mode: options?.calorie_mode,
+    manual_calorie_target: options?.manual_calorie_target,
+    target_days: options?.target_days,
+  }
 
-  if (goalType === 'lose_fat' || goalType === 'lose_weight') {
-    dailyDeficit = deficitFromFatGoal(fatToLoseKg, days, 300, 750)
-    weeklyChangeKg = Math.min(0.5, (dailyDeficit * 7) / 7700)
-    dailyCalories = Math.max(calorieFloor(profile), tdee - dailyDeficit)
+  if (goalType === 'lose_fat' || goalType === 'lose_weight' || goalType === 'body_recomp') {
+    const paceAnalysis = analyzePaceGoal(profile, goal, paceOptions)
+    if (paceAnalysis) {
+      dailyCalories = paceAnalysis.dailyCalories
+      dailyDeficit = paceAnalysis.dailyDeficit
+      weeklyChangeKg = paceAnalysis.weeklyChangeKg
+      proteinGrams = paceAnalysis.proteinGrams
+      daysInGoal = paceAnalysis.daysInGoal
+      projectedEndDate = paceAnalysis.projectedEndDate
+      fatLossPace = paceAnalysis.pace
+      warnings = paceAnalysis.warnings
 
-    const weeksNeeded = dailyDeficit > 0 ? Math.ceil(totalDeficitKcal / (dailyDeficit * 7)) : weeks
-    coachSummary =
-      `目標：體脂 ${currentBf.toFixed(1)}% → ${targetBf}%（約減脂 ${fatToLoseKg.toFixed(1)} kg，≈ ${(totalDeficitKcal / 1000).toFixed(1)} 萬大卡）\n` +
-      `期限：${weeks.toFixed(0)} 週；依每日赤字 ${dailyDeficit} kcal，約 ${weeksNeeded} 週可達成\n` +
-      `每週約減脂 ${(weeklyChangeKg * 1000).toFixed(0)}g，蛋白質以瘦體重保護肌肉`
+      const paceLabel =
+        paceAnalysis.pace === 'conservative'
+          ? '保守'
+          : paceAnalysis.pace === 'aggressive'
+            ? '積極'
+            : '標準'
+
+      if (goalType === 'body_recomp') {
+        coachSummary =
+          `身體重組（${paceLabel}節奏）：體脂 ${currentBf}% → ${targetBf}%\n` +
+          `每日目標 ${dailyCalories} kcal（赤字 ${dailyDeficit} kcal），蛋白質 ${proteinGrams} g`
+      } else {
+        coachSummary =
+          `減脂節奏：${paceLabel}｜體重 ${weight} → ${targetWeight} kg\n` +
+          `每日 ${dailyCalories} kcal（赤字 ${dailyDeficit} kcal），蛋白質 ${proteinGrams} g\n` +
+          `預估 ${Math.round(daysInGoal / 7)} 週達成，每週約 ${(weeklyChangeKg * 1000).toFixed(0)}g`
+      }
+    }
   } else if (goalType === 'gain_muscle') {
-    const weightGain = (targetWeight - weight)
+    const weightGain = targetWeight - weight
     weeklyChangeKg = Math.min(Math.max(weightGain / weeks, 0), 0.25)
     const dailySurplus = Math.round((weeklyChangeKg * 7700) / 7)
     dailyCalories = tdee + Math.min(dailySurplus, 500)
     dailyDeficit = -(dailyCalories - tdee)
     coachSummary = `目標增肌至 ${targetWeight} kg，每日盈餘 ${dailyCalories - tdee} kcal`
-  } else if (goalType === 'body_recomp') {
-    dailyDeficit = deficitFromFatGoal(fatToLoseKg, days, 250, 500)
-    weeklyChangeKg = Math.min(0.35, (dailyDeficit * 7) / 7700)
-    dailyCalories = Math.max(calorieFloor(profile), tdee - dailyDeficit)
-    coachSummary =
-      `身體重組：體脂 ${currentBf}% → ${targetBf}%（約減脂 ${fatToLoseKg.toFixed(1)} kg）\n` +
-      `每日赤字 ${dailyDeficit} kcal（總計約 ${(totalDeficitKcal / 1000).toFixed(1)} 萬大卡 ÷ ${days} 天）`
   } else {
     coachSummary = '維持體態，照著目前的節奏吃'
   }
 
-  // 蛋白質：依瘦體重（減脂 2.2g/kg，增肌 2.0g/kg）
-  const proteinPerKgLean =
-    goalType === 'lose_fat' || goalType === 'lose_weight' ? 2.2
-    : goalType === 'gain_muscle' ? 2.0
-    : 1.8
-  const proteinGrams = Math.round(leanMass * proteinPerKgLean)
-
-  const fatPct = goalType === 'lose_fat' || goalType === 'lose_weight' ? 0.28 : 0.3
+  const fatPct =
+    goalType === 'lose_fat' || goalType === 'lose_weight' || goalType === 'body_recomp' ? 0.28 : 0.3
   const fatGrams = Math.round((dailyCalories * fatPct) / 9)
   const carbsGrams = Math.max(
     50,
     Math.round((dailyCalories - proteinGrams * 4 - fatGrams * 9) / 4)
   )
-
-  const projectedEndDate = format(parseISO(goal.end_date), 'yyyy-MM-dd')
 
   return {
     tdee,
@@ -162,8 +183,8 @@ export function calculateGoalPlan(profile: UserProfile, goal: Goal): GoalPlan {
     fatMassToChangeKg: Math.round(fatMassToChange * 10) / 10,
     fatToLoseKg: Math.round(fatToLoseKg * 10) / 10,
     totalDeficitKcal,
-    daysInGoal: days,
-    weeksRemaining: Math.round(weeks),
+    daysInGoal,
+    weeksRemaining: Math.round(daysInGoal / 7),
     weeklyChangeKg: Math.round(weeklyChangeKg * 1000) / 1000,
     dailyDeficit,
     dailyCalories,
@@ -172,14 +193,17 @@ export function calculateGoalPlan(profile: UserProfile, goal: Goal): GoalPlan {
     fatGrams,
     projectedEndDate,
     coachSummary,
+    fatLossPace,
+    warnings,
   }
 }
 
 export function calculateNutritionTargets(
   profile: UserProfile,
-  goal: Goal
+  goal: Goal,
+  options?: GoalPlanOptions
 ): NutritionTargets {
-  const plan = calculateGoalPlan(profile, goal)
+  const plan = calculateGoalPlan(profile, goal, options)
   return {
     dailyCalories: plan.dailyCalories,
     proteinGrams: plan.proteinGrams,

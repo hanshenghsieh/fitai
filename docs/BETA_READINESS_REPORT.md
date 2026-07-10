@@ -1,15 +1,15 @@
 # Beta Readiness Report
 
-Generated: 2026-06-26T15:51:47.375Z
+Generated: 2026-07-10T09:22:17.882Z
 
 ## Coverage Summary
 
 | Metric | Rate |
 |--------|------|
-| Button Coverage | 98% |
+| Button Coverage | 80% |
 | Route Coverage | 100% |
 | Flow Coverage | 100% |
-| **E2E Pass Rate (static)** | **99%** |
+| **E2E Pass Rate (static)** | **93%** |
 
 ## Founder Principles
 

@@ -1,14 +1,14 @@
 # BetterBit App Button QA Report
 
-Generated: 2026-06-24T19:19:57.382Z
+Generated: 2026-07-10T09:22:18.770Z
 
 ## Summary
 
 | Metric | Count |
 |--------|-------|
 | Total buttons | 65 |
-| Static pass | 65 |
-| Static fail | 0 |
+| Static pass | 52 |
+| Static fail | 13 |
 | Dynamic (manual/E2E) | 65 pending manual |
 
 ## Methodology
@@ -31,15 +31,15 @@ For each button below, verify on device:
 |---|---|---|---|---|---|---|---|---|
 | Today | 試用天數 | 試用還剩 | yes | manual | pass |  |  |  |
 | Today | 設定 | aria-label: 設定 | yes | manual | pass |  |  |  |
-| Today | 刪除餐點 | aria-label: 移除 | yes | manual | pass |  |  |  |
-| Today | 餐次切換 | 第 1 餐 | yes | manual | pass |  |  |  |
+| Today | 刪除餐點 | aria-label: 移除 | no | manual | fail | Missing patterns: onClick={onDelete} | P1 |  |
+| Today | 餐次切換 | 第 1 餐 | no | manual | fail | Missing patterns: setActiveSlot | P1 |  |
 | Today | 就決定是它了 | 就決定是它了 | yes | manual | pass |  |  |  |
 | Today | 換一個 | 換一個 | yes | manual | pass |  |  |  |
-| Today | 更多記錄 | 更多記錄 | yes | manual | pass |  |  |  |
+| Today | 文字紀錄 | 文字紀錄 | no | manual | fail | Missing patterns: openMore | P1 |  |
 | Today | 拍今天吃的 | 拍今天吃的 | yes | manual | pass |  |  |  |
-| Today | 刪除確認-先留著 | 先留著 | yes | manual | pass |  |  |  |
-| Today | 刪除確認-移除 | 移除 | yes | manual | pass |  |  |  |
-| Today | 為什麼這餐 | 為什麼這餐 | yes | manual | pass |  |  |  |
+| Today | 刪除確認-先留著 | 先留著 | no | manual | fail | Missing patterns: setDeleteConfirmId | P1 |  |
+| Today | 刪除確認-移除 | 移除 | no | manual | fail | Missing patterns: confirmDeleteLog | P1 |  |
+| Today | 為什麼這餐 | 為什麼這餐 | no | manual | fail | Missing patterns: onClick | P1 |  |
 | Today | 更多記錄-關閉 | aria-label: 關閉 | yes | manual | pass |  |  |  |
 | Today | 手動紀錄-搜尋 | onPickSearch | yes | manual | pass |  |  |  |
 | Today | 常吃紀錄 | onCommitFrequent | yes | manual | pass |  |  |  |
@@ -71,15 +71,15 @@ For each button below, verify on device:
 | 分析 | 加體脂 | 加體脂 | yes | manual | pass |  |  |  |
 | 分析 | 取消體重 | 取消 | yes | manual | pass |  |  |  |
 | 分析 | 記一下體重 | 記一下 | yes | manual | pass |  |  |  |
-| 分析 | 繼續追蹤 | 繼續追蹤 | yes | manual | pass |  |  |  |
+| 分析 | 繼續追蹤 | 繼續追蹤 | no | manual | fail | Missing patterns: href="/settings" | P1 |  |
 | 我的 | 我的數值 | 我的數值 | yes | manual | pass |  |  |  |
 | 我的 | 儲存設定 | 儲存 | yes | manual | pass |  |  |  |
-| 我的 | 工作排班 | onWorkSchedule | yes | manual | pass |  |  |  |
-| 我的 | 共餐情境 | onEatingContext | yes | manual | pass |  |  |  |
+| 我的 | 工作排班 | onWorkSchedule | no | manual | fail | Missing patterns: onWorkSchedule | P1 |  |
+| 我的 | 共餐情境 | onEatingContext | no | manual | fail | Missing patterns: onEatingContext | P1 |  |
 | 我的 | 重排本週計畫 | 重排本週計畫 | yes | manual | pass |  |  |  |
 | 我的 | 登出 | 登出 | yes | manual | pass |  |  |  |
 | 我的 | 會員 | BetterBit 會員 | yes | manual | pass |  |  |  |
-| 我的 | Apple Health | 連接 Apple Health | yes | manual | pass |  |  |  |
+| 我的 | Apple Health | 連接 Apple Health | no | manual | fail | Missing patterns: connect, onClick | P1 |  |
 | 我的 | 開啟提醒 | 開啟提醒 | yes | manual | pass |  |  |  |
 | 我的 | 隱私權政策 | 隱私權政策 | yes | manual | pass |  |  |  |
 | 我的 | 服務條款 | 服務條款 | yes | manual | pass |  |  |  |
@@ -87,9 +87,9 @@ For each button below, verify on device:
 | 我的 | 刪除帳號 | 刪除帳號 | yes | manual | pass |  |  |  |
 | 我的 | 刪除帳號-取消 | 取消 | yes | manual | pass |  |  |  |
 | 我的 | 刪除帳號-永久刪除 | 永久刪除 | yes | manual | pass |  |  |  |
-| 我的 | 會員-返回設定 | ← 設定 | yes | manual | pass |  |  |  |
-| 我的 | 會員-結帳 | 繼續一起走走 | yes | manual | pass |  |  |  |
-| 我的 | 會員-回 Today | 先回去 Today | yes | manual | pass |  |  |  |
+| 我的 | 會員-返回設定 | ← 設定 | no | manual | fail | Missing patterns: href="/settings" | P1 |  |
+| 我的 | 會員-結帳 | 繼續一起走走 | no | manual | fail | Missing patterns: onClick | P1 |  |
+| 我的 | 會員-回 Today | 先回去 Today | no | manual | fail | Missing patterns: href="/dashboard" | P1 |  |
 | Auth | 登入 | 登入 | yes | manual | pass |  |  |  |
 | Auth | 前往註冊 | 註冊 | yes | manual | pass |  |  |  |
 | Auth | 建立帳號 | 建立帳號 | yes | manual | pass |  |  |  |

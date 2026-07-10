@@ -9,7 +9,7 @@ import {
   shouldBypassSubscriptionPaywallClient,
   shouldShowAppleIapClient,
 } from '@/lib/ios-payment-gate'
-import { SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
+import { SUBSCRIPTION_PRICE_MONTHLY } from '@/lib/subscription-pricing'
 
 interface Props {
   access: AccessStatus
@@ -46,7 +46,7 @@ export default function SettingsPremiumTeaser({ access }: Props) {
     ? '封測期間開放完整功能'
     : isSubscribed
       ? '你已解鎖完整減脂工具'
-      : SUBSCRIPTION_PRICE_LABEL
+      : SUBSCRIPTION_PRICE_MONTHLY
 
   return (
     <SettingsSection title="會員" description={description}>

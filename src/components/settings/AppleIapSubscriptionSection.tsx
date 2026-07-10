@@ -1,48 +1,36 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
-import { colors } from '@/lib/design-system'
-import {
-  APPLE_IAP_LEGAL_DISCLOSURE,
-  APPLE_IAP_PRICE_LABEL,
-  isRevenueCatConfigured,
-} from '@/lib/apple-iap-config'
+import { BB_V2 } from '@/lib/betterbit-v2'
+import { isRevenueCatConfigured } from '@/lib/apple-iap-config'
 import { purchaseAppleIap, restoreAppleIap, type AppleIapPurchaseStep } from '@/lib/apple-iap-client'
+import { isCapacitorNative } from '@/lib/capacitor-native'
 import {
-  PREMIUM_BODY,
-  PREMIUM_FEATURES,
-  PREMIUM_MANAGE_FOOTNOTE,
-  PREMIUM_SUBTITLE_SUBSCRIBED,
-  premiumPosture,
-  premiumTrialWhisper,
-} from '@/lib/premium-narrative'
-import LegalLinksRow from '@/components/legal/LegalLinksRow'
-import SettingsSubpageHeader from '@/components/settings/SettingsSubpageHeader'
+  formatProRenewalDate,
+  inferProPlanId,
+  type ProPlanId,
+} from '@/lib/pro-subscription-v2'
+import { triggerV2Haptic } from '@/lib/v2-haptics'
+import ProSubscriptionV2View from '@/components/betterbit-v2/ProSubscriptionV2View'
+import ProPaymentSuccessV2View from '@/components/betterbit-v2/ProPaymentSuccessV2View'
+import ProActiveStatusV2View, {
+  openAppleSubscriptionManagement,
+} from '@/components/betterbit-v2/ProActiveStatusV2View'
 import { createClient } from '@/lib/supabase/client'
+
+type SubscriptionView = 'paywall' | 'success' | 'active'
 
 interface Props {
   access: AccessStatus
   compact?: boolean
 }
 
-function FeatureList() {
-  return (
-    <ul className="space-y-2.5">
-      {PREMIUM_FEATURES.map(feature => (
-        <li key={feature} className="text-[14px] leading-relaxed flex gap-2" style={{ color: colors.text.secondary }}>
-          <span className="shrink-0" style={{ color: colors.accent.sage }}>✓</span>
-          <span className="min-w-0">{feature}</span>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
 export default function AppleIapSubscriptionSection({ access, compact = false }: Props) {
+  const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
   const [subscription, setSubscription] = useState<{
     status: string
@@ -53,17 +41,26 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
   const [purchasing, setPurchasing] = useState(false)
   const [purchaseStep, setPurchaseStep] = useState<AppleIapPurchaseStep | null>(null)
   const [restoring, setRestoring] = useState(false)
+  const [view, setView] = useState<SubscriptionView>('paywall')
+  const [purchasedPlan, setPurchasedPlan] = useState<ProPlanId>('yearly')
+  const [lastProductId, setLastProductId] = useState<string | null>(null)
 
   const iapReady = isRevenueCatConfigured()
   const isSubscribed = subscription?.status === 'active' || access.isSubscribed
-  const trialWhisper = premiumTrialWhisper(access)
 
   const purchaseStepLabel: Record<AppleIapPurchaseStep, string> = {
-    configure: '連接付款…',
-    offerings: '讀取方案…',
-    purchase: '等待 Apple 付款…',
-    sync: '同步會員…',
+    configure: '正在連接 App Store...',
+    offerings: '正在讀取方案...',
+    purchase: '正在確認訂閱...',
+    sync: '正在同步會員...',
   }
+
+  const activePlan = useMemo(
+    () => inferProPlanId(lastProductId),
+    [lastProductId]
+  )
+
+  const renewalDate = formatProRenewalDate(subscription?.current_period_end)
 
   useEffect(() => {
     void (async () => {
@@ -82,6 +79,12 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
     })()
   }, [])
 
+  useEffect(() => {
+    if (loading || view === 'success') return
+    if (isSubscribed) setView('active')
+    else setView('paywall')
+  }, [loading, isSubscribed, view])
+
   async function refreshSubscription() {
     const res = await fetch('/api/get-subscription')
     if (res.ok) {
@@ -90,7 +93,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
     }
   }
 
-  async function handleSubscribe() {
+  async function handleSubscribe(plan: ProPlanId) {
     if (!userId) {
       toast.error('請先登入')
       return
@@ -100,15 +103,21 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       return
     }
     if (purchasing) return
+
+    setPurchasedPlan(plan)
     setPurchasing(true)
     setPurchaseStep('configure')
     try {
       const result = await purchaseAppleIap(userId, step => setPurchaseStep(step))
       if (result.active) {
-        toast.message('訂閱成功，會員功能已啟用。')
+        triggerV2Haptic('success')
+        setLastProductId(result.productId ?? null)
+        setPurchasedPlan(inferProPlanId(result.productId))
         await refreshSubscription()
+        setView('success')
       }
     } catch (err) {
+      triggerV2Haptic('error')
       const message = err instanceof Error ? err.message : '無法完成訂閱'
       if (!/cancel|已取消/i.test(message)) toast.error(message)
     } finally {
@@ -130,112 +139,99 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
     try {
       const result = await restoreAppleIap(userId)
       if (result.active) {
-        toast.message('已還原你的會員訂閱。')
+        triggerV2Haptic('success')
+        setLastProductId(result.productId ?? null)
+        toast.message('已恢復你的 BetterBit Pro 權限')
         await refreshSubscription()
+        setView('active')
       } else {
-        toast.message('找不到可還原的訂閱。')
+        toast.message('目前找不到可恢復的訂閱')
       }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '還原失敗')
+    } catch {
+      triggerV2Haptic('error')
+      toast.error('恢復購買失敗，請稍後再試')
     } finally {
       setRestoring(false)
     }
   }
 
+  function handleManageSubscription() {
+    if (isCapacitorNative()) {
+      openAppleSubscriptionManagement()
+      return
+    }
+    toast.message('請在 iPhone App 內或 App Store 管理訂閱')
+  }
+
   if (loading) {
     return (
       <div className={compact ? 'py-4 flex justify-center' : 'px-5 py-8 flex justify-center'}>
-        <Loader2 className="h-5 w-5 animate-spin" style={{ color: colors.text.tertiary }} />
+        <Loader2 className="h-5 w-5 animate-spin" style={{ color: BB_V2.text.muted }} />
       </div>
     )
   }
 
-  const content = isSubscribed ? (
-    <div className="space-y-4">
-      <p className="text-[15px] leading-relaxed" style={{ color: colors.text.primary }}>
-        {PREMIUM_SUBTITLE_SUBSCRIBED}
-      </p>
-      {subscription?.current_period_end && (
-        <p className="text-[13px]" style={{ color: colors.text.tertiary }}>
-          下次續訂 {new Date(subscription.current_period_end).toLocaleDateString('zh-TW')}
-        </p>
-      )}
-      <p className="text-[12px] leading-relaxed" style={{ color: colors.text.tertiary }}>
-        {PREMIUM_MANAGE_FOOTNOTE}
-      </p>
-      <button
-        type="button"
-        onClick={handleRestore}
-        disabled={restoring || !iapReady}
-        className="text-[14px] underline underline-offset-2 disabled:opacity-40"
-        style={{ color: colors.text.secondary }}
-      >
-        {restoring ? '還原中…' : '還原購買'}
-      </button>
-    </div>
-  ) : (
-    <div className="space-y-4">
-      {!compact && (
-        <p className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
-          {PREMIUM_BODY}
-        </p>
-      )}
-      {!compact && <FeatureList />}
-      {trialWhisper && (
-        <p className="text-[14px] leading-relaxed" style={{ color: colors.text.tertiary }}>
-          {trialWhisper}
-        </p>
-      )}
-      <p className="text-[16px] font-medium" style={{ color: colors.text.primary }}>
-        {APPLE_IAP_PRICE_LABEL}
-      </p>
-      <button
-        type="button"
-        onClick={handleSubscribe}
-        disabled={purchasing || !iapReady}
-        className="w-full py-3 rounded-xl text-[15px] font-medium disabled:opacity-40"
-        style={{ backgroundColor: colors.accent.action, color: colors.bg.elevated }}
-      >
-        {purchasing
-          ? purchaseStep
-            ? purchaseStepLabel[purchaseStep]
-            : '處理中…'
-          : iapReady
-            ? '訂閱 BetterBit Pro'
-            : '訂閱準備中'}
-      </button>
-      <button
-        type="button"
-        onClick={handleRestore}
-        disabled={restoring || !iapReady}
-        className="w-full py-3 rounded-xl text-[14px] font-medium disabled:opacity-40"
-        style={{ backgroundColor: colors.bg.muted, color: colors.text.secondary }}
-      >
-        {restoring ? '還原中…' : '還原購買'}
-      </button>
-      <p className="text-[12px] leading-relaxed" style={{ color: colors.text.tertiary }}>
-        {APPLE_IAP_LEGAL_DISCLOSURE}
-      </p>
-      {!compact && <LegalLinksRow />}
-    </div>
-  )
-
   if (compact) {
-    return <div className="px-4 py-4 space-y-4">{content}</div>
+    return (
+      <div className="px-4 py-4 space-y-3">
+        <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
+          {isSubscribed ? 'BetterBit Pro 使用中' : 'BetterBit Pro'}
+        </p>
+        <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+          {isSubscribed ? '你已解鎖完整減脂工具' : '解鎖完整減脂體驗與進階工具'}
+        </p>
+        <button
+          type="button"
+          onClick={() => router.push('/settings/premium')}
+          className="w-full py-3 rounded-full text-[14px]"
+          style={{ backgroundColor: BB_V2.bg.softGreen, color: BB_V2.accent.green, fontWeight: 600 }}
+        >
+          {isSubscribed ? '查看 Pro 會員' : '升級 BetterBit Pro'}
+        </button>
+      </div>
+    )
+  }
+
+  if (view === 'success') {
+    return (
+      <ProPaymentSuccessV2View
+        plan={purchasedPlan}
+        renewalDate={renewalDate}
+        onStart={() => router.push('/dashboard')}
+        onViewSubscription={() => setView('active')}
+        onRestore={() => void handleRestore()}
+        restoring={restoring}
+      />
+    )
+  }
+
+  if (view === 'active' && isSubscribed) {
+    return (
+      <ProActiveStatusV2View
+        plan={activePlan}
+        renewalDate={renewalDate}
+        paymentMethod="Apple ID 付款"
+        onBack={() => router.back()}
+        onManageSubscription={handleManageSubscription}
+      />
+    )
   }
 
   return (
-    <div className="min-h-screen pb-16" style={{ backgroundColor: colors.bg.canvas }}>
-      <SettingsSubpageHeader
-        title="BetterBit Pro"
-        subtitle={premiumPosture(access, isSubscribed)}
-      />
-        <div className="px-6 space-y-5">
-        {content}
-        <Link href="/dashboard" className="block text-[14px]" style={{ color: colors.text.tertiary }}>
-          回到 Today
-        </Link>
-      </div>
-    </div>
+    <ProSubscriptionV2View
+      access={access}
+      handlers={{
+        onSubscribe: plan => void handleSubscribe(plan),
+        onRestore: () => void handleRestore(),
+        purchasing,
+        restoring,
+        iapReady,
+        purchaseLabel: purchasing
+          ? purchaseStep
+            ? purchaseStepLabel[purchaseStep]
+            : '處理中…'
+          : undefined,
+      }}
+    />
   )
 }

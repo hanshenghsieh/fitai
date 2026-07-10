@@ -3,10 +3,15 @@
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { setAppScrollLocked } from '@/lib/today-actions'
+import { hydrateUiPreferencesFromStorage } from '@/lib/settings/ui-preferences-runtime'
 
 /** Remount page content on tab change and reset scroll so Today UI never bleeds into Week. */
 export default function AppRouteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+
+  useEffect(() => {
+    hydrateUiPreferencesFromStorage()
+  }, [])
 
   useEffect(() => {
     setAppScrollLocked(false)

@@ -6,11 +6,12 @@ import { Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { colors } from '@/lib/design-system'
+import { BB_V2 } from '@/lib/betterbit-v2'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import SettingsSection from './SettingsSection'
 import SettingsRow from './SettingsRow'
 
-export default function SettingsDeleteAccountSection() {
+export default function SettingsDeleteAccountSection({ compact = false }: { compact?: boolean }) {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
@@ -42,14 +43,25 @@ export default function SettingsDeleteAccountSection() {
 
   return (
     <>
-      <SettingsSection title="危險區域">
-        <SettingsRow
-          label="刪除帳號"
-          detail="永久刪除所有資料，無法復原。"
+      {compact ? (
+        <button
+          type="button"
           onClick={() => setConfirmOpen(true)}
-          last
-        />
-      </SettingsSection>
+          className="w-full py-2 text-[12px] text-center"
+          style={{ color: BB_V2.text.muted }}
+        >
+          刪除帳號
+        </button>
+      ) : (
+        <SettingsSection title="危險區域">
+          <SettingsRow
+            label="刪除帳號"
+            detail="永久刪除所有資料，無法復原。"
+            onClick={() => setConfirmOpen(true)}
+            last
+          />
+        </SettingsSection>
+      )}
 
       {confirmOpen && (
         <div

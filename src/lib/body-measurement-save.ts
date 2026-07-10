@@ -9,11 +9,11 @@ export interface SaveBodyMeasurementInput {
 }
 
 export function validateBodyMetrics(weight_kg: number, body_fat_pct?: number | null): string | null {
-  if (!Number.isFinite(weight_kg) || weight_kg < 20 || weight_kg > 300) {
-    return '體重請填 20–300 kg'
+  if (!Number.isFinite(weight_kg) || weight_kg < 30 || weight_kg > 250) {
+    return '體重請填 30–250 kg'
   }
-  if (body_fat_pct != null && (!Number.isFinite(body_fat_pct) || body_fat_pct < 1 || body_fat_pct > 70)) {
-    return '體脂請填 1–70 %'
+  if (body_fat_pct != null && (!Number.isFinite(body_fat_pct) || body_fat_pct < 3 || body_fat_pct > 70)) {
+    return '體脂請填 3–70 %'
   }
   return null
 }

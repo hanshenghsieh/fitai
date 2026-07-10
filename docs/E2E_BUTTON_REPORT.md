@@ -1,20 +1,20 @@
 # E2E Button Coverage Report
 
-**Coverage:** 64/65 (98%)
+**Coverage:** 52/65 (80%)
 
 | Button | File | Status |
 |--------|------|--------|
 | undefined | src/components/dashboard/today/TodayHeader.tsx | pass |
 | undefined | src/components/dashboard/today/TodayHeader.tsx | pass |
-| undefined | src/components/dashboard/v2/MealLogCard.tsx | pass |
+| undefined | src/components/dashboard/v2/MealLogCard.tsx | fail |
 | undefined | src/components/dashboard/TodayOS.tsx | fail |
 | undefined | src/components/dashboard/TodayOS.tsx | pass |
 | undefined | src/components/dashboard/TodayOS.tsx | pass |
+| undefined | src/components/dashboard/TodayOS.tsx | fail |
 | undefined | src/components/dashboard/TodayOS.tsx | pass |
-| undefined | src/components/dashboard/TodayOS.tsx | pass |
-| undefined | src/components/dashboard/TodayOS.tsx | pass |
-| undefined | src/components/dashboard/TodayOS.tsx | pass |
-| undefined | src/components/dashboard/DiceMealPreview.tsx | pass |
+| undefined | src/components/dashboard/TodayOS.tsx | fail |
+| undefined | src/components/dashboard/TodayOS.tsx | fail |
+| undefined | src/components/dashboard/DiceMealPreview.tsx | fail |
 | undefined | src/components/dashboard/today/TodayFoodMore.tsx | pass |
 | undefined | src/components/dashboard/today/TodayFoodMore.tsx | pass |
 | undefined | src/components/dashboard/today/TodayFoodMore.tsx | pass |
@@ -46,15 +46,15 @@
 | undefined | src/components/progress/ProgressWeightLog.tsx | pass |
 | undefined | src/components/progress/ProgressWeightLog.tsx | pass |
 | undefined | src/components/progress/ProgressWeightLog.tsx | pass |
-| undefined | src/components/progress/ProgressUpgradeHint.tsx | pass |
+| undefined | src/components/progress/ProgressUpgradeHint.tsx | fail |
 | undefined | src/components/settings/SettingsAccountSection.tsx | pass |
 | undefined | src/components/settings/SettingsAccountSection.tsx | pass |
-| undefined | src/components/settings/SettingsAccountSection.tsx | pass |
-| undefined | src/components/settings/SettingsAccountSection.tsx | pass |
+| undefined | src/components/settings/SettingsAccountSection.tsx | fail |
+| undefined | src/components/settings/SettingsAccountSection.tsx | fail |
 | undefined | src/components/settings/SettingsAccountSection.tsx | pass |
 | undefined | src/components/settings/SettingsAccountSection.tsx | pass |
 | undefined | src/components/settings/SettingsPremiumTeaser.tsx | pass |
-| undefined | src/components/settings/SettingsHealthSection.tsx | pass |
+| undefined | src/components/settings/SettingsHealthSection.tsx | fail |
 | undefined | src/components/settings/SettingsNotificationsSection.tsx | pass |
 | undefined | src/components/settings/SettingsPrivacySection.tsx | pass |
 | undefined | src/components/settings/SettingsPrivacySection.tsx | pass |
@@ -62,9 +62,9 @@
 | undefined | src/components/settings/SettingsDeleteAccountSection.tsx | pass |
 | undefined | src/components/settings/SettingsDeleteAccountSection.tsx | pass |
 | undefined | src/components/settings/SettingsDeleteAccountSection.tsx | pass |
-| undefined | src/components/premium/PremiumScreen.tsx | pass |
-| undefined | src/components/premium/PremiumScreen.tsx | pass |
-| undefined | src/components/premium/PremiumScreen.tsx | pass |
+| undefined | src/components/premium/PremiumScreen.tsx | fail |
+| undefined | src/components/premium/PremiumScreen.tsx | fail |
+| undefined | src/components/premium/PremiumScreen.tsx | fail |
 | undefined | src/app/login/page.tsx | pass |
 | undefined | src/app/login/page.tsx | pass |
 | undefined | src/app/register/page.tsx | pass |
