@@ -50,7 +50,7 @@
 
 ## Not started (per plan)
 
-- **1D-3+** Analysis / Settings client loaders
+- **1D-4** Settings client loader
 - **1E** Capacitor production local assets (no `server.url`)
 - **1F** Local cache abstraction
 - **1G** V2 skeletons / OfflineShell / testflight:prep update
@@ -114,4 +114,24 @@ Yes — revert branch `feature/local-hybrid-build16`; `main` / Build 15 unaffect
 
 ---
 
-**1D-3:** Analysis client loader (next).
+## Sub-phase 1D-3 — Analysis Client Loader (2026-07-10)
+
+| Item | Status |
+|------|--------|
+| `src/features/analysis/useAnalysisData.ts` | Done |
+| `src/features/analysis/analysis-data-loader.ts` | Done |
+| `src/features/analysis/AnalysisPageClient.tsx` | Done |
+| `AnalysisV2Skeleton` / error / refreshing | Done |
+| `progress/page.tsx` | Client-only, no RSC |
+| Week switch (prev / next arrows) | Client-side via hook |
+| Build / tests | PASS (698) |
+
+### Analysis RSC blockers
+
+**Before:** `force-dynamic`, async `ProgressContent`, `getAppUser`, server `loadAnalyticsBundle` + body measurements  
+**After (progress/page.tsx):** None — pure `'use client'`  
+**Remaining:** None in Analysis route
+
+---
+
+**1D-4:** Settings client loader (next).

@@ -35,6 +35,11 @@ interface Props {
   dayPlansByDate?: Record<string, AnalysisDayPlanHint>
   currentWeightKg?: number | null
   profileWeightKg?: number | null
+  anchorDate?: Date
+  onNavigateWeek?: (direction: -1 | 1) => void
+  canGoNextWeek?: boolean
+  onRefresh?: () => void
+  isWeekTransitioning?: boolean
 }
 
 function formatNum(n: number | null, digits = 1): string {
@@ -231,10 +236,16 @@ export default function AnalysisV2Screen({
   dayPlansByDate,
   currentWeightKg,
   profileWeightKg,
+  anchorDate: anchorDateProp,
+  onNavigateWeek,
+  canGoNextWeek: canGoNextWeekProp,
+  onRefresh,
+  isWeekTransitioning,
 }: Props) {
   const router = useRouter()
-  const [anchor, setAnchor] = useState(() => initialAnalysisWeekAnchor(todayStr))
+  const [internalAnchor, setInternalAnchor] = useState(() => initialAnalysisWeekAnchor(todayStr))
   const [isPending, startTransition] = useTransition()
+  const anchor = anchorDateProp ?? internalAnchor
 
   const weekView = useMemo(
     () =>
@@ -252,21 +263,30 @@ export default function AnalysisV2Screen({
   )
 
   const canPrev = true
-  const canNext = canNavigateAnalysisWeek(anchor, 1, todayStr)
+  const canNext = canGoNextWeekProp ?? canNavigateAnalysisWeek(anchor, 1, todayStr)
+  const isPendingState = isWeekTransitioning ?? isPending
 
   const navigateWeek = useCallback(
     (direction: -1 | 1) => {
-      if (direction === 1 && !canNavigateAnalysisWeek(anchor, 1, todayStr)) return
+      if (direction === 1 && !canNext) return
+      if (onNavigateWeek) {
+        onNavigateWeek(direction)
+        return
+      }
       startTransition(() => {
-        setAnchor(prev => shiftAnalysisWeekAnchor(prev, direction))
+        setInternalAnchor(prev => shiftAnalysisWeekAnchor(prev, direction))
       })
     },
-    [anchor, todayStr]
+    [canNext, onNavigateWeek]
   )
 
   const refresh = useCallback(() => {
+    if (onRefresh) {
+      onRefresh()
+      return
+    }
     router.refresh()
-  }, [router])
+  }, [onRefresh, router])
 
   return (
     <V2PageBackground className="v2-analysis-page">
@@ -278,7 +298,7 @@ export default function AnalysisV2Screen({
             type="button"
             className="v2-analysis-week-arrow touch-manipulation"
             onClick={() => navigateWeek(-1)}
-            disabled={!canPrev || isPending}
+            disabled={!canPrev || isPendingState}
             aria-label="前一週"
           >
             <ChevronLeft className="h-5 w-5" strokeWidth={2.2} />
@@ -291,14 +311,14 @@ export default function AnalysisV2Screen({
             type="button"
             className="v2-analysis-week-arrow touch-manipulation"
             onClick={() => navigateWeek(1)}
-            disabled={!canNext || isPending}
+            disabled={!canNext || isPendingState}
             aria-label="後一週"
           >
             <ChevronRight className="h-5 w-5" strokeWidth={2.2} />
           </button>
         </div>
 
-        <div className={`v2-analysis-body ${isPending ? 'v2-analysis-body--pending' : ''}`}>
+        <div className={`v2-analysis-body ${isPendingState ? 'v2-analysis-body--pending' : ''}`}>
           <div className="v2-analysis-summary-row">
             <SummaryCard
               icon={<Scale className="h-4 w-4" />}
