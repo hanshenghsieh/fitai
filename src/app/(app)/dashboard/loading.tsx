@@ -1,5 +1,5 @@
-import TodayDashboardSkeleton from '@/components/dashboard/TodayDashboardSkeleton'
+import TodayV2Skeleton from '@/features/today/TodayV2Skeleton'
 
 export default function DashboardLoading() {
-  return <TodayDashboardSkeleton />
+  return <TodayV2Skeleton />
 }

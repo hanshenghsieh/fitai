@@ -50,10 +50,30 @@
 
 ## Not started (per plan)
 
-- **1D** RSC → client loaders (Today, Record, Analysis, Settings)
+- **1D-2+** Record / Analysis / Settings client loaders
 - **1E** Capacitor production local assets (no `server.url`)
 - **1F** Local cache abstraction
 - **1G** V2 skeletons / OfflineShell / testflight:prep update
+
+---
+
+## Sub-phase 1D-1 — Today Client Loader (2026-07-10)
+
+| Item | Status |
+|------|--------|
+| `src/features/today/useTodayData.ts` | Done |
+| `src/features/today/today-data-loader.ts` | Done |
+| `src/features/today/TodayPageClient.tsx` | Done |
+| `TodayV2Skeleton` / error / refreshing | Done |
+| `dashboard/page.tsx` | Client-only, no RSC |
+| `GeneratePlanButton` | Uses `apiFetch` + refetch |
+| Build / tests | PASS |
+
+### Today RSC blockers
+
+**Before:** `force-dynamic`, `getAppUser`, `headers()`, server Supabase fetch, auto plan gen on server  
+**After (page.tsx):** None — pure `'use client'`  
+**Remaining:** `generate-plan-action.ts` (orphaned `'use server'`, unused) — safe to remove in cleanup
 
 ---
 
@@ -73,4 +93,4 @@ Yes — revert branch `feature/local-hybrid-build16`; `main` / Build 15 unaffect
 
 ## Next exact action
 
-**1D-1:** Today (`dashboard/page.tsx`) — client loader + session guard, keep server data parity.
+**1D-2:** Record (`weekly/page.tsx`) — client loader (after Today deploy validation).

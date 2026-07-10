@@ -9,9 +9,10 @@ import BBCard from '@/components/ui/BBCard'
 interface Props {
   failed?: boolean
   errorMessage?: string | null
+  onPlanGenerated?: () => void
 }
 
-export default function TodayPlanEmpty({ failed = false, errorMessage }: Props) {
+export default function TodayPlanEmpty({ failed = false, errorMessage, onPlanGenerated }: Props) {
   const line = failed
     ? { text: '沒送出去，再試一次。', subtext: errorMessage ?? '再試一次就好。', expression: 'normal' as const }
     : pickZaiJianLine('empty')
@@ -39,7 +40,7 @@ export default function TodayPlanEmpty({ failed = false, errorMessage }: Props) 
             showFace
             className="mx-auto max-w-xs"
           />
-          <GeneratePlanButton />
+          <GeneratePlanButton onPlanGenerated={onPlanGenerated} />
         </BBCard>
       </div>
     </div>
