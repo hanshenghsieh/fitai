@@ -197,4 +197,4 @@ All four primary app pages client-loader complete. Gate **PASS**.
 
 ---
 
-**Next:** **1E** — Local bundled assets / `output: export` / `server.url` removal feasibility (do not start until explicitly approved)
+**Next:** **1E-pre** — resolve export blockers (`(app)/layout` client gate, api/ build exclusion) → re-run `build:ios-local` → human approval → **1E-C** Capacitor (see `LOCAL_HYBRID_1E_FEASIBILITY.md`)

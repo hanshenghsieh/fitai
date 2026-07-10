@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:ios-local": "node scripts/build-ios-local.mjs",
     "start": "next start",
     "lint": "eslint",
     "import-menu": "node scripts/import-menu.js",
