@@ -1,9 +1,5 @@
-import WeekScreenSkeleton from '@/components/week/WeekScreenSkeleton'
+import RecordV2Skeleton from '@/features/record/RecordV2Skeleton'
 
 export default function WeeklyLoading() {
-  return (
-    <div className="pb-6">
-      <WeekScreenSkeleton />
-    </div>
-  )
+  return <RecordV2Skeleton />
 }

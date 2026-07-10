@@ -50,7 +50,7 @@
 
 ## Not started (per plan)
 
-- **1D-2+** Record / Analysis / Settings client loaders
+- **1D-3+** Analysis / Settings client loaders
 - **1E** Capacitor production local assets (no `server.url`)
 - **1F** Local cache abstraction
 - **1G** V2 skeletons / OfflineShell / testflight:prep update
@@ -93,4 +93,25 @@ Yes — revert branch `feature/local-hybrid-build16`; `main` / Build 15 unaffect
 
 ## Next exact action
 
-**1D-2:** Record (`weekly/page.tsx`) — client loader (after Today deploy validation).
+## Sub-phase 1D-2 — Record Client Loader (2026-07-10)
+
+| Item | Status |
+|------|--------|
+| `src/features/record/useRecordData.ts` | Done |
+| `src/features/record/record-data-loader.ts` | Done |
+| `src/features/record/RecordPageClient.tsx` | Done |
+| `RecordV2Skeleton` / error / refreshing | Done |
+| `weekly/page.tsx` | Client-only, no RSC |
+| Date switch (arrows / pill / score cards) | Client-side via hook |
+| Meal mutations | Unchanged; `onRefresh` replaces `router.refresh()` |
+| Build / tests | PASS (698) |
+
+### Record RSC blockers
+
+**Before:** `force-dynamic`, async `RecordContent`, `getAppUser`, server `loadAnalyticsBundle`  
+**After (weekly/page.tsx):** None — pure `'use client'`  
+**Remaining:** None in Record route
+
+---
+
+**1D-3:** Analysis client loader (next).

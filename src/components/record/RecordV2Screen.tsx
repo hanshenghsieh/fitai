@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useRef, useState, useTransition } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Calendar,
@@ -51,6 +51,10 @@ interface Props {
   fallbackTargets: RecordDayTargets
   calorieBankEnabled: boolean
   weeklyPlanId: string | null
+  selectedDate?: string
+  onSelectedDateChange?: (date: string) => void
+  onRefresh?: () => void
+  contentFadeKey?: string
 }
 
 type ActionTarget =
@@ -102,33 +106,51 @@ export default function RecordV2Screen({
   fallbackTargets,
   calorieBankEnabled,
   weeklyPlanId,
+  selectedDate: selectedDateProp,
+  onSelectedDateChange,
+  onRefresh,
+  contentFadeKey,
 }: Props) {
   const router = useRouter()
   const dateInputRef = useRef<HTMLInputElement>(null)
-  const [selectedDate, setSelectedDate] = useState(todayStr)
+  const [internalDate, setInternalDate] = useState(todayStr)
+  const selectedDate = selectedDateProp ?? internalDate
   const [foodLogs, setFoodLogs] = useState<FoodLogEntry[]>(() => extractAllFoodLogs(initialCheckins))
   const [fadeKey, setFadeKey] = useState(0)
   const [actionTarget, setActionTarget] = useState<ActionTarget | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ActionTarget | null>(null)
   const [pending, startTransition] = useTransition()
 
+  useEffect(() => {
+    setFoodLogs(extractAllFoodLogs(initialCheckins))
+  }, [initialCheckins])
+
+  const applySelectedDate = useCallback(
+    (date: string) => {
+      if (date > todayStr) return
+      if (onSelectedDateChange) {
+        onSelectedDateChange(date)
+      } else {
+        setInternalDate(date)
+        setFadeKey(k => k + 1)
+      }
+    },
+    [onSelectedDateChange, todayStr]
+  )
+
   const shiftDate = useCallback(
     (delta: number) => {
       const next = format(addDays(parseISO(selectedDate), delta), 'yyyy-MM-dd')
-      if (next > todayStr) return
-      setSelectedDate(next)
-      setFadeKey(k => k + 1)
+      applySelectedDate(next)
     },
-    [selectedDate, todayStr]
+    [applySelectedDate, selectedDate]
   )
 
   const pickDate = useCallback(
     (date: string) => {
-      if (date > todayStr) return
-      setSelectedDate(date)
-      setFadeKey(k => k + 1)
+      applySelectedDate(date)
     },
-    [todayStr]
+    [applySelectedDate]
   )
 
   const weekCards = useMemo(
@@ -177,9 +199,11 @@ export default function RecordV2Screen({
   const refreshAfterMutation = useCallback(
     (nextLogs: FoodLogEntry[]) => {
       setFoodLogs(nextLogs)
-      startTransition(() => router.refresh())
+      if (onRefresh) {
+        startTransition(() => onRefresh())
+      }
     },
-    [router]
+    [onRefresh]
   )
 
   const handleDelete = useCallback(async () => {
@@ -221,15 +245,19 @@ export default function RecordV2Screen({
           return merged
         })
         toast.message('餐點已新增')
-        startTransition(() => router.refresh())
+        if (onRefresh) {
+          startTransition(() => onRefresh())
+        }
       } catch {
         toast.error('複製失敗，請稍後再試')
       } finally {
         setActionTarget(null)
       }
     },
-    [router, weeklyPlanId]
+    [onRefresh, weeklyPlanId]
   )
+
+  const contentKey = contentFadeKey ?? String(fadeKey)
 
   const summaryScoreColor =
     dayView.summary.tone === 'high'
@@ -326,7 +354,7 @@ export default function RecordV2Screen({
           </div>
         </section>
 
-        <div key={fadeKey} className="v2-record-content-fade">
+        <div key={contentKey} className="v2-record-content-fade">
           {dayView.isFuture ? (
             <div className="v2-record-empty">
               <Leaf className="h-10 w-10" strokeWidth={1.5} style={{ color: '#2f8f35' }} />
