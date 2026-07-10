@@ -197,4 +197,4 @@ All four primary app pages client-loader complete. Gate **PASS**.
 
 ---
 
-**Next:** **1E-C** — Capacitor `webDir: out` + remove `server.url` (human approval required; Mac `cap sync`)
+**Next:** **1E-C complete** — Mac simulator validation + feature preview API URL → then **1F** local cache

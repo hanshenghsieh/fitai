@@ -286,6 +286,20 @@ Flight mode open app:
 
 `npm run build:ios-local` **PASS** — `out/` generated with all primary routes.
 
+### 1E-C — Capacitor local bundled assets (2026-07-10)
+
+| Item | Status |
+|------|--------|
+| `capacitor.config.ts` | `webDir: out`, no `server.url` (prod) |
+| Dev override | `CAPACITOR_DEV_SERVER_URL` only |
+| `npm run ios:local:prep` | Added |
+| `npx cap sync ios` | PASS — assets copied to `ios/App/App/public` |
+| `ios/.../capacitor.config.json` | No `server.url`, `webDir: out` |
+| Online smoke (Mac) | Pending — need feature Vercel preview URL |
+| Airplane smoke (Mac) | Pending — Mac Run required |
+
+Branch pushed: `feature/local-hybrid-build16` → await Vercel preview deploy for API_BASE_URL.
+
 ---
 
 ## 1E-Pre Blockers (original audit)

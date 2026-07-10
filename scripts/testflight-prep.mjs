@@ -43,12 +43,29 @@ function checkCapacitorServer() {
     return
   }
   const cfg = readFileSync(cfgPath, 'utf8')
-  if (!cfg.includes('betterbit.app')) {
-    console.warn('[WARN] capacitor.config.json server.url is not betterbit.app')
-    console.warn('       TestFlight loads remote web — deploy Vercel Production before testing.')
+  const isLocalHybrid = process.env.IOS_BUILD_TARGET?.trim() === 'local-hybrid'
+
+  if (isLocalHybrid) {
+    if (!cfg.includes('"webDir": "out"') && !cfg.includes('"webDir":"out"')) {
+      console.error('[FAIL] local-hybrid expects webDir "out" in capacitor.config.json')
+      process.exit(1)
+    }
+    if (/"url"\s*:\s*"https?:\/\//.test(cfg)) {
+      console.error('[FAIL] local-hybrid must NOT set server.url (remote wrapper)')
+      process.exit(1)
+    }
+    console.log('[OK] Capacitor local hybrid — webDir=out, no server.url')
   } else {
-    console.log('[OK] Capacitor server → betterbit.app')
+    if (cfg.includes('"webDir": "out"') || cfg.includes('"webDir":"out"')) {
+      console.warn('[WARN] webDir is out — Build 15 remote wrapper expects capacitor-www + server.url')
+    }
+    if (!cfg.includes('betterbit.app') && !/"url"\s*:/.test(cfg)) {
+      console.warn('[WARN] capacitor.config.json has no server.url — ensure this is intentional')
+    } else if (cfg.includes('betterbit.app')) {
+      console.log('[OK] Capacitor server → betterbit.app (Build 15 remote wrapper)')
+    }
   }
+
   if (!cfg.includes('PurchasesPlugin')) {
     console.error('[FAIL] capacitor.config.json missing PurchasesPlugin in packageClassList')
     console.error('       Run: npx cap sync ios — then archive again')
@@ -58,10 +75,13 @@ function checkCapacitorServer() {
 }
 
 console.log('=== TestFlight prep ===\n')
+console.log(`IOS_BUILD_TARGET=${process.env.IOS_BUILD_TARGET ?? '(default remote wrapper)'}`)
 
 checkFeatureFlag()
 checkIosBuildNumber()
 checkCapacitorServer()
+
+const isLocalHybrid = process.env.IOS_BUILD_TARGET?.trim() === 'local-hybrid'
 
 const buildEnv = {
   ...process.env,
@@ -69,7 +89,15 @@ const buildEnv = {
 }
 
 run('npm test')
-run('npm run build', { env: buildEnv })
+if (isLocalHybrid) {
+  if (!process.env.NEXT_PUBLIC_API_BASE_URL?.trim()) {
+    console.error('[FAIL] IOS_BUILD_TARGET=local-hybrid requires NEXT_PUBLIC_API_BASE_URL')
+    process.exit(1)
+  }
+  run('npm run build:ios-local', { env: buildEnv })
+} else {
+  run('npm run build', { env: buildEnv })
+}
 run('npm run cap:sync')
 
 console.log('\n=== Prep complete ===')

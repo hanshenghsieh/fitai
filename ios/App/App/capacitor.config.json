@@ -1,16 +1,7 @@
 {
 	"appId": "app.fitai.betterbit",
 	"appName": "再健一點",
-	"webDir": "capacitor-www",
-	"server": {
-		"url": "https://betterbit.app",
-		"cleartext": false,
-		"androidScheme": "https",
-		"allowNavigation": [
-			"betterbit.app",
-			"*.betterbit.app"
-		]
-	},
+	"webDir": "out",
 	"ios": {
 		"contentInset": "never",
 		"scrollEnabled": false,
@@ -28,6 +19,14 @@
 			"backgroundColor": "#FFF9F2",
 			"overlaysWebView": true
 		}
+	},
+	"server": {
+		"androidScheme": "https",
+		"allowNavigation": [
+			"betterbit.app",
+			"*.betterbit.app",
+			"*.vercel.app"
+		]
 	},
 	"packageClassList": [
 		"AppPlugin",
