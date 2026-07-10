@@ -273,7 +273,22 @@ Flight mode open app:
 
 ---
 
-## 1E-Pre Blockers (must fix before 1E-C)
+## 1E-Pre Blockers — RESOLVED (2026-07-10)
+
+| Priority | Blocker | Fix | Status |
+|----------|---------|-----|--------|
+| P0 | API routes vs export | Exclude to `.ios-local-staging/` during build | ✅ |
+| P0 | `(app)/layout.tsx` server auth | `AppAuthGuard` client guard | ✅ |
+| P1 | `page.tsx` server redirect | `RootRedirectClient` | ✅ |
+| P2 | `growth/*` | Excluded during ios-local build | ✅ |
+| P2 | `generate-plan-action.ts` | Deleted (no runtime refs) | ✅ |
+| P2 | `robots.ts` / `sitemap.ts` | `dynamic = 'force-static'` | ✅ |
+
+`npm run build:ios-local` **PASS** — `out/` generated with all primary routes.
+
+---
+
+## 1E-Pre Blockers (original audit)
 
 | Priority | Blocker | Fix |
 |----------|---------|-----|
@@ -303,9 +318,8 @@ Yes — revert `next.config.ts`, `package.json`, `scripts/build-ios-local.mjs` o
 
 ## Next Recommended Action
 
-1. **1E-pre** — Client `(app)/layout.tsx` auth gate + fix `page.tsx` redirect
-2. **Re-run `build:ios-local`** on Mac (or fix Windows copy-based api exclusion)
-3. **Verify `out/`** opens in browser with `NEXT_PUBLIC_API_BASE_URL` set
-4. **Human approval** → **1E-C** Capacitor `webDir: out`, remove `server.url`, Mac `cap sync`
+1. **Human approval** → **1E-C** Capacitor `webDir: out`, remove `server.url`, Mac `cap sync`
+2. **Verify `out/`** in browser via `npx serve out` with `NEXT_PUBLIC_API_BASE_URL` set
+3. TestFlight Build 16 on Mac
 
-**Do NOT:** merge main, production deploy, cap sync, remove server.url until 1E-pre complete and `out/` verified.
+**Do NOT:** merge main, production deploy until 1E-C validated.

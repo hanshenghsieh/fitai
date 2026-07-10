@@ -197,4 +197,4 @@ All four primary app pages client-loader complete. Gate **PASS**.
 
 ---
 
-**Next:** **1E-pre** — resolve export blockers (`(app)/layout` client gate, api/ build exclusion) → re-run `build:ios-local` → human approval → **1E-C** Capacitor (see `LOCAL_HYBRID_1E_FEASIBILITY.md`)
+**Next:** **1E-C** — Capacitor `webDir: out` + remove `server.url` (human approval required; Mac `cap sync`)
