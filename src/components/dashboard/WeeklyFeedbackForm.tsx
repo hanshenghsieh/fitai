@@ -44,7 +44,7 @@ export default function WeeklyFeedbackForm({ existing }: { existing: WeeklyFeedb
         }),
       })
       if (!res.ok) throw new Error('提交失敗')
-      toast.success('收到了。下週再健一點。')
+      toast.success('收到了。下週見。')
     } catch {
       toast.error('沒送出去，再試一次。')
     } finally {

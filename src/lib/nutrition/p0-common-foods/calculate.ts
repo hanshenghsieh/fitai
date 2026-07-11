@@ -58,6 +58,11 @@ export function defaultFoodRecordDraft(item: CommonFoodItem): FoodRecordDraft {
   }
 }
 
+function usesWeightBasedNutrition(item: CommonFoodItem, draft: FoodRecordDraft): boolean {
+  const unit = (draft.unit || item.defaultUnit || 'g').toLowerCase()
+  return unit === 'g' || unit === 'ml'
+}
+
 export function calculateFoodRecordNutrition(item: CommonFoodItem, draft: FoodRecordDraft): FoodRecordNutrition {
   const manual = draft.manualOverride
   if (manual?.calories != null || manual?.protein_g != null || manual?.fat_g != null || manual?.carbs_g != null) {
@@ -70,14 +75,21 @@ export function calculateFoodRecordNutrition(item: CommonFoodItem, draft: FoodRe
     }
   }
 
-  const baseAmount = item.baseAmount > 0 ? item.baseAmount : 100
-  const ratio = draft.amount / baseAmount
+  const weightBased = usesWeightBasedNutrition(item, draft)
+  const divisor = weightBased
+    ? item.baseAmount > 0
+      ? item.baseAmount
+      : 100
+    : item.normalAmount > 0
+      ? item.normalAmount
+      : 1
+  const ratio = draft.amount / divisor
 
-  let calories = item.kcalBase * ratio
-  let protein = item.proteinBase_g * ratio
-  let carbs = item.carbsBase_g * ratio
-  let fat = item.fatBase_g * ratio
-  let sodium = item.sodiumBase_mg * ratio
+  let calories = (weightBased ? item.kcalBase : item.kcalDefault) * ratio
+  let protein = (weightBased ? item.proteinBase_g : item.proteinDefault_g) * ratio
+  let carbs = (weightBased ? item.carbsBase_g : item.carbsDefault_g) * ratio
+  let fat = (weightBased ? item.fatBase_g : item.fatDefault_g) * ratio
+  let sodium = (weightBased ? item.sodiumBase_mg : item.sodiumDefault_mg) * ratio
 
   if (draft.oilLevel && item.supportsOilOptions) calories += OIL_KCAL[draft.oilLevel]
   if (draft.sauceLevel && item.supportsSauce) calories += SAUCE_KCAL[draft.sauceLevel]

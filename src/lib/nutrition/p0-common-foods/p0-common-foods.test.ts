@@ -119,6 +119,32 @@ describe('P0 nutrition calculate', () => {
     })
     assert.ok(large.calories > small.calories)
   })
+
+  it('布丁 uses per-serving nutrition, not per-100g', () => {
+    const item = getP0FoodById('bb_p0_0643')!
+    assert.equal(item.name, '布丁')
+    assert.equal(item.defaultUnit, '個/份')
+
+    const normal = calculateFoodRecordNutrition(item, defaultFoodRecordDraft(item))
+    assert.equal(normal.calories, 180)
+
+    const small = calculateFoodRecordNutrition(item, {
+      ...defaultFoodRecordDraft(item),
+      portionPreset: 'small',
+      amount: item.smallAmount,
+    })
+    assert.equal(small.calories, 90)
+  })
+
+  it('雞蛋 per-piece nutrition is not divided by 100g', () => {
+    const item = getP0FoodById('bb_p0_0230')!
+    assert.equal(item.defaultUnit, '顆')
+    const nutrition = calculateFoodRecordNutrition(item, {
+      ...defaultFoodRecordDraft(item),
+      sauceLevel: 'none',
+    })
+    assert.equal(nutrition.calories, 78)
+  })
 })
 
 describe('patchFoodRecordOnLog clears pending status', () => {

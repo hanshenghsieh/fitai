@@ -1,5 +1,5 @@
 /**
- * BetterBit companion lines — 500 gentle sentences.
+ * Betterbit companion lines — 500 gentle sentences.
  * No guilt, no punishment, no streak language.
  */
 

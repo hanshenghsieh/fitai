@@ -42,7 +42,7 @@ export default function ProActiveStatusV2View({
 }: Props) {
   return (
     <V2PageBackground>
-      <V2Header title="BetterBit Pro" variant="back" onBack={onBack} hideRight />
+      <V2Header title="Betterbit Pro" variant="back" onBack={onBack} hideRight />
 
       <V2PageEnter>
         <div

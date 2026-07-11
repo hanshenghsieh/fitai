@@ -554,8 +554,8 @@ export function V2VisualInterfacePreview() {
   return (
     <div className="v2-sv2-preview-card">
       <div className="v2-sv2-preview-mock">
-        <p className="text-[8px] font-bold text-center" style={{ color: '#123d24' }}>
-          BetterBit
+        <p className="text-[8px] font-bold text-center tracking-wide" style={{ color: '#123d24' }}>
+          BETTERBIT
         </p>
         <p className="text-[7px] text-center mt-1" style={{ color: '#7a807a' }}>
           蛋白質缺口

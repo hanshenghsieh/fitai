@@ -265,7 +265,7 @@ export default function GoalsSettingsView({ initial }: { initial: SettingsBundle
     <>
       <V2SettingsVisualShell
         title="目標設定"
-        subtitle="BetterBit 會依照你的目標，自動調整每日熱量、蛋白質與減脂節奏。"
+        subtitle="Betterbit 會依照你的目標，自動調整每日熱量、蛋白質與減脂節奏。"
         saveLabel="儲存目標設定"
         onSave={handleSave}
         saving={saving}

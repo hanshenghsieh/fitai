@@ -64,7 +64,7 @@ export default function CalorieBankDetailView({
         }}
       >
         <V2Header
-          title="BetterBit"
+          title="Betterbit"
           variant="back"
           onBack={onClose}
           rightSlot={

@@ -52,7 +52,7 @@ export default function LoginPage() {
             回來了。今天吃什麼？
           </h1>
           <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
-            登入 BetterBit，繼續你的減脂節奏。
+            登入 Betterbit，繼續你的減脂節奏。
           </p>
         </div>
         <V2Card padding="24px">

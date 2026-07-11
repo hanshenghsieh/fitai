@@ -13,8 +13,8 @@ export const PRO_PLAN_LABELS: Record<ProPlanId, string> = {
 }
 
 export const PRO_PLAN_FULL_LABELS: Record<ProPlanId, string> = {
-  monthly: 'BetterBit Pro 月繳方案',
-  yearly: 'BetterBit Pro 年繳方案',
+  monthly: 'Betterbit Pro 月繳方案',
+  yearly: 'Betterbit Pro 年繳方案',
 }
 
 export const PRO_PLAN_PRICES: Record<ProPlanId, string> = {

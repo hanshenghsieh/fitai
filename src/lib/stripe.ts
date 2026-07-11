@@ -10,7 +10,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 export const SUBSCRIPTION_PLANS = {
   monthly: {
-    name: '再健一點 月付方案',
+    name: 'Betterbit Pro 月付方案',
     amount: 50000, // $500 台幣，單位為最小單位（分）
     currency: 'twd',
     interval: 'month' as const,

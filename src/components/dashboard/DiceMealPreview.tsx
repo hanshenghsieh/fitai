@@ -130,7 +130,7 @@ export default function DiceMealPreview({
               style={{ color: TODAY.textSecondary, fontWeight: 400 }}
             >
               <Check className="h-4 w-4 shrink-0 mt-0.5" strokeWidth={TODAY.iconStroke} style={{ color: TODAY.mocha }} />
-              <span>這餐符合你今天的節奏，BetterBit 幫你把外食選擇算清楚。</span>
+              <span>這餐符合你今天的節奏，Betterbit 幫你把外食選擇算清楚。</span>
             </li>
           )}
         </ul>

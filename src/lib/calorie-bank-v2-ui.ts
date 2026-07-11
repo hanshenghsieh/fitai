@@ -126,7 +126,7 @@ function formatSpreadDayLabel(dayOffset: number): string {
 
 export function getDetailHeroCopy(bank: CalorieBankRow, miniState: CalorieBankMiniState): string {
   if (miniState === 'space') {
-    return '昨天吃得比目標少，BetterBit 已把熱量溫和回補到今天。照著調整後的預算吃，節奏會更穩定。'
+    return '昨天吃得比目標少，Betterbit 已把熱量溫和回補到今天。照著調整後的預算吃，節奏會更穩定。'
   }
   if (miniState === 'recovery' && bank.delta_kcal <= 0) {
     return '熱量銀行正在幫你平衡前幾天的節奏。今天的目標已微調，照著吃就好，減脂計畫不會中斷。'

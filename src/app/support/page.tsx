@@ -7,7 +7,7 @@ import { createPageMetadata } from '@/lib/site-metadata'
 
 export const metadata: Metadata = createPageMetadata({
   title: '支援',
-  description: 'BetterBit 客服與常見問題。',
+  description: 'Betterbit 客服與常見問題。',
   path: '/support',
 })
 
@@ -19,7 +19,7 @@ export default function SupportPage() {
           有問題、有想法，直接寫信。我們會看。
         </p>
         <a
-          href={`mailto:${SUPPORT_EMAIL}?subject=BetterBit 支援`}
+          href={`mailto:${SUPPORT_EMAIL}?subject=Betterbit 支援`}
           className="inline-flex items-center justify-center px-5 py-3 rounded-xl text-[15px] font-medium mt-2"
           style={{ backgroundColor: colors.accent.action, color: '#FFFDF9' }}
         >
@@ -55,7 +55,7 @@ export default function SupportPage() {
           <div>
             <p className="font-medium" style={{ color: colors.text.primary }}>這是醫療建議嗎？</p>
             <p>
-              不是。BetterBit 是生活參考工具，不能取代醫師或營養師的專業判斷。身體不適請先休息並就醫。
+              不是。Betterbit 是生活參考工具，不能取代醫師或營養師的專業判斷。身體不適請先休息並就醫。
             </p>
           </div>
         </div>

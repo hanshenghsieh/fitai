@@ -14,9 +14,9 @@ export interface HelpGuideItem {
 export const HELP_FAQ_ITEMS: HelpFaqItem[] = [
   {
     id: 'what-is-betterbit',
-    question: 'BetterBit 是什麼？',
+    question: 'Betterbit 是什麼？',
     answer:
-      'BetterBit 是為外食族設計的 AI 減脂助手，幫你記錄餐點、估算熱量與營養素，並依照你的目標調整每日計畫。',
+      'Betterbit 是為外食族設計的 AI 減脂助手，幫你記錄餐點、估算熱量與營養素，並依照你的目標調整每日計畫。',
   },
   {
     id: 'log-meals',
@@ -28,7 +28,7 @@ export const HELP_FAQ_ITEMS: HelpFaqItem[] = [
     id: 'calorie-accuracy',
     question: '熱量計算準確嗎？',
     answer:
-      'BetterBit 會依照食物資料、品牌菜單與 AI 估算提供參考值。實際熱量可能因份量、料理方式與醬料不同而有差異。',
+      'Betterbit 會依照食物資料、品牌菜單與 AI 估算提供參考值。實際熱量可能因份量、料理方式與醬料不同而有差異。',
   },
   {
     id: 'set-goals',
@@ -44,12 +44,12 @@ export const HELP_FAQ_ITEMS: HelpFaqItem[] = [
     id: 'sync-data',
     question: '如何同步資料？',
     answer:
-      '登入同一個帳號後，BetterBit 會同步你的主要紀錄與設定。若資料沒有立即更新，請重新整理或稍後再試。',
+      '登入同一個帳號後，Betterbit 會同步你的主要紀錄與設定。若資料沒有立即更新，請重新整理或稍後再試。',
   },
   {
     id: 'cancel-pro',
     question: '如何取消 Pro 訂閱？',
-    answer: 'iPhone 使用者可以到 App Store > Apple ID > 訂閱項目中管理或取消 BetterBit Pro。',
+    answer: 'iPhone 使用者可以到 App Store > Apple ID > 訂閱項目中管理或取消 Betterbit Pro。',
   },
   {
     id: 'contact-info',

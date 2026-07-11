@@ -178,7 +178,7 @@ export function formatAutoResolvedNote(
   resolvedAt: Date = new Date()
 ): string {
   const dateStr = format(resolvedAt, 'yyyy/MM/dd')
-  return `此筆原為文字紀錄。BetterBit 於 ${dateStr} 根據可信資料庫自動補齊營養資料：${matchedItemName}。來源：${sourceName}。若不符合實際餐點，可手動修改。`
+  return `此筆原為文字紀錄。Betterbit 於 ${dateStr} 根據可信資料庫自動補齊營養資料：${matchedItemName}。來源：${sourceName}。若不符合實際餐點，可手動修改。`
 }
 
 export function applyAutoResolveToLog(

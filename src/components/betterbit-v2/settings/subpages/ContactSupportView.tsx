@@ -47,7 +47,7 @@ export default function ContactSupportView({ initial }: { initial: SettingsBundl
   }
 
   function handleEmailSupport() {
-    window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('BetterBit 客服')}`
+    window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Betterbit 客服')}`
   }
 
   function handleOnlineSupport() {
@@ -68,7 +68,7 @@ export default function ContactSupportView({ initial }: { initial: SettingsBundl
     setSending(true)
     try {
       const subject = encodeURIComponent(
-        `BetterBit 客服 - ${ISSUE_TYPES.find(t => t.value === issueType)?.label ?? '其他'}`
+        `Betterbit 客服 - ${ISSUE_TYPES.find(t => t.value === issueType)?.label ?? '其他'}`
       )
       const body = encodeURIComponent(
         `問題類型: ${labelOf(ISSUE_TYPES, issueType)}\nEmail: ${email.trim()}\n\n${trimmed}\n\n---\n${appInfo}`

@@ -26,7 +26,7 @@ export function buildCalorieBankExplainer(
   const recovery = isRecoveryActive(bank)
 
   const intro =
-    '熱量、蛋白質、脂肪、碳水任一項超過今日計畫，BetterBit 會啟用熱量銀行，把差額分散到接下來幾天——刪除餐點、數值回到計畫內，當天觸發的銀行會自動撤銷。'
+    '熱量、蛋白質、脂肪、碳水任一項超過今日計畫，Betterbit 會啟用熱量銀行，把差額分散到接下來幾天——刪除餐點、數值回到計畫內，當天觸發的銀行會自動撤銷。'
 
   let reasonBody = '今天的目標已依你最近的飲食節奏微調。'
   if (diff > 0) {

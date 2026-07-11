@@ -35,7 +35,7 @@ export function getCalorieBankBannerCopy(
     return {
       title,
       body: `今天目標已微調為 ${adjusted.toLocaleString()} kcal（原 ${normal.toLocaleString()}）`,
-      subtext: `昨天少吃了 ${Math.abs(diff).toLocaleString()} kcal，BetterBit 幫你把熱量分散回補`,
+      subtext: `昨天少吃了 ${Math.abs(diff).toLocaleString()} kcal，Betterbit 幫你把熱量分散回補`,
     }
   }
 
@@ -44,7 +44,7 @@ export function getCalorieBankBannerCopy(
     return {
       title,
       body: `今天目標為 ${adjusted.toLocaleString()} kcal（原 ${normal.toLocaleString()}）`,
-      subtext: hint || '不用重來，BetterBit 幫你把熱量分散平衡',
+      subtext: hint || '不用重來，Betterbit 幫你把熱量分散平衡',
     }
   }
 

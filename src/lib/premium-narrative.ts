@@ -4,14 +4,14 @@ import type { AccessStatus } from '@/lib/subscription-access'
 import { SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
 
 export function premiumPosture(access: AccessStatus, isSubscribed: boolean): string {
-  if (isSubscribed) return 'BetterBit Pro 使用中'
+  if (isSubscribed) return 'Betterbit Pro 使用中'
   return SUBSCRIPTION_PRICE_LABEL
 }
 
 export const PREMIUM_SUBTITLE_SUBSCRIBED = '你已解鎖完整減脂工具。'
 
 export const PREMIUM_BODY =
-  'BetterBit Pro 幫你把外食選擇算清楚——完整飲食記錄、AI 下一餐推薦、每週分析與熱量銀行，陪你穩定減脂。'
+  'Betterbit Pro 幫你把外食選擇算清楚——完整飲食記錄、AI 下一餐推薦、每週分析與熱量銀行，陪你穩定減脂。'
 
 export const PREMIUM_FEATURES = [
   '無限飲食記錄',

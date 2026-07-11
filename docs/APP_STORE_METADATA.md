@@ -1,4 +1,4 @@
-# BetterBit App Store 文案（Metadata）
+# Betterbit App Store 文案（Metadata）
 
 **建立日期：** 2026-06-18  
 **Primary Language：** Chinese (Traditional) — 台灣  
@@ -30,16 +30,16 @@
 **建議（30 字元內）：**
 
 ```
-再健一點
+Betterbit
 ```
 
-**備選（若需英文辨識）：**
+**備選：**
 
 ```
-BetterBit 再健一點
+BETTERBIT
 ```
 
-> App Store 顯示名稱與 iOS 主畫面名稱需一致策略。目前 Capacitor `appName` 為「再健一點」。
+> App Store 顯示名稱與 iOS 主畫面名稱需一致。Capacitor `appName` 與 `CFBundleDisplayName` 均為 **Betterbit**。
 
 ---
 
@@ -64,7 +64,7 @@ BetterBit 再健一點
 **繁中（App Store 主描述）：**
 
 ```
-再健一點（BetterBit）幫你算好該吃多少、動多少，照著做就好。
+Betterbit 幫你算好該吃多少、動多少，照著做就好。
 
 你不用自己查熱量、排菜單、想運動課表。輸入體態與生活型態，系統依 TDEE 與目標，自動生成每日三餐與運動計畫，並依你的回饋每週調整。
 
@@ -85,7 +85,7 @@ NASA inside — 精準在背後運算。
 A friend outside — 外面像朋友，不像教練。
 
 【重要說明】
-再健一點提供生活參考與營養估算，不是醫療建議。身體不適請先休息，並諮詢合格醫療人員。
+Betterbit 提供生活參考與營養估算，不是醫療建議。身體不適請先休息，並諮詢合格醫療人員。
 
 【訂閱】
 Premium 功能將於 App 內另行開放。目前 iOS 版以完整試用體驗為主。
@@ -113,7 +113,7 @@ https://betterbit.app/support
 **v1.0.0 首次上架：**
 
 ```
-BetterBit 正式上線。
+Betterbit 正式上線。
 
 • 個人化週計畫 — 依你的目標自動排三餐與運動
 • 今日記錄 — 骰子選餐、文字、拍照 AI，不用填表
@@ -130,7 +130,7 @@ BetterBit 正式上線。
 • 修正問題，提升穩定性
 • 改善今日記錄與本週計畫體驗
 
-感謝使用再健一點。
+感謝使用 Betterbit。
 ```
 
 ---
@@ -156,7 +156,7 @@ BetterBit 正式上線。
 **建議以英文提供給 Apple 審核團隊（P0 · 方案 C）：**
 
 ```
-BetterBit (再健一點) is a personalized meal & workout planner for Traditional Chinese users in Taiwan.
+Betterbit is a personalized meal & workout planner for Traditional Chinese users in Taiwan. Operated by 再健一點有限公司.
 
 TEST ACCOUNT:
 Email: [provide demo account]
@@ -181,7 +181,7 @@ Privacy: https://betterbit.app/privacy
 Terms: https://betterbit.app/terms
 Support: https://betterbit.app/support
 
-Thank you for reviewing BetterBit.
+Thank you for reviewing Betterbit.
 ```
 
 > **提交前必做：** 填入真實測試帳號；確認 Vercel Production 已設 `NEXT_PUBLIC_APP_STORE_SAFE_MODE=true`。
@@ -215,7 +215,7 @@ Thank you for reviewing BetterBit.
 
 ## P0 — 必須
 
-- [ ] App Name 確定（再健一點 / BetterBit）
+- [ ] App Name 確定（Betterbit）
 - [ ] Subtitle
 - [ ] Description（繁中）
 - [ ] Keywords

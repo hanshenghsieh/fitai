@@ -1,7 +1,7 @@
 {
   "id": "https://betterbit.app/",
-  "name": "再健一點",
-  "short_name": "再健一點",
+  "name": "Betterbit",
+  "short_name": "Betterbit",
   "description": "安靜陪伴你的健康節奏",
   "start_url": "/dashboard",
   "scope": "https://betterbit.app/",

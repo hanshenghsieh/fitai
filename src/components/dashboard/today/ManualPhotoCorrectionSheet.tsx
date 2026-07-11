@@ -354,7 +354,7 @@ export default function ManualPhotoCorrectionSheet({
               微調這餐
             </h2>
             <p className="text-[13px] mt-1 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-              這餐看起來像這樣，你可以微調一下。修正後會讓 BetterBit 算得更準。
+              這餐看起來像這樣，你可以微調一下。修正後會讓 Betterbit 算得更準。
             </p>
           </div>
           <button type="button" onClick={onClose} className="p-1.5" aria-label="關閉">
@@ -483,7 +483,7 @@ export default function ManualPhotoCorrectionSheet({
               {homeDraft && homeWeightLines.length > 0 ? (
                 <>
                   <p className="text-[14px] leading-relaxed" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
-                    BetterBit 已先幫你估一版，不確定的話直接儲存即可。
+                    Betterbit 已先幫你估一版，不確定的話直接儲存即可。
                   </p>
                   <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
                     覺得飯比較多？只要按飯多一點。不用知道幾克，系統會自動換算。

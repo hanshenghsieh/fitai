@@ -11,7 +11,7 @@ interface BBCardProps {
   onClick?: () => void
 }
 
-/** Unified BetterBit card — white, 28px radius, soft shadow, 24px padding */
+/** Unified Betterbit card — white, 28px radius, soft shadow, 24px padding */
 export default function BBCard({
   children,
   className = '',

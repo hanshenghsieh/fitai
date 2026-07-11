@@ -38,18 +38,18 @@ export default function AboutBetterBitView({ appVersion }: { appVersion: string 
   }, [])
 
   const thirdPartyBody = onIos
-    ? 'BetterBit 使用以下第三方服務：\n\n• Supabase — 帳號與資料同步\n• RevenueCat — 訂閱權益管理\n• Apple In-App Purchase — iOS App 內付款\n• Vercel — 應用部署與 API'
-    : 'BetterBit 使用以下第三方服務：\n\n• Supabase — 帳號與資料同步\n• RevenueCat — 訂閱權益管理\n• Apple In-App Purchase — iOS App 內付款\n• Vercel — 應用部署與 API\n• Stripe — Web 付款使用'
+    ? 'Betterbit 使用以下第三方服務：\n\n• Supabase — 帳號與資料同步\n• RevenueCat — 訂閱權益管理\n• Apple In-App Purchase — iOS App 內付款\n• Vercel — 應用部署與 API'
+    : 'Betterbit 使用以下第三方服務：\n\n• Supabase — 帳號與資料同步\n• RevenueCat — 訂閱權益管理\n• Apple In-App Purchase — iOS App 內付款\n• Vercel — 應用部署與 API\n• Stripe — Web 付款使用'
 
   return (
     <>
-      <V2SupportPageShell title="關於 BetterBit" subtitle="版本資訊與開發團隊">
+      <V2SupportPageShell title="關於 Betterbit" subtitle="版本資訊與開發團隊">
         <section className="v2-sv2-card v2-sv2-about-brand" style={{ animationDelay: '0ms' }}>
           <div className="v2-sv2-about-logo">
             <Heart className="h-8 w-8 text-white" fill="white" />
           </div>
-          <h2 className="text-[22px] font-bold" style={{ color: '#123d24' }}>
-            BetterBit
+          <h2 className="text-[22px] font-bold tracking-wide" style={{ color: '#123d24' }}>
+            BETTERBIT
           </h2>
           <p className="text-[15px] font-semibold mt-1" style={{ color: '#2f8f35' }}>
             {versionLabel}
@@ -67,7 +67,7 @@ export default function AboutBetterBitView({ appVersion }: { appVersion: string 
             onClick={() =>
               setModal({
                 title: '版本資訊',
-                body: `BetterBit ${versionLabel}\n\n版本號來自 package.json，build 號可透過 NEXT_PUBLIC_APP_BUILD 設定。`,
+                body: `Betterbit ${versionLabel}\n\n版本號來自 package.json，build 號可透過 NEXT_PUBLIC_APP_BUILD 設定。`,
               })
             }
           />
@@ -87,7 +87,7 @@ export default function AboutBetterBitView({ appVersion }: { appVersion: string 
             onClick={() =>
               setModal({
                 title: '開源聲明',
-                body: 'BetterBit 使用多項開源軟體與函式庫，包括 Next.js、React、Supabase Client 等。完整清單將於後續版本提供。',
+                body: 'Betterbit 使用多項開源軟體與函式庫，包括 Next.js、React、Supabase Client 等。完整清單將於後續版本提供。',
               })
             }
           />
@@ -102,7 +102,7 @@ export default function AboutBetterBitView({ appVersion }: { appVersion: string 
             onClick={() =>
               setModal({
                 title: '授權資訊',
-                body: 'BetterBit 使用之第三方 SDK 與服務，依各自授權條款使用。',
+                body: 'Betterbit 使用之第三方 SDK 與服務，依各自授權條款使用。',
               })
             }
           />
@@ -110,10 +110,10 @@ export default function AboutBetterBitView({ appVersion }: { appVersion: string 
 
         <V2SettingsVisualCard icon={<Users className="h-4 w-4" />} title="開發團隊" staggerIndex={2}>
           {[
-            { icon: <Users className="h-4 w-4" />, title: 'BetterBit 團隊', subtitle: '產品設計與開發' },
-            { icon: <User className="h-4 w-4" />, title: '產品經理', subtitle: 'BetterBit Product Team' },
-            { icon: <Paintbrush className="h-4 w-4" />, title: 'UI/UX 設計', subtitle: 'BetterBit Design Team' },
-            { icon: <Terminal className="h-4 w-4" />, title: '工程團隊', subtitle: 'BetterBit Development Team' },
+            { icon: <Users className="h-4 w-4" />, title: 'Betterbit 團隊', subtitle: '產品設計與開發' },
+            { icon: <User className="h-4 w-4" />, title: '產品經理', subtitle: 'Betterbit Product Team' },
+            { icon: <Paintbrush className="h-4 w-4" />, title: 'UI/UX 設計', subtitle: 'Betterbit Design Team' },
+            { icon: <Terminal className="h-4 w-4" />, title: '工程團隊', subtitle: 'Betterbit Development Team' },
           ].map(row => (
             <div
               key={row.title}
@@ -133,7 +133,7 @@ export default function AboutBetterBitView({ appVersion }: { appVersion: string 
         </V2SettingsVisualCard>
 
         <footer className="v2-sv2-about-footer">
-          <p>© 2025 BetterBit. All rights reserved.</p>
+          <p>© 2025 Betterbit. All rights reserved.</p>
           <p className="mt-1">Made with 💚 for your better life.</p>
         </footer>
       </V2SupportPageShell>

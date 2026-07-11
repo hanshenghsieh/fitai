@@ -57,7 +57,7 @@ const CARD_DENSITY = [
 ]
 
 const THEME_COLORS = [
-  { value: 'betterbit_green', label: 'BetterBit Green' },
+  { value: 'betterbit_green', label: 'Betterbit Green' },
   { value: 'fresh_green', label: '清新綠' },
   { value: 'deep_forest', label: '深森林' },
   { value: 'cream_white', label: '奶油白' },
@@ -105,7 +105,7 @@ export default function InterfaceSettingsView({ initial }: { initial: SettingsBu
     <>
       <V2SettingsVisualShell
         title="介面設定"
-        subtitle="調整 BetterBit 的顯示方式，讓你看得更舒服。"
+        subtitle="調整 Betterbit 的顯示方式，讓你看得更舒服。"
         saveLabel="儲存介面設定"
         onSave={handleSave}
         saving={saving}
@@ -183,7 +183,7 @@ export default function InterfaceSettingsView({ initial }: { initial: SettingsBu
               openPicker({
                 key: 'theme',
                 title: '主題色調',
-                options: [{ value: 'betterbit_green', label: 'BetterBit Green' }],
+                options: [{ value: 'betterbit_green', label: 'Betterbit Green' }],
                 value: ui.theme_color ?? 'betterbit_green',
                 onSelect: v => setField('theme_color', v as UiSettings['theme_color']),
               })

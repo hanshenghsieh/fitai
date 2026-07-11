@@ -38,7 +38,7 @@ export default function SettingsPremiumTeaser({ access }: Props) {
   const description = bypassPaywall
     ? '封測期間開放完整功能。'
     : isSubscribed
-      ? 'BetterBit Pro 使用中'
+      ? 'Betterbit Pro 使用中'
       : appleIap
         ? '透過 App Store 訂閱解鎖完整工具'
         : '解鎖完整外食減脂工具'
@@ -54,10 +54,10 @@ export default function SettingsPremiumTeaser({ access }: Props) {
       <SettingsRow
         label={
           bypassPaywall
-            ? 'BetterBit Pro'
+            ? 'Betterbit Pro'
             : isSubscribed
-              ? 'BetterBit Pro 使用中'
-              : 'BetterBit Pro'
+              ? 'Betterbit Pro 使用中'
+              : 'Betterbit Pro'
         }
         detail={detail}
         onClick={() => router.push('/settings/premium')}

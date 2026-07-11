@@ -456,7 +456,7 @@ function StepFinish({
       <ul className="text-[13px] space-y-1.5 px-1" style={{ color: BB_V2.text.secondary }}>
         <li>· 完成後直接進 Today，從第一餐開始</li>
         <li>· 不用補過去，記錄下一餐就好</li>
-        <li>· 不知道吃什麼，可以讓 BetterBit 幫你算</li>
+        <li>· 不知道吃什麼，可以讓 Betterbit 幫你算</li>
       </ul>
 
       <label
@@ -471,7 +471,7 @@ function StepFinish({
           style={{ accentColor: BB_V2.accent.orange }}
         />
         <span className="text-[12px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-          BetterBit 提供健康與飲食輔助建議，不能取代醫師、營養師或其他專業醫療建議。食物辨識與熱量估算僅供參考。
+          Betterbit 提供健康與飲食輔助建議，不能取代醫師、營養師或其他專業醫療建議。食物辨識與熱量估算僅供參考。
           <span className="block mt-2 font-medium" style={{ color: BB_V2.text.primary }}>
             我了解
           </span>

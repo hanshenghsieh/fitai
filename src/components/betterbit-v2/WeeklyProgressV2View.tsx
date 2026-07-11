@@ -7,7 +7,7 @@ import V2Header from './V2Header'
 /** Shell wrapper for week / progress analytics pages */
 export default function WeeklyProgressV2View({
   children,
-  title = 'BetterBit',
+  title = 'Betterbit',
 }: {
   children: ReactNode
   title?: string

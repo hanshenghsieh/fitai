@@ -398,7 +398,7 @@ function AccuracyConfirmSection({
           這餐我先幫你記下來
         </p>
         <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-          {accuracy.ui_message}不確定的項目會先標成估算，修正後 BetterBit 會算得更準。
+          {accuracy.ui_message}不確定的項目會先標成估算，修正後 Betterbit 會算得更準。
         </p>
       </div>
     )

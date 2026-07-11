@@ -165,7 +165,7 @@ export default function DietPreferencesSettingsView({ initial }: { initial: Sett
     <>
       <V2SettingsVisualShell
         title="飲食偏好"
-        subtitle="告訴 BetterBit 你喜歡什麼、不吃什麼，推薦會更貼近你的生活。"
+        subtitle="告訴 Betterbit 你喜歡什麼、不吃什麼，推薦會更貼近你的生活。"
         saveLabel="儲存飲食偏好"
         onSave={handleSave}
         saving={saving}
@@ -173,7 +173,7 @@ export default function DietPreferencesSettingsView({ initial }: { initial: Sett
         isDirty={isDirty}
         footerExtra={
           <V2VisualInfoBar>
-            BetterBit 會優先避開你不喜歡或不吃的選項，讓推薦更貼近你的生活。
+            Betterbit 會優先避開你不喜歡或不吃的選項，讓推薦更貼近你的生活。
           </V2VisualInfoBar>
         }
       >

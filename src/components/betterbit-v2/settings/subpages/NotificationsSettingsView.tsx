@@ -126,7 +126,7 @@ export default function NotificationsSettingsView({ initial }: { initial: Settin
     <>
       <V2SettingsVisualShell
         title="通知設定"
-        subtitle="選擇你想收到的提醒，讓 BetterBit 在剛好的時間幫你一把。"
+        subtitle="選擇你想收到的提醒，讓 Betterbit 在剛好的時間幫你一把。"
         saveLabel="儲存通知設定"
         onSave={handleSave}
         saving={saving}

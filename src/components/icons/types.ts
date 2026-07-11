@@ -1,4 +1,4 @@
-/** BetterBit icon semantic names — single registry */
+/** Betterbit icon semantic names — single registry */
 export type BBIconName =
   | 'calories'
   | 'protein'

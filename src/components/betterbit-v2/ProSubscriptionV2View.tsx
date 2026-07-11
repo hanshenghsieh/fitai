@@ -65,7 +65,7 @@ export default function ProSubscriptionV2View({ access, handlers, showClose = tr
   return (
     <V2PageBackground>
       <V2Header
-        title="BetterBit Pro"
+        title="Betterbit Pro"
         variant={showClose ? 'close' : 'back'}
         onClose={showClose ? () => router.back() : undefined}
         onBack={!showClose ? () => router.back() : undefined}
@@ -112,7 +112,7 @@ export default function ProSubscriptionV2View({ access, handlers, showClose = tr
 
           <div className="space-y-2.5">
             <p className="text-[16px] px-1" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
-              BetterBit Pro 專屬功能
+              Betterbit Pro 專屬功能
             </p>
             {PRO_V2_FEATURES.map(({ icon: Icon, title, subtitle }) => (
               <V2FeatureRow
@@ -131,7 +131,7 @@ export default function ProSubscriptionV2View({ access, handlers, showClose = tr
               loading={purchasing}
               loadingText={purchaseLabel}
             >
-              {iapReady ? '立即升級 BetterBit Pro' : '訂閱準備中'}
+              {iapReady ? '立即升級 Betterbit Pro' : '訂閱準備中'}
             </V2PrimaryButton>
 
             <p className="text-[11px] text-center leading-relaxed px-2" style={{ color: BB_V2.text.muted }}>

@@ -46,7 +46,7 @@ export default function Day1GuideBanner({ onDismiss }: Props) {
       <ul className="mt-2 space-y-1.5 text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
         <li>· 先從今天第一餐開始</li>
         <li>· 不用補過去，記錄下一餐就好</li>
-        <li>· 不知道吃什麼，可以讓 BetterBit 幫你算</li>
+        <li>· 不知道吃什麼，可以讓 Betterbit 幫你算</li>
       </ul>
     </BBCard>
   )

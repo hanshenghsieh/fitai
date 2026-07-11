@@ -89,7 +89,7 @@ export default function NutritionConfirmationSheet({
                   {isP0
                     ? '我們在通用食材庫找到這項，填份量就能估算。'
                     : canUsePortionFlow
-                      ? 'BetterBit 已先幫你估一版，不確定的話直接儲存即可。'
+                      ? 'Betterbit 已先幫你估一版，不確定的話直接儲存即可。'
                       : '目前沒有可信營養資料。你可以建立估算餐點，或選相近品項。'}
                 </p>
               </div>
@@ -213,7 +213,7 @@ export default function NutritionConfirmationSheet({
         mealLabel={mealLabel}
         log={log}
         title={isP0 ? '填份量算營養' : '修正餐點'}
-        subtitle={isP0 ? undefined : 'BetterBit 已先幫你估一版，不確定的話直接儲存即可。'}
+        subtitle={isP0 ? undefined : 'Betterbit 已先幫你估一版，不確定的話直接儲存即可。'}
         saveLabel="儲存並計入今日"
         onClose={() => setPortionOpen(false)}
         onFoodRecordSave={(item, draft) => {

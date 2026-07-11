@@ -82,7 +82,7 @@ export function listenForPushMessages() {
     onMessage(msg, (payload) => {
       console.log('📲 Message received:', payload)
       if (payload.notification) {
-        new Notification(payload.notification.title || '再健一點', {
+        new Notification(payload.notification.title || 'Betterbit', {
           body: payload.notification.body,
           icon: payload.notification.icon,
           tag: 'fitai-notification',

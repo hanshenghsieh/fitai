@@ -2,7 +2,7 @@ import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import { isRecoveryActive } from '@/lib/engines/calorie-bank-engine'
 import type { ZaiJianLine } from '@/lib/copy/zaijian'
 
-/** BetterBit recovery copy — no guilt, no debt language. */
+/** Betterbit recovery copy — no guilt, no debt language. */
 export function getRecoveryPostureLine(
   bank: CalorieBankRow | null | undefined
 ): ZaiJianLine | null {

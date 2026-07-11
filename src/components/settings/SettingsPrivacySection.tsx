@@ -13,7 +13,7 @@ export default function SettingsPrivacySection() {
       />
       <SettingsRow
         label="健康參考"
-        detail="BetterBit 提供生活參考，不是醫療建議。不舒服先休息。"
+        detail="Betterbit 提供生活參考，不是醫療建議。不舒服先休息。"
       />
       <SettingsRow
         label="隱私權政策"

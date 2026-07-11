@@ -13,7 +13,7 @@ export const copy = {
   rollsRemaining: (n: number) => (n > 0 ? `還能換 ${n} 次` : ''),
   rollsExhausted: '照著目前這組吃就好',
   completeToday: '今天做得很好',
-  overeat: '沒關係，明天再健一點。',
+  overeat: '沒關係，明天繼續就好。',
   restDay: '今天好好休息',
   weekSteady: '本週穩定前進',
   goalDistance: (kg: number) => `距離目標還差 ${kg.toFixed(1)} kg`,

@@ -23,7 +23,7 @@ const devServerUrl =
 
 const config: CapacitorConfig = {
   appId: 'app.fitai.betterbit',
-  appName: '再健一點',
+  appName: 'Betterbit',
   webDir: 'out',
   ios: {
     contentInset: 'never',

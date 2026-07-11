@@ -388,7 +388,7 @@ export default function AnalyticsScreen({
         />
         <EmptyStateCard
           title="飲食紀錄還不夠"
-          reason={summary.insufficient_reason ?? '先記錄今天第一餐，BetterBit 就能幫你看熱量趨勢。'}
+          reason={summary.insufficient_reason ?? '先記錄今天第一餐，Betterbit 就能幫你看熱量趨勢。'}
           ctaLabel="回到今天"
           ctaHref="/dashboard"
         />

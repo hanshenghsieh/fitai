@@ -13,7 +13,7 @@ import SettingsSubpageHeader from '@/components/settings/SettingsSubpageHeader'
 export default function PremiumTestFlightScreen() {
   return (
     <div className="min-h-screen pb-16" style={{ backgroundColor: colors.bg.canvas }}>
-      <SettingsSubpageHeader title="BetterBit 會員" subtitle={PREMIUM_TESTFLIGHT_SUBTITLE} />
+      <SettingsSubpageHeader title="Betterbit 會員" subtitle={PREMIUM_TESTFLIGHT_SUBTITLE} />
 
       <div className="px-5 space-y-8">
         <p className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>

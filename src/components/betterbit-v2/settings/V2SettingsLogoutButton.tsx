@@ -65,7 +65,7 @@ export default function V2SettingsLogoutButton() {
                 確認登出？
               </p>
               <p className="text-[14px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-                你可以隨時重新登入 BetterBit。
+                你可以隨時重新登入 Betterbit。
               </p>
             </div>
             <div className="flex gap-3">

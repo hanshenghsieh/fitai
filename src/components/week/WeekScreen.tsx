@@ -51,7 +51,7 @@ export default function WeekScreen({ summary, error }: Props) {
         </header>
         <EmptyStateCard
           title="還沒有本週資料"
-          reason={summary.insufficient_reason ?? '先記錄今天第一餐，BetterBit 就能幫你整理趨勢。'}
+          reason={summary.insufficient_reason ?? '先記錄今天第一餐，Betterbit 就能幫你整理趨勢。'}
           ctaLabel="回到今天"
           ctaHref="/dashboard"
         />

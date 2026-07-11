@@ -142,7 +142,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       if (result.active) {
         triggerV2Haptic('success')
         setLastProductId(result.productId ?? null)
-        toast.message('已恢復你的 BetterBit Pro 權限')
+        toast.message('已恢復你的 Betterbit Pro 權限')
         await refreshSubscription()
         setView('active')
       } else {
@@ -176,7 +176,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
     return (
       <div className="px-4 py-4 space-y-3">
         <p className="text-[15px]" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
-          {isSubscribed ? 'BetterBit Pro 使用中' : 'BetterBit Pro'}
+          {isSubscribed ? 'Betterbit Pro 使用中' : 'Betterbit Pro'}
         </p>
         <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
           {isSubscribed ? '你已解鎖完整減脂工具' : '解鎖完整減脂體驗與進階工具'}
@@ -187,7 +187,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
           className="w-full py-3 rounded-full text-[14px]"
           style={{ backgroundColor: BB_V2.bg.softGreen, color: BB_V2.accent.green, fontWeight: 600 }}
         >
-          {isSubscribed ? '查看 Pro 會員' : '升級 BetterBit Pro'}
+          {isSubscribed ? '查看 Pro 會員' : '升級 Betterbit Pro'}
         </button>
       </div>
     )

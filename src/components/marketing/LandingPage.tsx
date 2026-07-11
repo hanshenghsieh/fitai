@@ -13,11 +13,11 @@ export default function LandingPage() {
     <V2PageBackground className="min-h-[100dvh]">
       <div className="max-w-lg mx-auto px-[18px] pt-14 pb-16 space-y-10">
         <div className="text-center space-y-4">
-          <p className="text-[12px] font-semibold tracking-wide uppercase" style={{ color: BB_V2.accent.green }}>
-            BetterBit
+          <p className="text-[12px] font-semibold tracking-[0.2em]" style={{ color: BB_V2.accent.green }}>
+            BETTERBIT
           </p>
           <h1 className="text-[28px] leading-tight" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
-            外食減脂不用算，BetterBit 幫你算好
+            外食減脂不用算，Betterbit 幫你算好
           </h1>
           <p className="text-[16px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
             拍一餐、看懂今天還能吃多少，讓每一次外食都更接近目標。
@@ -30,8 +30,8 @@ export default function LandingPage() {
             style={{ borderColor: BB_V2.text.deepGreen, background: BB_V2.bg.pill }}
           >
             <div className="p-4 space-y-2 text-left">
-              <p className="text-[11px]" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
-                BetterBit
+              <p className="text-[11px] tracking-[0.15em]" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
+                BETTERBIT
               </p>
               <p className="text-[20px] leading-snug" style={{ fontWeight: 700 }}>
                 今天
@@ -63,7 +63,7 @@ export default function LandingPage() {
           {[
             { title: '拍照記錄', desc: 'AI 估算熱量與三大營養素，不用填表。' },
             { title: '外食也能執行', desc: '台灣品牌菜單對齊熱量與蛋白質目標。' },
-            { title: 'BetterBit Pro', desc: `${SUBSCRIPTION_PRICE_MONTHLY} 起 · 完整減脂工具。` },
+            { title: 'Betterbit Pro', desc: `${SUBSCRIPTION_PRICE_MONTHLY} 起 · 完整減脂工具。` },
           ].map(item => (
             <V2Card key={item.title} padding="16px 18px">
               <h3 className="text-[15px] mb-1" style={{ fontWeight: 600 }}>

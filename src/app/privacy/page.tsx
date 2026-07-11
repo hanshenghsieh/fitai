@@ -5,7 +5,7 @@ import { createPageMetadata } from '@/lib/site-metadata'
 
 export const metadata: Metadata = createPageMetadata({
   title: '隱私權政策',
-  description: 'BetterBit 如何收集、使用與保護你的個人資料。',
+  description: 'Betterbit 如何收集、使用與保護你的個人資料。',
   path: '/privacy',
 })
 
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
     <LegalPageLayout title="隱私權政策" updated="2026 年 6 月 18 日">
       <LegalSection title="我們是誰">
         <p>
-          BetterBit（再健一點）提供個人化飲食與運動計畫的生活參考服務。我們重視你的隱私，只收集提供服務所需的資料，不販售、不公開你的個人資訊。
+          Betterbit 由「再健一點有限公司」營運，提供個人化飲食與運動計畫的生活參考服務。我們重視你的隱私，只收集提供服務所需的資料，不販售、不公開你的個人資訊。
         </p>
       </LegalSection>
 
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
 
       <LegalSection title="健康免責">
         <p>
-          BetterBit 提供生活參考與營養估算，不是醫療建議、診斷或治療。身體不適請先休息，並諮詢合格醫療專業人員。
+          Betterbit 提供生活參考與營養估算，不是醫療建議、診斷或治療。身體不適請先休息，並諮詢合格醫療專業人員。
         </p>
       </LegalSection>
 

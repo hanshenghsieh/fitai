@@ -114,7 +114,7 @@ describe('Unknown Food Auto Apply V1', () => {
   it('8. auto_resolved writes resolution note', () => {
     const updated = applyAutoResolveToLog(unknownLog('x'), mockCandidate())
     assert.ok(updated.resolution_note?.includes('自動補齊營養資料'))
-    assert.ok(formatAutoResolvedNote('品項', '來源').includes('BetterBit'))
+    assert.ok(formatAutoResolvedNote('品項', '來源').includes('Betterbit'))
   })
 
   it('9. auto_resolved writes audit log', () => {

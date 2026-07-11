@@ -16,7 +16,7 @@ export default function SettingsSupportSection() {
         label="跟我們說"
         detail="有問題、有想法，直接寫信。我們會看。"
         onClick={() => {
-          window.location.href = `mailto:${SUPPORT_EMAIL}?subject=BetterBit 支援`
+          window.location.href = `mailto:${SUPPORT_EMAIL}?subject=Betterbit 支援`
         }}
         last
       />

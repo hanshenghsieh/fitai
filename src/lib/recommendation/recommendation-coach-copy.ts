@@ -45,7 +45,7 @@ export function buildRecommendationCoachBullets(params: {
     bullets.push('這餐符合你今天的節奏，不用硬撐也不必節食。')
   }
   if (bullets.length < 2) {
-    bullets.push('BetterBit 幫你把外食選擇算清楚，照常吃就好。')
+    bullets.push('Betterbit 幫你把外食選擇算清楚，照常吃就好。')
   }
 
   return [...new Set(bullets)].slice(0, 3)

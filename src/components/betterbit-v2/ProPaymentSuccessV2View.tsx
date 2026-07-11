@@ -47,7 +47,7 @@ export default function ProPaymentSuccessV2View({
             <h1 className="text-[22px] leading-snug" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
               付款成功！
               <br />
-              已升級為 BetterBit Pro
+              已升級為 Betterbit Pro
             </h1>
             <p className="text-[14px] mt-2" style={{ color: BB_V2.text.secondary }}>
               感謝你的信任，我們會陪你一起達成目標 💚
@@ -66,7 +66,7 @@ export default function ProPaymentSuccessV2View({
               訂閱成功！
             </h2>
             <p className="text-[18px] mt-1" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
-              歡迎加入 BetterBit Pro 🎉
+              歡迎加入 Betterbit Pro 🎉
             </p>
             <p className="text-[13px] mt-2 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
               你已解鎖完整減脂功能

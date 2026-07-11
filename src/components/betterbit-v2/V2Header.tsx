@@ -21,7 +21,7 @@ interface Props {
 }
 
 export default function V2Header({
-  title = 'BetterBit',
+  title = 'Betterbit',
   variant = 'main',
   onBack,
   onClose,

@@ -68,7 +68,7 @@ export default function InviteFriendsView() {
           邀請好友，雙方都有獎勵！
         </h2>
         <p className="text-[13px] mt-2 leading-relaxed px-2" style={{ color: '#7a807a' }}>
-          邀請好友加入 BetterBit，
+          邀請好友加入 Betterbit，
           <br />
           雙方都可獲得 Pro 試用天數或專屬優惠。
         </p>

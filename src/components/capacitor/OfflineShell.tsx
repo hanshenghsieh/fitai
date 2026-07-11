@@ -68,7 +68,7 @@ export default function OfflineShell() {
         目前離線
       </p>
       <p className="text-[15px] leading-relaxed max-w-xs" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-        再健一點需要網路才能載入你的計畫。請確認連線後再試。
+        Betterbit 需要網路才能載入你的計畫。請確認連線後再試。
       </p>
       <button
         type="button"

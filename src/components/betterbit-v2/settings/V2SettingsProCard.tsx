@@ -32,7 +32,7 @@ export default function V2SettingsProCard({ subscribed, onClick }: Props) {
 
       <div className="flex-1 min-w-0">
         <p className="text-[16px]" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
-          {subscribed ? 'BetterBit Pro 使用中' : '升級 BetterBit Pro'}
+          {subscribed ? 'Betterbit Pro 使用中' : '升級 Betterbit Pro'}
         </p>
         <p className="text-[13px] mt-0.5" style={{ color: BB_V2.text.secondary }}>
           {subscribed ? '你已解鎖完整減脂工具' : '解鎖完整減脂工具'}

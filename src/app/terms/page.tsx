@@ -5,7 +5,7 @@ import { createPageMetadata } from '@/lib/site-metadata'
 
 export const metadata: Metadata = createPageMetadata({
   title: '服務條款',
-  description: 'BetterBit 服務條款與使用規範。',
+  description: 'Betterbit 服務條款與使用規範。',
   path: '/terms',
 })
 
@@ -14,13 +14,13 @@ export default function TermsPage() {
     <LegalPageLayout title="服務條款" updated="2026 年 6 月 18 日">
       <LegalSection title="接受條款">
         <p>
-          使用 BetterBit（再健一點）即表示你同意本條款。若不同意，請停止使用並刪除帳號。
+          使用 Betterbit 即表示你同意本條款。本產品由「再健一點有限公司」營運。若不同意，請停止使用並刪除帳號。
         </p>
       </LegalSection>
 
       <LegalSection title="服務內容">
         <p>
-          BetterBit 提供個人化飲食與運動計畫、食物紀錄、進度追蹤等生活參考功能。我們可能更新、調整或終止部分功能，並會盡合理努力維持服務穩定。
+          Betterbit 提供個人化飲食與運動計畫、食物紀錄、進度追蹤等生活參考功能。我們可能更新、調整或終止部分功能，並會盡合理努力維持服務穩定。
         </p>
       </LegalSection>
 
@@ -41,7 +41,7 @@ export default function TermsPage() {
 
       <LegalSection title="訂閱與付款">
         <p>
-          部分功能需付費訂閱（BetterBit Pro）。Web 版可透過 Stripe 付款；iOS App 內訂閱使用 Apple In-App Purchase（App Store 訂閱），並由 RevenueCat 管理訂閱狀態。
+          部分功能需付費訂閱（Betterbit Pro）。Web 版可透過 Stripe 付款；iOS App 內訂閱使用 Apple In-App Purchase（App Store 訂閱），並由 RevenueCat 管理訂閱狀態。
         </p>
         <p>
           目前方案：月繳 NT$190／月、年繳 NT$980／年（以 App 內與 App Store 顯示為準）。試用期與實際扣款金額以你裝置上的方案為準。
@@ -53,13 +53,13 @@ export default function TermsPage() {
 
       <LegalSection title="智慧財產">
         <p>
-          BetterBit 的介面、文案、演算法與資料庫內容受著作權與其他法律保護。未經授權不得複製、修改或商業利用。
+          Betterbit 的介面、文案、演算法與資料庫內容受著作權與其他法律保護。未經授權不得複製、修改或商業利用。
         </p>
       </LegalSection>
 
       <LegalSection title="責任限制">
         <p>
-          在法律允許的最大範圍內，BetterBit 對因使用或無法使用服務所造成的間接、附帶或衍生損害不負責任。服務以「現狀」提供，我們不保證完全無錯誤或不中斷。
+          在法律允許的最大範圍內，Betterbit 對因使用或無法使用服務所造成的間接、附帶或衍生損害不負責任。服務以「現狀」提供，我們不保證完全無錯誤或不中斷。
         </p>
       </LegalSection>
 

@@ -57,7 +57,7 @@ function getNotificationContent(type: NotificationType, data?: Record<string, un
       const line = pickZaiJianLine(completed ? 'success' : 'cheat_recovery')
       return {
         title: line.text,
-        body: line.subtext ?? '明天再健一點。',
+        body: line.subtext ?? '明天繼續就好。',
       }
     }
     default:

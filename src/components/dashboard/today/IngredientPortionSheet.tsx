@@ -326,7 +326,7 @@ export default function IngredientPortionSheet({
             <>
               <div className="space-y-2">
                 <p className="text-[14px] leading-relaxed" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
-                  BetterBit 已先幫你估一版，不確定的話直接儲存即可。
+                  Betterbit 已先幫你估一版，不確定的話直接儲存即可。
                 </p>
                 <p className="text-[13px] leading-relaxed" style={{ color: BB_V2.text.secondary }}>
                   覺得飯比較多？只要按飯多一點。不用知道幾克，系統會自動換算。

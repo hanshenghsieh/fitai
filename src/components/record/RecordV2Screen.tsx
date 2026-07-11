@@ -271,7 +271,7 @@ export default function RecordV2Screen({
   return (
     <div className="v2-record-page">
       <V2Header
-        title="BetterBit"
+        title="Betterbit"
         hideRight
         rightSlot={
           <button
@@ -367,7 +367,7 @@ export default function RecordV2Screen({
                 <div className="v2-record-empty v2-record-empty--inline">
                   <UtensilsCrossed className="h-10 w-10" strokeWidth={1.5} style={{ color: '#2f8f35' }} />
                   <p className="v2-record-empty-title">今天還沒有餐點紀錄</p>
-                  <p className="v2-record-empty-desc">拍一餐，讓 BetterBit 幫你算熱量與營養。</p>
+                  <p className="v2-record-empty-desc">拍一餐，讓 Betterbit 幫你算熱量與營養。</p>
                   <button type="button" className="v2-record-empty-cta touch-manipulation" onClick={openAddMeal}>
                     <Camera className="h-5 w-5" />
                     拍照記錄第一餐

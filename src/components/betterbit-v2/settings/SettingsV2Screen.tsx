@@ -169,7 +169,7 @@ export default function SettingsV2Screen({ access, appVersion }: Props) {
             />
             <V2SettingsRow
               icon={<Info className="h-5 w-5" strokeWidth={BB_V2.iconStroke} />}
-              title="關於 BetterBit"
+              title="關於 Betterbit"
               subtitle="版本資訊與開發團隊"
               value={versionLabel}
               onClick={() => router.push('/settings/about')}

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getAppUrl } from '@/lib/app-url'
 
-export const SITE_NAME = '再健一點'
+export const SITE_NAME = 'Betterbit'
 export const SITE_DESCRIPTION =
   '安靜陪伴你的健康節奏。你不用完美，照常過就好。'
 export const SITE_TAGLINE = '依你的體態與目標，自動算出該吃多少、動多少。'
