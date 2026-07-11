@@ -2,6 +2,7 @@ import { useRouter } from 'next/navigation'
 import { Loader2, LogOut } from 'lucide-react'
 import { colors } from '@/lib/design-system'
 import { clearUserLocalState } from '@/lib/clear-user-local-state'
+import { appRoute } from '@/lib/navigation/routes'
 import SettingsSection from './SettingsSection'
 import SettingsRow from './SettingsRow'
 
@@ -24,7 +25,7 @@ export default function SettingsAccountSection({
     clearUserLocalState()
     await supabase.auth.signOut()
     clearUserLocalState()
-    router.push('/login')
+    router.push(appRoute('/login'))
     router.refresh()
   }
 

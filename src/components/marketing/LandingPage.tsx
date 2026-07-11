@@ -7,6 +7,7 @@ import V2PageBackground from '@/components/betterbit-v2/V2PageBackground'
 import V2PrimaryButton from '@/components/betterbit-v2/V2PrimaryButton'
 import V2Card from '@/components/betterbit-v2/V2Card'
 import { SUBSCRIPTION_PRICE_MONTHLY } from '@/lib/subscription-pricing'
+import { appRoute } from '@/lib/navigation/routes'
 
 export default function LandingPage() {
   return (
@@ -47,11 +48,11 @@ export default function LandingPage() {
         </V2Card>
 
         <div className="space-y-3">
-          <Link href="/register" className="block">
+          <Link href={appRoute('/register')} className="block">
             <V2PrimaryButton>開始使用 · 14 天免費試用</V2PrimaryButton>
           </Link>
           <Link
-            href="/login"
+            href={appRoute('/login')}
             className="flex items-center justify-center gap-2 py-3 text-[15px]"
             style={{ color: BB_V2.text.secondary }}
           >

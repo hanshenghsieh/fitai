@@ -17,6 +17,7 @@ import ZaiJian from '@/components/character/ZaiJian'
 import { OnboardingCard, OnboardingChip } from '@/components/onboarding/OnboardingChip'
 import type { ActivityLevel, FitnessLevel, Goal, UserProfile } from '@/types'
 import { apiFetch } from '@/lib/api/client'
+import { appRoute } from '@/lib/navigation/routes'
 
 const TOTAL_STEPS = 3
 
@@ -164,7 +165,7 @@ export default function OnboardingPage() {
         toast.error(pickZaiJianLine('error').text)
       }
 
-      router.push('/dashboard?welcome=1')
+      router.push(appRoute('/dashboard?welcome=1'))
       router.refresh()
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : pickZaiJianLine('error').text)

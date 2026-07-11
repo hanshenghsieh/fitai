@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { clearUserLocalState } from '@/lib/clear-user-local-state'
+import { appRoute } from '@/lib/navigation/routes'
 
 export default function V2SettingsLogoutButton() {
   const router = useRouter()
@@ -19,7 +20,7 @@ export default function V2SettingsLogoutButton() {
       clearUserLocalState()
       await supabase.auth.signOut()
       clearUserLocalState()
-      router.push('/login')
+      router.push(appRoute('/login'))
       router.refresh()
     } finally {
       setLoading(false)

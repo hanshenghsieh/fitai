@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { loadRecordPageData, type RecordPageData } from '@/features/record/record-data-loader'
+import { appRoute } from '@/lib/navigation/routes'
 import { getNutritionDayKey } from '@/lib/timezone'
 import { getLastActiveUserId, readCache, writeCache } from '@/lib/local-cache'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
@@ -72,7 +73,7 @@ export function useRecordData(): UseRecordDataResult {
       } = await supabase.auth.getSession()
 
       if (sessionError || !session?.user) {
-        router.replace('/login')
+        router.replace(appRoute('/login'))
         return
       }
 

@@ -12,6 +12,7 @@ import { colors } from '@/lib/design-system'
 import { pickZaiJianLine } from '@/lib/copy/zaijian'
 import ZaiJian from '@/components/character/ZaiJian'
 import { apiFetch } from '@/lib/api/client'
+import { appRoute } from '@/lib/navigation/routes'
 
 export default function RegisterPage() {
   const [displayName, setDisplayName] = useState('')
@@ -44,7 +45,7 @@ export default function RegisterPage() {
       clearUserLocalState()
       toast.success('好，認識一下。')
       await new Promise(r => setTimeout(r, 400))
-      router.push('/onboarding')
+      router.push(appRoute('/onboarding'))
       router.refresh()
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : pickZaiJianLine('error').text)
@@ -83,7 +84,7 @@ export default function RegisterPage() {
             {loading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : '建立帳號'}
           </button>
           <p className="text-[13px] text-center" style={{ color: colors.text.tertiary }}>
-            已有帳號？ <Link href="/login" style={{ color: colors.accent.action }}>登入</Link>
+            已有帳號？ <Link href={appRoute('/login')} style={{ color: colors.accent.action }}>登入</Link>
           </p>
         </form>
       </div>

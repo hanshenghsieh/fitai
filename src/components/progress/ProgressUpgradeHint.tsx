@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
 import { shouldBypassSubscriptionPaywallClient } from '@/lib/ios-payment-gate'
+import { appRoute } from '@/lib/navigation/routes'
 
 interface Props {
   access: AccessStatus
@@ -23,7 +24,7 @@ export default function ProgressUpgradeHint({ access, children, hasEarnedPreview
             試用已結束。上面的趨勢是你這段時間留下的。
           </p>
           <Link
-            href="/settings/premium"
+            href={appRoute('/settings/premium')}
             className="inline-block mt-3 text-[14px] font-medium"
             style={{ color: colors.accent.action }}
           >
@@ -45,7 +46,7 @@ export default function ProgressUpgradeHint({ access, children, hasEarnedPreview
         <p className="text-[13px] leading-relaxed mb-3" style={{ color: colors.text.tertiary }}>
           訂閱後可持續追蹤長期變化。
         </p>
-        <Link href="/settings/premium" className="text-[14px] font-medium" style={{ color: colors.accent.action }}>
+        <Link href={appRoute('/settings/premium')} className="text-[14px] font-medium" style={{ color: colors.accent.action }}>
           了解會員 →
         </Link>
       </div>

@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import BBCard from '@/components/ui/BBCard'
+import { appRoute, isLocalHybrid } from '@/lib/navigation/routes'
 
 export default function AppRouteError({
   error,
@@ -11,9 +13,13 @@ export default function AppRouteError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const router = useRouter()
+
   useEffect(() => {
     console.error('[app-route-error]', error)
   }, [error])
+
+  const showDebug = isLocalHybrid()
 
   return (
     <div
@@ -28,6 +34,16 @@ export default function AppRouteError({
         <p className="text-[15px] leading-relaxed" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
           可能是暫時的連線問題。再試一次，或回到今日頁面。
         </p>
+        {showDebug ? (
+          <pre
+            className="text-left text-[11px] leading-relaxed whitespace-pre-wrap break-words rounded-xl p-3 max-h-48 overflow-auto"
+            style={{ backgroundColor: BB_V2.bg.pill, color: BB_V2.text.secondary }}
+          >
+            {error.message || 'Unknown error'}
+            {error.digest ? `\n\ndigest: ${error.digest}` : ''}
+            {error.stack ? `\n\n${error.stack.split('\n').slice(0, 4).join('\n')}` : ''}
+          </pre>
+        ) : null}
         <div className="flex flex-col gap-3">
           <button
             type="button"
@@ -37,13 +53,14 @@ export default function AppRouteError({
           >
             重試
           </button>
-          <a
-            href="/dashboard"
+          <button
+            type="button"
+            onClick={() => router.push(appRoute('/dashboard'))}
             className="h-12 inline-flex items-center justify-center rounded-[20px] text-[15px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{ color: BB_V2.accent.orange, fontWeight: 500 }}
           >
             回到今日
-          </a>
+          </button>
         </div>
       </BBCard>
     </div>

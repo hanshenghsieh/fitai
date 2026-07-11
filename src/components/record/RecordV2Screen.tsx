@@ -43,6 +43,7 @@ import {
   deleteTodayFoodLog,
 } from '@/lib/record/mutate-today-food-log'
 import { addDays, format, parseISO } from 'date-fns'
+import { appRoute } from '@/lib/navigation/routes'
 
 interface Props {
   todayStr: string
@@ -95,7 +96,8 @@ function MealIcon({ bucket }: { bucket: RecordMealGroup['bucket'] }) {
   return <UtensilsCrossed className={cls} strokeWidth={2} aria-hidden />
 }
 
-function formatKcal(n: number): string {
+function formatKcal(n: number | null | undefined): string {
+  if (n == null || Number.isNaN(n)) return '—'
   return n.toLocaleString('zh-TW')
 }
 
@@ -119,7 +121,7 @@ export default function RecordV2Screen({
   const [fadeKey, setFadeKey] = useState(0)
   const [actionTarget, setActionTarget] = useState<ActionTarget | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ActionTarget | null>(null)
-  const [pending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
 
   useEffect(() => {
     setFoodLogs(extractAllFoodLogs(initialCheckins))
@@ -182,7 +184,7 @@ export default function RecordV2Screen({
   const isViewingToday = selectedDate === todayStr
 
   const openAddMeal = useCallback(() => {
-    router.push('/dashboard?record=1')
+    router.push(appRoute('/dashboard?record=1'))
   }, [router])
 
   const openCalendar = useCallback(() => {
@@ -502,18 +504,6 @@ export default function RecordV2Screen({
             </>
           )}
         </div>
-
-        <div className="v2-record-bottom-cta-wrap">
-          <button
-            type="button"
-            className="v2-record-bottom-cta touch-manipulation"
-            onClick={openAddMeal}
-            disabled={pending}
-          >
-            <Camera className="h-5 w-5" strokeWidth={2.2} />
-            拍照辨識 / 新增餐點
-          </button>
-        </div>
       </div>
 
       <AppOverlay
@@ -535,7 +525,7 @@ export default function RecordV2Screen({
               onClick={() => {
                 setActionTarget(null)
                 if (!guardTodayOnly()) return
-                router.push('/dashboard?record=1')
+                router.push(appRoute('/dashboard?record=1'))
               }}
             >
               編輯
@@ -564,7 +554,7 @@ export default function RecordV2Screen({
                 onClick={() => {
                   const log = actionTarget.log
                   toast.message(
-                    `${getFoodLogDisplayLabel(log)} · ${log.calories} kcal · 蛋白質 ${Math.round(log.protein_g)}g`
+                    `${getFoodLogDisplayLabel(log)} · ${formatKcal(log.calories)} kcal · 蛋白質 ${Math.round(log.protein_g ?? 0)}g`
                   )
                   setActionTarget(null)
                 }}

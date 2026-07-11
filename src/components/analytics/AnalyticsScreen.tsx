@@ -18,6 +18,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react'
 import { toast } from 'sonner'
 import BBIcon from '@/components/icons/BBIcon'
 import { BB_V2 } from '@/lib/betterbit-v2'
+import { appRoute } from '@/lib/navigation/routes'
 import BBCard from '@/components/ui/BBCard'
 import EmptyStateCard from '@/components/ui/EmptyStateCard'
 import {
@@ -632,7 +633,7 @@ export default function AnalyticsScreen({
       {/* Terminal CTAs */}
       <div className="space-y-3 pt-2">
         <Link
-          href="/dashboard"
+          href={appRoute('/dashboard')}
           className="flex w-full h-14 items-center justify-center text-[15px] active:opacity-90"
           style={{
             borderRadius: BB_V2.radius.button,
@@ -644,7 +645,7 @@ export default function AnalyticsScreen({
           回到今天，記錄下一餐
         </Link>
         <Link
-          href="/weekly"
+          href={appRoute('/weekly')}
           className="flex w-full h-12 items-center justify-center text-[14px] active:opacity-90"
           style={{
             borderRadius: BB_V2.radius.button,

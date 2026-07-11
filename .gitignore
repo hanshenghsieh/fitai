@@ -21,6 +21,10 @@ scripts/test-accounts.json
 # production
 /build
 
+# ios build artifacts (xcodebuild derivedData / SPM checkouts)
+/ios/build
+/.ios-local-staging
+
 # misc
 .DS_Store
 *.pem

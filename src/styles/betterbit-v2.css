@@ -1412,7 +1412,8 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
 .v2-record-inner {
   max-width: 640px;
   margin: 0 auto;
-  padding: 0 18px calc(var(--app-nav-total, 72px) + 88px);
+  /* Outer .app-scroll-with-nav already pads --app-nav-total; no fixed CTA here. */
+  padding: 0 18px 24px;
 }
 
 .v2-record-date-switch {
@@ -1478,26 +1479,23 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
 }
 
 .v2-record-week-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin: 0 -18px;
-  padding: 0 18px 4px;
+  padding: 0 0 4px;
 }
 
 .v2-record-week-row {
   display: flex;
-  gap: 8px;
-  min-width: min-content;
+  gap: 5px;
 }
 
 .v2-record-score-card {
-  flex: 0 0 72px;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 10px 6px 12px;
-  border-radius: 20px;
+  padding: 10px 2px 12px;
+  border-radius: 16px;
   border: 1.5px solid #e6eee2;
   background: rgba(255, 255, 255, 0.92);
   transition: transform 0.15s ease, border-color 0.18s ease, box-shadow 0.18s ease;
@@ -2045,7 +2043,8 @@ html[data-betterbit-reduced-motion='true'] .v2-record-meal-card {
 .v2-analysis-inner {
   max-width: 640px;
   margin: 0 auto;
-  padding: 0 18px calc(var(--app-nav-total, 72px) + 24px);
+  /* Outer .app-scroll-with-nav already pads --app-nav-total; no fixed CTA here. */
+  padding: 0 18px 24px;
 }
 
 .v2-analysis-week-switch {

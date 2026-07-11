@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { apiFetch } from '@/lib/api/client'
+import { appRoute } from '@/lib/navigation/routes'
 import type { SettingsBundle } from '@/lib/app/settings-data'
 import {
   loadSettingsBundleData,
@@ -85,7 +86,7 @@ export function useSettingsData(): UseSettingsDataResult {
       } = await supabase.auth.getSession()
 
       if (sessionError || !session?.user) {
-        router.replace('/login')
+        router.replace(appRoute('/login'))
         return
       }
 
@@ -209,7 +210,7 @@ export function useSettingsBundle(): UseSettingsBundleResult {
       } = await supabase.auth.getSession()
 
       if (sessionError || !session?.user) {
-        router.replace('/login')
+        router.replace(appRoute('/login'))
         return
       }
 

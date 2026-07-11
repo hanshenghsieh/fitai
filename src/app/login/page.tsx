@@ -9,9 +9,11 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
-import { pickZaiJianLine } from '@/lib/copy/zaijian'
+import { getSanitizedLoginError, logLoginError } from '@/lib/auth/login-error'
+import { clearUserLocalState } from '@/lib/clear-user-local-state'
 import V2PageBackground from '@/components/betterbit-v2/V2PageBackground'
 import V2Card from '@/components/betterbit-v2/V2Card'
+import { iosLocalPath } from '@/lib/ios-local-path'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -26,19 +28,20 @@ export default function LoginPage() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
-      const { clearUserLocalState } = await import('@/lib/clear-user-local-state')
       clearUserLocalState()
       toast.success('回來了。')
       await new Promise(r => setTimeout(r, 400))
-      router.push('/dashboard')
+      router.push(iosLocalPath('/dashboard'))
       router.refresh()
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : ''
-      const friendly =
-        /invalid login credentials/i.test(msg)
-          ? '帳號或密碼不對。再試一次。'
-          : pickZaiJianLine('error').text
-      toast.error(friendly)
+      logLoginError(err)
+      const sanitized = getSanitizedLoginError(err)
+      if (process.env.NEXT_PUBLIC_BUILD_TARGET === 'ios-local') {
+        const d = sanitized.debug
+        toast.error(`${sanitized.message}｜${d.name ?? ''} ${d.status ?? ''} ${d.message ?? ''}`.trim())
+      } else {
+        toast.error(sanitized.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -81,13 +84,13 @@ export default function LoginPage() {
             </button>
             <p className="text-[13px] text-center" style={{ color: BB_V2.text.muted }}>
               還沒有帳號？{' '}
-              <Link href="/register" style={{ color: BB_V2.accent.green, fontWeight: 600 }}>
+              <Link href={iosLocalPath('/register')} style={{ color: BB_V2.accent.green, fontWeight: 600 }}>
                 註冊
               </Link>
             </p>
           </form>
         </V2Card>
-        <Link href="/" className="block text-center text-[13px]" style={{ color: BB_V2.text.muted }}>
+        <Link href={iosLocalPath('/')} className="block text-center text-[13px]" style={{ color: BB_V2.text.muted }}>
           ← 首頁
         </Link>
       </div>

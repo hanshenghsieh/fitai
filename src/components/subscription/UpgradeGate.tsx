@@ -6,6 +6,7 @@ import type { AccessStatus } from '@/lib/subscription-access'
 import { colors } from '@/lib/design-system'
 import { shouldBypassSubscriptionPaywallClient } from '@/lib/ios-payment-gate'
 import { SUBSCRIPTION_PRICE_LABEL } from '@/lib/stripe-config'
+import { appRoute } from '@/lib/navigation/routes'
 
 interface Props {
   access: AccessStatus
@@ -34,7 +35,7 @@ export default function UpgradeGate({ access, feature, children, preview }: Prop
             上面是你在試用期累積的趨勢。訂閱後可持續追蹤{feature}。
           </p>
           <Link
-            href="/settings/premium"
+            href={appRoute('/settings/premium')}
             className="inline-block px-6 py-2.5 rounded-xl font-semibold text-white text-sm"
             style={{ backgroundColor: colors.accent.action }}
           >
@@ -59,7 +60,7 @@ export default function UpgradeGate({ access, feature, children, preview }: Prop
             試用結束後，訂閱可持續獲得每週自動重算的個人化計畫、進度分析與計畫調整。
           </p>
           <Link
-            href="/settings/premium"
+            href={appRoute('/settings/premium')}
             className="inline-block px-6 py-2.5 rounded-xl font-semibold text-white text-sm"
             style={{ backgroundColor: colors.accent.action }}
           >

@@ -7,10 +7,23 @@
  * Windows: if EPERM persists, run on Mac (recommended for TestFlight Build 16).
  */
 import { spawnSync } from 'node:child_process'
-import { cpSync, existsSync, mkdirSync, renameSync, rmSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 
 const root = join(import.meta.dirname, '..')
+
+/**
+ * Read a key from .env.local (next build loads this automatically, but this
+ * plain node pre-check does not, so read the same file the build will use).
+ */
+function readEnvLocal(key) {
+  if (process.env[key]?.trim()) return process.env[key].trim()
+  const envPath = join(root, '.env.local')
+  if (!existsSync(envPath)) return ''
+  const content = readFileSync(envPath, 'utf8')
+  const match = content.match(new RegExp(`^${key}=(.*)$`, 'm'))
+  return match ? match[1].trim() : ''
+}
 const isWindows = process.platform === 'win32'
 const stagingRoot = join(root, '.ios-local-staging')
 
@@ -127,6 +140,16 @@ function restoreAll() {
   moved.length = 0
 }
 
+function isPlaceholderSupabase(value) {
+  if (!value) return true
+  const v = value.trim().toLowerCase()
+  return (
+    v.startsWith('your_') ||
+    v.includes('placeholder') ||
+    v === 'https://xxx.supabase.co'
+  )
+}
+
 function failFastEnv() {
   const apiBase =
     process.env.NEXT_PUBLIC_API_BASE_URL?.trim() ||
@@ -138,10 +161,21 @@ function failFastEnv() {
     process.exit(1)
   }
 
+  const supabaseUrl = readEnvLocal('NEXT_PUBLIC_SUPABASE_URL')
+  const supabaseAnonKey = readEnvLocal('NEXT_PUBLIC_SUPABASE_ANON_KEY')
+
+  if (isPlaceholderSupabase(supabaseUrl) || isPlaceholderSupabase(supabaseAnonKey)) {
+    console.error('[build:ios-local] NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY are missing or placeholder.')
+    console.error('  Update .env.local with real Supabase project credentials before ios:local:prep.')
+    process.exit(1)
+  }
+
   return {
     ...process.env,
     NEXT_PUBLIC_BUILD_TARGET: 'ios-local',
     NEXT_PUBLIC_API_BASE_URL: apiBase.replace(/\/$/, ''),
+    NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseAnonKey,
   }
 }
 

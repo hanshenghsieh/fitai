@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { BB_V2 } from '@/lib/betterbit-v2'
+import { appRoute } from '@/lib/navigation/routes'
 import type { WeekSummary } from '@/lib/analytics/week-summary'
 import { buildWeekHeroDisplay, pickWeekFocusAction } from '@/lib/analytics/week-display'
 import EmptyStateCard from '@/components/ui/EmptyStateCard'
@@ -88,7 +89,7 @@ export default function WeekScreen({ summary, error }: Props) {
       />
 
       <Link
-          href="/dashboard"
+          href={appRoute('/dashboard')}
           className="flex w-full h-14 items-center justify-center text-[15px] active:opacity-90"
           style={{
             borderRadius: BB_V2.radius.button,

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { X } from 'lucide-react'
 import { colors } from '@/lib/design-system'
+import { appRoute } from '@/lib/navigation/routes'
 import { simplifyWorkout } from '@/lib/weekly-journey'
 import type { DayJourneyNode } from '@/lib/weekly-journey'
 import type { DayPlan } from '@/types'
@@ -70,7 +71,7 @@ export default function WeekDaySheet({ open, onClose, node, dayPlan, isToday }: 
 
         {isToday && (
           <Link
-            href="/dashboard"
+            href={appRoute('/dashboard')}
             className="mt-6 block w-full py-3.5 rounded-xl text-center text-[15px] font-medium"
             style={{ backgroundColor: colors.accent.action, color: colors.bg.elevated }}
           >

@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { BB_V2 } from '@/lib/betterbit-v2'
+import { appRoute } from '@/lib/navigation/routes'
 import { getStripePriceId } from '@/lib/stripe-config'
 import { formatProRenewalDate, type ProPlanId } from '@/lib/pro-subscription-v2'
 import { shouldHideExternalPaymentsClient, shouldShowAppleIapClient } from '@/lib/ios-payment-gate'
@@ -130,7 +131,7 @@ function PremiumStripeV2Screen({ access }: Props) {
       <ProPaymentSuccessV2View
         plan={purchasedPlan}
         renewalDate={renewalDate}
-        onStart={() => router.push('/dashboard')}
+        onStart={() => router.push(appRoute('/dashboard'))}
         onViewSubscription={() => setView('active')}
         onRestore={() => toast.message('Web 版請使用帳單管理')}
       />
@@ -143,7 +144,7 @@ function PremiumStripeV2Screen({ access }: Props) {
         plan="monthly"
         renewalDate={renewalDate}
         paymentMethod="Stripe 信用卡"
-        onBack={() => router.push('/settings')}
+        onBack={() => router.push(appRoute('/settings'))}
         onManageSubscription={() => void handleBillingPortal()}
       />
     )

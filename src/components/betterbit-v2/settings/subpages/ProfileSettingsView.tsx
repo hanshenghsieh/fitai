@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { appRoute } from '@/lib/navigation/routes'
 import {
   User,
   Calendar,
@@ -318,7 +319,7 @@ export default function ProfileSettingsView({ initial }: { initial: SettingsBund
             icon={<Lock className="h-4 w-4" />}
             label="變更密碼"
             subtitle="更新你的登入密碼"
-            onClick={() => router.push('/settings/password')}
+            onClick={() => router.push(appRoute('/settings/password'))}
           />
           <div className="py-2">
             <SettingsDeleteAccountSection compact />

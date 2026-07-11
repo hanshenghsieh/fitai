@@ -57,6 +57,18 @@ html.capacitor-ios .app-page-top {
   padding-top: 8px;
 }
 
+/* V2 sticky header: bake in the safe-area inset by default so it works inside
+   full-screen overlays (portaled to <body>, outside .app-shell). When rendered
+   inside .app-shell, the shell already pads --app-safe-top, so drop to 8px to
+   avoid double-counting on native. */
+.v2-app-header {
+  padding-top: max(8px, var(--app-safe-top, 0px));
+}
+
+html.capacitor-ios .app-shell .v2-app-header {
+  padding-top: 8px;
+}
+
 html[data-app-overlay='open'] .app-bottom-nav {
   display: none;
 }

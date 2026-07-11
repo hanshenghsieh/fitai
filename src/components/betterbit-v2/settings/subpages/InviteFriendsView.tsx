@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { appRoute } from '@/lib/navigation/routes'
 import { toast } from 'sonner'
 import { Users, Crown, Heart, Bell, Share2 } from 'lucide-react'
 import V2SupportPageShell from '@/components/betterbit-v2/settings/visual-v2/V2SupportPageShell'
@@ -56,7 +57,7 @@ export default function InviteFriendsView() {
             <Share2 className="h-5 w-5" />
             分享邀請連結
           </button>
-          <button type="button" onClick={() => router.push('/settings')} className="v2-sv2-btn-secondary touch-manipulation">
+          <button type="button" onClick={() => router.push(appRoute('/settings'))} className="v2-sv2-btn-secondary touch-manipulation">
             取消
           </button>
         </>

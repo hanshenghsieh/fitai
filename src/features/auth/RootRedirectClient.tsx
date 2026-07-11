@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import LandingPage from '@/components/marketing/LandingPage'
 import AppAuthLoadingShell from '@/features/auth/AppAuthLoadingShell'
+import { iosLocalPath } from '@/lib/ios-local-path'
 
 type ViewState = 'loading' | 'landing' | 'redirecting'
 
@@ -41,7 +42,9 @@ export default function RootRedirectClient() {
 
         if (!mountedRef.current) return
 
-        router.replace(profile?.onboarding_completed ? '/dashboard' : '/onboarding')
+        router.replace(
+          iosLocalPath(profile?.onboarding_completed ? '/dashboard' : '/onboarding'),
+        )
       } catch {
         if (!mountedRef.current) return
         setView('landing')

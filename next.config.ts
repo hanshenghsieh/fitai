@@ -3,7 +3,12 @@ import type { NextConfig } from "next";
 const isIosLocalBuild = process.env.NEXT_PUBLIC_BUILD_TARGET === 'ios-local'
 
 const nextConfig: NextConfig = {
-  ...(isIosLocalBuild ? { output: 'export' as const } : {}),
+  ...(isIosLocalBuild
+    ? {
+        output: 'export' as const,
+        trailingSlash: true,
+      }
+    : {}),
   typescript: {
     ignoreBuildErrors: true,
   },

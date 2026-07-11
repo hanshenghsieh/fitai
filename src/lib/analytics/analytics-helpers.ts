@@ -5,10 +5,13 @@ import { HIGH_FIBER_PATTERN, SUGAR_DRINK_PATTERN } from './week-constants'
 import type { AnalysisCheckinRow } from './analysis-summary'
 
 export function mealBucket(log: FoodLogEntry): 'breakfast' | 'lunch' | 'dinner' | 'snack' {
-  if (log.slot === 'breakfast') return 'breakfast'
-  if (log.slot === 'lunch') return 'lunch'
-  if (log.slot === 'dinner') return 'dinner'
-  if (log.slot === 'bedtime' || log.slot === 'other') return 'snack'
+  // Respect the explicit slot (incl. new meal1/meal2/meal3/before_sleep vocabulary
+  // set when a meal is moved on the Today page) before falling back to time-of-day.
+  const slot = log.slot as string | undefined
+  if (slot === 'breakfast' || slot === 'meal1') return 'breakfast'
+  if (slot === 'lunch' || slot === 'meal2') return 'lunch'
+  if (slot === 'dinner' || slot === 'meal3') return 'dinner'
+  if (slot === 'bedtime' || slot === 'before_sleep' || slot === 'other') return 'snack'
   try {
     const hour = parseISO(log.logged_at).getHours()
     if (hour < 10) return 'breakfast'

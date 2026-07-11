@@ -9,6 +9,7 @@ import { loadPremiumPageData } from '@/features/settings/settings-data-loader'
 import SettingsV2Skeleton from '@/features/settings/SettingsV2Skeleton'
 import SettingsErrorState from '@/features/settings/SettingsErrorState'
 import SettingsRefreshingBanner from '@/features/settings/SettingsRefreshingBanner'
+import { appRoute } from '@/lib/navigation/routes'
 
 export default function PremiumPageClient() {
   const router = useRouter()
@@ -38,7 +39,7 @@ export default function PremiumPageClient() {
       } = await supabase.auth.getSession()
 
       if (sessionError || !session?.user) {
-        router.replace('/login')
+        router.replace(appRoute('/login'))
         return
       }
 

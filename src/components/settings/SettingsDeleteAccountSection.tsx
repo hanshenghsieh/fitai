@@ -11,6 +11,7 @@ import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import SettingsSection from './SettingsSection'
 import SettingsRow from './SettingsRow'
 import { apiFetch } from '@/lib/api/client'
+import { appRoute } from '@/lib/navigation/routes'
 
 export default function SettingsDeleteAccountSection({ compact = false }: { compact?: boolean }) {
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -32,7 +33,7 @@ export default function SettingsDeleteAccountSection({ compact = false }: { comp
       await supabase.auth.signOut()
       clearUserLocalState()
       toast.message('帳號已刪除')
-      router.push('/')
+      router.push(appRoute('/'))
       router.refresh()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : GENTLE_ERROR_MESSAGE)

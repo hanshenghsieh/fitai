@@ -2,11 +2,9 @@ import { addDays, format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import {
-  clampDailyAdjust,
   computeRecoveryWindow,
   DEFAULT_CALORIE_FLOOR_FEMALE,
   isRecoveryActive,
-  recoveryTargetsForDayOffsets,
 } from '@/lib/engines/calorie-bank-engine'
 
 export type CalorieBankMiniState = 'over' | 'space' | 'recovery'
@@ -93,27 +91,34 @@ export function previewSpreadDays(
   calorieFloor = DEFAULT_CALORIE_FLOOR_FEMALE
 ): SpreadDayPreview[] {
   const normal = bank.daily_target_kcal
-  const excess = getTodayExcessKcal(bank)
-  const window = computeRecoveryWindow(excess)
-  const adjust =
-    spreadDays === bank.spread_days_remaining && bank.daily_adjust_kcal < 0
-      ? bank.daily_adjust_kcal
-      : clampDailyAdjust(
-          window.dailyAdjustKcal !== 0
-            ? window.dailyAdjustKcal
-            : -Math.round(excess / spreadDays),
-          normal,
-          calorieFloor
-        )
+  const excess = Math.max(0, Math.round(getTodayExcessKcal(bank)))
 
-  const targets = recoveryTargetsForDayOffsets(normal, spreadDays, adjust, calorieFloor, spreadDays)
+  // Spread the excess evenly across the chosen days so the per-day reduction
+  // scales with the selection (more days → gentler) and the total absorbed
+  // equals the excess. Each day is clamped so the target never drops below the
+  // calorie floor; any remainder from integer division lands on the first days.
+  const maxReductionPerDay = Math.max(0, normal - calorieFloor)
+  const base = spreadDays > 0 ? Math.floor(excess / spreadDays) : 0
+  let remainder = excess - base * spreadDays
 
-  return targets.map((targetKcal, index) => ({
-    dateLabel: formatSpreadDayLabel(index + 1),
-    originalKcal: normal,
-    adjustKcal: targetKcal - normal,
-    targetKcal,
-  }))
+  const previews: SpreadDayPreview[] = []
+  for (let i = 0; i < spreadDays; i++) {
+    let reduction = base
+    if (remainder > 0) {
+      reduction += 1
+      remainder -= 1
+    }
+    reduction = Math.min(reduction, maxReductionPerDay)
+    const targetKcal = normal - reduction
+    previews.push({
+      dateLabel: formatSpreadDayLabel(i + 1),
+      originalKcal: normal,
+      adjustKcal: -reduction,
+      targetKcal,
+    })
+  }
+
+  return previews
 }
 
 function formatSpreadDayLabel(dayOffset: number): string {

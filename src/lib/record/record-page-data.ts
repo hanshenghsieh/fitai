@@ -124,7 +124,7 @@ export function buildMealGroups(dayLogs: FoodLogEntry[]): RecordMealGroup[] {
       bucket,
       label: MEAL_LABELS[bucket],
       logs,
-      totalKcal: logs.reduce((s, l) => s + l.calories, 0),
+      totalKcal: logs.reduce((s, l) => s + (l.calories ?? 0), 0),
       timeLabel: formatMealTime(logs),
       photoUrl: pickMealPhoto(logs),
     }
@@ -193,11 +193,11 @@ export function buildRecordDayView(
     isFuture,
     isEmpty: !isFuture && dayLogs.length === 0,
     summary: {
-      totalKcal: dayLogs.reduce((s, l) => s + l.calories, 0),
+      totalKcal: dayLogs.reduce((s, l) => s + (l.calories ?? 0), 0),
       targetKcal: targets.calories,
       mealCount,
       mealTarget,
-      proteinG: Math.round(dayLogs.reduce((s, l) => s + l.protein_g, 0)),
+      proteinG: Math.round(dayLogs.reduce((s, l) => s + (l.protein_g ?? 0), 0)),
       proteinTarget: targets.protein_g,
       score: scored.score,
       status: scored.status,

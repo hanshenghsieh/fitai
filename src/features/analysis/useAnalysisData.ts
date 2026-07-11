@@ -10,6 +10,7 @@ import {
   shiftAnalysisWeekAnchor,
 } from '@/lib/analysis/analysis-page-data'
 import { loadAnalysisPageData, type AnalysisPageData } from '@/features/analysis/analysis-data-loader'
+import { appRoute } from '@/lib/navigation/routes'
 import { getNutritionDayKey } from '@/lib/timezone'
 import { getLastActiveUserId, readCache, writeCache } from '@/lib/local-cache'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
@@ -81,7 +82,7 @@ export function useAnalysisData(): UseAnalysisDataResult {
       } = await supabase.auth.getSession()
 
       if (sessionError || !session?.user) {
-        router.replace('/login')
+        router.replace(appRoute('/login'))
         return
       }
 

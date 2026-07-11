@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { TODAY } from '@/lib/today-design'
+import { appRoute } from '@/lib/navigation/routes'
 
 interface Props {
   trialDaysLeft?: number | null
@@ -22,7 +23,7 @@ export default function TodayHeader({ trialDaysLeft }: Props) {
         </h1>
         {trialDaysLeft != null && trialDaysLeft > 0 && trialDaysLeft <= 14 && (
           <Link
-            href="/settings"
+            href={appRoute('/settings')}
             prefetch
             className="text-[13px] mt-1.5 block leading-relaxed"
             style={{ color: TODAY.textSecondary, fontWeight: 400 }}

@@ -69,6 +69,7 @@ import {
   writeWorkoutItemsSessionCache,
 } from '@/lib/workout-items-session-cache'
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
+import { normalizePath } from '@/lib/navigation/routes'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
 import { getNutritionDayKey, getPreviousNutritionDayKey } from '@/lib/timezone'
 import { filterFoodLogsForNutritionDay } from '@/lib/nutrition-day-food-logs'
@@ -151,7 +152,7 @@ export default function BetterBitHome({
 }: Props) {
   const pathname = usePathname()
   const router = useRouter()
-  const onDashboard = pathname === '/dashboard'
+  const onDashboard = normalizePath(pathname) === '/dashboard'
   const [isPending, startTransition] = useTransition()
   const [expandedWorkout, setExpandedWorkout] = useState(false)
   const exercises = todayPlan.workout?.main ?? []

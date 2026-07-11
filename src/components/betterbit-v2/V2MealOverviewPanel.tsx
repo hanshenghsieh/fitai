@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ShoppingBag, UtensilsCrossed, Salad, Cookie, X } from 'lucide-react'
+import { ShoppingBag, UtensilsCrossed, Salad, Cookie, Moon, X } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import { normalizeFoodLogSlot, type FoodSlot } from '@/lib/food-slots'
@@ -10,12 +10,17 @@ import V2Card from './V2Card'
 const LONG_PRESS_MS = 1500
 const MOVE_CANCEL_PX = 12
 
-const SLOT_ROWS: { slot: FoodSlot; icon: typeof ShoppingBag }[] = [
+type SlotRow = { slot: FoodSlot; icon: typeof ShoppingBag }
+
+const BASE_SLOT_ROWS: SlotRow[] = [
   { slot: 'meal1', icon: ShoppingBag },
   { slot: 'meal2', icon: UtensilsCrossed },
   { slot: 'meal3', icon: Salad },
   { slot: 'other', icon: Cookie },
 ]
+
+/** 睡前餐位不預設顯示，只有實際有紀錄時才補上（例如深夜 22:00 後記錄的餐點）。 */
+const BEFORE_SLEEP_ROW: SlotRow = { slot: 'before_sleep', icon: Moon }
 
 const NAMED_LABELS: Record<FoodSlot, string> = {
   meal1: '早餐',
@@ -70,6 +75,10 @@ export default function V2MealOverviewPanel({
   onDeleteLog,
 }: Props) {
   const grouped = useMemo(() => groupLogsBySlot(foodLogs), [foodLogs])
+  const slotRows = useMemo(
+    () => (grouped.before_sleep.length > 0 ? [...BASE_SLOT_ROWS, BEFORE_SLEEP_ROW] : BASE_SLOT_ROWS),
+    [grouped.before_sleep.length]
+  )
   const labels = labelMode === 'named' ? NAMED_LABELS : NUMBERED_LABELS
 
   const [editMode, setEditMode] = useState(false)
@@ -122,8 +131,14 @@ export default function V2MealOverviewPanel({
     if (!editMode) return
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
+    // body overflow alone doesn't lock the Capacitor scroll container, so block
+    // touch scrolling outright — only the dragged chip should move, not the
+    // background underneath it.
+    const preventScroll = (e: TouchEvent) => e.preventDefault()
+    document.addEventListener('touchmove', preventScroll, { passive: false })
     return () => {
       document.body.style.overflow = prev
+      document.removeEventListener('touchmove', preventScroll)
     }
   }, [editMode])
 
@@ -219,8 +234,20 @@ export default function V2MealOverviewPanel({
     [clearLongPress]
   )
 
-  const handlePointerUp = useCallback(() => {
-    if (editMode || longPressActivated.current) {
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    if (editMode) {
+      clearLongPress()
+      // Drag end is handled by the window `pointerup` listener.
+      if (isDraggingRef.current) return
+      // In edit mode, releasing on anything that is not a meal chip exits —
+      // including empty areas inside the same card (labels, kcal, meal icon).
+      const target = e.target as HTMLElement | null
+      if (target?.closest('[data-meal-chip]')) return
+      exitEditMode()
+      return
+    }
+
+    if (longPressActivated.current) {
       clearLongPress()
       return
     }
@@ -234,7 +261,7 @@ export default function V2MealOverviewPanel({
       const log = foodLogs.find(l => l.id === logId)
       if (log) onEditLog(log)
     }
-  }, [clearLongPress, editMode, foodLogs, onEditLog])
+  }, [clearLongPress, editMode, exitEditMode, foodLogs, onEditLog])
 
   const draggingLog = draggingLogId ? foodLogs.find(l => l.id === draggingLogId) : null
 
@@ -257,11 +284,11 @@ export default function V2MealOverviewPanel({
         onPointerCancel={handlePointerUp}
       >
         <V2Card padding="4px 16px 8px">
-        {SLOT_ROWS.map(({ slot, icon: Icon }, rowIndex) => {
+        {slotRows.map(({ slot, icon: Icon }, rowIndex) => {
           const logs = grouped[slot]
           const kcal = logs.reduce((s, l) => s + (l.calories ?? 0), 0)
           const isDropTarget = editMode && hoverSlot === slot
-          const isLast = rowIndex === SLOT_ROWS.length - 1
+          const isLast = rowIndex === slotRows.length - 1
 
           return (
             <div
@@ -381,6 +408,7 @@ function MealChip({
 }) {
   return (
     <span
+      data-meal-chip
       role={draggable ? 'button' : undefined}
       tabIndex={draggable ? -1 : undefined}
       onPointerDown={onPointerDown}

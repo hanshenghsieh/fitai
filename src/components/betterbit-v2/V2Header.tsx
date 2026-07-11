@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { Menu, History, ArrowLeft, X, Info } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
+import { appRoute } from '@/lib/navigation/routes'
 
 type HeaderVariant = 'main' | 'back' | 'close' | 'info'
 
@@ -36,7 +37,7 @@ export default function V2Header({
 
   return (
     <header
-      className="sticky top-0 z-40 px-4 pt-[max(8px,var(--app-safe-top,0px))] pb-2"
+      className="v2-app-header sticky top-0 z-40 px-4 pb-2"
       style={{ backgroundColor: BB_V2.bg.header }}
     >
       <div className="max-w-[640px] mx-auto flex items-center justify-between gap-2 min-h-[48px]">
@@ -74,7 +75,7 @@ export default function V2Header({
               <History className="h-5 w-5" strokeWidth={BB_V2.iconStroke} style={{ color: BB_V2.text.deepGreen }} />
             </button>
           ) : !hideRight && !rightSlot && variant === 'main' ? (
-            <Link href="/progress" className={iconBtn} aria-label="分析">
+            <Link href={appRoute('/progress')} className={iconBtn} aria-label="分析">
               <History className="h-5 w-5" strokeWidth={BB_V2.iconStroke} style={{ color: BB_V2.text.deepGreen }} />
             </Link>
           ) : null}

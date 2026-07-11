@@ -27,11 +27,6 @@ class BridgeViewController: CAPBridgeViewController {
         .darkContent
     }
 
-    override func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        super.webViewWebContentProcessDidTerminate(webView)
-        webView.reload()
-    }
-
     private func applyWebViewShellSettings() {
         guard let webView = webView else { return }
 

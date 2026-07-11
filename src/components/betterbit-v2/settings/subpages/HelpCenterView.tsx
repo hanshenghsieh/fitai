@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import { appRoute } from '@/lib/navigation/routes'
 import {
   Search,
   CircleHelp,
@@ -146,7 +147,7 @@ export default function HelpCenterView() {
           </div>
           <button
             type="button"
-            onClick={() => router.push('/settings/contact')}
+            onClick={() => router.push(appRoute('/settings/contact'))}
             className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-semibold touch-manipulation"
             style={{ backgroundColor: '#2f8f35', color: '#fff' }}
           >

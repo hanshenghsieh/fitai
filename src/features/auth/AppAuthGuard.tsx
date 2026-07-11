@@ -4,10 +4,14 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import AppAuthLoadingShell from '@/features/auth/AppAuthLoadingShell'
+import { iosLocalPath } from '@/lib/ios-local-path'
 
 interface Props {
   children: ReactNode
 }
+
+/** Skip re-verification when layout remounts within the same JS session. */
+let verifiedUserId: string | null = null
 
 export default function AppAuthGuard({ children }: Props) {
   const router = useRouter()
@@ -28,7 +32,13 @@ export default function AppAuthGuard({ children }: Props) {
         if (!mountedRef.current) return
 
         if (sessionError || !session?.user) {
-          router.replace('/login')
+          verifiedUserId = null
+          router.replace(iosLocalPath('/login'))
+          return
+        }
+
+        if (verifiedUserId === session.user.id) {
+          setReady(true)
           return
         }
 
@@ -41,14 +51,17 @@ export default function AppAuthGuard({ children }: Props) {
         if (!mountedRef.current) return
 
         if (!profile?.onboarding_completed) {
-          router.replace('/onboarding')
+          verifiedUserId = null
+          router.replace(iosLocalPath('/onboarding'))
           return
         }
 
+        verifiedUserId = session.user.id
         setReady(true)
       } catch {
         if (!mountedRef.current) return
-        router.replace('/login')
+        verifiedUserId = null
+        router.replace(iosLocalPath('/login'))
       }
     }
 

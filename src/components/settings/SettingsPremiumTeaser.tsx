@@ -11,6 +11,7 @@ import {
 } from '@/lib/ios-payment-gate'
 import { SUBSCRIPTION_PRICE_MONTHLY } from '@/lib/subscription-pricing'
 import { apiFetch } from '@/lib/api/client'
+import { appRoute } from '@/lib/navigation/routes'
 
 interface Props {
   access: AccessStatus
@@ -60,7 +61,7 @@ export default function SettingsPremiumTeaser({ access }: Props) {
               : 'Betterbit Pro'
         }
         detail={detail}
-        onClick={() => router.push('/settings/premium')}
+        onClick={() => router.push(appRoute('/settings/premium'))}
         last
       />
     </SettingsSection>

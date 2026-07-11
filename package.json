@@ -32,7 +32,7 @@
     "alias:generate": "node scripts/nutrition/generate-food-aliases.mjs",
     "qa:e2e-coverage": "node scripts/qa/e2e-coverage.mjs",
     "qa:release-gate": "node scripts/qa/run-release-gate.mjs",
-    "qa:release-gate:unit": "node --import tsx --test src/lib/apple-iap-store.test.ts src/lib/apple-iap-client.test.ts src/lib/apple-iap-sync-regression.test.ts src/lib/ios-payment-gate.test.ts src/lib/clear-user-local-state.test.ts src/lib/offline-pending-sync.test.ts src/lib/food-log-persist.test.ts src/lib/nutrition-day-food-logs.test.ts src/lib/today-offline-cache.test.ts src/lib/subscription-access.test.ts",
+    "qa:release-gate:unit": "node --import tsx --test src/lib/apple-iap-store.test.ts src/lib/apple-iap-client.test.ts src/lib/apple-iap-sync-regression.test.ts src/lib/ios-payment-gate.test.ts src/lib/clear-user-local-state.test.ts src/lib/offline-pending-sync.test.ts src/lib/food-log-persist.test.ts src/lib/nutrition-day-food-logs.test.ts src/lib/today-offline-cache.test.ts src/lib/subscription-access.test.ts src/lib/auth/login-error.test.ts",
     "qa:top100-food-log": "npx tsx scripts/qa/run-top100-food-log-qa.ts",
     "qa:food-log-persist-e2e": "node scripts/qa/run-food-log-persist-e2e.mjs",
     "verify:restaurant-menu": "npx tsx scripts/verify-restaurant-menu-data.ts",

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { appRoute } from '@/lib/navigation/routes'
 import {
   Info,
   FileText,
@@ -74,12 +75,12 @@ export default function AboutBetterBitView({ appVersion }: { appVersion: string 
           <V2VisualChevronRow
             icon={<FileText className="h-4 w-4" />}
             label="使用條款"
-            onClick={() => router.push('/terms')}
+            onClick={() => router.push(appRoute('/terms'))}
           />
           <V2VisualChevronRow
             icon={<Shield className="h-4 w-4" />}
             label="隱私權政策"
-            onClick={() => router.push('/privacy')}
+            onClick={() => router.push(appRoute('/privacy'))}
           />
           <V2VisualChevronRow
             icon={<Code2 className="h-4 w-4" />}

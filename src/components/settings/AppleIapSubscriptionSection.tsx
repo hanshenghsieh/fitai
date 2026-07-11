@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { BB_V2 } from '@/lib/betterbit-v2'
+import { appRoute } from '@/lib/navigation/routes'
 import { isRevenueCatConfigured } from '@/lib/apple-iap-config'
 import { purchaseAppleIap, restoreAppleIap, type AppleIapPurchaseStep } from '@/lib/apple-iap-client'
 import { isCapacitorNative } from '@/lib/capacitor-native'
@@ -183,7 +184,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
         </p>
         <button
           type="button"
-          onClick={() => router.push('/settings/premium')}
+          onClick={() => router.push(appRoute('/settings/premium'))}
           className="w-full py-3 rounded-full text-[14px]"
           style={{ backgroundColor: BB_V2.bg.softGreen, color: BB_V2.accent.green, fontWeight: 600 }}
         >
@@ -198,7 +199,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       <ProPaymentSuccessV2View
         plan={purchasedPlan}
         renewalDate={renewalDate}
-        onStart={() => router.push('/dashboard')}
+        onStart={() => router.push(appRoute('/dashboard'))}
         onViewSubscription={() => setView('active')}
         onRestore={() => void handleRestore()}
         restoring={restoring}

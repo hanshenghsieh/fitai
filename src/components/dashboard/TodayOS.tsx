@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { normalizePath } from '@/lib/navigation/routes'
 import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu, type FoodSearchHit } from '@/lib/food-search'
 import FoodTypePortionSheet from '@/components/dashboard/today/FoodTypePortionSheet'
@@ -445,7 +446,7 @@ export default function TodayOS({
   onMealUiState,
 }: Props) {
   const pathname = usePathname()
-  const onDashboard = pathname === '/dashboard'
+  const onDashboard = normalizePath(pathname) === '/dashboard'
   const coords = useGeolocation(userMemory.eat_out_prefs?.work_location)
   const memory = memoryFromCheckinMeta({ user_memory: userMemory })
 

@@ -1,33 +1,58 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { ShieldCheck, KeyRound, Camera, PieChart, User } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { dispatchOpenRecordSheet } from '@/lib/today-actions'
 import { dispatchRouteChangeFlush } from '@/lib/route-change-flush'
+import { appRoute, normalizePath, navigateTo } from '@/lib/navigation/routes'
 
 const tabs = [
-  { href: '/dashboard', label: '今天', icon: ShieldCheck, match: (p: string) => p === '/dashboard' },
-  { href: '/weekly', label: '記錄', icon: KeyRound, match: (p: string) => p === '/weekly' },
-  { href: '/progress', label: '分析', icon: PieChart, match: (p: string) => p === '/progress' },
-  { href: '/settings', label: '我的', icon: User, match: (p: string) => p.startsWith('/settings') },
+  { path: '/dashboard', label: '今天', icon: ShieldCheck, match: (p: string) => p === '/dashboard' },
+  { path: '/weekly', label: '記錄', icon: KeyRound, match: (p: string) => p === '/weekly' },
+  { path: '/progress', label: '分析', icon: PieChart, match: (p: string) => p === '/progress' },
+  { path: '/settings', label: '我的', icon: User, match: (p: string) => p.startsWith('/settings') },
 ] as const
 
 export default function BottomNav() {
-  const pathname = usePathname()
+  const pathname = normalizePath(usePathname())
   const router = useRouter()
+
+  function go(path: string) {
+    if (path === pathname) return
+    dispatchRouteChangeFlush(appRoute(path))
+    navigateTo(path, target => router.push(target))
+  }
 
   function openPhoto() {
     if (pathname === '/dashboard') {
       dispatchOpenRecordSheet()
       return
     }
-    router.push('/dashboard?record=1')
+    navigateTo('/dashboard?record=1', target => router.push(target))
   }
 
   const left = tabs.slice(0, 2)
   const right = tabs.slice(2)
+
+  function renderTab({ path, label, icon: Icon, match }: (typeof tabs)[number]) {
+    const active = match(pathname)
+    return (
+      <button
+        key={path}
+        type="button"
+        onClick={() => go(path)}
+        className="flex flex-col items-center justify-center gap-0.5 min-w-[52px] min-h-[44px] touch-manipulation"
+        style={{ color: active ? BB_V2.accent.green : BB_V2.text.secondary }}
+        aria-current={active ? 'page' : undefined}
+      >
+        <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : BB_V2.iconStroke} />
+        <span className="text-[11px] leading-none" style={{ fontWeight: active ? 600 : 400 }}>
+          {label}
+        </span>
+      </button>
+    )
+  }
 
   return (
     <nav
@@ -36,25 +61,7 @@ export default function BottomNav() {
     >
       <div className="app-bottom-nav__row">
         <div className="flex flex-1 justify-around">
-          {left.map(({ href, label, icon: Icon, match }) => {
-            const active = match(pathname)
-            return (
-              <Link
-                key={href}
-                href={href}
-                prefetch
-                onClick={() => dispatchRouteChangeFlush(href)}
-                className="flex flex-col items-center justify-center gap-0.5 min-w-[52px] min-h-[44px] touch-manipulation"
-                style={{ color: active ? BB_V2.accent.green : BB_V2.text.secondary }}
-                aria-current={active ? 'page' : undefined}
-              >
-                <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : BB_V2.iconStroke} />
-                <span className="text-[11px] leading-none" style={{ fontWeight: active ? 600 : 400 }}>
-                  {label}
-                </span>
-              </Link>
-            )
-          })}
+          {left.map(renderTab)}
         </div>
 
         <button
@@ -75,25 +82,7 @@ export default function BottomNav() {
         </button>
 
         <div className="flex flex-1 justify-around">
-          {right.map(({ href, label, icon: Icon, match }) => {
-            const active = match(pathname)
-            return (
-              <Link
-                key={href}
-                href={href}
-                prefetch
-                onClick={() => dispatchRouteChangeFlush(href)}
-                className="flex flex-col items-center justify-center gap-0.5 min-w-[52px] min-h-[44px] touch-manipulation"
-                style={{ color: active ? BB_V2.accent.green : BB_V2.text.secondary }}
-                aria-current={active ? 'page' : undefined}
-              >
-                <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : BB_V2.iconStroke} />
-                <span className="text-[11px] leading-none" style={{ fontWeight: active ? 600 : 400 }}>
-                  {label}
-                </span>
-              </Link>
-            )
-          })}
+          {right.map(renderTab)}
         </div>
       </div>
     </nav>

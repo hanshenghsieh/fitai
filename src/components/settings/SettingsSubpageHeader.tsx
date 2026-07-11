@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { colors } from '@/lib/design-system'
+import { appRoute } from '@/lib/navigation/routes'
 
 interface Props {
   title?: string
@@ -15,7 +16,7 @@ export default function SettingsSubpageHeader({ title, subtitle }: Props) {
       style={{ backgroundColor: colors.bg.canvas }}
     >
       <Link
-        href="/settings"
+        href={appRoute('/settings')}
         className="inline-flex items-center gap-1 min-h-[48px] -ml-1 px-1 text-[15px] rounded-xl active:opacity-70"
         style={{ color: colors.text.secondary, fontWeight: 500 }}
       >
