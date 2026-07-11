@@ -1,9 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { loadRecordPageData, type RecordPageData } from '@/features/record/record-data-loader'
+import { getNutritionDayKey } from '@/lib/timezone'
+import { getLastActiveUserId, readCache, writeCache } from '@/lib/local-cache'
+import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 
 export interface UseRecordDataResult {
   selectedDate: string | null
@@ -12,18 +15,38 @@ export interface UseRecordDataResult {
   isLoading: boolean
   isRefreshing: boolean
   isDateTransitioning: boolean
+  isStale: boolean
+  isOffline: boolean
   error: string | null
   refetch: () => Promise<void>
   mutate: (updater: (prev: RecordPageData | null) => RecordPageData | null) => void
 }
 
+interface RecordCacheEntry {
+  userId: string
+  data: RecordPageData
+}
+
+function readInitialRecordCache(): { data: RecordPageData; isStale: boolean } | null {
+  const userId = getLastActiveUserId()
+  if (!userId) return null
+  const hit = readCache<RecordCacheEntry>('record', userId, [getNutritionDayKey()])
+  if (!hit || hit.data.userId !== userId) return null
+  return { data: hit.data.data, isStale: hit.isStale }
+}
+
 export function useRecordData(): UseRecordDataResult {
   const router = useRouter()
-  const [data, setData] = useState<RecordPageData | null>(null)
-  const [selectedDate, setSelectedDateState] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const { isOffline } = useNetworkStatus()
+  const initialCache = useMemo(() => readInitialRecordCache(), [])
+  const [data, setData] = useState<RecordPageData | null>(initialCache?.data ?? null)
+  const [selectedDate, setSelectedDateState] = useState<string | null>(
+    initialCache?.data.todayStr ?? null
+  )
+  const [isLoading, setIsLoading] = useState(!initialCache)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isDateTransitioning, setIsDateTransitioning] = useState(false)
+  const [isStale, setIsStale] = useState(initialCache?.isStale ?? false)
   const [error, setError] = useState<string | null>(null)
   const mountedRef = useRef(true)
   const dateTransitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -56,7 +79,12 @@ export function useRecordData(): UseRecordDataResult {
       const loaded = await loadRecordPageData(supabase, session.user.id)
       if (!mountedRef.current) return
       setData(loaded)
+      setIsStale(false)
       setSelectedDateState(prev => prev ?? loaded.todayStr)
+      writeCache('record', session.user.id, [loaded.todayStr], {
+        userId: session.user.id,
+        data: loaded,
+      })
     } catch (err) {
       if (!mountedRef.current) return
       const message = err instanceof Error ? err.message : '目前連線不穩，請稍後再試'
@@ -69,7 +97,8 @@ export function useRecordData(): UseRecordDataResult {
   }, [router])
 
   useEffect(() => {
-    void fetchRecord('initial')
+    void fetchRecord(initialCache ? 'refresh' : 'initial')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchRecord])
 
   const refetch = useCallback(async () => {
@@ -96,6 +125,8 @@ export function useRecordData(): UseRecordDataResult {
     isLoading,
     isRefreshing,
     isDateTransitioning,
+    isStale,
+    isOffline,
     error,
     refetch,
     mutate,

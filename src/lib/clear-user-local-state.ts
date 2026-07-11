@@ -3,6 +3,7 @@ import { clearTodayOfflineSnapshot } from '@/lib/today-offline-cache'
 import { clearWorkoutItemsSessionCache } from '@/lib/workout-items-session-cache'
 import { clearWeightMeasurementsSessionCache } from '@/lib/weight-measurements-session-cache'
 import { clearPendingSync } from '@/lib/offline-pending-sync'
+import { clearAllLocalCache } from '@/lib/local-cache'
 import { getNutritionDayKey } from '@/lib/timezone'
 
 /**
@@ -18,6 +19,8 @@ export function clearUserLocalState(): void {
   clearWorkoutItemsSessionCache(today)
   clearWeightMeasurementsSessionCache()
   clearPendingSync()
+  // 1F local read-through cache (all namespaces + last-user marker).
+  clearAllLocalCache()
 
   try {
     const sessionKeys: string[] = []

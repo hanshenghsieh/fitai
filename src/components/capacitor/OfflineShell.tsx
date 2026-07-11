@@ -3,36 +3,34 @@
 import { useEffect, useState } from 'react'
 import { TODAY } from '@/lib/today-design'
 import { hasTodayOfflineSnapshot } from '@/lib/today-offline-cache'
-import { hasPendingSync, isOffline } from '@/lib/offline-pending-sync'
+import { isOffline } from '@/lib/offline-pending-sync'
 
 export default function OfflineShell() {
   const [offline, setOffline] = useState(false)
   const [hasCache, setHasCache] = useState(false)
-  const [pendingSync, setPendingSync] = useState(false)
 
   useEffect(() => {
     const sync = () => {
-      const nextOffline = isOffline()
-      setOffline(nextOffline)
+      setOffline(isOffline())
       setHasCache(hasTodayOfflineSnapshot())
-      setPendingSync(hasPendingSync())
     }
     sync()
     window.addEventListener('online', sync)
     window.addEventListener('offline', sync)
     window.addEventListener('storage', sync)
-    window.addEventListener('bb-pending-sync', sync)
     return () => {
       window.removeEventListener('online', sync)
       window.removeEventListener('offline', sync)
       window.removeEventListener('storage', sync)
-      window.removeEventListener('bb-pending-sync', sync)
     }
   }, [])
 
-  if (!offline && !pendingSync) return null
+  // Only surface something when actually offline. Background sync while online
+  // stays low-key (handled by the small "同步中…" pill), so we never imply a
+  // full offline write queue that isn't built yet.
+  if (!offline) return null
 
-  if (hasCache || pendingSync) {
+  if (hasCache) {
     return (
       <div
         className="fixed inset-x-0 top-0 z-[100] px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3"
@@ -49,21 +47,15 @@ export default function OfflineShell() {
           }}
         >
           <p className="text-[13px]" style={{ color: TODAY.text, fontWeight: 600 }}>
-            {offline ? '離線模式' : '待同步'}
+            目前離線，先顯示上次資料
           </p>
           <p className="text-[12px] mt-0.5 leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-            {offline
-              ? pendingSync
-                ? '紀錄已暫存，恢復連線後會自動同步。'
-                : '顯示上次同步的今日紀錄。恢復連線後會自動更新。'
-              : '有未同步的紀錄，正在背景更新…'}
+            連線後會自動更新。
           </p>
         </div>
       </div>
     )
   }
-
-  if (!offline) return null
 
   return (
     <div

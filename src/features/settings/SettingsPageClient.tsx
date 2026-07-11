@@ -5,9 +5,10 @@ import { useSettingsData } from '@/features/settings/useSettingsData'
 import SettingsV2Skeleton from '@/features/settings/SettingsV2Skeleton'
 import SettingsErrorState from '@/features/settings/SettingsErrorState'
 import SettingsRefreshingBanner from '@/features/settings/SettingsRefreshingBanner'
+import StaleDataBanner from '@/features/shared/StaleDataBanner'
 
 export default function SettingsPageClient() {
-  const { data, isLoading, isRefreshing, error, refetch } = useSettingsData()
+  const { data, isLoading, isRefreshing, isOffline, error, refetch } = useSettingsData()
 
   if (isLoading && !data) {
     return <SettingsV2Skeleton />
@@ -21,9 +22,12 @@ export default function SettingsPageClient() {
     return <SettingsV2Skeleton />
   }
 
+  const showStaleBanner = (Boolean(error) || isOffline) && !isRefreshing
+
   return (
     <div className="relative">
       {isRefreshing ? <SettingsRefreshingBanner /> : null}
+      {showStaleBanner ? <StaleDataBanner /> : null}
       <SettingsV2Screen access={data.access} appVersion={data.appVersion} />
     </div>
   )

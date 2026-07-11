@@ -42,6 +42,7 @@ import {
 } from '@/lib/weight-measurements-session-cache'
 import ProgressWeightLog from '@/components/progress/ProgressWeightLog'
 import { apiFetch } from '@/lib/api/client'
+import { invalidateBodyData } from '@/lib/local-cache/invalidate'
 
 const WeightTrendChart = dynamic(() => import('@/components/analytics/WeightTrendChart'), {
   ssr: false,
@@ -355,9 +356,11 @@ export default function AnalyticsScreen({
         savedMeasurements.length < next.length &&
         savedMeasurements.length < base.length + 1
       ) {
-        toast.error('部分體重紀錄可能未同步，請稍後再試')
+        toast.message('同步暫時失敗，稍後會自動重試')
       }
       if (savedMeasurements?.length) {
+        // Server confirmed the body-data write → refresh analysis/settings/today caches.
+        invalidateBodyData(userId)
         await refreshMeasurements(weightKg, savedMeasurements)
       } else {
         await refreshMeasurements(weightKg, next)

@@ -5,6 +5,7 @@ import { useRecordData } from '@/features/record/useRecordData'
 import RecordV2Skeleton from '@/features/record/RecordV2Skeleton'
 import RecordErrorState from '@/features/record/RecordErrorState'
 import RecordRefreshingBanner from '@/features/record/RecordRefreshingBanner'
+import StaleDataBanner from '@/features/shared/StaleDataBanner'
 
 export default function RecordPageClient() {
   const {
@@ -14,6 +15,7 @@ export default function RecordPageClient() {
     isLoading,
     isRefreshing,
     isDateTransitioning,
+    isOffline,
     error,
     refetch,
   } = useRecordData()
@@ -31,12 +33,14 @@ export default function RecordPageClient() {
   }
 
   const showRefreshing = isRefreshing || isDateTransitioning
+  const showStaleBanner = (Boolean(error) || isOffline) && !showRefreshing
 
   return (
     <div className="relative">
       {showRefreshing ? (
         <RecordRefreshingBanner label={isDateTransitioning ? '載入中...' : '同步中...'} />
       ) : null}
+      {showStaleBanner ? <StaleDataBanner /> : null}
       <RecordV2Screen
         todayStr={data.todayStr}
         checkins={data.checkins}

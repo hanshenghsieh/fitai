@@ -91,7 +91,6 @@ import Day1GuideBanner, {
   markDay1GuidePending,
   shouldShowDay1Guide,
 } from '@/components/dashboard/today/Day1GuideBanner'
-import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import {
   clearPendingSync,
   hasPendingSync,
@@ -99,6 +98,7 @@ import {
   markPendingSync,
 } from '@/lib/offline-pending-sync'
 import { zaijian } from '@/lib/copy/zaijian'
+import { invalidateMealMutation } from '@/lib/local-cache/invalidate'
 import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile } from '@/types'
 import { apiFetch } from '@/lib/api/client'
 
@@ -571,6 +571,8 @@ export default function BetterBitHome({
           writeFoodCache(state.userMemory?.food_logs_today ?? [])
           writeWorkoutItemsSessionCache(state.workoutItems)
           clearPendingSync()
+          // Server confirmed the write → let today/record/analysis re-read fresh.
+          invalidateMealMutation(profile?.id)
         } catch (err) {
           if (err instanceof DOMException && err.name === 'AbortError') {
             persistPatchRef.current = { ...patch, ...persistPatchRef.current }
@@ -590,7 +592,9 @@ export default function BetterBitHome({
           const now = Date.now()
           if (now - persistErrorToastAtRef.current > 8000) {
             persistErrorToastAtRef.current = now
-            toast.error(GENTLE_ERROR_MESSAGE)
+            toast.message('同步暫時失敗，稍後會自動重試', {
+              action: { label: '重新整理', onClick: () => void flushPersist() },
+            })
           }
         } else {
           persistBackgroundFailCountRef.current += 1

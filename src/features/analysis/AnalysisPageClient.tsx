@@ -5,6 +5,7 @@ import { useAnalysisData } from '@/features/analysis/useAnalysisData'
 import AnalysisV2Skeleton from '@/features/analysis/AnalysisV2Skeleton'
 import AnalysisErrorState from '@/features/analysis/AnalysisErrorState'
 import AnalysisRefreshingBanner from '@/features/analysis/AnalysisRefreshingBanner'
+import StaleDataBanner from '@/features/shared/StaleDataBanner'
 
 export default function AnalysisPageClient() {
   const {
@@ -16,6 +17,7 @@ export default function AnalysisPageClient() {
     isLoading,
     isRefreshing,
     isWeekTransitioning,
+    isOffline,
     error,
     refetch,
   } = useAnalysisData()
@@ -33,12 +35,14 @@ export default function AnalysisPageClient() {
   }
 
   const showRefreshing = isRefreshing || isWeekTransitioning
+  const showStaleBanner = (Boolean(error) || isOffline) && !showRefreshing
 
   return (
     <div className="relative">
       {showRefreshing ? (
         <AnalysisRefreshingBanner label={isWeekTransitioning ? '載入中...' : '同步中...'} />
       ) : null}
+      {showStaleBanner ? <StaleDataBanner /> : null}
       <AnalysisV2Screen
         todayStr={data.todayStr}
         measurements={data.measurements}

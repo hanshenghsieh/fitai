@@ -13,6 +13,7 @@ import { useTodayData } from '@/features/today/useTodayData'
 import TodayV2Skeleton from '@/features/today/TodayV2Skeleton'
 import TodayErrorState from '@/features/today/TodayErrorState'
 import TodayRefreshingBanner from '@/features/today/TodayRefreshingBanner'
+import StaleDataBanner from '@/features/shared/StaleDataBanner'
 
 const PLAN_FAILED_LINE = {
   text: GENTLE_ERROR_MESSAGE,
@@ -21,7 +22,7 @@ const PLAN_FAILED_LINE = {
 }
 
 export default function TodayPageClient() {
-  const { data, isLoading, isRefreshing, error, refetch } = useTodayData()
+  const { data, isLoading, isRefreshing, isOffline, error, refetch } = useTodayData()
 
   if (isLoading && !data) {
     return <TodayV2Skeleton />
@@ -54,9 +55,12 @@ export default function TodayPageClient() {
     planGenerateError,
   } = data
 
+  const showStaleBanner = Boolean(data) && (Boolean(error) || isOffline) && !isRefreshing
+
   return (
     <div className="max-w-lg mx-auto relative" style={{ backgroundColor: colors.bg.canvas }}>
       {isRefreshing ? <TodayRefreshingBanner /> : null}
+      {showStaleBanner ? <StaleDataBanner /> : null}
       <NotificationPrompt />
 
       {weeklyPlan?.generation_status === 'generating' && <ZaiJianPanel moment="loading" />}
