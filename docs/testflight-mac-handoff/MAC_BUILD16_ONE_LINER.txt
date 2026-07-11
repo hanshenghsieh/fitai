@@ -1,0 +1,21 @@
+你幫我完成 Betterbit iOS TestFlight Build 16（local hybrid，不是 Build 15 remote wrapper）。請完整閱讀並執行 docs/testflight-mac-handoff/BUILD_16_MAC_CURSOR.md。
+
+硬性限制：不要 merge main、不要 production deploy betterbit.app、capacitor 不要加 server.url。
+
+第一步（必做）：git checkout feature/local-hybrid-build16 → git status。若你有本機小 bug 修改，先 git add -A、commit（fix: Mac-side bug fixes for Build 16）、push origin feature/local-hybrid-build16，再 git pull。
+
+然後：
+export IOS_BUILD_TARGET=local-hybrid
+export IOS_BUILD_NUMBER=16
+export NEXT_PUBLIC_API_BASE_URL=https://fitai-r567yi5vu-hanshenghsiehs-projects.vercel.app
+npm ci
+npm run testflight:prep
+
+驗證 ios/App/App/capacitor.config.json：webDir=out、無 server.url、有 PurchasesPlugin；public/index.html 存在。
+
+建議先 npm run ios:local:open 在 Simulator Run 煙測（見 docs/performance/LOCAL_HYBRID_1E_D_MAC_SMOKE_TEST.md），再：
+bash scripts/testflight-archive-mac.sh
+open build/BetterBit-Build16.xcarchive
+→ Organizer Upload 到 App Store Connect。
+
+若 ASC 已有 Build 16 才 bump 到 17。上傳後依 POST_UPLOAD_VERIFY.md 回報：實際 build 號、ASC 狀態、主畫面名稱 Betterbit、新 icon、local shell（非 betterbit.app WebView）、IAP Sandbox 是否可付款；若有你 push 的 commit 請給 hash。
