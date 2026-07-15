@@ -19,6 +19,8 @@ import { basename, join, relative } from 'node:path'
 
 const root = join(import.meta.dirname, '..')
 const results = []
+const IAP_PRODUCT_ID = 'betterbit_pro_monthly'
+const IAP_ENTITLEMENT_ID = 'premium'
 
 function rel(p) {
   return relative(root, p).replace(/\\/g, '/')
@@ -181,6 +183,72 @@ function checkCapacitorConfig() {
   } else {
     pass('cap.apiEnv', `NEXT_PUBLIC_API_BASE_URL=${apiBase}`)
   }
+}
+
+function checkRevenueCatIap() {
+  console.log('\n[1B] RevenueCat / Apple IAP')
+  const publicKey =
+    process.env.NEXT_PUBLIC_REVENUECAT_IOS_API_KEY?.trim()
+  const enabled = process.env.NEXT_PUBLIC_APPLE_IAP_ENABLED?.trim()
+  const productId =
+    process.env.NEXT_PUBLIC_APPLE_IAP_PRODUCT_ID?.trim()
+  const entitlementId =
+    process.env.NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID?.trim()
+
+  enabled === 'true'
+    ? pass('iap.enabled', 'Apple IAP enabled')
+    : fail('iap.enabled', 'NEXT_PUBLIC_APPLE_IAP_ENABLED must be true')
+  publicKey?.startsWith('appl_')
+    ? pass('iap.publicKey', 'RevenueCat iOS public key present')
+    : fail('iap.publicKey', 'RevenueCat iOS appl_ public key missing')
+  productId === IAP_PRODUCT_ID
+    ? pass('iap.product', `product id = ${IAP_PRODUCT_ID}`)
+    : fail('iap.product', `product id must equal ${IAP_PRODUCT_ID}`)
+  entitlementId === IAP_ENTITLEMENT_ID
+    ? pass('iap.entitlement', `entitlement id = ${IAP_ENTITLEMENT_ID}`)
+    : fail('iap.entitlement', `entitlement id must equal ${IAP_ENTITLEMENT_ID}`)
+
+  const packagePath = join(root, 'package.json')
+  const packageJson = existsSync(packagePath)
+    ? JSON.parse(readText(packagePath))
+    : null
+  packageJson?.dependencies?.['@revenuecat/purchases-capacitor']
+    ? pass('iap.package', '@revenuecat/purchases-capacitor dependency present')
+    : fail('iap.package', '@revenuecat/purchases-capacitor dependency missing')
+
+  const capJsonPath = join(root, 'ios/App/App/capacitor.config.json')
+  const capJson = existsSync(capJsonPath)
+    ? JSON.parse(readText(capJsonPath))
+    : null
+  capJson?.packageClassList?.includes('PurchasesPlugin')
+    ? pass('iap.plugin.synced', 'PurchasesPlugin is synced')
+    : fail('iap.plugin.synced', 'PurchasesPlugin missing — run cap sync ios')
+
+  const spmPath = join(root, 'ios/App/CapApp-SPM/Package.swift')
+  const spm = existsSync(spmPath) ? readText(spmPath) : ''
+  if (
+    spm.includes('@revenuecat') &&
+    spm.includes('RevenuecatPurchasesCapacitor')
+  ) {
+    pass('iap.spm', 'RevenueCat PurchasesPlugin is linked through SPM')
+  } else {
+    fail('iap.spm', 'RevenueCat PurchasesPlugin missing from iOS SPM')
+  }
+
+  const iosJs = gatherText(
+    [join(root, 'ios/App/App/public/_next')],
+    ['.js']
+  )
+  iosJs.includes(IAP_PRODUCT_ID)
+    ? pass('iap.bundle.product', 'monthly product id found in iOS bundle')
+    : fail('iap.bundle.product', 'monthly product id missing from iOS bundle')
+  iosJs.includes(IAP_ENTITLEMENT_ID)
+    ? pass('iap.bundle.entitlement', 'premium entitlement marker found in iOS bundle')
+    : fail('iap.bundle.entitlement', 'premium entitlement marker missing from iOS bundle')
+  const hasRevenueCatPublicKey = /appl_[A-Za-z0-9_-]+/.test(iosJs)
+  hasRevenueCatPublicKey
+    ? pass('iap.bundle.publicKey', 'RevenueCat public key marker found in iOS bundle')
+    : fail('iap.bundle.publicKey', 'RevenueCat public key marker missing from iOS bundle')
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -591,6 +659,7 @@ async function main() {
   console.log(`time: ${new Date().toISOString()}`)
 
   checkCapacitorConfig()
+  checkRevenueCatIap()
   checkBundles()
   checkSwift()
   await checkSplashAndIcon()

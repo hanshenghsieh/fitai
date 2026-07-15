@@ -13,6 +13,8 @@ import { join } from 'node:path'
 const root = join(import.meta.dirname, '..')
 const isWindows = process.platform === 'win32'
 const stagingRoot = join(root, '.ios-local-staging')
+const IAP_PRODUCT_ID = 'betterbit_pro_monthly'
+const IAP_ENTITLEMENT_ID = 'premium'
 
 const EXCLUDE_DIRS = [
   { src: join(root, 'src/app/api'), bak: join(stagingRoot, 'api') },
@@ -138,11 +140,41 @@ function failFastEnv() {
     process.exit(1)
   }
 
-  // Apex betterbit.app redirects to www; WKWebView can lose CORS headers across
-  // that redirect, so local-hybrid builds always bake in the canonical host.
+  const iapEnabled = process.env.NEXT_PUBLIC_APPLE_IAP_ENABLED?.trim()
+  const revenueCatKey =
+    process.env.NEXT_PUBLIC_REVENUECAT_IOS_API_KEY?.trim()
+  const productId = process.env.NEXT_PUBLIC_APPLE_IAP_PRODUCT_ID?.trim()
+  const entitlementId =
+    process.env.NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID?.trim()
+  const iapErrors = []
+  if (iapEnabled !== 'true') {
+    iapErrors.push('NEXT_PUBLIC_APPLE_IAP_ENABLED must be true')
+  }
+  if (!revenueCatKey?.startsWith('appl_')) {
+    iapErrors.push('NEXT_PUBLIC_REVENUECAT_IOS_API_KEY must be present and use an appl_ public key')
+  }
+  if (productId !== IAP_PRODUCT_ID) {
+    iapErrors.push(`NEXT_PUBLIC_APPLE_IAP_PRODUCT_ID must equal ${IAP_PRODUCT_ID}`)
+  }
+  if (entitlementId !== IAP_ENTITLEMENT_ID) {
+    iapErrors.push(`NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID must equal ${IAP_ENTITLEMENT_ID}`)
+  }
+  if (iapErrors.length > 0) {
+    for (const error of iapErrors) {
+      console.error(`[build:ios-local] ${error}.`)
+    }
+    process.exit(1)
+  }
+  console.log('[build:ios-local] RevenueCat public config present and identifiers match.')
+
+  // Apex betterbit.app 308-redirects to www; WKWebView drops CORS redirects.
+  // Bake in the canonical www host so native mutations don't hit the redirect.
   const canonical = apiBase
     .replace(/\/$/, '')
     .replace(/^https:\/\/betterbit\.app/i, 'https://www.betterbit.app')
+  if (canonical !== apiBase.replace(/\/$/, '')) {
+    console.log(`[build:ios-local] normalized API base → ${canonical}`)
+  }
 
   return {
     ...process.env,

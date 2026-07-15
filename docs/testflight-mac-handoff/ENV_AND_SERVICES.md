@@ -9,7 +9,9 @@ Dashboard：https://vercel.com → 专案 **fitai**
 | `NEXT_PUBLIC_APPLE_IAP_ENABLED` | `true` | 开 IAP UI |
 | `NEXT_PUBLIC_REVENUECAT_IOS_API_KEY` | `appl_...` | RevenueCat → Apps → Public API Key |
 | `NEXT_PUBLIC_APPLE_IAP_PRODUCT_ID` | `betterbit_pro_monthly` | ASC 商品 ID |
-| `NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID` | `BetterBit Pro` | 跟 RC Entitlement Identifier 一致 |
+| `NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID` | `premium` | 跟 RC Entitlement Identifier 一致；BetterBit Pro 僅為顯示名稱 |
+| `REVENUECAT_SECRET_API_KEY` | `sk_...` | Server-only subscriber verification；不可放進 iOS bundle |
+| `REVENUECAT_WEBHOOK_AUTHORIZATION` | 自訂高強度值 | 必須與 RevenueCat Webhook Authorization header 完全一致 |
 
 Mac **不用** redeploy，除非改了 env。
 
@@ -24,10 +26,17 @@ Dashboard：https://app.revenuecat.com
 | iOS Public API Key | `appl_` 开头（给 Vercel + SDK） |
 | Bundle ID | `app.fitai.betterbit` |
 | Product | `betterbit_pro_monthly` |
-| Entitlement Identifier | `BetterBit Pro` |
+| Entitlement Identifier | `premium` |
 | Current Offering | `default` → Monthly → `betterbit_pro_monthly` |
 
 Integrations → In-app purchase key + App Store Connect API：需绿勾。
+
+Webhook：
+
+- URL：`https://www.betterbit.app/api/webhooks/revenuecat`
+- Authorization：使用与 Vercel `REVENUECAT_WEBHOOK_AUTHORIZATION` 完全相同的值
+- 发送 production + sandbox lifecycle events
+- Server 收到事件后会重新查询 RevenueCat subscriber；不会信任 webhook 内的 transaction/price/receipt
 
 ---
 

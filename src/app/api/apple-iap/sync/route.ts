@@ -1,24 +1,15 @@
 import { NextRequest } from 'next/server'
-import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/server'
 import { requireApiUser } from '@/lib/api/auth'
 import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { upsertAppleIapSubscription } from '@/lib/apple-iap-store'
 import { isAppleIapEnabled } from '@/lib/apple-iap-config'
 import { shouldBlockExternalPaymentsOnServer } from '@/lib/ios-payment-gate'
-
-const syncSchema = z.object({
-  originalTransactionId: z.string().min(4).max(256),
-  productId: z.string().max(128).optional(),
-  expiresAt: z
-    .string()
-    .optional()
-    .nullable()
-    .refine(v => v == null || v === '' || !Number.isNaN(Date.parse(v)), {
-      message: 'Invalid expiresAt',
-    }),
-  isRestore: z.boolean().optional(),
-})
+import {
+  fetchVerifiedRevenueCatSubscription,
+  parseAppleIapSyncTrigger,
+  RevenueCatConfigurationError,
+} from '@/lib/revenuecat-server'
 
 export async function OPTIONS(request: NextRequest) {
   return handleCorsOptions(request)
@@ -38,42 +29,47 @@ export async function POST(req: NextRequest) {
     if (!auth.ok) return auth.response
     const { user } = auth
 
-    const parsed = syncSchema.safeParse(await req.json().catch(() => ({})))
-    if (!parsed.success) {
+    const parsed = parseAppleIapSyncTrigger(
+      await req.json().catch(() => null)
+    )
+    if (!parsed) {
       return jsonWithCors({ error: 'Invalid payload' }, req, { status: 400 })
     }
 
-    const expiresRaw = parsed.data.expiresAt
-    const expiresAt =
-      expiresRaw == null || expiresRaw === ''
-        ? null
-        : new Date(expiresRaw).toISOString()
-
-    const row = await upsertAppleIapSubscription(createAdminClient(), {
-      userId: user.id,
-      originalTransactionId: parsed.data.originalTransactionId || user.id,
-      productId: parsed.data.productId,
-      expiresAt,
-    })
+    const verified = await fetchVerifiedRevenueCatSubscription(user.id)
+    const row = await upsertAppleIapSubscription(
+      createAdminClient(),
+      verified
+    )
 
     return jsonWithCors(
       {
         success: true,
+        verified: true,
+        active: verified.active,
+        product_id: verified.productId,
         subscription: {
           status: row.status,
           subscription_source: row.subscription_source,
           current_period_end: row.current_period_end,
         },
-        restored: parsed.data.isRestore === true,
+        restored: parsed.isRestore,
       },
       req
     )
   } catch (err) {
-    console.error('Apple IAP sync failed:', err)
+    const configurationError = err instanceof RevenueCatConfigurationError
+    console.error('Apple IAP sync failed:', {
+      reason: configurationError ? 'not_configured' : 'verification_failed',
+    })
     return jsonWithCors(
-      { error: err instanceof Error ? err.message : 'Sync failed' },
+      {
+        error: configurationError
+          ? 'Apple IAP verification is not configured'
+          : 'Unable to verify Apple subscription',
+      },
       req,
-      { status: 500 }
+      { status: configurationError ? 503 : 502 }
     )
   }
 }

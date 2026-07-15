@@ -294,7 +294,7 @@ NEXT_PUBLIC_APP_URL=https://betterbit.app        # metadata / links
 NEXT_PUBLIC_APPLE_IAP_ENABLED=true
 NEXT_PUBLIC_REVENUECAT_IOS_API_KEY=appl_...
 NEXT_PUBLIC_APPLE_IAP_PRODUCT_ID=betterbit_pro_monthly
-NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID=BetterBit Pro
+NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID=premium
 NEXT_PUBLIC_APP_STORE_SAFE_MODE=true            # TestFlight — hide Stripe
 ```
 

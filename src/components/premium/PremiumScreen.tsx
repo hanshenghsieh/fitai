@@ -8,7 +8,11 @@ import type { AccessStatus } from '@/lib/subscription-access'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { getStripePriceId } from '@/lib/stripe-config'
 import { formatProRenewalDate, type ProPlanId } from '@/lib/pro-subscription-v2'
-import { shouldHideExternalPaymentsClient, shouldShowAppleIapClient } from '@/lib/ios-payment-gate'
+import {
+  resolvePremiumPaymentSurface,
+  shouldHideExternalPaymentsClient,
+  shouldShowAppleIapClient,
+} from '@/lib/ios-payment-gate'
 import PremiumTestFlightScreen from '@/components/premium/PremiumTestFlightScreen'
 import AppleIapSubscriptionSection from '@/components/settings/AppleIapSubscriptionSection'
 import ProSubscriptionV2View from '@/components/betterbit-v2/ProSubscriptionV2View'
@@ -30,12 +34,17 @@ export default function PremiumScreen({ access }: Props) {
     setHidePayments(shouldHideExternalPaymentsClient())
     setShowAppleIap(shouldShowAppleIapClient())
   }, [])
+  const surface = resolvePremiumPaymentSurface({
+    showAppleIap,
+    hideExternalPayments: hidePayments,
+  })
 
-  if (showAppleIap) {
+  if (surface === 'apple_iap') {
     return <AppleIapSubscriptionSection access={access} />
   }
 
-  if (hidePayments) {
+  if (surface === 'informational') {
+    // Native safe-mode fallback while Apple IAP is not configured.
     return <PremiumTestFlightScreen />
   }
 

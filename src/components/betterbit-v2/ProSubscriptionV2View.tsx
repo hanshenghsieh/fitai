@@ -34,11 +34,20 @@ interface Props {
   access: AccessStatus
   handlers: ProPaywallV2Handlers
   showClose?: boolean
+  availablePlans?: 'all' | 'monthly-only'
 }
 
-export default function ProSubscriptionV2View({ access, handlers, showClose = true }: Props) {
+export default function ProSubscriptionV2View({
+  access,
+  handlers,
+  showClose = true,
+  availablePlans = 'all',
+}: Props) {
   const router = useRouter()
-  const [plan, setPlan] = useState<ProPlanId>('yearly')
+  const monthlyOnly = availablePlans === 'monthly-only'
+  const [plan, setPlan] = useState<ProPlanId>(
+    monthlyOnly ? 'monthly' : 'yearly'
+  )
   const trialWhisper = premiumTrialWhisper(access)
   const [yearlyPerMonth, yearlySavings] = yearlyPlanSubtextLines()
 
@@ -91,7 +100,7 @@ export default function ProSubscriptionV2View({ access, handlers, showClose = tr
             )}
           </div>
 
-          <div className="flex gap-3">
+          <div className={monthlyOnly ? 'flex' : 'flex gap-3'}>
             <V2PricingCard
               title="月訂方案"
               price={PRO_PLAN_PRICES.monthly}
@@ -99,15 +108,17 @@ export default function ProSubscriptionV2View({ access, handlers, showClose = tr
               selected={plan === 'monthly'}
               onSelect={() => selectPlan('monthly')}
             />
-            <V2PricingCard
-              title="年訂方案"
-              price={PRO_PLAN_PRICES.yearly}
-              subtextLines={[yearlyPerMonth, yearlySavings]}
-              savingsHighlight={yearlySavings}
-              badge="最優惠"
-              selected={plan === 'yearly'}
-              onSelect={() => selectPlan('yearly')}
-            />
+            {!monthlyOnly && (
+              <V2PricingCard
+                title="年訂方案"
+                price={PRO_PLAN_PRICES.yearly}
+                subtextLines={[yearlyPerMonth, yearlySavings]}
+                savingsHighlight={yearlySavings}
+                badge="最優惠"
+                selected={plan === 'yearly'}
+                onSelect={() => selectPlan('yearly')}
+              />
+            )}
           </div>
 
           <div className="space-y-2.5">

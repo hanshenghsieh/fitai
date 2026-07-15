@@ -27,11 +27,11 @@ Mac 執行：`git pull origin main`
 NEXT_PUBLIC_APPLE_IAP_ENABLED=true
 NEXT_PUBLIC_REVENUECAT_IOS_API_KEY=appl_...（RevenueCat Public key）
 NEXT_PUBLIC_APPLE_IAP_PRODUCT_ID=betterbit_pro_monthly
-NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID=BetterBit Pro
+NEXT_PUBLIC_APPLE_IAP_ENTITLEMENT_ID=premium
 NEXT_PUBLIC_APP_STORE_SAFE_MODE=true
 ```
 
-⚠️ Entitlement ID 必須是 **`BetterBit Pro`**（不是 `premium`）。
+⚠️ Entitlement ID 必須是 **`premium`**；`BetterBit Pro` 只作為對外顯示名稱。
 
 ---
 
@@ -71,7 +71,7 @@ Mac **仍須再跑** `npm run testflight:prep`（確保本機 node_modules / cap
 ## RevenueCat（Dashboard 已設）
 
 - Product：`betterbit_pro_monthly`
-- Entitlement：**BetterBit Pro**
+- Entitlement：**premium**
 - Offering：`default` → Monthly → `betterbit_pro_monthly`
 
 ---

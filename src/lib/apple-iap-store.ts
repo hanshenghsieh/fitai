@@ -2,9 +2,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 export interface AppleIapSyncInput {
   userId: string
-  originalTransactionId: string
-  productId?: string | null
-  expiresAt?: string | null
+  active: boolean
+  productId: string
+  purchasedAt: string
+  expiresAt: string
+  willRenew: boolean
 }
 
 export interface AppleIapSubscriptionRow {
@@ -35,20 +37,18 @@ export function isAppleIapSubscriptionId(id?: string | null): boolean {
 
 export function buildAppleIapSubscriptionRow(input: AppleIapSyncInput): AppleIapSubscriptionRow {
   const now = new Date()
-  const syntheticId = buildAppleIapSubscriptionId(input.originalTransactionId)
-  const periodEnd = input.expiresAt ? new Date(input.expiresAt) : null
-  const isActive = !periodEnd || periodEnd.getTime() > now.getTime()
+  const syntheticId = buildAppleIapSubscriptionId(input.userId)
 
   return {
     user_id: input.userId,
     stripe_subscription_id: syntheticId,
     stripe_customer_id: syntheticId,
-    status: isActive ? 'active' : 'canceled',
+    status: input.active ? 'active' : 'canceled',
     subscription_source: 'apple_iap',
     plan: 'premium',
-    current_period_start: now.toISOString(),
-    current_period_end: periodEnd?.toISOString() ?? null,
-    cancel_at_period_end: false,
+    current_period_start: new Date(input.purchasedAt).toISOString(),
+    current_period_end: new Date(input.expiresAt).toISOString(),
+    cancel_at_period_end: input.active && !input.willRenew,
     updated_at: now.toISOString(),
   }
 }

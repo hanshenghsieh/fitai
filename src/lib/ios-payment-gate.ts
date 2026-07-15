@@ -55,6 +55,17 @@ export function shouldHideExternalPaymentsClient(): boolean {
   return hasIosPlatformCookie(document.cookie)
 }
 
+export type PremiumPaymentSurface = 'apple_iap' | 'informational' | 'stripe'
+
+export function resolvePremiumPaymentSurface(input: {
+  showAppleIap: boolean
+  hideExternalPayments: boolean
+}): PremiumPaymentSurface {
+  if (input.showAppleIap) return 'apple_iap'
+  if (input.hideExternalPayments) return 'informational'
+  return 'stripe'
+}
+
 /**
  * Pre-IAP TestFlight: hide paywalls and grant free access.
  * Once Apple IAP is enabled, paywalls must show (route to Apple IAP).

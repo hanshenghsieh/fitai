@@ -13,7 +13,6 @@ import { apiFetch } from '@/lib/api/client'
 
 export interface AppleIapPurchaseResult {
   active: boolean
-  originalTransactionId?: string
   productId?: string
   expiresAt?: string | null
 }
@@ -177,42 +176,40 @@ function readEntitlement(customerInfo: {
   }
 }) {
   const active = customerInfo.entitlements?.active ?? {}
-  const entitlement =
-    active[APPLE_IAP_ENTITLEMENT_ID] ?? Object.values(active)[0]
+  const entitlement = active[APPLE_IAP_ENTITLEMENT_ID]
 
-  if (!entitlement?.productIdentifier) return null
-
-  const originalTransactionId = `${entitlement.productIdentifier}_${entitlement.originalPurchaseDate ?? 'active'}`
+  if (entitlement?.productIdentifier !== APPLE_IAP_PRODUCT_ID) return null
 
   return {
     productId: entitlement.productIdentifier,
     expiresAt: entitlement.expirationDate ?? null,
-    originalTransactionId,
   }
 }
 
-async function syncToBackend(payload: {
-  originalTransactionId: string
-  productId?: string
-  expiresAt?: string | null
-  isRestore?: boolean
-}) {
+async function syncToBackend(isRestore = false): Promise<AppleIapPurchaseResult> {
   const res = await apiFetch('/api/apple-iap/sync', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'x-betterbit-platform': 'ios',
     },
-    body: JSON.stringify({
-      originalTransactionId: payload.originalTransactionId,
-      productId: payload.productId,
-      expiresAt: payload.expiresAt,
-      isRestore: payload.isRestore,
-    }),
+    body: JSON.stringify({ isRestore }),
   })
+  const data = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const data = await res.json().catch(() => ({}))
     throw new Error(data.error || '無法同步訂閱狀態')
+  }
+  if (
+    data.verified !== true ||
+    data.active !== true ||
+    data.product_id !== APPLE_IAP_PRODUCT_ID
+  ) {
+    throw new Error('訂閱尚未通過伺服器驗證，請稍後使用「恢復購買」重試')
+  }
+  return {
+    active: true,
+    productId: data.product_id,
+    expiresAt: data.subscription?.current_period_end ?? null,
   }
 }
 
@@ -281,11 +278,10 @@ export async function getAppleIapStatus(userId: string): Promise<AppleIapPurchas
     '讀取會員狀態逾時'
   )
   const entitlement = readEntitlement(customerInfo)
-  if (!entitlement?.originalTransactionId) return { active: false }
+  if (!entitlement) return { active: false }
 
   return {
     active: true,
-    originalTransactionId: entitlement.originalTransactionId,
     productId: entitlement.productId,
     expiresAt: entitlement.expiresAt,
   }
@@ -306,23 +302,12 @@ export async function purchaseAppleIap(
     onStep?.('purchase')
     const purchaseResult = await executePurchase(Purchases, target)
     const entitlement = readEntitlement(purchaseResult.customerInfo)
-    if (!entitlement?.originalTransactionId) {
+    if (!entitlement) {
       throw new Error('購買未完成')
     }
 
     onStep?.('sync')
-    await syncToBackend({
-      originalTransactionId: entitlement.originalTransactionId,
-      productId: entitlement.productId,
-      expiresAt: entitlement.expiresAt,
-    })
-
-    return {
-      active: true,
-      originalTransactionId: entitlement.originalTransactionId,
-      productId: entitlement.productId,
-      expiresAt: entitlement.expiresAt,
-    }
+    return await syncToBackend()
   } catch (err) {
     throw humanizePurchaseError(err)
   }
@@ -339,23 +324,11 @@ export async function restoreAppleIap(userId: string): Promise<AppleIapPurchaseR
       '還原逾時，請稍後再試'
     )
     const entitlement = readEntitlement(customerInfo)
-    if (!entitlement?.originalTransactionId) {
+    if (!entitlement) {
       return { active: false }
     }
 
-    await syncToBackend({
-      originalTransactionId: entitlement.originalTransactionId,
-      productId: entitlement.productId,
-      expiresAt: entitlement.expiresAt,
-      isRestore: true,
-    })
-
-    return {
-      active: true,
-      originalTransactionId: entitlement.originalTransactionId,
-      productId: entitlement.productId,
-      expiresAt: entitlement.expiresAt,
-    }
+    return await syncToBackend(true)
   } catch (err) {
     throw humanizePurchaseError(err)
   }

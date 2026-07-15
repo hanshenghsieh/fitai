@@ -7,6 +7,18 @@ import {
 } from './apple-iap-store'
 
 describe('apple-iap-store', () => {
+  function input(active: boolean, userId: string) {
+    const now = Date.now()
+    return {
+      userId,
+      active,
+      productId: 'betterbit_pro_monthly',
+      purchasedAt: new Date(now - 86_400_000).toISOString(),
+      expiresAt: new Date(now + (active ? 86_400_000 : -1)).toISOString(),
+      willRenew: active,
+    }
+  }
+
   it('builds stable apple_iap subscription ids', () => {
     assert.equal(buildAppleIapSubscriptionId('1000001'), 'apple_iap_1000001')
     assert.equal(buildAppleIapSubscriptionId('apple_iap_1000001'), 'apple_iap_1000001')
@@ -15,24 +27,14 @@ describe('apple-iap-store', () => {
   })
 
   it('marks active subscription when expiry is in the future', () => {
-    const future = new Date(Date.now() + 86_400_000).toISOString()
-    const row = buildAppleIapSubscriptionRow({
-      userId: 'user-1',
-      originalTransactionId: 'tx-1',
-      expiresAt: future,
-    })
+    const row = buildAppleIapSubscriptionRow(input(true, 'user-1'))
     assert.equal(row.status, 'active')
     assert.equal(row.subscription_source, 'apple_iap')
     assert.equal(row.plan, 'premium')
   })
 
   it('marks canceled subscription when expiry is in the past', () => {
-    const past = new Date(Date.now() - 86_400_000).toISOString()
-    const row = buildAppleIapSubscriptionRow({
-      userId: 'user-1',
-      originalTransactionId: 'tx-2',
-      expiresAt: past,
-    })
+    const row = buildAppleIapSubscriptionRow(input(false, 'user-1'))
     assert.equal(row.status, 'canceled')
   })
 })

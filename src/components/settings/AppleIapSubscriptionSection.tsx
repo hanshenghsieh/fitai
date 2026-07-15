@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
@@ -11,7 +11,6 @@ import { purchaseAppleIap, restoreAppleIap, type AppleIapPurchaseStep } from '@/
 import { isCapacitorNative } from '@/lib/capacitor-native'
 import {
   formatProRenewalDate,
-  inferProPlanId,
   type ProPlanId,
 } from '@/lib/pro-subscription-v2'
 import { triggerV2Haptic } from '@/lib/v2-haptics'
@@ -43,8 +42,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
   const [purchaseStep, setPurchaseStep] = useState<AppleIapPurchaseStep | null>(null)
   const [restoring, setRestoring] = useState(false)
   const [view, setView] = useState<SubscriptionView>('paywall')
-  const [purchasedPlan, setPurchasedPlan] = useState<ProPlanId>('yearly')
-  const [lastProductId, setLastProductId] = useState<string | null>(null)
+  const [purchasedPlan, setPurchasedPlan] = useState<ProPlanId>('monthly')
 
   const iapReady = isRevenueCatConfigured()
   const isSubscribed = subscription?.status === 'active' || access.isSubscribed
@@ -55,11 +53,6 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
     purchase: '正在確認訂閱...',
     sync: '正在同步會員...',
   }
-
-  const activePlan = useMemo(
-    () => inferProPlanId(lastProductId),
-    [lastProductId]
-  )
 
   const renewalDate = formatProRenewalDate(subscription?.current_period_end)
 
@@ -112,8 +105,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       const result = await purchaseAppleIap(userId, step => setPurchaseStep(step))
       if (result.active) {
         triggerV2Haptic('success')
-        setLastProductId(result.productId ?? null)
-        setPurchasedPlan(inferProPlanId(result.productId))
+        setPurchasedPlan('monthly')
         await refreshSubscription()
         setView('success')
       }
@@ -141,7 +133,6 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       const result = await restoreAppleIap(userId)
       if (result.active) {
         triggerV2Haptic('success')
-        setLastProductId(result.productId ?? null)
         toast.message('已恢復你的 Betterbit Pro 權限')
         await refreshSubscription()
         setView('active')
@@ -209,7 +200,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
   if (view === 'active' && isSubscribed) {
     return (
       <ProActiveStatusV2View
-        plan={activePlan}
+        plan="monthly"
         renewalDate={renewalDate}
         paymentMethod="Apple ID 付款"
         onBack={() => router.back()}
@@ -221,6 +212,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
   return (
     <ProSubscriptionV2View
       access={access}
+      availablePlans="monthly-only"
       handlers={{
         onSubscribe: plan => void handleSubscribe(plan),
         onRestore: () => void handleRestore(),

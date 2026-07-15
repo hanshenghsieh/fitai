@@ -4,6 +4,7 @@ import { isAppleIapEnabled } from './apple-iap-config'
 import {
   hasIosPlatformCookie,
   isCapacitorUserAgent,
+  resolvePremiumPaymentSurface,
   shouldBlockExternalPaymentsOnServer,
   shouldBypassSubscriptionPaywallClient,
   shouldGrantFullAccessPreIap,
@@ -98,5 +99,29 @@ describe('ios-payment-gate', () => {
       if (prev === undefined) delete process.env.NEXT_PUBLIC_APPLE_IAP_ENABLED
       else process.env.NEXT_PUBLIC_APPLE_IAP_ENABLED = prev
     }
+  })
+
+  it('routes IAP-enabled native users to Apple paywall before informational fallback', () => {
+    assert.equal(
+      resolvePremiumPaymentSurface({
+        showAppleIap: true,
+        hideExternalPayments: true,
+      }),
+      'apple_iap'
+    )
+    assert.equal(
+      resolvePremiumPaymentSurface({
+        showAppleIap: false,
+        hideExternalPayments: true,
+      }),
+      'informational'
+    )
+    assert.equal(
+      resolvePremiumPaymentSurface({
+        showAppleIap: false,
+        hideExternalPayments: false,
+      }),
+      'stripe'
+    )
   })
 })

@@ -7,7 +7,7 @@ cd "$ROOT"
 
 PROJECT="ios/App/App.xcodeproj"
 SCHEME="App"
-ARCHIVE_PATH="$ROOT/build/BetterBit-Build${IOS_BUILD_NUMBER:-16}.xcarchive"
+ARCHIVE_PATH="$ROOT/build/BetterBit-Build${IOS_BUILD_NUMBER:-24}.xcarchive"
 
 if ! command -v xcodebuild >/dev/null 2>&1; then
   echo "[FAIL] xcodebuild not found. Run on Mac with Xcode installed."
@@ -19,7 +19,13 @@ xcodebuild -version
 
 echo ""
 echo "=== Prep (test + build + cap:sync) ==="
+IOS_BUILD_TARGET=local-hybrid \
+PREFLIGHT_SKIP_ZIP=1 \
 node scripts/testflight-prep.mjs
+
+echo ""
+echo "=== Fail-closed iOS / RevenueCat preflight ==="
+npm run preflight:ios-local
 
 mkdir -p "$ROOT/build"
 
