@@ -72,12 +72,6 @@ import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exerci
 import { getNutritionDayKey, getPreviousNutritionDayKey } from '@/lib/timezone'
 import { filterFoodLogsForNutritionDay } from '@/lib/nutrition-day-food-logs'
 import { addWaterMl, resetWaterMl, resolveDailyWaterGoalMl, setWaterMl as applyWaterTotal } from '@/lib/water-log'
-import {
-  confirmWaterIntake,
-  resolveWaterIntake,
-  WATER_FALLBACK_USER_ID,
-  writeWaterIntake,
-} from '@/lib/water-intake-storage'
 import { TODAY } from '@/lib/today-design'
 import TodayWaterLog from '@/components/dashboard/today/TodayWaterLog'
 import BBCard from '@/components/ui/BBCard'
@@ -219,17 +213,7 @@ export default function BetterBitHome({
   const [postureLine, setPostureLine] = useState('最近忙嗎？回來就好。今天照常。')
   const [trackedDayKey, setTrackedDayKey] = useState(() => getNutritionDayKey())
   const syncUserId = profile?.id ?? checkin?.user_id ?? null
-  const waterUserId = profile?.id ?? checkin?.user_id ?? WATER_FALLBACK_USER_ID
-  const [waterMl, setWaterMl] = useState(() => {
-    const date = getNutritionDayKey()
-    const serverMatchesDay = checkin?.checkin_date === date
-    return resolveWaterIntake(
-      serverMatchesDay ? (checkin?.water_ml ?? 0) : 0,
-      serverMatchesDay ? checkin?.updated_at : null,
-      waterUserId,
-      date
-    )
-  })
+  const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
   const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(null)
   const [previousDayBank, setPreviousDayBank] = useState<CalorieBankRow | null>(null)
   const [userPrefs, setUserPrefs] = useState<UserSettingsPreferences | null>(null)
@@ -259,19 +243,6 @@ export default function BetterBitHome({
     mealSuggestRef.current = mealSuggest
     workoutItemsRef.current = workoutItems
   }, [waterMl, userMemory, customEatOut, dailyRolls, mealSuggest, workoutItems])
-
-  useEffect(() => {
-    const serverMatchesDay = checkin?.checkin_date === trackedDayKey
-    const resolved = resolveWaterIntake(
-      serverMatchesDay ? (checkin?.water_ml ?? 0) : 0,
-      serverMatchesDay ? checkin?.updated_at : null,
-      waterUserId,
-      trackedDayKey
-    )
-    if (resolved === waterMlRef.current) return
-    waterMlRef.current = resolved
-    startTransition(() => setWaterMl(resolved))
-  }, [checkin?.checkin_date, checkin?.updated_at, checkin?.water_ml, trackedDayKey, waterUserId])
 
   const writeFoodCache = useCallback(
     (logs: FoodLogEntry[]) => {
@@ -593,13 +564,6 @@ export default function BetterBitHome({
       ) {
         return
       }
-      if (entry.payload.water_ml !== undefined) {
-        confirmWaterIntake(
-          entry.userId,
-          entry.nutritionDate,
-          entry.payload.water_ml
-        )
-      }
       if (entry.payload.notes_patch?.user_memory?.food_logs_today !== undefined) {
         clearFoodLogsSessionCache(entry.nutritionDate)
         writeFoodCache(userMemoryRef.current.food_logs_today ?? [])
@@ -621,11 +585,10 @@ export default function BetterBitHome({
   const commitWaterMl = useCallback(
     (nextMl: number) => {
       waterMlRef.current = nextMl
-      writeWaterIntake(waterUserId, trackedDayKey, nextMl)
       startTransition(() => setWaterMl(nextMl))
       persist({ waterMl: nextMl })
     },
-    [persist, trackedDayKey, waterUserId]
+    [persist]
   )
 
   const handleAddWater = useCallback(
