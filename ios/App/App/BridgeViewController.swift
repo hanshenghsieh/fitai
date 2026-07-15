@@ -3,6 +3,8 @@ import Capacitor
 import WebKit
 
 /// WKWebView shell: edge-to-edge canvas, disable pinch / double-tap zoom.
+/// Cap 8: do NOT use `override` / `super` on webViewWebContentProcessDidTerminate
+/// (that symbol is not an open override and breaks Xcode builds).
 class BridgeViewController: CAPBridgeViewController {
     private let canvasColor = UIColor(red: 255 / 255, green: 249 / 255, blue: 242 / 255, alpha: 1)
 
@@ -27,8 +29,8 @@ class BridgeViewController: CAPBridgeViewController {
         .darkContent
     }
 
-    override func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        super.webViewWebContentProcessDidTerminate(webView)
+    /// Plain method (no override / no super) — QA Gate v2 asserts this exact shape.
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         webView.reload()
     }
 

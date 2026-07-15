@@ -31,15 +31,19 @@ const config: CapacitorConfig = {
     allowsLinkPreview: false,
   },
   plugins: {
+    // Native URLSession for window.fetch — bypasses missing CORS on production /api/*
+    CapacitorHttp: {
+      enabled: true,
+    },
     SplashScreen: {
-      launchShowDuration: 1200,
+      launchShowDuration: 300,
       launchAutoHide: true,
-      backgroundColor: '#FFF9F2',
+      backgroundColor: '#FDFCF8',
       showSpinner: false,
     },
     StatusBar: {
       style: 'DARK',
-      backgroundColor: '#FFF9F2',
+      backgroundColor: '#FDFCF8',
       overlaysWebView: true,
     },
   },

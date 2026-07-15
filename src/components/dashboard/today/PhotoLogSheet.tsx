@@ -18,12 +18,14 @@ import type { PhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 import { photoV2UiMessage } from '@/lib/nutrition/search-v2/photo-pipeline'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
 import { isNativeIOS } from '@/lib/capacitor-native'
+import type { FoodPhotoSource } from '@/lib/food-capture'
 
 const ICON_STROKE = TODAY.iconStroke
 const IOS_LITE_CANDIDATE_LIMIT = 3
 
 export interface PhotoLogDraft {
   file: File
+  source: FoodPhotoSource
   previewUrl: string
   dataUrl?: string
   name: string
@@ -47,7 +49,7 @@ interface Props {
   processing?: boolean
   accuracyEnabled?: boolean
   onClose: () => void
-  onPickFile: (file: File) => void
+  onPickFile: (file: File, source: FoodPhotoSource) => void
   onDraftChange: (patch: Partial<Pick<PhotoLogDraft, 'name' | 'calories' | 'protein_g'>>) => void
   onAccuracyChange?: (patch: Partial<UserConfirmationAnswers>) => void
   onSave: () => void
@@ -56,9 +58,16 @@ interface Props {
   onOpenManualCorrection?: () => void
   onPhotoV2Select?: (candidateId: string) => void
   onSavePhotoOnly?: () => void
+  onRetryUpload?: () => void
 }
 
-function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void; onClose: () => void }) {
+function CaptureStep({
+  onPickFile,
+  onClose,
+}: {
+  onPickFile: (file: File, source: FoodPhotoSource) => void
+  onClose: () => void
+}) {
   const cameraRef = useRef<HTMLInputElement>(null)
   const galleryRef = useRef<HTMLInputElement>(null)
   const [picking, setPicking] = useState(false)
@@ -70,10 +79,13 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
     return () => window.removeEventListener('focus', clearPicking)
   }, [])
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    source: FoodPhotoSource
+  ) => {
     setPicking(false)
     const f = e.target.files?.[0]
-    if (f) onPickFile(f)
+    if (f) onPickFile(f, source)
     e.target.value = ''
   }
 
@@ -83,11 +95,15 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
       mode === 'camera' ? await captureFoodPhotoFromCamera() : await pickFoodPhotoFromGallery()
     setPicking(false)
     if (result.ok) {
-      onPickFile(result.file)
+      onPickFile(result.file, result.source)
       return
     }
     if (result.reason === 'denied') {
-      toast.error(mode === 'camera' ? '需要相機權限才能拍照' : '需要相簿權限才能選照片')
+      toast.error(
+        mode === 'camera'
+          ? '需要相機權限，請到 iPhone 設定中開啟。'
+          : '需要相簿權限，請到 iPhone 設定中開啟。'
+      )
       return
     }
     if (result.reason === 'unavailable') {
@@ -138,14 +154,14 @@ function CaptureStep({ onPickFile, onClose }: { onPickFile: (file: File) => void
               accept="image/*"
               capture="environment"
               className="hidden"
-              onChange={handleFile}
+              onChange={event => handleFile(event, 'camera')}
             />
             <input
               ref={galleryRef}
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={handleFile}
+              onChange={event => handleFile(event, 'library')}
             />
           </>
         )}
@@ -522,6 +538,7 @@ function ReviewStep({
   onOpenManualCorrection,
   onPhotoV2Select,
   onSavePhotoOnly,
+  onRetryUpload,
 }: {
   draft: PhotoLogDraft
   accuracyEnabled?: boolean
@@ -534,6 +551,7 @@ function ReviewStep({
   onOpenManualCorrection?: () => void
   onPhotoV2Select?: Props['onPhotoV2Select']
   onSavePhotoOnly?: () => void
+  onRetryUpload?: () => void
 }) {
   const iosLiteMode = isNativeIOS() && accuracyEnabled && !draft.accuracy
   const accuracyMode = accuracyEnabled && !!draft.accuracy
@@ -644,6 +662,16 @@ function ReviewStep({
             <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
               {draft.recognitionHint}
             </p>
+            {onRetryUpload ? (
+              <button
+                type="button"
+                onClick={onRetryUpload}
+                className="text-[13px] underline underline-offset-2"
+                style={{ color: TODAY.mocha, fontWeight: 600 }}
+              >
+                重新嘗試辨識
+              </button>
+            ) : null}
           </div>
         ) : null}
 
@@ -829,6 +857,7 @@ export default function PhotoLogSheet({
   onOpenManualCorrection,
   onPhotoV2Select,
   onSavePhotoOnly,
+  onRetryUpload,
 }: Props) {
   return (
     <AppOverlay open={open} onClose={onClose} variant="sheet">
@@ -857,6 +886,7 @@ export default function PhotoLogSheet({
             onOpenManualCorrection={onOpenManualCorrection}
             onPhotoV2Select={onPhotoV2Select}
             onSavePhotoOnly={onSavePhotoOnly}
+            onRetryUpload={onRetryUpload}
           />
         ) : (
           <CaptureStep onPickFile={onPickFile} onClose={onClose} />

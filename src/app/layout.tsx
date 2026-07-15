@@ -6,6 +6,7 @@ import '@/styles/capacitor-ios-shell.css'
 import { Toaster } from '@/components/ui/sonner'
 import CapacitorShell from '@/components/capacitor/CapacitorShell'
 import OfflineShell from '@/components/capacitor/OfflineShell'
+import OfflineMutationSync from '@/components/offline/OfflineMutationSync'
 import { colors } from '@/lib/design-system'
 import { getAppUrl } from '@/lib/app-url'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from '@/lib/site-metadata'
@@ -90,6 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         {children}
         <CapacitorShell />
+        <OfflineMutationSync />
         <OfflineShell />
         <Toaster theme="light" richColors={false} position="top-center" />
       </body>

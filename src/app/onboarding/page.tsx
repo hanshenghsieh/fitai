@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { useEffect, useState, useMemo } from 'react'
+import { createClient, isCapacitorNative } from '@/lib/supabase/client'
+import { waitForSession } from '@/lib/supabase/wait-for-session'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
@@ -17,6 +17,7 @@ import ZaiJian from '@/components/character/ZaiJian'
 import { OnboardingCard, OnboardingChip } from '@/components/onboarding/OnboardingChip'
 import type { ActivityLevel, FitnessLevel, Goal, UserProfile } from '@/types'
 import { apiFetch } from '@/lib/api/client'
+import AppAuthLoadingShell from '@/features/auth/AppAuthLoadingShell'
 
 const TOTAL_STEPS = 3
 
@@ -69,9 +70,41 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [data, setData] = useState<FormData>(initialData)
   const [loading, setLoading] = useState(false)
+  const [sessionReady, setSessionReady] = useState(false)
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
-  const router = useRouter()
   const set = (key: keyof FormData, val: unknown) => setData(prev => ({ ...prev, [key]: val }))
+
+  useEffect(() => {
+    let mounted = true
+
+    void (async () => {
+      const justRegistered =
+        typeof window !== 'undefined' && /[?&]login=1\b/.test(window.location.search)
+      const stabilized = await waitForSession(createClient(), {
+        requireAccessToken: true,
+        verifyPersistedStorage: isCapacitorNative(),
+        timeoutMs: justRegistered ? 5_000 : 3_000,
+        intervalMs: 150,
+      })
+      if (!mounted) return
+      if (!stabilized.ok) {
+        const message =
+          stabilized.reason === 'storage_not_persisted'
+            ? '登入狀態無法儲存到裝置，請重新登入。'
+            : stabilized.reason === 'missing_access_token'
+              ? '登入憑證不完整，請重新登入。'
+              : '登入連線尚未建立，請重新登入。'
+        toast.error(message)
+        window.location.replace('/login')
+        return
+      }
+      setSessionReady(true)
+    })()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const planPreview = useMemo(() => {
     if (step < 3 || !data.weight_kg || !data.gender) return null
@@ -101,6 +134,10 @@ export default function OnboardingPage() {
   }, [step, data])
 
   async function handleSubmit() {
+    if (!sessionReady) {
+      toast.error('登入連線尚未建立，請稍後再試。')
+      return
+    }
     setLoading(true)
     const supabase = createClient()
     try {
@@ -164,11 +201,11 @@ export default function OnboardingPage() {
         toast.error(pickZaiJianLine('error').text)
       }
 
-      router.push('/dashboard?welcome=1')
-      router.refresh()
+      // Hard navigation so the dashboard guard reads the freshly-written
+      // onboarding_completed profile + session instead of bouncing to /login.
+      window.location.assign('/dashboard?welcome=1&login=1')
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : pickZaiJianLine('error').text)
-    } finally {
       setLoading(false)
     }
   }
@@ -177,6 +214,10 @@ export default function OnboardingPage() {
     if (step === 1) return data.gender && data.age && data.height_cm && data.weight_kg && data.goal_type
     if (step === 2) return !!data.activity_level
     return true
+  }
+
+  if (!sessionReady) {
+    return <AppAuthLoadingShell />
   }
 
   return (

@@ -4,7 +4,6 @@ import { useState, useTransition, useCallback, useEffect, useRef, useMemo } from
 import { usePathname, useRouter } from 'next/navigation'
 import { CheckCircle2, Circle, ChevronDown, ChevronUp, Play } from 'lucide-react'
 import {
-  buildCheckinPayload,
   initWorkoutItems,
   reconcileWorkoutItems,
   workoutItemsNeedSync,
@@ -12,12 +11,12 @@ import {
   userMemoryFromCheckin,
   mealSuggestFromCheckin,
   customEatOutFromCheckin,
-  mealModesFromCheckin,
   type MealType,
   type CustomEatOutSelection,
   type MealSuggestState,
   type UserMemoryMeta,
   type DailyRollState,
+  userMemoryForPersist,
 } from '@/lib/checkin-utils'
 import { toast } from 'sonner'
 import TodayV2Dashboard from '@/components/betterbit-v2/TodayV2Dashboard'
@@ -73,6 +72,12 @@ import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exerci
 import { getNutritionDayKey, getPreviousNutritionDayKey } from '@/lib/timezone'
 import { filterFoodLogsForNutritionDay } from '@/lib/nutrition-day-food-logs'
 import { addWaterMl, resetWaterMl, resolveDailyWaterGoalMl, setWaterMl as applyWaterTotal } from '@/lib/water-log'
+import {
+  confirmWaterIntake,
+  resolveWaterIntake,
+  WATER_FALLBACK_USER_ID,
+  writeWaterIntake,
+} from '@/lib/water-intake-storage'
 import { TODAY } from '@/lib/today-design'
 import TodayWaterLog from '@/components/dashboard/today/TodayWaterLog'
 import BBCard from '@/components/ui/BBCard'
@@ -92,11 +97,12 @@ import Day1GuideBanner, {
   shouldShowDay1Guide,
 } from '@/components/dashboard/today/Day1GuideBanner'
 import {
-  clearPendingSync,
-  hasPendingSync,
-  isOffline,
-  markPendingSync,
-} from '@/lib/offline-pending-sync'
+  enqueueCheckinMutation,
+  OFFLINE_MUTATION_CONFIRMED_EVENT,
+  requestOfflineMutationReplay,
+  type CheckinMutationPayload,
+  type OfflineMutationEntry,
+} from '@/lib/offline-mutation-queue'
 import { zaijian } from '@/lib/copy/zaijian'
 import { invalidateMealMutation } from '@/lib/local-cache/invalidate'
 import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile } from '@/types'
@@ -109,6 +115,15 @@ interface GoalSnapshot {
   weeks_remaining?: number
   weekly_fat_loss_g?: number
   daily_deficit?: number
+}
+
+interface CheckinUiPatch {
+  workoutItems?: WorkoutCheckinItem[]
+  userMemory?: UserMemoryMeta
+  dailyRolls?: DailyRollState
+  mealSuggest?: Partial<Record<MealType, MealSuggestState>>
+  customEatOut?: Partial<Record<MealType, CustomEatOutSelection[]>>
+  waterMl?: number
 }
 
 interface Props {
@@ -196,15 +211,25 @@ export default function BetterBitHome({
   )
   const didLocalReconcileRef = useRef(false)
   const didSessionHydrateRef = useRef(false)
-  const persistAbortRef = useRef<AbortController | null>(null)
 
   const displayUserMemory = useMemo(
     () => ({ ...userMemory, food_logs_today: displayFoodLogs }),
     [userMemory, displayFoodLogs]
   )
   const [postureLine, setPostureLine] = useState('最近忙嗎？回來就好。今天照常。')
-  const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
   const [trackedDayKey, setTrackedDayKey] = useState(() => getNutritionDayKey())
+  const syncUserId = profile?.id ?? checkin?.user_id ?? null
+  const waterUserId = profile?.id ?? checkin?.user_id ?? WATER_FALLBACK_USER_ID
+  const [waterMl, setWaterMl] = useState(() => {
+    const date = getNutritionDayKey()
+    const serverMatchesDay = checkin?.checkin_date === date
+    return resolveWaterIntake(
+      serverMatchesDay ? (checkin?.water_ml ?? 0) : 0,
+      serverMatchesDay ? checkin?.updated_at : null,
+      waterUserId,
+      date
+    )
+  })
   const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(null)
   const [previousDayBank, setPreviousDayBank] = useState<CalorieBankRow | null>(null)
   const [userPrefs, setUserPrefs] = useState<UserSettingsPreferences | null>(null)
@@ -218,20 +243,7 @@ export default function BetterBitHome({
     allowDiceAndSuggest: true,
   })
   const calorieBankSyncedRef = useRef(false)
-  const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const persistRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const persistErrorToastAtRef = useRef(0)
-  const persistShowErrorToastRef = useRef(false)
-  const persistBackgroundFailCountRef = useRef(0)
-  const persistFlushingRef = useRef(false)
-  const persistPatchRef = useRef<{
-    workoutItems?: WorkoutCheckinItem[]
-    userMemory?: UserMemoryMeta
-    dailyRolls?: DailyRollState
-    mealSuggest?: Partial<Record<MealType, MealSuggestState>>
-    customEatOut?: Partial<Record<MealType, CustomEatOutSelection[]>>
-    waterMl?: number
-  }>({})
   const userMemoryRef = useRef(userMemory)
   const customEatOutRef = useRef(customEatOut)
   const dailyRollsRef = useRef(dailyRolls)
@@ -247,6 +259,19 @@ export default function BetterBitHome({
     mealSuggestRef.current = mealSuggest
     workoutItemsRef.current = workoutItems
   }, [waterMl, userMemory, customEatOut, dailyRolls, mealSuggest, workoutItems])
+
+  useEffect(() => {
+    const serverMatchesDay = checkin?.checkin_date === trackedDayKey
+    const resolved = resolveWaterIntake(
+      serverMatchesDay ? (checkin?.water_ml ?? 0) : 0,
+      serverMatchesDay ? checkin?.updated_at : null,
+      waterUserId,
+      trackedDayKey
+    )
+    if (resolved === waterMlRef.current) return
+    waterMlRef.current = resolved
+    startTransition(() => setWaterMl(resolved))
+  }, [checkin?.checkin_date, checkin?.updated_at, checkin?.water_ml, trackedDayKey, waterUserId])
 
   const writeFoodCache = useCallback(
     (logs: FoodLogEntry[]) => {
@@ -357,7 +382,6 @@ export default function BetterBitHome({
     const applyNutritionDayRollover = (nextDay: string) => {
       clearFoodLogsSessionCache(nextDay)
       clearTodayOfflineSnapshot()
-      clearPendingSync()
 
       const emptyMemory: UserMemoryMeta = {
         ...userMemoryRef.current,
@@ -374,7 +398,6 @@ export default function BetterBitHome({
       calorieBankSyncedRef.current = false
       didSessionHydrateRef.current = false
       didLocalReconcileRef.current = false
-      persistPatchRef.current = {}
       router.refresh()
     }
 
@@ -509,212 +532,100 @@ export default function BetterBitHome({
     return () => window.clearTimeout(timer)
   }, [])
 
-  const mealModes = mealModesFromCheckin(checkin)
+  const persist = useCallback(
+    (patch: CheckinUiPatch): boolean => {
+      if (!syncUserId) {
+        toast.error('登入狀態尚未就緒，這次變更無法安全儲存')
+        return false
+      }
 
-  const buildPersistState = useCallback(
-    (patch: typeof persistPatchRef.current) => ({
-      dietItems: checkin?.diet_items ?? [],
-      workoutItems: patch.workoutItems ?? workoutItemsRef.current,
-      waterMl: patch.waterMl ?? waterMlRef.current,
-      mealModes,
-      customEatOut: patch.customEatOut ?? customEatOutRef.current,
-      dailyRolls: patch.dailyRolls ?? dailyRollsRef.current,
-      mealSuggest: patch.mealSuggest ?? mealSuggestRef.current,
-      userMemory: userMemoryRef.current,
-    }),
-    [checkin, mealModes]
+      const payload: CheckinMutationPayload = {
+        weekly_plan_id: weeklyPlanId,
+      }
+      const notesPatch: NonNullable<CheckinMutationPayload['notes_patch']> = {}
+      if (patch.workoutItems !== undefined) payload.workout_items = patch.workoutItems
+      if (patch.waterMl !== undefined) payload.water_ml = patch.waterMl
+      if (patch.userMemory !== undefined) {
+        notesPatch.user_memory = userMemoryForPersist(patch.userMemory)
+      }
+      if (patch.dailyRolls !== undefined) notesPatch.daily_rolls = patch.dailyRolls
+      if (patch.mealSuggest !== undefined) notesPatch.meal_suggest = patch.mealSuggest
+      if (patch.customEatOut !== undefined) notesPatch.custom_eat_out = patch.customEatOut
+      if (Object.keys(notesPatch).length > 0) payload.notes_patch = notesPatch
+
+      const result = enqueueCheckinMutation({
+        userId: syncUserId,
+        nutritionDate: trackedDayKey,
+        payload,
+      })
+      if (!result.durable) {
+        const now = Date.now()
+        if (now - persistErrorToastAtRef.current > 8000) {
+          persistErrorToastAtRef.current = now
+          toast.error('無法安全儲存在此裝置，請保持頁面開啟並稍後重試')
+        }
+        return false
+      }
+
+      requestOfflineMutationReplay(syncUserId)
+      return true
+    },
+    [syncUserId, trackedDayKey, weeklyPlanId]
   )
 
-  const flushPersist = useCallback(async () => {
-    if (persistFlushingRef.current) return
-    if (Object.keys(persistPatchRef.current).length === 0) return
+  useEffect(() => {
+    if (syncUserId) requestOfflineMutationReplay(syncUserId)
+  }, [syncUserId, trackedDayKey])
 
-    if (isOffline()) {
-      markPendingSync(trackedDayKey)
-      return
-    }
-
-    persistFlushingRef.current = true
-    let sawError = false
-
-    try {
-      while (Object.keys(persistPatchRef.current).length > 0) {
-        const patch = { ...persistPatchRef.current }
-        persistPatchRef.current = {}
-
-        persistAbortRef.current?.abort()
-        const ac = new AbortController()
-        persistAbortRef.current = ac
-
-        const state = buildPersistState(patch)
-        try {
-          const res = await apiFetch('/api/checkin', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            keepalive: true,
-            signal: ac.signal,
-            body: JSON.stringify(buildCheckinPayload(state, weeklyPlanId, checkin)),
-          })
-          if (!res.ok) {
-            const bodyText = await res.text().catch(() => '')
-            console.error('[persist] checkin PATCH failed', res.status, bodyText.slice(0, 300))
-            if (res.status === 401) {
-              clearPendingSync()
-              persistPatchRef.current = {}
-              break
-            }
-            throw new Error(bodyText || `HTTP ${res.status}`)
-          }
-          const json = (await res.json()) as { calorie_bank?: CalorieBankRow | null }
-          if (json.calorie_bank) setCalorieBank(json.calorie_bank)
-          clearFoodLogsSessionCache()
-          writeFoodCache(state.userMemory?.food_logs_today ?? [])
-          writeWorkoutItemsSessionCache(state.workoutItems)
-          clearPendingSync()
-          // Server confirmed the write → let today/record/analysis re-read fresh.
-          invalidateMealMutation(profile?.id)
-        } catch (err) {
-          if (err instanceof DOMException && err.name === 'AbortError') {
-            persistPatchRef.current = { ...patch, ...persistPatchRef.current }
-            continue
-          }
-          persistPatchRef.current = { ...patch, ...persistPatchRef.current }
-          markPendingSync(trackedDayKey)
-          sawError = true
-          break
-        }
-      }
-    } finally {
-      persistFlushingRef.current = false
-      persistAbortRef.current = null
-      if (sawError && !isOffline()) {
-        if (persistShowErrorToastRef.current) {
-          const now = Date.now()
-          if (now - persistErrorToastAtRef.current > 8000) {
-            persistErrorToastAtRef.current = now
-            toast.message('同步暫時失敗，稍後會自動重試', {
-              action: { label: '重新整理', onClick: () => void flushPersist() },
-            })
-          }
-        } else {
-          persistBackgroundFailCountRef.current += 1
-          if (persistBackgroundFailCountRef.current >= 5) {
-            clearPendingSync()
-            persistPatchRef.current = {}
-            persistBackgroundFailCountRef.current = 0
-          }
-        }
-      } else if (!sawError) {
-        persistBackgroundFailCountRef.current = 0
-      }
-      persistShowErrorToastRef.current = false
-      if (Object.keys(persistPatchRef.current).length > 0 && !isOffline()) {
-        if (persistRetryTimerRef.current) clearTimeout(persistRetryTimerRef.current)
-        persistRetryTimerRef.current = setTimeout(() => {
-          persistRetryTimerRef.current = null
-          void flushPersist()
-        }, 2500)
-      }
-    }
-  }, [buildPersistState, weeklyPlanId, writeFoodCache, trackedDayKey])
-
-  const flushPendingPersist = useCallback(() => {
-    const hasPatch = Object.keys(persistPatchRef.current).length > 0
-    const pending = hasPendingSync(trackedDayKey)
-    if (!hasPatch && !pending) return
-
-    if (persistTimerRef.current) {
-      clearTimeout(persistTimerRef.current)
-      persistTimerRef.current = null
-    }
-    persistPatchRef.current = {
-      ...persistPatchRef.current,
-      userMemory: userMemoryRef.current,
-    }
-    writeFoodCache(userMemoryRef.current.food_logs_today ?? [])
-    writeWorkoutItemsSessionCache(workoutItemsRef.current)
-    if (persistFlushingRef.current) {
-      persistAbortRef.current?.abort()
-    }
-    persistShowErrorToastRef.current = false
-    void flushPersist()
-  }, [flushPersist, writeFoodCache, trackedDayKey])
-
-  const persist = useCallback(
-    (patch: {
-      workoutItems?: WorkoutCheckinItem[]
-      userMemory?: UserMemoryMeta
-      dailyRolls?: DailyRollState
-      mealSuggest?: Partial<Record<MealType, MealSuggestState>>
-      customEatOut?: Partial<Record<MealType, CustomEatOutSelection[]>>
-      waterMl?: number
-    }) => {
-      persistPatchRef.current = { ...persistPatchRef.current, ...patch }
-      if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
-
-      const isFoodLogPatch = patch.userMemory?.food_logs_today !== undefined
-      const isWorkoutPatch = patch.workoutItems !== undefined
-      if (isFoodLogPatch || isWorkoutPatch) {
-        persistTimerRef.current = null
-        if (isFoodLogPatch) {
-          writeFoodCache(patch.userMemory!.food_logs_today ?? [])
-        }
-        if (isWorkoutPatch) {
-          writeWorkoutItemsSessionCache(patch.workoutItems!)
-        }
-        if (persistFlushingRef.current) {
-          persistAbortRef.current?.abort()
-        }
-        persistShowErrorToastRef.current = true
-        void flushPersist()
+  useEffect(() => {
+    const onConfirmed = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{
+          entry?: OfflineMutationEntry
+          calorieBank?: CalorieBankRow | null
+        }>
+      ).detail
+      const entry = detail?.entry
+      if (
+        !entry ||
+        entry.userId !== syncUserId ||
+        entry.nutritionDate !== trackedDayKey
+      ) {
         return
       }
-
-      persistTimerRef.current = setTimeout(() => {
-        persistTimerRef.current = null
-        persistShowErrorToastRef.current = true
-        void flushPersist()
-      }, 300)
-    },
-    [flushPersist, writeFoodCache]
-  )
-
-  useEffect(() => {
-    const onRouteChange = () => flushPendingPersist()
-    const onPageHide = () => flushPendingPersist()
-    const onVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') flushPendingPersist()
-    }
-    const onOnline = () => flushPendingPersist()
-    window.addEventListener('betterbit:route-change', onRouteChange)
-    window.addEventListener('pagehide', onPageHide)
-    window.addEventListener('online', onOnline)
-    document.addEventListener('visibilitychange', onVisibilityChange)
-    return () => {
-      window.removeEventListener('betterbit:route-change', onRouteChange)
-      window.removeEventListener('pagehide', onPageHide)
-      window.removeEventListener('online', onOnline)
-      document.removeEventListener('visibilitychange', onVisibilityChange)
-      if (persistRetryTimerRef.current) {
-        clearTimeout(persistRetryTimerRef.current)
-        persistRetryTimerRef.current = null
+      if (entry.payload.water_ml !== undefined) {
+        confirmWaterIntake(
+          entry.userId,
+          entry.nutritionDate,
+          entry.payload.water_ml
+        )
       }
-      flushPendingPersist()
+      if (entry.payload.notes_patch?.user_memory?.food_logs_today !== undefined) {
+        clearFoodLogsSessionCache(entry.nutritionDate)
+        writeFoodCache(userMemoryRef.current.food_logs_today ?? [])
+      }
+      if (entry.payload.workout_items !== undefined) {
+        writeWorkoutItemsSessionCache(
+          workoutItemsRef.current,
+          entry.nutritionDate
+        )
+      }
+      if (detail.calorieBank) setCalorieBank(detail.calorieBank)
+      invalidateMealMutation(entry.userId)
     }
-  }, [flushPendingPersist])
-
-  useEffect(() => {
-    if (!hasPendingSync(trackedDayKey)) return
-    void flushPendingPersist()
-  }, [flushPendingPersist, trackedDayKey])
+    window.addEventListener(OFFLINE_MUTATION_CONFIRMED_EVENT, onConfirmed)
+    return () =>
+      window.removeEventListener(OFFLINE_MUTATION_CONFIRMED_EVENT, onConfirmed)
+  }, [syncUserId, trackedDayKey, writeFoodCache])
 
   const commitWaterMl = useCallback(
     (nextMl: number) => {
       waterMlRef.current = nextMl
+      writeWaterIntake(waterUserId, trackedDayKey, nextMl)
       startTransition(() => setWaterMl(nextMl))
       persist({ waterMl: nextMl })
     },
-    [persist]
+    [persist, trackedDayKey, waterUserId]
   )
 
   const handleAddWater = useCallback(

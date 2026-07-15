@@ -138,10 +138,16 @@ function failFastEnv() {
     process.exit(1)
   }
 
+  // Apex betterbit.app redirects to www; WKWebView can lose CORS headers across
+  // that redirect, so local-hybrid builds always bake in the canonical host.
+  const canonical = apiBase
+    .replace(/\/$/, '')
+    .replace(/^https:\/\/betterbit\.app/i, 'https://www.betterbit.app')
+
   return {
     ...process.env,
     NEXT_PUBLIC_BUILD_TARGET: 'ios-local',
-    NEXT_PUBLIC_API_BASE_URL: apiBase.replace(/\/$/, ''),
+    NEXT_PUBLIC_API_BASE_URL: canonical,
   }
 }
 

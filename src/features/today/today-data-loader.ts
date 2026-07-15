@@ -72,6 +72,7 @@ async function maybeAutoGeneratePlan(
     headers['x-betterbit-platform'] = 'ios'
   }
 
+  console.log('[TODAY_ACTION] auto-generate submit start')
   const res = await apiFetch('/api/generate-plan', {
     method: 'POST',
     headers,

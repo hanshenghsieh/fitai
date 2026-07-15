@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { waitForSession } from '@/lib/supabase/wait-for-session'
 import LandingPage from '@/components/marketing/LandingPage'
 import AppAuthLoadingShell from '@/features/auth/AppAuthLoadingShell'
 
@@ -18,15 +19,41 @@ export default function RootRedirectClient() {
 
     async function resolve() {
       try {
+        // CapacitorRouter maps ANY extensionless path → /index.html. If the
+        // address bar shows an app route, recover by loading that route's real
+        // static HTML instead of bouncing everyone to /dashboard.
+        const path = typeof window !== 'undefined' ? window.location.pathname : '/'
+        const search = typeof window !== 'undefined' ? window.location.search : ''
+        const isRoot = path === '/' || path === '/index.html' || path === ''
+        if (!isRoot) {
+          const appPrefixes = [
+            '/dashboard',
+            '/weekly-plan',
+            '/weekly',
+            '/progress',
+            '/settings',
+            '/login',
+            '/onboarding',
+            '/register',
+          ]
+          const looksLikeAppRoute = appPrefixes.some((p) => path === p || path.startsWith(`${p}/`) || path === `${p}.html`)
+          if (looksLikeAppRoute && !path.endsWith('.html')) {
+            const recovery = `${path}.html${search}`
+            console.log('[ROOT] recovery assign =', recovery)
+            window.location.replace(recovery)
+            return
+          }
+          console.log('[ROOT] skip for path =', path)
+          setView('landing')
+          return
+        }
+
         const supabase = createClient()
-        const {
-          data: { session },
-          error: sessionError,
-        } = await supabase.auth.getSession()
+        const session = await waitForSession(supabase, { retries: 2, delayMs: 250 })
 
         if (!mountedRef.current) return
 
-        if (sessionError || !session?.user) {
+        if (!session?.user) {
           setView('landing')
           return
         }
@@ -41,7 +68,10 @@ export default function RootRedirectClient() {
 
         if (!mountedRef.current) return
 
-        router.replace(profile?.onboarding_completed ? '/dashboard' : '/onboarding')
+        const target = profile?.onboarding_completed ? '/dashboard' : '/onboarding'
+        console.log('[ROOT] redirect to', target)
+        // Soft replace (not assign) so Capcitor does not reload index.html again.
+        router.replace(target)
       } catch {
         if (!mountedRef.current) return
         setView('landing')

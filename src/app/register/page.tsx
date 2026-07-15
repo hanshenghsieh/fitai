@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient, isCapacitorNative } from '@/lib/supabase/client'
+import { waitForSession } from '@/lib/supabase/wait-for-session'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
@@ -18,7 +18,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
@@ -36,16 +35,49 @@ export default function RegisterPage() {
       })
       const signupData = await signupRes.json()
       if (!signupRes.ok) throw new Error(signupData.error || '註冊失敗')
+      if (typeof signupData.userId !== 'string' || !signupData.userId) {
+        throw new Error('帳號已建立，但無法確認新帳號身分。請重新登入。')
+      }
 
       const loginResult = await supabase.auth.signInWithPassword({ email, password })
       if (loginResult.error) throw loginResult.error
+      const immediateSession = loginResult.data.session
+      const immediateUser = loginResult.data.user
+      if (!immediateSession || !immediateUser) {
+        throw new Error('帳號已建立，但登入連線尚未建立。請重新登入。')
+      }
+      if (immediateUser.id !== signupData.userId || immediateSession.user.id !== signupData.userId) {
+        throw new Error('登入帳號與新建立帳號不一致。請先登出後再試。')
+      }
+      if (!immediateSession.access_token) {
+        throw new Error('帳號已建立，但登入憑證不完整。請重新登入。')
+      }
+
+      const stabilized = await waitForSession(supabase, {
+        expectedUserId: signupData.userId,
+        requireAccessToken: true,
+        verifyPersistedStorage: isCapacitorNative(),
+        timeoutMs: 5_000,
+        intervalMs: 150,
+      })
+      if (!stabilized.ok) {
+        const reason =
+          stabilized.reason === 'user_mismatch'
+            ? '登入帳號與新建立帳號不一致。'
+            : stabilized.reason === 'missing_access_token'
+              ? '登入憑證不完整。'
+              : stabilized.reason === 'storage_not_persisted'
+                ? '登入狀態無法儲存到裝置。'
+                : stabilized.reason === 'get_session_error'
+                  ? '無法讀取登入狀態。'
+                  : '登入連線未在時間內建立。'
+        throw new Error(`帳號已建立，但${reason}請重新登入。`)
+      }
 
       const { clearUserLocalState } = await import('@/lib/clear-user-local-state')
       clearUserLocalState()
       toast.success('好，認識一下。')
-      await new Promise(r => setTimeout(r, 400))
-      router.push('/onboarding')
-      router.refresh()
+      window.location.assign('/onboarding?login=1')
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : pickZaiJianLine('error').text)
       setLoading(false)

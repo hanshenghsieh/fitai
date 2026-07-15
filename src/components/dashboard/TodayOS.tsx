@@ -17,9 +17,11 @@ import {
 import { enrichFoodLog, sumItemMacros } from '@/lib/food-log-macros'
 import {
   fileToDataUrl,
+  FoodPhotoError,
   prepareFoodPhotoFile,
   uploadFoodPhotoFile,
   fetchPhotoMatch,
+  type FoodPhotoSource,
 } from '@/lib/food-capture'
 import { storesInText } from '@/lib/dice-store-names'
 import { isCapacitorNative, isNativeIOS } from '@/lib/capacitor-native'
@@ -760,10 +762,14 @@ export default function TodayOS({
     registerDeleteLog?.(removeLogById)
   }, [registerDeleteLog, removeLogById])
 
-  const parsePhotoDraft = useCallback(async (file: File, previewUrl: string) => {
+  const parsePhotoDraft = useCallback(async (
+    file: File,
+    previewUrl: string,
+    source: FoodPhotoSource
+  ) => {
     let parsedName = ''
     try {
-      const parsed = await uploadFoodPhotoFile(file)
+      const parsed = await uploadFoodPhotoFile(file, source)
       parsedName = parsed.name.trim() || '未知食物'
       const photoId = `photo-parse-${Date.now()}`
 
@@ -837,13 +843,15 @@ export default function TodayOS({
           : prev
       )
     } catch (err) {
-      const raw = err instanceof Error ? err.message : ''
-      const isHardApiError = /辨識失敗|failed|error|500|401|403/i.test(raw)
-      const hint = '這餐看起來需要你再確認一下，可以手動修正後加入今日紀錄。'
-      if (isHardApiError) {
-        toast.error('暫時無法連線辨識', { description: '你可以手動修正或稍後再試' })
-      } else {
-        toast.message('需要你再確認一下', { description: hint })
+      const photoError =
+        err instanceof FoodPhotoError
+          ? err
+          : new FoodPhotoError(
+              'PHOTO_SERVER_ERROR',
+              '照片辨識暫時失敗，請稍後再試。'
+            )
+      if (photoError.code !== 'PHOTO_CANCELLED') {
+        toast.error(photoError.message)
       }
       setPhotoDraft(prev =>
         prev
@@ -856,7 +864,7 @@ export default function TodayOS({
               fat_g: null,
               loading: false,
               accuracy: undefined,
-              recognitionHint: hint,
+              recognitionHint: photoError.message,
             }
           : prev
       )
@@ -864,7 +872,7 @@ export default function TodayOS({
   }, [])
 
   const handlePhotoPick = useCallback(
-    (file: File) => {
+    (file: File, source: FoodPhotoSource) => {
       if (photoPreviewUrlRef.current) URL.revokeObjectURL(photoPreviewUrlRef.current)
       photoPreviewUrlRef.current = null
       setPhotoOpen(true)
@@ -879,6 +887,7 @@ export default function TodayOS({
           setPhotoProcessing(false)
           setPhotoDraft({
             file: prepared.file,
+            source,
             previewUrl: prepared.previewUrl,
             name: '',
             calories: null,
@@ -887,7 +896,7 @@ export default function TodayOS({
             fat_g: null,
             loading: true,
           })
-          await parsePhotoDraft(prepared.file, prepared.previewUrl)
+          await parsePhotoDraft(prepared.file, prepared.previewUrl, source)
         } catch (err) {
           setPhotoProcessing(false)
           const message = err instanceof Error ? err.message : '無法處理照片'
@@ -898,6 +907,21 @@ export default function TodayOS({
     },
     [parsePhotoDraft]
   )
+
+  const retryPhotoUpload = useCallback(() => {
+    if (!photoDraft || photoDraft.loading) return
+    const current = photoDraft
+    setPhotoDraft(prev =>
+      prev
+        ? {
+            ...prev,
+            loading: true,
+            recognitionHint: undefined,
+          }
+        : prev
+    )
+    void parsePhotoDraft(current.file, current.previewUrl, current.source)
+  }, [photoDraft, parsePhotoDraft])
 
   const closePhotoSheet = useCallback(() => {
     setPhotoOpen(false)
@@ -1932,6 +1956,7 @@ export default function TodayOS({
         onOpenManualCorrection={() => setManualPhotoOpen(true)}
         onPhotoV2Select={handlePhotoV2Select}
         onSavePhotoOnly={savePhotoOnly}
+        onRetryUpload={retryPhotoUpload}
         saving={photoSaving}
       />
 

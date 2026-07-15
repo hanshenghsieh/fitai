@@ -1,11 +1,17 @@
-import { Camera, CameraErrorCode, type MediaResult } from '@capacitor/camera'
+import {
+  Camera,
+  CameraErrorCode,
+  type CameraPermissionState,
+  type CameraPermissionType,
+  type MediaResult,
+} from '@capacitor/camera'
 import { Capacitor } from '@capacitor/core'
 import { isNativeIOS } from '@/lib/capacitor-native'
 
 export type NativePhotoFailure = 'denied' | 'cancelled' | 'unavailable'
 
 export type NativePhotoResult =
-  | { ok: true; file: File }
+  | { ok: true; file: File; source: 'camera' | 'library' }
   | { ok: false; reason: NativePhotoFailure }
 
 function dataUrlToFile(dataUrl: string, filename: string): File {
@@ -44,6 +50,21 @@ function mapError(error: unknown): NativePhotoFailure {
   return 'unavailable'
 }
 
+function permissionGranted(
+  permission: CameraPermissionType,
+  state: CameraPermissionState
+): boolean {
+  return state === 'granted' || (permission === 'photos' && state === 'limited')
+}
+
+async function ensurePermission(permission: CameraPermissionType): Promise<boolean> {
+  const current = await Camera.checkPermissions()
+  if (permissionGranted(permission, current[permission])) return true
+  if (current[permission] === 'denied') return false
+  const requested = await Camera.requestPermissions({ permissions: [permission] })
+  return permissionGranted(permission, requested[permission])
+}
+
 async function mediaResultToFile(result: MediaResult, namePrefix: string): Promise<File | null> {
   const src = result.webPath ?? (result.uri ? Capacitor.convertFileSrc(result.uri) : undefined)
   if (src) {
@@ -71,6 +92,7 @@ async function mediaResultToFile(result: MediaResult, namePrefix: string): Promi
 export async function captureFoodPhotoFromCamera(): Promise<NativePhotoResult> {
   if (!isCapacitorCameraUsable()) return { ok: false, reason: 'unavailable' }
   try {
+    if (!(await ensurePermission('camera'))) return { ok: false, reason: 'denied' }
     const result = await Camera.takePhoto({
       quality: 90,
       correctOrientation: true,
@@ -79,7 +101,7 @@ export async function captureFoodPhotoFromCamera(): Promise<NativePhotoResult> {
     })
     const file = await mediaResultToFile(result, 'food')
     if (!file) return { ok: false, reason: 'unavailable' }
-    return { ok: true, file }
+    return { ok: true, file, source: 'camera' }
   } catch (error) {
     return { ok: false, reason: mapError(error) }
   }
@@ -88,8 +110,10 @@ export async function captureFoodPhotoFromCamera(): Promise<NativePhotoResult> {
 export async function pickFoodPhotoFromGallery(): Promise<NativePhotoResult> {
   if (!isCapacitorCameraUsable()) return { ok: false, reason: 'unavailable' }
   try {
+    if (!(await ensurePermission('photos'))) return { ok: false, reason: 'denied' }
     const { results } = await Camera.chooseFromGallery({
       quality: 90,
+      correctOrientation: true,
       allowMultipleSelection: false,
       presentationStyle: 'fullscreen',
       editable: 'no',
@@ -98,7 +122,7 @@ export async function pickFoodPhotoFromGallery(): Promise<NativePhotoResult> {
     if (!first) return { ok: false, reason: 'cancelled' }
     const file = await mediaResultToFile(first, 'food')
     if (!file) return { ok: false, reason: 'unavailable' }
-    return { ok: true, file }
+    return { ok: true, file, source: 'library' }
   } catch (error) {
     return { ok: false, reason: mapError(error) }
   }

@@ -29,6 +29,8 @@ import FoodPhotoThumb from '@/components/dashboard/today/FoodPhotoThumb'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { AnalysisDayPlanHint } from '@/lib/analytics/analysis-summary'
 import { getFoodLogDisplayLabel } from '@/lib/nutrition/food-log-display'
+import { resolveFoodLogsFromSession } from '@/lib/food-log-session-cache'
+import { foodLogNutritionDayKey, filterFoodLogsForNutritionDay } from '@/lib/nutrition-day-food-logs'
 import {
   buildRecordDayView,
   buildRecordWeekCards,
@@ -99,6 +101,14 @@ function formatKcal(n: number): string {
   return n.toLocaleString('zh-TW')
 }
 
+function resolveRecordFoodLogs(checkins: RecordCheckinRow[], todayStr: string): FoodLogEntry[] {
+  const serverLogs = extractAllFoodLogs(checkins)
+  const historicalLogs = serverLogs.filter(log => foodLogNutritionDayKey(log) !== todayStr)
+  const serverTodayLogs = filterFoodLogsForNutritionDay(serverLogs, todayStr)
+  const resolvedTodayLogs = resolveFoodLogsFromSession(serverTodayLogs, todayStr)
+  return [...historicalLogs, ...resolvedTodayLogs].sort((a, b) => a.logged_at.localeCompare(b.logged_at))
+}
+
 export default function RecordV2Screen({
   todayStr,
   checkins: initialCheckins,
@@ -115,15 +125,17 @@ export default function RecordV2Screen({
   const dateInputRef = useRef<HTMLInputElement>(null)
   const [internalDate, setInternalDate] = useState(todayStr)
   const selectedDate = selectedDateProp ?? internalDate
-  const [foodLogs, setFoodLogs] = useState<FoodLogEntry[]>(() => extractAllFoodLogs(initialCheckins))
+  const [foodLogs, setFoodLogs] = useState<FoodLogEntry[]>(() =>
+    resolveRecordFoodLogs(initialCheckins, todayStr)
+  )
   const [fadeKey, setFadeKey] = useState(0)
   const [actionTarget, setActionTarget] = useState<ActionTarget | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ActionTarget | null>(null)
   const [pending, startTransition] = useTransition()
 
   useEffect(() => {
-    setFoodLogs(extractAllFoodLogs(initialCheckins))
-  }, [initialCheckins])
+    setFoodLogs(resolveRecordFoodLogs(initialCheckins, todayStr))
+  }, [initialCheckins, todayStr])
 
   const applySelectedDate = useCallback(
     (date: string) => {

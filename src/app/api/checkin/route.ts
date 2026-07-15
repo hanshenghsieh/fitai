@@ -5,8 +5,51 @@ import { getNutritionDayKey } from '@/lib/timezone'
 import { mergePersistedCheckinNotes, parseCheckinMeta } from '@/lib/checkin-utils'
 import { syncBankFromFoodLogs } from '@/lib/banks/calorie-bank-store'
 import { differenceInDays, format, parseISO, startOfWeek } from 'date-fns'
-import type { WeeklyPlanData, UserProfile } from '@/types'
+import type { DailyCheckin, WeeklyPlanData, UserProfile } from '@/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
+
+class CheckinRequestError extends Error {}
+
+interface MutationContract {
+  nutritionDate: string
+  idempotencyKey: string
+  entryRevision: number
+}
+
+export function mergeCheckinNotesPatch(
+  existingNotes: string | null | undefined,
+  notesPatch: Record<string, unknown>
+): string {
+  let existingMeta: Record<string, unknown> = {}
+  if (typeof existingNotes === 'string') {
+    try {
+      existingMeta = JSON.parse(existingNotes) as Record<string, unknown>
+    } catch {
+      existingMeta = {}
+    }
+  }
+  const nextMeta = { ...existingMeta, ...notesPatch }
+  if (
+    notesPatch.user_memory &&
+    typeof notesPatch.user_memory === 'object' &&
+    !Array.isArray(notesPatch.user_memory)
+  ) {
+    const existingMemory =
+      existingMeta.user_memory &&
+      typeof existingMeta.user_memory === 'object' &&
+      !Array.isArray(existingMeta.user_memory)
+        ? (existingMeta.user_memory as Record<string, unknown>)
+        : {}
+    nextMeta.user_memory = {
+      ...existingMemory,
+      ...(notesPatch.user_memory as Record<string, unknown>),
+    }
+  }
+  return mergePersistedCheckinNotes(
+    JSON.stringify(nextMeta),
+    { notes: existingNotes ?? null } as Pick<DailyCheckin, 'notes'>
+  )
+}
 
 async function resolveDailyTargets(
   supabase: SupabaseClient,
@@ -85,9 +128,10 @@ async function mergeCheckinBodyWithExistingNotes(
   supabase: SupabaseClient,
   userId: string,
   checkinDate: string,
-  body: Record<string, unknown>
+  body: Record<string, unknown>,
+  notesPatch?: Record<string, unknown>
 ): Promise<Record<string, unknown>> {
-  if (typeof body.notes !== 'string') return body
+  if (typeof body.notes !== 'string' && !notesPatch) return body
 
   const { data: existing } = await supabase
     .from('daily_checkins')
@@ -96,9 +140,89 @@ async function mergeCheckinBodyWithExistingNotes(
     .eq('checkin_date', checkinDate)
     .maybeSingle()
 
+  if (notesPatch) {
+    return {
+      ...body,
+      notes: mergeCheckinNotesPatch(existing?.notes, notesPatch),
+    }
+  }
+
   return {
     ...body,
-    notes: mergePersistedCheckinNotes(body.notes, existing),
+    notes: mergePersistedCheckinNotes(body.notes as string, existing),
+  }
+}
+
+export function isValidNutritionDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const parsed = new Date(`${value}T00:00:00.000Z`)
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+}
+
+function parsePatchRequest(
+  request: NextRequest,
+  raw: Record<string, unknown>
+): {
+  body: Record<string, unknown>
+  notesPatch?: Record<string, unknown>
+  contract?: MutationContract
+} {
+  const {
+    nutrition_date: nutritionDateValue,
+    idempotency_key: idempotencyKeyValue,
+    entry_revision: entryRevisionValue,
+    notes_patch: notesPatchValue,
+    ...body
+  } = raw
+  const hasContract =
+    nutritionDateValue != null ||
+    idempotencyKeyValue != null ||
+    entryRevisionValue != null ||
+    notesPatchValue != null
+  if (!hasContract) return { body }
+
+  if (
+    typeof nutritionDateValue !== 'string' ||
+    !isValidNutritionDate(nutritionDateValue)
+  ) {
+    throw new CheckinRequestError('Invalid nutrition_date')
+  }
+  if (
+    typeof idempotencyKeyValue !== 'string' ||
+    idempotencyKeyValue.length < 1 ||
+    idempotencyKeyValue.length > 200
+  ) {
+    throw new CheckinRequestError('Invalid idempotency_key')
+  }
+  const headerKey = request.headers.get('idempotency-key')
+  if (headerKey && headerKey !== idempotencyKeyValue) {
+    throw new CheckinRequestError('Idempotency key mismatch')
+  }
+  if (
+    typeof entryRevisionValue !== 'number' ||
+    !Number.isInteger(entryRevisionValue) ||
+    entryRevisionValue < 1
+  ) {
+    throw new CheckinRequestError('Invalid entry_revision')
+  }
+  if (
+    notesPatchValue != null &&
+    (typeof notesPatchValue !== 'object' || Array.isArray(notesPatchValue))
+  ) {
+    throw new CheckinRequestError('Invalid notes_patch')
+  }
+  if (notesPatchValue != null && typeof body.notes === 'string') {
+    throw new CheckinRequestError('Use notes_patch or notes, not both')
+  }
+
+  return {
+    body,
+    notesPatch: notesPatchValue as Record<string, unknown> | undefined,
+    contract: {
+      nutritionDate: nutritionDateValue,
+      idempotencyKey: idempotencyKeyValue,
+      entryRevision: entryRevisionValue,
+    },
   }
 }
 
@@ -147,16 +271,33 @@ export async function PATCH(request: NextRequest) {
   if (!auth.ok) return auth.response
   const { user, supabase } = auth
 
-  const body = await request.json()
-  const today = getNutritionDayKey()
-  const mergedBody = await mergeCheckinBodyWithExistingNotes(supabase, user.id, today, body)
+  let parsed: ReturnType<typeof parsePatchRequest>
+  try {
+    parsed = parsePatchRequest(
+      request,
+      (await request.json()) as Record<string, unknown>
+    )
+  } catch (error) {
+    if (error instanceof CheckinRequestError) {
+      return jsonWithCors({ error: error.message }, request, { status: 400 })
+    }
+    return jsonWithCors({ error: 'Invalid request body' }, request, { status: 400 })
+  }
+  const checkinDate = parsed.contract?.nutritionDate ?? getNutritionDayKey()
+  const mergedBody = await mergeCheckinBodyWithExistingNotes(
+    supabase,
+    user.id,
+    checkinDate,
+    parsed.body,
+    parsed.notesPatch
+  )
 
   const { data, error } = await supabase
     .from('daily_checkins')
     .upsert(
       {
         user_id: user.id,
-        checkin_date: today,
+        checkin_date: checkinDate,
         ...mergedBody,
       },
       { onConflict: 'user_id,checkin_date' }
@@ -179,5 +320,21 @@ export async function PATCH(request: NextRequest) {
     console.error('[checkin] calorie bank sync failed after PATCH:', err)
   }
 
-  return jsonWithCors({ checkin: data, calorie_bank: bank }, request)
+  return jsonWithCors(
+    {
+      checkin: data,
+      calorie_bank: bank,
+      ...(parsed.contract
+        ? {
+            confirmation: {
+              status: 'confirmed',
+              idempotency_key: parsed.contract.idempotencyKey,
+              nutrition_date: parsed.contract.nutritionDate,
+              entry_revision: parsed.contract.entryRevision,
+            },
+          }
+        : {}),
+    },
+    request
+  )
 }

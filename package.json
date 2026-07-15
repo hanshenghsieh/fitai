@@ -70,6 +70,7 @@
     "cap:ios": "npx cap sync ios && npx cap open ios",
     "ios:local:prep": "node scripts/ios-local-prep.mjs",
     "ios:local:open": "npx cap open ios",
+    "preflight:ios-local": "node scripts/preflight-ios-local-hybrid.mjs",
     "testflight:prep": "node scripts/testflight-prep.mjs",
     "testflight:3a-prep": "node scripts/testflight-build-3a-prep.mjs"
   },

@@ -1,56 +1,60 @@
-import type { DailyCheckin } from '@/types'
 import type { FoodLogEntry } from '@/lib/banks/types'
-import { apiFetch } from '@/lib/api/client'
+import { resolveFoodLogsFromSession, writeFoodLogsSessionCache } from '@/lib/food-log-session-cache'
+import { readTodayOfflineSnapshot } from '@/lib/today-offline-cache'
+import { getNutritionDayKey } from '@/lib/timezone'
 import {
-  buildCheckinPayload,
-  initDietItems,
-  mealModesFromCheckin,
-  parseCheckinMeta,
   type UserMemoryMeta,
 } from '@/lib/checkin-utils'
-
-async function fetchTodayCheckin(): Promise<DailyCheckin | null> {
-  const res = await apiFetch('/api/checkin')
-  if (!res.ok) throw new Error('無法載入今日紀錄')
-  const json = (await res.json()) as { checkin: DailyCheckin | null }
-  return json.checkin
-}
+import { createClient } from '@/lib/supabase/client'
+import {
+  enqueueCheckinMutation,
+  readPendingCheckinMutation,
+  readPendingFoodLogs,
+  requestOfflineMutationReplay,
+  type CheckinUserMemoryPatch,
+} from '@/lib/offline-mutation-queue'
 
 export async function patchTodayFoodLogs(
   updater: (logs: FoodLogEntry[], memory: UserMemoryMeta | undefined) => FoodLogEntry[],
   weeklyPlanId: string | null
 ): Promise<FoodLogEntry[]> {
-  const checkin = await fetchTodayCheckin()
-  const meta = parseCheckinMeta(checkin)
-  const prevLogs = meta.user_memory?.food_logs_today ?? []
-  const nextLogs = updater(prevLogs, meta.user_memory)
-  const nextMemory: UserMemoryMeta = { ...meta.user_memory, food_logs_today: nextLogs }
+  const date = getNutritionDayKey()
+  const supabase = createClient()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  const userId = session?.user.id
+  if (!userId) throw new Error('登入狀態失效，無法安全儲存')
 
-  const payload = buildCheckinPayload(
-    {
-      dietItems: initDietItems(checkin),
-      workoutItems: checkin?.workout_items ?? [],
-      waterMl: checkin?.water_ml ?? 0,
-      mealModes: mealModesFromCheckin(checkin),
-      customEatOut: meta.custom_eat_out,
-      dailyRolls: meta.daily_rolls,
-      mealSuggest: meta.meal_suggest,
-      userMemory: nextMemory,
-    },
-    weeklyPlanId,
-    checkin
-  )
-
-  const res = await apiFetch('/api/checkin', {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    throw new Error(text || '儲存失敗')
+  const pendingEntry = readPendingCheckinMutation(userId, date)
+  const pendingMemory = pendingEntry?.payload.notes_patch?.user_memory
+  const prevLogs =
+    readPendingFoodLogs(userId, date) ?? resolveFoodLogsFromSession([], date)
+  const nextLogs = updater(prevLogs, pendingMemory as UserMemoryMeta | undefined)
+  const nextMemory: CheckinUserMemoryPatch = {
+    ...(pendingMemory ?? {}),
+    food_logs_today: nextLogs,
   }
+
+  const queued = enqueueCheckinMutation({
+    userId,
+    nutritionDate: date,
+    payload: {
+      weekly_plan_id: weeklyPlanId,
+      notes_patch: { user_memory: nextMemory },
+    },
+  })
+  if (!queued.durable) {
+    throw new Error('無法安全儲存在此裝置')
+  }
+
+  const snapshot = readTodayOfflineSnapshot(date)
+  writeFoodLogsSessionCache(nextLogs, date, {
+    calorie_target: snapshot?.calorie_target,
+    protein_target: snapshot?.protein_target,
+    water_ml: snapshot?.water_ml,
+  })
+  requestOfflineMutationReplay(userId)
 
   return nextLogs
 }

@@ -1,4 +1,8 @@
 import { getNutritionDayKey } from '@/lib/timezone'
+import {
+  clearLegacyPendingSyncMarker,
+  readOfflineMutationEntries,
+} from '@/lib/offline-mutation-queue'
 
 const STORAGE_KEY = 'bb_pending_sync_v1'
 
@@ -28,14 +32,28 @@ export function clearPendingSync(): void {
   const storage = readStorage()
   if (!storage) return
   try {
-    storage.removeItem(STORAGE_KEY)
+    // Compatibility marker only. Never delete durable, unconfirmed outbox data.
+    clearLegacyPendingSyncMarker()
     if (typeof window !== 'undefined') window.dispatchEvent(new Event('bb-pending-sync'))
   } catch {
     // ignore
   }
 }
 
-export function hasPendingSync(date = getNutritionDayKey()): boolean {
+export function hasPendingSync(
+  date = getNutritionDayKey(),
+  userId?: string
+): boolean {
+  if (
+    readOfflineMutationEntries().some(
+      entry =>
+        entry.nutritionDate === date &&
+        entry.status !== 'confirmed' &&
+        (!userId || entry.userId === userId)
+    )
+  ) {
+    return true
+  }
   const storage = readStorage()
   if (!storage) return false
   try {
