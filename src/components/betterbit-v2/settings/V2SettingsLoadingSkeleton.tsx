@@ -53,10 +53,10 @@ function SettingsCardSkeleton({ rows = 4 }: { rows?: number }) {
 export default function V2SettingsLoadingSkeleton() {
   return (
     <div
-      className="v2-settings-page max-w-[640px] mx-auto pb-[calc(var(--app-nav-total,72px)+28px)]"
+      className="v2-settings-page app-tab-column pb-[calc(var(--app-nav-total,72px)+28px)]"
       style={{
-        paddingLeft: 20,
-        paddingRight: 20,
+        paddingLeft: 'var(--v2-page-px)',
+        paddingRight: 'var(--v2-page-px)',
         background: `linear-gradient(180deg, ${BB_V2.bg.canvas} 0%, ${BB_V2.bg.softGreen} 100%)`,
         minHeight: '100dvh',
       }}

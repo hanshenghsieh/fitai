@@ -1,5 +1,7 @@
 /** Phase 5 — 真實生活餐次，不強迫早午晚 */
 
+import { getTaipeiTimeParts } from '@/lib/timezone'
+
 export type FoodSlot = 'meal1' | 'meal2' | 'meal3' | 'other' | 'before_sleep'
 
 export type LegacyMealSlot = 'breakfast' | 'lunch' | 'dinner'
@@ -36,7 +38,8 @@ export function mealHoursFromLogs(logs: { logged_at: string }[]): number[] {
   return logs
     .map(l => {
       try {
-        return new Date(l.logged_at).getHours() + new Date(l.logged_at).getMinutes() / 60
+        const { hour, minute } = getTaipeiTimeParts(new Date(l.logged_at))
+        return hour + minute / 60
       } catch {
         return 12
       }
@@ -97,8 +100,9 @@ export function normalizeFoodLogSlot(log: {
   if (log.logged_at) {
     try {
       const d = new Date(log.logged_at)
-      const hour = d.getHours() + d.getMinutes() / 60
-      if (!Number.isNaN(hour)) return inferSlotFromHour(hour)
+      const { hour, minute } = getTaipeiTimeParts(d)
+      const localHour = hour + minute / 60
+      if (!Number.isNaN(localHour)) return inferSlotFromHour(localHour)
     } catch {
       /* fall through */
     }

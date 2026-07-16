@@ -50,18 +50,30 @@ export async function POST(req: NextRequest) {
     const userId = userData.id
 
     console.log('Creating profile...')
-    await fetch(`${SUPABASE_URL}/rest/v1/user_profiles`, {
+    const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?on_conflict=id`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${SERVICE_KEY}`,
         apikey: SERVICE_KEY,
         'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal',
       },
       body: JSON.stringify({
         id: userId,
         display_name: displayName,
       }),
     })
+    if (!profileRes.ok) {
+      const profileError = await profileRes.text()
+      await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${SERVICE_KEY}`,
+          apikey: SERVICE_KEY,
+        },
+      })
+      throw new Error(profileError || 'Profile bootstrap failed')
+    }
 
     console.log('Profile created, returning success')
     return jsonWithCors({ userId, email }, req)

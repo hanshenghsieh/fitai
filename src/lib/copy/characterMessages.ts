@@ -561,7 +561,7 @@ export const CHARACTER_MESSAGES: Record<MessageCategory, CharacterMessage[]> = {
   { id: 'empty-04', text: '零。', subtext: '每個人都從零開始，包括我。', expression: 'eyeRoll', category: 'empty' },
   { id: 'empty-05', text: '還沒記錄。', subtext: '今天記一筆，明天就有歷史。', expression: 'normal', category: 'empty' },
   { id: 'empty-06', text: '空白。', subtext: '像新的一頁，寫上去就好。', expression: 'sleepy', category: 'empty' },
-  { id: 'empty-07', text: '什麼都沒有。', subtext: '正好，從第一餐開始。', expression: 'normal', category: 'empty' },
+  { id: 'empty-07', text: '還沒紀錄。', subtext: '從第一餐開始就好。', expression: 'normal', category: 'empty' },
   { id: 'empty-08', text: '新帳號。', subtext: '歡迎，不用懂，照著做。', expression: 'happy', category: 'empty' },
   { id: 'empty-09', text: '清單空。', subtext: '骰子可以幫你填第一格。', expression: 'normal', category: 'empty' },
   { id: 'empty-10', text: '無。', subtext: '無也是一種狀態，短暫的。', expression: 'normal', category: 'empty' },

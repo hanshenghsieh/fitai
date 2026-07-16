@@ -36,10 +36,10 @@ export default function V2Header({
 
   return (
     <header
-      className="sticky top-0 z-40 px-4 pt-[max(8px,var(--app-safe-top,0px))] pb-2"
+      className="sticky top-0 z-40 pt-[max(8px,var(--app-safe-top,0px))] pb-2"
       style={{ backgroundColor: BB_V2.bg.header }}
     >
-      <div className="max-w-[640px] mx-auto flex items-center justify-between gap-2 min-h-[48px]">
+      <div className="app-tab-column flex items-center justify-between gap-2 min-h-[48px] px-[var(--v2-page-px,18px)]">
         <div className="w-11 flex justify-start">
           {variant === 'back' && onBack ? (
             <button type="button" onClick={onBack} className={iconBtn} aria-label="返回">

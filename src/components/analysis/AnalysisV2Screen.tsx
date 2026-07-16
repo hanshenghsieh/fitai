@@ -292,7 +292,7 @@ export default function AnalysisV2Screen({
     <V2PageBackground className="v2-analysis-page">
       <V2Header onHistory={refresh} hideRight={false} />
 
-      <div className="v2-analysis-inner">
+      <div className="v2-analysis-inner app-tab-column">
         <div className="v2-analysis-week-switch">
           <button
             type="button"

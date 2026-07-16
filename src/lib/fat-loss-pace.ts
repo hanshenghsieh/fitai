@@ -2,7 +2,7 @@ import { addDays, differenceInDays, format, parseISO } from 'date-fns'
 import type { UserProfile, Goal, GoalType } from '@/types'
 import type { CalorieBankIntensity } from '@/lib/settings/user-settings-types'
 import { calorieFloorFromGender } from '@/lib/engines/calorie-bank-engine'
-import { calculateBMR, calculateTDEE } from '@/lib/goal-calculator'
+import { calculateBMR, calculateTDEE } from '@/lib/bmr-tdee'
 
 export type FatLossPace = 'conservative' | 'standard' | 'aggressive'
 

@@ -1,5 +1,5 @@
 import type { FoodLogEntry } from '@/lib/banks/types'
-import { isNutritionPendingConfirmation } from '@/lib/nutrition/food-log-display'
+import { isNutritionPendingConfirmation } from '@/lib/nutrition/nutrition-pending-status'
 
 export const MEAL_STATUS_PENDING = '待確認'
 export const MEAL_STATUS_LOGGED = '已記錄'

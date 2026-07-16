@@ -4,20 +4,26 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { colors } from '@/lib/design-system'
-import { initializeFirebase, requestNotificationPermission, listenForPushMessages } from '@/lib/firebase'
+import {
+  isFirebaseConfigured,
+  requestNotificationPermission,
+  listenForPushMessages,
+} from '@/lib/firebase'
 import { isWebPushSupported } from '@/lib/capacitor-native'
 import SettingsSection from './SettingsSection'
 
 export default function SettingsNotificationsSection() {
   const [supported, setSupported] = useState(false)
+  const [configured, setConfigured] = useState(false)
   const [enabled, setEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!isWebPushSupported()) return
 
-    const ok = initializeFirebase()
+    const ok = isFirebaseConfigured()
     setSupported(true)
+    setConfigured(ok)
     if (ok && Notification.permission === 'granted') {
       setEnabled(true)
       listenForPushMessages()
@@ -30,12 +36,13 @@ export default function SettingsNotificationsSection() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      initializeFirebase()
       const token = await requestNotificationPermission(user.id)
       if (token) {
         setEnabled(true)
         listenForPushMessages()
         toast.message('好，需要時我會輕輕提醒你。')
+      } else {
+        toast.message('通知服務目前無法使用，其他功能不受影響。')
       }
     } finally {
       setLoading(false)
@@ -50,7 +57,11 @@ export default function SettingsNotificationsSection() {
         <p className="text-[15px] leading-relaxed" style={{ color: colors.text.secondary }}>
           我們只會在你需要的時候，輕輕提醒。不轟炸、不催促。
         </p>
-        {enabled ? (
+        {!configured ? (
+          <p className="text-[13px]" style={{ color: colors.text.secondary }}>
+            通知服務目前無法使用，其他功能不受影響。
+          </p>
+        ) : enabled ? (
           <p className="text-[13px]" style={{ color: colors.accent.sage }}>
             已開啟
           </p>

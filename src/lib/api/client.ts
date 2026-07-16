@@ -8,11 +8,40 @@ import { isCapacitorNative } from '@/lib/capacitor-native'
  * therefore fails with TypeError. Prefer the canonical www host, and on
  * native use CapacitorHttp (URLSession) which bypasses CORS entirely.
  */
-function resolveApiBaseUrl(): string {
+interface ApiBaseUrlOptions {
+  configuredBase?: string
+  browserOrigin?: string | null
+  native?: boolean
+}
+
+export function resolveApiBaseUrl(options: ApiBaseUrlOptions = {}): string {
   const fromEnv =
+    options.configuredBase?.trim() ||
     process.env.NEXT_PUBLIC_API_BASE_URL?.trim() ||
     process.env.NEXT_PUBLIC_APP_URL?.trim() ||
     'https://www.betterbit.app'
+  const browserOrigin =
+    options.browserOrigin === undefined
+      ? typeof window !== 'undefined'
+        ? window.location.origin
+        : null
+      : options.browserOrigin
+  const native = options.native ?? isCapacitorNative()
+
+  if (!native && browserOrigin) {
+    try {
+      const origin = new URL(browserOrigin)
+      if (
+        (origin.protocol === 'http:' || origin.protocol === 'https:') &&
+        (origin.hostname === 'localhost' || origin.hostname === '127.0.0.1')
+      ) {
+        return origin.origin
+      }
+    } catch {
+      // Fall through to the configured production base.
+    }
+  }
+
   return fromEnv
     .replace(/\/$/, '')
     .replace(/^https:\/\/betterbit\.app$/i, 'https://www.betterbit.app')

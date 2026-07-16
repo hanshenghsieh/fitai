@@ -7,7 +7,9 @@ import {
   type GoalPlanOptions,
   type GoalPlanWarnings,
 } from '@/lib/fat-loss-pace'
+import { calculateBMR, calculateTDEE } from '@/lib/bmr-tdee'
 
+export { calculateBMR, calculateTDEE }
 export type { GoalPlanOptions, GoalPlanWarnings, FatLossPace }
 
 export interface NutritionTargets {
@@ -36,41 +38,6 @@ export interface GoalPlan extends NutritionTargets {
   warnings?: GoalPlanWarnings
 }
 
-const ACTIVITY_MULTIPLIERS: Record<string, number> = {
-  sedentary: 1.2,
-  light: 1.375,
-  moderate: 1.55,
-  active: 1.725,
-  very_active: 1.9,
-}
-
-/** 計算 BMR：有體脂用 Katch-McArdle，否則 Mifflin-St Jeor */
-export function calculateBMR(profile: UserProfile): number {
-  const weight = profile.weight_kg ?? 70
-  const height = profile.height_cm ?? 170
-  const age = profile.age ?? 30
-
-  if (profile.body_fat_pct && profile.body_fat_pct > 0 && profile.body_fat_pct < 60) {
-    const leanMass = profile.muscle_mass_kg
-      ? profile.muscle_mass_kg + weight * 0.1 // 肌肉量 + 估計器官水分
-      : weight * (1 - profile.body_fat_pct / 100)
-    return Math.round(370 + 21.6 * leanMass)
-  }
-
-  const isMale = profile.gender === 'male'
-  return Math.round(
-    isMale
-      ? 10 * weight + 6.25 * height - 5 * age + 5
-      : 10 * weight + 6.25 * height - 5 * age - 161
-  )
-}
-
-export function calculateTDEE(profile: UserProfile): number {
-  const bmr = calculateBMR(profile)
-  const multiplier = ACTIVITY_MULTIPLIERS[profile.activity_level] ?? 1.55
-  return Math.round(bmr * multiplier)
-}
-
 function getLeanMass(profile: UserProfile): number {
   const weight = profile.weight_kg ?? 70
   if (profile.muscle_mass_kg) return profile.muscle_mass_kg / 0.85 // 肌肉約佔 lean mass 85%
@@ -78,7 +45,7 @@ function getLeanMass(profile: UserProfile): number {
   return weight * (1 - bf / 100)
 }
 
-function daysInGoal(goal: Goal): number {
+function calculateDaysInGoal(goal: Goal): number {
   return Math.max(7, differenceInDays(parseISO(goal.end_date), parseISO(goal.start_date)))
 }
 
@@ -102,7 +69,7 @@ export function calculateGoalPlan(
 
   const targetFatMass = targetWeight * (targetBf / 100)
   const fatMassToChange = fatMass - targetFatMass
-  const days = daysInGoal(goal)
+  const days = calculateDaysInGoal(goal)
   const weeks = days / 7
   const fatToLoseKg = Math.max(0, fatMassToChange)
   const totalDeficitKcal = Math.round(fatToLoseKg * 7700)

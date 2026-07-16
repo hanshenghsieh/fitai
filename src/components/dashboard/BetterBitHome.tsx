@@ -101,6 +101,7 @@ import { zaijian } from '@/lib/copy/zaijian'
 import { invalidateMealMutation } from '@/lib/local-cache/invalidate'
 import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile } from '@/types'
 import { apiFetch } from '@/lib/api/client'
+import { moveTodayMealLogSlot } from '@/lib/today-meal-overview'
 
 interface GoalSnapshot {
   current_body_fat?: number | null
@@ -121,6 +122,7 @@ interface CheckinUiPatch {
 }
 
 interface Props {
+  userId: string
   todayPlan: DayPlan
   checkin: DailyCheckin | null
   weeklyPlanId: string | null
@@ -145,6 +147,7 @@ function formatExerciseDetail(set: { sets: number; reps: number | null; duration
 }
 
 export default function BetterBitHome({
+  userId,
   todayPlan,
   checkin,
   weeklyPlanId,
@@ -212,7 +215,7 @@ export default function BetterBitHome({
   )
   const [postureLine, setPostureLine] = useState('最近忙嗎？回來就好。今天照常。')
   const [trackedDayKey, setTrackedDayKey] = useState(() => getNutritionDayKey())
-  const syncUserId = profile?.id ?? checkin?.user_id ?? null
+  const syncUserId = userId
   const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
   const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(null)
   const [previousDayBank, setPreviousDayBank] = useState<CalorieBankRow | null>(null)
@@ -643,9 +646,9 @@ export default function BetterBitHome({
     didSessionHydrateRef.current = true
     const serverFp = foodLogIdsFingerprint(initialFoodLogs)
     const localFp = foodLogIdsFingerprint(userMemoryRef.current.food_logs_today ?? [])
-    if (serverFp === localFp) return
+    if (!syncUserId || serverFp === localFp) return
     persist({ userMemory: userMemoryRef.current })
-  }, [initialFoodLogs, persist])
+  }, [initialFoodLogs, persist, syncUserId])
 
   useEffect(() => {
     const reconciled = reconcileWorkoutItems(workoutItemsRef.current, planExerciseList)
@@ -859,10 +862,11 @@ export default function BetterBitHome({
 
   const handleMoveLogSlot = useCallback(
     (logId: string, slot: FoodSlot) => {
-      patchFoodLog(logId, { slot })
+      const nextLogs = moveTodayMealLogSlot(userMemory.food_logs_today ?? [], logId, slot)
+      handleLogFood(nextLogs, { ...userMemory, food_logs_today: nextLogs })
       toast.message('已移動餐點')
     },
-    [patchFoodLog]
+    [handleLogFood, userMemory]
   )
 
   return (

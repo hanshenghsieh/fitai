@@ -4,12 +4,11 @@ import { colors } from '@/lib/design-system'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import NotificationPrompt from '@/components/dashboard/NotificationPrompt'
 import BetterBitHome from '@/components/dashboard/BetterBitHome'
-import GeneratePlanButton from '@/components/dashboard/GeneratePlanButton'
-import TodayPlanEmpty from '@/components/dashboard/today/TodayPlanEmpty'
 import ZaiJianPanel from '@/components/character/ZaiJianPanel'
 import ZaiJian from '@/components/character/ZaiJian'
 import { userMemoryFromCheckin } from '@/lib/checkin-utils'
 import { useTodayData } from '@/features/today/useTodayData'
+import { buildFallbackTodayPlan } from '@/features/today/fallback-today-plan'
 import TodayV2Skeleton from '@/features/today/TodayV2Skeleton'
 import TodayErrorState from '@/features/today/TodayErrorState'
 import TodayRefreshingBanner from '@/features/today/TodayRefreshingBanner'
@@ -46,6 +45,7 @@ export default function TodayPageClient() {
     goalSnapshot,
     safeDayIndex,
     profile,
+    goal,
     foodDna,
     dayOfWeek,
     recentMissedDays,
@@ -57,50 +57,69 @@ export default function TodayPageClient() {
 
   const showStaleBanner = Boolean(data) && (Boolean(error) || isOffline) && !isRefreshing
 
+  const resolvedTodayPlan =
+    todayPlan ?? buildFallbackTodayPlan(todayStr, profile, goal, safeDayIndex)
+
+  if (!profile?.onboarding_completed) {
+    return <TodayV2Skeleton />
+  }
+
+  if (!resolvedTodayPlan) {
+    return (
+      <TodayErrorState
+        onRetry={() => void refetch()}
+        title="個人計畫尚未完成"
+        detail={planGenerateError ?? '請重新整理；若仍未完成，請回到設定確認身體資料與目標。'}
+      />
+    )
+  }
+
   return (
-    <div className="max-w-lg mx-auto relative" style={{ backgroundColor: colors.bg.canvas }}>
+    <div className="relative w-full" style={{ backgroundColor: colors.bg.canvas }}>
       {isRefreshing ? <TodayRefreshingBanner /> : null}
       {showStaleBanner ? <StaleDataBanner /> : null}
       <NotificationPrompt />
 
+      {!todayPlan && planGenerateError ? (
+        <div className="app-tab-column px-[var(--v2-page-px,18px)] pt-2">
+          <ZaiJian
+            size="sm"
+            line={{
+              text: '目前先依你的身體資料顯示計算目標。',
+              subtext: planGenerateError,
+              expression: 'normal',
+            }}
+            layout="bubble"
+          />
+        </div>
+      ) : null}
+
       {weeklyPlan?.generation_status === 'generating' && <ZaiJianPanel moment="loading" />}
 
       {weeklyPlan?.generation_status === 'failed' && (
-        <div className="m-4 space-y-4">
+        <div className="m-4">
           <ZaiJian size="md" line={PLAN_FAILED_LINE} layout="bubble" />
-          <GeneratePlanButton onPlanGenerated={() => void refetch()} />
         </div>
       )}
 
-      {!weeklyPlan || !planData?.days?.length ? (
-        <TodayPlanEmpty
-          failed={Boolean(planGenerateError)}
-          errorMessage={planGenerateError}
-          onPlanGenerated={() => void refetch()}
-        />
-      ) : todayPlan ? (
-        <BetterBitHome
-          key={`${userId}:${todayStr}`}
-          todayPlan={todayPlan}
-          checkin={checkin}
-          weeklyPlanId={weeklyPlan?.id ?? null}
-          goalSnapshot={goalSnapshot}
-          dayIndex={safeDayIndex}
-          profile={profile}
-          foodDna={foodDna}
-          dayOfWeek={dayOfWeek}
-          recentMissedDays={recentMissedDays}
-          recentFoodLogs={recentFoodLogs}
-          trialDaysLeft={trialDaysLeft}
-          initialFoodLogs={initialFoodLogs.length ? initialFoodLogs : (userMemoryFromCheckin(checkin ?? null).food_logs_today ?? [])}
-        />
-      ) : (
-        <TodayPlanEmpty
-          failed={Boolean(planGenerateError)}
-          errorMessage={planGenerateError}
-          onPlanGenerated={() => void refetch()}
-        />
-      )}
+      <BetterBitHome
+        key={`${userId}:${todayStr}:${planData?.days?.length ?? 0}`}
+        userId={userId}
+        todayPlan={resolvedTodayPlan}
+        checkin={checkin}
+        weeklyPlanId={weeklyPlan?.id ?? null}
+        goalSnapshot={goalSnapshot}
+        dayIndex={safeDayIndex}
+        profile={profile}
+        foodDna={foodDna}
+        dayOfWeek={dayOfWeek}
+        recentMissedDays={recentMissedDays}
+        recentFoodLogs={recentFoodLogs}
+        trialDaysLeft={trialDaysLeft}
+        initialFoodLogs={
+          initialFoodLogs.length ? initialFoodLogs : (userMemoryFromCheckin(checkin ?? null).food_logs_today ?? [])
+        }
+      />
     </div>
   )
 }

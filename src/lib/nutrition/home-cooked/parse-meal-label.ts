@@ -1,5 +1,4 @@
 import { resolveWholeFoodLabel } from '@/lib/nutrition/home-cooked/whole-food-registry'
-import { buildPhotoEstimatedMealDraft } from '@/lib/nutrition/home-cooked/meal-quick-adjust'
 import type { DetectedIngredientLine, HomeCookedMealDraft, SauceLevel } from '@/lib/nutrition/home-cooked/types'
 
 export const COMPOSITE_MEAL_SPLIT_RE = /[+＋、,，/／|｜\n]+/
@@ -49,8 +48,4 @@ export function parseMealLabelToDraft(mealLabel: string): HomeCookedMealDraft {
     meal_oil_level: 'normal',
     sauce_level: inferSauceLevel(mealLabel, ingredients),
   }
-}
-
-export function withSuggestedDefaults(draft: HomeCookedMealDraft): HomeCookedMealDraft {
-  return buildPhotoEstimatedMealDraft(draft.meal_label, draft)
 }

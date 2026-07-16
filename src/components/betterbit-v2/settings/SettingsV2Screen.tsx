@@ -62,8 +62,8 @@ export default function SettingsV2Screen({ access, appVersion }: Props) {
   return (
     <V2PageEnter>
       <div
-        className="v2-settings-page max-w-[640px] mx-auto pb-[calc(var(--app-nav-total,72px)+28px)]"
-        style={{ paddingLeft: 20, paddingRight: 20 }}
+        className="v2-settings-page app-tab-column pb-[calc(var(--app-nav-total,72px)+28px)]"
+        style={{ paddingLeft: 'var(--v2-page-px)', paddingRight: 'var(--v2-page-px)' }}
       >
         <header
           className="text-center pt-[max(12px,var(--app-safe-top,0px))] pb-5"

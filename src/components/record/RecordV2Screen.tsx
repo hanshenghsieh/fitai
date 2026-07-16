@@ -131,7 +131,7 @@ export default function RecordV2Screen({
   const [fadeKey, setFadeKey] = useState(0)
   const [actionTarget, setActionTarget] = useState<ActionTarget | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ActionTarget | null>(null)
-  const [pending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
 
   useEffect(() => {
     setFoodLogs(resolveRecordFoodLogs(initialCheckins, todayStr))
@@ -297,7 +297,7 @@ export default function RecordV2Screen({
         }
       />
 
-      <div className="v2-record-inner">
+      <div className="v2-record-inner app-tab-column">
         <div className="v2-record-date-switch">
           <button
             type="button"
@@ -515,17 +515,6 @@ export default function RecordV2Screen({
           )}
         </div>
 
-        <div className="v2-record-bottom-cta-wrap">
-          <button
-            type="button"
-            className="v2-record-bottom-cta touch-manipulation"
-            onClick={openAddMeal}
-            disabled={pending}
-          >
-            <Camera className="h-5 w-5" strokeWidth={2.2} />
-            拍照辨識 / 新增餐點
-          </button>
-        </div>
       </div>
 
       <AppOverlay

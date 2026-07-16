@@ -6,7 +6,9 @@
   --app-safe-top: env(safe-area-inset-top, 0px);
   --app-safe-bottom: env(safe-area-inset-bottom, 0px);
   --app-nav-total: calc(var(--app-nav-bar-height) + var(--app-safe-bottom));
+  --app-nav-fab-overhang: 24px;
   --app-page-top: calc(var(--app-safe-top) + 8px);
+  --app-tab-max-width: 512px;
 }
 
 .safe-area-pb {
@@ -157,6 +159,13 @@ html[data-app-overlay] .app-bottom-nav {
   max-width: 640px;
   margin: 0 auto;
   padding: 0 24px;
+}
+
+.app-tab-column {
+  box-sizing: border-box;
+  width: calc(100% - 24px);
+  max-width: var(--app-tab-max-width);
+  margin-inline: auto;
 }
 
 html {

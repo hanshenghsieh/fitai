@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { Loader2, ChevronRight, ChevronLeft } from 'lucide-react'
-import { addMonths, format } from 'date-fns'
+import { addMonths, format, startOfWeek } from 'date-fns'
 import { colors, cardStyle } from '@/lib/design-system'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { calculateGoalPlan } from '@/lib/goal-calculator'
@@ -18,6 +18,7 @@ import { OnboardingCard, OnboardingChip } from '@/components/onboarding/Onboardi
 import type { ActivityLevel, FitnessLevel, Goal, UserProfile } from '@/types'
 import { apiFetch } from '@/lib/api/client'
 import AppAuthLoadingShell from '@/features/auth/AppAuthLoadingShell'
+import { messageForGeneratePlanError } from '@/lib/generate-plan-errors'
 
 const TOTAL_STEPS = 3
 
@@ -149,7 +150,7 @@ export default function OnboardingPage() {
       const endDate = format(addMonths(new Date(), parseInt(data.goal_months) || 3), 'yyyy-MM-dd')
       const equipment = data.equipment.length ? data.equipment : ['none']
 
-      const { error: profileError } = await supabase.from('user_profiles').upsert({
+      const profilePayload = {
         id: user.id,
         gender: data.gender || null,
         age: parseInt(data.age) || null,
@@ -165,12 +166,15 @@ export default function OnboardingPage() {
         food_budget: data.food_budget,
         injuries: data.injuries,
         equipment,
-        onboarding_completed: true,
+        onboarding_completed: false,
         water_ml_target: Math.round(weightKg * 35),
-      })
+      }
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .upsert(profilePayload, { onConflict: 'id' })
       if (profileError) throw new Error(profileError.message)
 
-      const { error: goalError } = await supabase.from('goals').insert({
+      const goalPayload = {
         user_id: user.id,
         goal_type: data.goal_type || 'lose_fat',
         target_weight_kg: parseFloat(data.target_weight_kg) || null,
@@ -180,29 +184,91 @@ export default function OnboardingPage() {
         start_weight_kg: weightKg,
         start_body_fat_pct: parseFloat(data.body_fat_pct) || null,
         is_active: true,
-      })
-      if (goalError) throw new Error(goalError.message)
+      }
+      const { data: activeGoals, error: activeGoalError } = await supabase
+        .from('goals')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+      if (activeGoalError) throw new Error(activeGoalError.message)
 
-      const startDate = format(new Date(), 'yyyy-MM-dd')
-      await supabase.from('body_measurements').insert({
-        user_id: user.id,
-        measured_at: startDate,
-        weight_kg: weightKg,
-        body_fat_pct: parseFloat(data.body_fat_pct) || null,
-      })
+      const primaryGoalId = activeGoals?.[0]?.id as string | undefined
+      const { error: goalError } = primaryGoalId
+        ? await supabase.from('goals').update(goalPayload).eq('id', primaryGoalId)
+        : await supabase.from('goals').insert(goalPayload)
+      if (goalError) throw new Error(goalError.message)
+      const duplicateGoalIds = (activeGoals ?? [])
+        .slice(1)
+        .map(goal => goal.id as string)
+      if (duplicateGoalIds.length) {
+        const { error: duplicateGoalError } = await supabase
+          .from('goals')
+          .update({ is_active: false })
+          .in('id', duplicateGoalIds)
+        if (duplicateGoalError) throw new Error(duplicateGoalError.message)
+      }
 
       toast.message(zaijian.generating)
-      try {
-        const generateRes = await apiFetch('/api/generate-plan', { method: 'POST' })
-        const result = await generateRes.json()
-        if (!generateRes.ok) throw new Error(result.error || 'plan failed')
-        toast.success('計畫已就緒，照著做就好。')
-      } catch {
-        toast.error(pickZaiJianLine('error').text)
+      const generateRes = await apiFetch('/api/generate-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      const result = (await generateRes.json().catch(() => ({}))) as {
+        error?: string
+        code?: string
+        data?: { days?: Array<{ daily_targets?: { calories?: number } }> }
+      }
+      if (!generateRes.ok) {
+        throw new Error(
+          messageForGeneratePlanError({ error: result.error, code: result.code })
+        )
+      }
+      if (!result.data?.days?.length) {
+        throw new Error('計畫尚未完成，請再試一次。')
+      }
+
+      const { data: completedProfile, error: completionError } = await supabase
+        .from('user_profiles')
+        .update({ onboarding_completed: true })
+        .eq('id', user.id)
+        .select('id, onboarding_completed')
+        .single()
+      if (completionError || !completedProfile?.onboarding_completed) {
+        throw new Error(completionError?.message || '個人設定尚未完成，請再試一次。')
+      }
+
+      const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+      const [{ data: verifiedGoal }, { data: verifiedPlan }] = await Promise.all([
+        supabase
+          .from('goals')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from('weekly_plans')
+          .select('generation_status, plan_data')
+          .eq('user_id', user.id)
+          .eq('week_start', weekStart)
+          .maybeSingle(),
+      ])
+      const verifiedDays = (
+        verifiedPlan?.plan_data as { days?: unknown[] } | null | undefined
+      )?.days
+      if (
+        !verifiedGoal ||
+        verifiedPlan?.generation_status !== 'completed' ||
+        !verifiedDays?.length
+      ) {
+        throw new Error('計畫驗證尚未完成，請再試一次。')
       }
 
       // Hard navigation so the dashboard guard reads the freshly-written
       // onboarding_completed profile + session instead of bouncing to /login.
+      toast.success('計畫已就緒，照著做就好。')
       window.location.assign('/dashboard?welcome=1&login=1')
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : pickZaiJianLine('error').text)

@@ -1,7 +1,9 @@
 import { addDays, format, parseISO, startOfWeek } from 'date-fns'
 import type { FoodLogEntry } from '@/lib/banks/types'
-import { mealBucket } from '@/lib/analytics/analytics-helpers'
 import { extractRecentFoodLogsFromCheckins } from '@/lib/food-memory'
+import { foodLogNutritionDayKey } from '@/lib/nutrition-day-food-logs'
+import { normalizeFoodLogSlot } from '@/lib/food-slots'
+import { formatTaipeiTime } from '@/lib/timezone'
 import type { AnalysisDayPlanHint } from '@/lib/analytics/analysis-summary'
 import {
   calculateDailyFoodScore,
@@ -11,7 +13,7 @@ import {
 
 const WEEKDAY_ZH = ['日', '一', '二', '三', '四', '五', '六'] as const
 
-export type RecordMealBucket = 'breakfast' | 'lunch' | 'snack' | 'dinner'
+export type RecordMealBucket = 'breakfast' | 'lunch' | 'dinner' | 'before_sleep' | 'snack'
 
 export interface RecordCheckinRow {
   checkin_date: string
@@ -62,13 +64,14 @@ export interface RecordDayView {
   meals: RecordMealGroup[]
 }
 
-const MEAL_ORDER: RecordMealBucket[] = ['breakfast', 'lunch', 'snack', 'dinner']
+const MEAL_ORDER: RecordMealBucket[] = ['breakfast', 'lunch', 'dinner', 'before_sleep', 'snack']
 
 const MEAL_LABELS: Record<RecordMealBucket, string> = {
   breakfast: '早餐',
   lunch: '午餐',
-  snack: '點心',
   dinner: '晚餐',
+  before_sleep: '睡前／宵夜',
+  snack: '點心',
 }
 
 export function formatRecordDateLabel(dateStr: string): string {
@@ -93,14 +96,29 @@ function resolveTargets(
   return fallback
 }
 
-function formatMealTime(logs: FoodLogEntry[]): string | null {
+function loggedAtEpoch(log: FoodLogEntry): number {
+  const timestamp = new Date(log.logged_at).getTime()
+  return Number.isNaN(timestamp) ? Number.POSITIVE_INFINITY : timestamp
+}
+
+export function compareRecordFoodLogsByTime(a: FoodLogEntry, b: FoodLogEntry): number {
+  const difference = loggedAtEpoch(a) - loggedAtEpoch(b)
+  return difference || a.id.localeCompare(b.id)
+}
+
+export function formatRecordMealTime(logs: FoodLogEntry[]): string | null {
   if (!logs.length) return null
-  const sorted = [...logs].sort((a, b) => a.logged_at.localeCompare(b.logged_at))
-  try {
-    return format(parseISO(sorted[0].logged_at), 'HH:mm')
-  } catch {
-    return null
-  }
+  const sorted = [...logs].sort(compareRecordFoodLogsByTime)
+  return formatTaipeiTime(sorted[0]!.logged_at)
+}
+
+function recordMealBucket(log: FoodLogEntry): RecordMealBucket {
+  const slot = normalizeFoodLogSlot(log)
+  if (slot === 'meal1') return 'breakfast'
+  if (slot === 'meal2') return 'lunch'
+  if (slot === 'meal3') return 'dinner'
+  if (slot === 'before_sleep') return 'before_sleep'
+  return 'snack'
 }
 
 function pickMealPhoto(logs: FoodLogEntry[]): string | null {
@@ -114,18 +132,18 @@ export function buildMealGroups(dayLogs: FoodLogEntry[]): RecordMealGroup[] {
   const grouped = new Map<RecordMealBucket, FoodLogEntry[]>()
   for (const bucket of MEAL_ORDER) grouped.set(bucket, [])
   for (const log of dayLogs) {
-    const bucket = mealBucket(log) as RecordMealBucket
+    const bucket = recordMealBucket(log)
     grouped.get(bucket)?.push(log)
   }
 
   return MEAL_ORDER.map(bucket => {
-    const logs = (grouped.get(bucket) ?? []).sort((a, b) => a.logged_at.localeCompare(b.logged_at))
+    const logs = (grouped.get(bucket) ?? []).sort(compareRecordFoodLogsByTime)
     return {
       bucket,
       label: MEAL_LABELS[bucket],
       logs,
-      totalKcal: logs.reduce((s, l) => s + l.calories, 0),
-      timeLabel: formatMealTime(logs),
+      totalKcal: logs.reduce((s, l) => s + (l.calories ?? 0), 0),
+      timeLabel: formatRecordMealTime(logs),
       photoUrl: pickMealPhoto(logs),
     }
   })
@@ -145,7 +163,7 @@ export function buildRecordWeekCards(
   for (let i = 0; i < 7; i++) {
     const date = format(addDays(weekStart, i), 'yyyy-MM-dd')
     const isFuture = date > todayStr
-    const dayLogs = allLogs.filter(l => l.logged_at.slice(0, 10) === date)
+    const dayLogs = allLogs.filter(l => foodLogNutritionDayKey(l) === date)
     const targets = resolveTargets(date, dayPlansByDate, fallbackTargets)
     const scored = calculateDailyFoodScore({
       dayLogs,
@@ -177,7 +195,7 @@ export function buildRecordDayView(
   mealTarget = 3
 ): RecordDayView {
   const isFuture = date > todayStr
-  const dayLogs = isFuture ? [] : allLogs.filter(l => l.logged_at.slice(0, 10) === date)
+  const dayLogs = isFuture ? [] : allLogs.filter(l => foodLogNutritionDayKey(l) === date)
   const targets = resolveTargets(date, dayPlansByDate, fallbackTargets)
   const scored = calculateDailyFoodScore({
     dayLogs,
@@ -193,11 +211,11 @@ export function buildRecordDayView(
     isFuture,
     isEmpty: !isFuture && dayLogs.length === 0,
     summary: {
-      totalKcal: dayLogs.reduce((s, l) => s + l.calories, 0),
+      totalKcal: dayLogs.reduce((s, l) => s + (l.calories ?? 0), 0),
       targetKcal: targets.calories,
       mealCount,
       mealTarget,
-      proteinG: Math.round(dayLogs.reduce((s, l) => s + l.protein_g, 0)),
+      proteinG: Math.round(dayLogs.reduce((s, l) => s + (l.protein_g ?? 0), 0)),
       proteinTarget: targets.protein_g,
       score: scored.score,
       status: scored.status,

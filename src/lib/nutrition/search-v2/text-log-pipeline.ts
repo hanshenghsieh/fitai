@@ -3,7 +3,7 @@
  */
 import type { SearchV2Candidate, SearchV2Context, SearchV2Outcome } from '@/lib/nutrition/search-v2/types'
 import { NULL_MACROS } from '@/lib/nutrition/search-v2/types'
-import { searchNutritionV2 } from '@/lib/nutrition/search-v2/index'
+import { searchNutritionV2 } from '@/lib/nutrition/search-v2/search-nutrition-v2-core'
 import { confidenceFromLevel } from '@/lib/nutrition/search-v2/confidence'
 
 export interface TextFoodLogPayload {

@@ -14,6 +14,9 @@ import {
 export const WEEK_ANALYTICS_LOOKBACK_DAYS = 28
 export const PROGRESS_ANALYTICS_LOOKBACK_DAYS = 70
 
+// Production does not currently expose body_measurements through PostgREST.
+// Profile weight and check-in weight_history remain the schema-safe canonical sources.
+
 export interface AnalyticsBundle {
   profileWeightKg: number | null
   measurements: { id?: string; measured_at: string; weight_kg: number; created_at?: string }[]
@@ -94,19 +97,11 @@ export async function loadAnalyticsBundle(
 
   const [
     { data: profile },
-    { data: measurements },
     { data: goal },
     { data: checkins },
     { data: weeklyPlans },
   ] = await Promise.all([
     supabase.from('user_profiles').select('weight_kg').eq('id', userId).single(),
-    supabase
-      .from('body_measurements')
-      .select('id, measured_at, weight_kg, created_at')
-      .eq('user_id', userId)
-      .gte('measured_at', since)
-      .order('measured_at', { ascending: true })
-      .order('created_at', { ascending: true }),
     supabase
       .from('goals')
       .select('target_weight_kg, start_weight_kg, start_date')
@@ -131,7 +126,7 @@ export async function loadAnalyticsBundle(
   return {
     profileWeightKg: profile?.weight_kg ?? null,
     measurements: mergeWeightMeasurementSources(
-      measurements ?? [],
+      [],
       extractWeightHistoryFromCheckins(checkins ?? [])
     ),
     activeGoal: goal?.[0] ?? null,
@@ -166,15 +161,7 @@ export async function loadBodyMeasurementsForUser(
 ): Promise<BodyMeasurement[]> {
   const since = format(subDays(new Date(), lookbackDays), 'yyyy-MM-dd')
 
-  const [{ data: dbRows }, { data: checkins }] = await Promise.all([
-    supabase
-      .from('body_measurements')
-      .select('id, measured_at, weight_kg, body_fat_pct, muscle_mass_kg, waist_cm, hip_cm, chest_cm, created_at')
-      .eq('user_id', userId)
-      .gte('measured_at', since)
-      .order('measured_at', { ascending: true })
-      .order('created_at', { ascending: true })
-      .limit(52),
+  const [{ data: checkins }] = await Promise.all([
     supabase
       .from('daily_checkins')
       .select('checkin_date, notes')
@@ -184,7 +171,7 @@ export async function loadBodyMeasurementsForUser(
   ])
 
   const merged = mergeWeightMeasurementSources(
-    dbRows ?? [],
+    [],
     extractWeightHistoryFromCheckins(checkins ?? [])
   )
 

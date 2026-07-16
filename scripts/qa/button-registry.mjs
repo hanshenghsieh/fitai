@@ -28,7 +28,6 @@ export const BUTTON_REGISTRY = [
   { page: 'Today', button_name: '下肢重訓展開', selector_or_text: 'setExpandedWorkout', file: 'src/components/dashboard/BetterBitHome.tsx', patterns: ['setExpandedWorkout', 'onClick'] },
   { page: 'Today', button_name: '動作完成切換', selector_or_text: 'toggleExercise', file: 'src/components/dashboard/BetterBitHome.tsx', patterns: ['toggleExercise', 'onClick'] },
   { page: 'Today', button_name: '動作教學', selector_or_text: '動作教學', file: 'src/components/dashboard/BetterBitHome.tsx', patterns: ['href', '動作教學'] },
-  { page: 'Today', button_name: '幫我排本週', selector_or_text: '幫我排本週', file: 'src/components/dashboard/GeneratePlanButton.tsx', patterns: ['generate-plan', 'onClick'] },
   { page: 'Today', button_name: '通知-好', selector_or_text: '好', file: 'src/components/dashboard/NotificationPrompt.tsx', patterns: ['onClick'] },
   { page: 'Today', button_name: '通知-關閉', selector_or_text: 'aria-label: 關閉', file: 'src/components/dashboard/NotificationPrompt.tsx', patterns: ['onClick'] },
   // Bottom Nav

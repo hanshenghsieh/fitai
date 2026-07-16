@@ -114,7 +114,7 @@ export default function TodayV2Dashboard({
       <V2Header hideRight />
 
       <div
-        className="max-w-[640px] mx-auto pb-4 space-y-4"
+        className="app-tab-column pb-4 space-y-4"
         style={{ paddingLeft: BB_V2.pagePadding, paddingRight: BB_V2.pagePadding }}
       >
         {/* Main calorie card */}
@@ -222,7 +222,30 @@ export default function TodayV2Dashboard({
           </div>
         </div>
 
-        {/* Meal overview */}
+        {showMealActions && (
+          <TodayMealActions
+            primaryAction={primaryAction}
+            primaryLoading={mealActionsLoading}
+            primaryDisabled={mealActionsLoading || (primaryAction === 'recommend-meal' && rerollDisabled)}
+            rerollDisabled={rerollDisabled}
+            textPhotoDisabled={textPhotoDisabled}
+            onPrimary={onPrimaryMealAction!}
+            onTextLog={onTextLog!}
+            onPhotoLog={onPhotoLog!}
+            onReroll={onReroll!}
+            showReroll={showReroll}
+          />
+        )}
+
+        {interstitial}
+
+        {overTarget && (
+          <p className="text-[13px] text-center px-2 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
+            今天營養量已經很足夠了
+          </p>
+        )}
+
+        {/* Meal overview stays visible after recommendation and directly above water. */}
         <div>
           <V2SectionTitle
             action={
@@ -265,29 +288,6 @@ export default function TodayV2Dashboard({
             onDeleteLog={onDeleteLog}
           />
         </div>
-
-        {showMealActions && (
-          <TodayMealActions
-            primaryAction={primaryAction}
-            primaryLoading={mealActionsLoading}
-            primaryDisabled={mealActionsLoading || (primaryAction === 'recommend-meal' && rerollDisabled)}
-            rerollDisabled={rerollDisabled}
-            textPhotoDisabled={textPhotoDisabled}
-            onPrimary={onPrimaryMealAction!}
-            onTextLog={onTextLog!}
-            onPhotoLog={onPhotoLog!}
-            onReroll={onReroll!}
-            showReroll={showReroll}
-          />
-        )}
-
-        {interstitial}
-
-        {overTarget && (
-          <p className="text-[13px] text-center px-2 leading-relaxed" style={{ color: BB_V2.text.secondary }}>
-            今天營養量已經很足夠了
-          </p>
-        )}
       </div>
     </V2PageBackground>
   )

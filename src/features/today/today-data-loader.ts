@@ -1,6 +1,6 @@
 import { format, startOfWeek, differenceInDays, subDays, parse } from 'date-fns'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
-import type { DayPlan, DailyCheckin, UserProfile, WeeklyPlanData } from '@/types'
+import type { DayPlan, DailyCheckin, Goal, UserProfile, WeeklyPlanData } from '@/types'
 import type { FoodDna } from '@/lib/food-memory'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { AccessStatus } from '@/lib/subscription-access'
@@ -31,6 +31,7 @@ export interface TodayPageData {
   todayPlan: DayPlan | null
   checkin: DailyCheckin | null
   profile: UserProfile | null
+  goal: Goal | null
   foodDna: FoodDna
   recentFoodLogs: FoodLogEntry[]
   recentMissedDays: number
@@ -113,7 +114,8 @@ export async function loadTodayPageData(
   const [
     weeklyPlanResult,
     { data: checkin },
-    { data: profileRow },
+    profileResult,
+    goalResult,
     { data: recentCheckins },
     { data: subscription },
   ] = await Promise.all([
@@ -132,10 +134,18 @@ export async function loadTodayPageData(
     supabase
       .from('user_profiles')
       .select(
-        'id, display_name, weight_kg, body_fat_pct, created_at, gender, age, height_cm, goal_type, activity_level, is_vegetarian, is_vegan, is_halal, is_gluten_free, allergens, disliked_foods, food_budget, onboarding_completed'
+        'id, display_name, weight_kg, body_fat_pct, muscle_mass_kg, created_at, updated_at, gender, age, height_cm, activity_level, fitness_level, equipment, injuries, health_conditions, is_vegetarian, is_vegan, is_halal, is_gluten_free, allergens, disliked_foods, cuisine_preference, cooking_time_mins, food_budget, sleep_hours_target, water_ml_target, onboarding_completed'
       )
       .eq('id', user.id)
-      .single(),
+      .maybeSingle(),
+    supabase
+      .from('goals')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
     supabase
       .from('daily_checkins')
       .select('notes, checkin_date, diet_items, workout_items')
@@ -152,9 +162,14 @@ export async function loadTodayPageData(
       .maybeSingle(),
   ])
 
+  if (weeklyPlanResult.error) throw new Error(weeklyPlanResult.error.message)
+  if (profileResult.error) throw new Error(profileResult.error.message)
+  if (goalResult.error) throw new Error(goalResult.error.message)
+
   let weeklyPlan = weeklyPlanResult.data as TodayWeeklyPlanRow | null
   let planData = (weeklyPlan?.plan_data ?? null) as WeeklyPlanData | null
-  const profile = profileRow as UserProfile | null
+  const profile = profileResult.data as UserProfile | null
+  const goal = goalResult.data as Goal | null
 
   const autoGen = await maybeAutoGeneratePlan(profile, weeklyPlan, planData)
   planGenerateError = autoGen.planGenerateError
@@ -198,6 +213,7 @@ export async function loadTodayPageData(
     todayPlan,
     checkin: (checkin as DailyCheckin | null) ?? null,
     profile,
+    goal,
     foodDna,
     recentFoodLogs,
     recentMissedDays,

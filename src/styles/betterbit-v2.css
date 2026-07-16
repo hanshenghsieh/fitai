@@ -1177,8 +1177,11 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
 }
 
 .app-bottom-nav--v2 {
-  left: 12px;
-  right: 12px;
+  left: 0;
+  right: 0;
+  width: calc(100% - 24px);
+  max-width: var(--app-tab-max-width);
+  margin-inline: auto;
   bottom: max(8px, var(--app-safe-bottom));
   border-radius: 28px 28px 32px 32px;
   border: 1px solid rgba(230, 238, 226, 0.95);
@@ -1191,11 +1194,14 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
 
 .app-bottom-nav--v2 .app-bottom-nav__row {
   height: calc(var(--app-nav-bar-height) + 4px);
-  padding: 0 16px 8px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 12px 8px;
 }
 
 .app-shell:has(.app-bottom-nav--v2) .app-scroll-with-nav {
-  padding-bottom: calc(var(--app-nav-total) + 12px);
+  padding-bottom: calc(var(--app-nav-total) + var(--app-nav-fab-overhang) + 12px);
 }
 
 @keyframes v2-calorie-bank-slide-up {
@@ -1410,9 +1416,7 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
 }
 
 .v2-record-inner {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 0 18px calc(var(--app-nav-total, 72px) + 88px);
+  padding: 0 18px 24px;
 }
 
 .v2-record-date-switch {
@@ -1478,26 +1482,30 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
 }
 
 .v2-record-week-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin: 0 -18px;
-  padding: 0 18px 4px;
+  /* Fit all 7 day cards in viewport — no horizontal scroll */
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0 0 4px;
 }
 
 .v2-record-week-row {
-  display: flex;
-  gap: 8px;
-  min-width: min-content;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
 }
 
 .v2-record-score-card {
-  flex: 0 0 72px;
+  flex: none;
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 6px 12px;
-  border-radius: 20px;
+  gap: 2px;
+  padding: 8px 2px 10px;
+  border-radius: 14px;
   border: 1.5px solid #e6eee2;
   background: rgba(255, 255, 255, 0.92);
   transition: transform 0.15s ease, border-color 0.18s ease, box-shadow 0.18s ease;
@@ -1548,18 +1556,18 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
 }
 
 .v2-record-score-today-label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   line-height: 1;
 }
 
 .v2-record-score-weekday {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
 }
 
 .v2-record-score-value {
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.1;
   animation: v2-record-score-in 180ms ease-out;
@@ -1582,10 +1590,14 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
 }
 
 .v2-record-score-status {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.15;
   text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .v2-record-content-fade {
@@ -1856,40 +1868,6 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
   font-weight: 600;
 }
 
-.v2-record-bottom-cta-wrap {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(var(--app-nav-total, 72px) + 8px);
-  padding: 0 18px;
-  z-index: 30;
-  pointer-events: none;
-}
-
-.v2-record-bottom-cta {
-  pointer-events: auto;
-  max-width: 640px;
-  margin: 0 auto;
-  width: 100%;
-  min-height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #2f8f35 0%, #123d24 100%);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  box-shadow: 0 6px 20px rgba(47, 143, 53, 0.35);
-  transition: transform 0.15s ease;
-}
-
-.v2-record-bottom-cta:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
 .v2-record-empty {
   text-align: center;
   padding: 24px 16px;
@@ -2022,8 +2000,7 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
   .v2-record-page,
   .v2-record-content-fade,
   .v2-record-score-value,
-  .v2-record-meal-card,
-  .v2-record-bottom-cta {
+  .v2-record-meal-card {
     animation: none !important;
     transition: none !important;
   }
@@ -2043,8 +2020,6 @@ html[data-betterbit-reduced-motion='true'] .v2-record-meal-card {
 }
 
 .v2-analysis-inner {
-  max-width: 640px;
-  margin: 0 auto;
   padding: 0 18px calc(var(--app-nav-total, 72px) + 24px);
 }
 

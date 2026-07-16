@@ -1,6 +1,7 @@
 import type { FoodLogEntry } from '@/lib/banks/types'
 import { homeCookedDraftFromLog } from '@/lib/nutrition/home-cooked/draft-from-log'
-import { isCompositeMealLabel, parseMealLabelToDraft, withSuggestedDefaults } from '@/lib/nutrition/home-cooked/parse-meal-label'
+import { isCompositeMealLabel, parseMealLabelToDraft } from '@/lib/nutrition/home-cooked/parse-meal-label'
+import { withSuggestedDefaults } from '@/lib/nutrition/home-cooked/meal-quick-adjust'
 import type { HomeCookedMealDraft } from '@/lib/nutrition/home-cooked/types'
 import { defaultFoodRecordDraft } from './calculate'
 import { foodRecordDraftFromLog } from './draft-from-log'

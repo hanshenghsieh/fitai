@@ -1,10 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ShoppingBag, UtensilsCrossed, Salad, Cookie, X } from 'lucide-react'
+import { ShoppingBag, UtensilsCrossed, Salad, Cookie, Moon, X } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import { normalizeFoodLogSlot, type FoodSlot } from '@/lib/food-slots'
+import { groupTodayMealOverviewLogs } from '@/lib/today-meal-overview'
+import { setAppScrollLocked } from '@/lib/today-actions'
 import V2Card from './V2Card'
 
 const LONG_PRESS_MS = 1500
@@ -14,6 +16,7 @@ const SLOT_ROWS: { slot: FoodSlot; icon: typeof ShoppingBag }[] = [
   { slot: 'meal1', icon: ShoppingBag },
   { slot: 'meal2', icon: UtensilsCrossed },
   { slot: 'meal3', icon: Salad },
+  { slot: 'before_sleep', icon: Moon },
   { slot: 'other', icon: Cookie },
 ]
 
@@ -35,23 +38,8 @@ const NUMBERED_LABELS: Record<FoodSlot, string> = {
 
 export type MealLabelMode = 'named' | 'numbered'
 
-function groupLogsBySlot(logs: FoodLogEntry[]) {
-  const map: Record<FoodSlot, FoodLogEntry[]> = {
-    meal1: [],
-    meal2: [],
-    meal3: [],
-    other: [],
-    before_sleep: [],
-  }
-  for (const log of logs) {
-    const slot = normalizeFoodLogSlot(log)
-    map[slot]?.push(log)
-  }
-  return map
-}
-
 function logDisplayName(log: FoodLogEntry) {
-  return log.name || log.items?.[0]?.name || '餐點'
+  return log.name || '餐點'
 }
 
 interface Props {
@@ -69,7 +57,7 @@ export default function V2MealOverviewPanel({
   onEditLog,
   onDeleteLog,
 }: Props) {
-  const grouped = useMemo(() => groupLogsBySlot(foodLogs), [foodLogs])
+  const grouped = useMemo(() => groupTodayMealOverviewLogs(foodLogs), [foodLogs])
   const labels = labelMode === 'named' ? NAMED_LABELS : NUMBERED_LABELS
 
   const [editMode, setEditMode] = useState(false)
@@ -120,10 +108,9 @@ export default function V2MealOverviewPanel({
 
   useEffect(() => {
     if (!editMode) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    setAppScrollLocked(true)
     return () => {
-      document.body.style.overflow = prev
+      setAppScrollLocked(false)
     }
   }, [editMode])
 
@@ -132,6 +119,7 @@ export default function V2MealOverviewPanel({
 
     const onMove = (e: PointerEvent) => {
       if (!isDraggingRef.current) return
+      e.preventDefault()
       setDragPos({ x: e.clientX, y: e.clientY })
       setHoverSlot(resolveHoverSlot(e.clientX, e.clientY))
     }
@@ -182,7 +170,10 @@ export default function V2MealOverviewPanel({
       if (e.pointerType === 'mouse' && e.button !== 0) return
 
       if (editMode) {
-        if (onMoveLog) startDragging(logId, e.clientX, e.clientY)
+        if (onMoveLog) {
+          e.preventDefault()
+          startDragging(logId, e.clientX, e.clientY)
+        }
         return
       }
 
@@ -236,6 +227,23 @@ export default function V2MealOverviewPanel({
     }
   }, [clearLongPress, editMode, foodLogs, onEditLog])
 
+  const handleEditBackgroundPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (!editMode || isDraggingRef.current) return
+      const target = e.target
+      if (!(target instanceof Element)) return
+      if (
+        target.closest(
+          'button, input, textarea, select, [data-reorder-item], [data-reorder-action]'
+        )
+      ) {
+        return
+      }
+      exitEditMode()
+    },
+    [editMode, exitEditMode]
+  )
+
   const draggingLog = draggingLogId ? foodLogs.find(l => l.id === draggingLogId) : null
 
   return (
@@ -244,14 +252,15 @@ export default function V2MealOverviewPanel({
         <button
           type="button"
           aria-label="取消移動"
-          className="fixed inset-0 z-[62] cursor-default"
+          className="fixed inset-0 z-[59] cursor-default"
           style={{ backgroundColor: 'rgba(26, 46, 26, 0.12)' }}
-          onClick={exitEditMode}
+          onPointerDown={exitEditMode}
         />
       )}
 
       <div
         className={editMode ? 'relative z-[63] pointer-events-none' : undefined}
+        onPointerDownCapture={handleEditBackgroundPointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
@@ -367,7 +376,7 @@ function MealChip({
   onDelete,
 }: {
   name: string
-  kcal?: number
+  kcal?: number | null
   jiggle?: boolean
   jiggleDelay?: number
   hidden?: boolean
@@ -381,13 +390,16 @@ function MealChip({
 }) {
   return (
     <span
+      data-reorder-item
       role={draggable ? 'button' : undefined}
       tabIndex={draggable ? -1 : undefined}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
-      className={`relative inline-flex items-center gap-1 max-w-full px-2.5 py-1 rounded-lg text-[12px] select-none touch-manipulation ${
+      className={`relative inline-flex items-center gap-1 max-w-full px-2.5 py-1 rounded-lg text-[12px] select-none ${
+        jiggle ? 'touch-none' : 'touch-manipulation'
+      } ${
         jiggle ? 'v2-meal-chip-jiggle' : ''
       }`}
       style={{
@@ -403,6 +415,7 @@ function MealChip({
       {showDelete && onDelete && (
         <button
           type="button"
+          data-reorder-action
           aria-label="刪除餐點"
           className="v2-meal-chip-delete"
           onPointerDown={e => e.stopPropagation()}
@@ -424,7 +437,7 @@ function MealChip({
   )
 }
 
-function DragGhost({ name, kcal, x, y }: { name: string; kcal?: number; x: number; y: number }) {
+function DragGhost({ name, kcal, x, y }: { name: string; kcal?: number | null; x: number; y: number }) {
   return (
     <div
       className="fixed z-[70] pointer-events-none px-2.5 py-1 rounded-lg text-[12px] shadow-lg"

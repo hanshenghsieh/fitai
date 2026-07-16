@@ -5,13 +5,28 @@ const TZ = 'Asia/Taipei'
 /** 凌晨此時刻前仍歸屬「前一日」飲食紀錄（配合睡前／夜班） */
 export const NUTRITION_DAY_ROLLOVER_HOUR = 5
 
-export function getTaipeiHour(date = new Date()): number {
-  const h = new Intl.DateTimeFormat('en-US', {
+export function getTaipeiTimeParts(date = new Date()): { hour: number; minute: number } {
+  const parts = new Intl.DateTimeFormat('en-US', {
     hour: 'numeric',
-    hour12: false,
+    minute: 'numeric',
+    hourCycle: 'h23',
     timeZone: TZ,
-  }).format(date)
-  return parseInt(h, 10) % 24
+  }).formatToParts(date)
+  return {
+    hour: parseInt(parts.find(part => part.type === 'hour')?.value ?? '0', 10),
+    minute: parseInt(parts.find(part => part.type === 'minute')?.value ?? '0', 10),
+  }
+}
+
+export function getTaipeiHour(date = new Date()): number {
+  return getTaipeiTimeParts(date).hour
+}
+
+export function formatTaipeiTime(value: Date | string): string | null {
+  const date = typeof value === 'string' ? new Date(value) : value
+  if (Number.isNaN(date.getTime())) return null
+  const { hour, minute } = getTaipeiTimeParts(date)
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
 }
 
 export function getTaipeiDateKey(date = new Date()): string {

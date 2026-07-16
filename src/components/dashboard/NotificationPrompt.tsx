@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-import { initializeFirebase, requestNotificationPermission, listenForPushMessages } from '@/lib/firebase'
+import {
+  isFirebaseConfigured,
+  requestNotificationPermission,
+  listenForPushMessages,
+} from '@/lib/firebase'
 import { isWebPushSupported } from '@/lib/capacitor-native'
 import { colors } from '@/lib/design-system'
 import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
@@ -21,6 +25,7 @@ export default function NotificationPrompt() {
 
   useEffect(() => {
     if (!isWebPushSupported()) return
+    if (!isFirebaseConfigured()) return
 
     const supported = true
     setIsSupported(supported)
@@ -46,7 +51,6 @@ export default function NotificationPrompt() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      initializeFirebase()
       const token = await requestNotificationPermission(user.id)
 
       if (token) {
@@ -54,16 +58,16 @@ export default function NotificationPrompt() {
         listenForPushMessages()
         toast.success('好，我會提醒你。')
       } else {
-        toast.error(GENTLE_ERROR_MESSAGE)
+        toast.message('通知服務目前無法使用，其他功能不受影響。')
       }
     } catch {
-      toast.error(GENTLE_ERROR_MESSAGE)
+      toast.message(GENTLE_ERROR_MESSAGE)
     }
   }
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 max-w-lg mx-auto px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3 z-50 border-b"
+      className="fixed top-0 left-0 right-0 app-tab-column px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3 z-50 border-b"
       style={{ backgroundColor: colors.bg.elevated, borderColor: colors.border.subtle }}
     >
       <div className="flex items-start gap-3">

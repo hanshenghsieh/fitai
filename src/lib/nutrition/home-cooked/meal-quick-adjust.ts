@@ -164,3 +164,8 @@ export function mapSauceAmountToLevel(amount: QuickAmountLevel): HomeCookedMealD
   if (amount === 'more') return 'heavy'
   return 'normal'
 }
+
+/** Apply photo-style default portions to a parsed meal draft (no circular import with parse-meal-label). */
+export function withSuggestedDefaults(draft: HomeCookedMealDraft): HomeCookedMealDraft {
+  return buildPhotoEstimatedMealDraft(draft.meal_label, draft)
+}
