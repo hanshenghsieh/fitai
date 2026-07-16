@@ -27,6 +27,7 @@ let browser
 let page
 let transitionPoll
 const transitionErrors = []
+const geometry = []
 const blockingErrors = []
 
 async function adminJson(path) {
@@ -60,6 +61,50 @@ async function replaceInput(page, selector, value) {
     inputElement.dispatchEvent(new Event('input', { bubbles: true }))
   })
   await page.type(selector, String(value))
+}
+
+async function measureTabGeometry(page, path) {
+  await page.goto(`${baseUrl}${path}`, { waitUntil: 'networkidle0' })
+  await page.waitForSelector('.app-tab-header')
+  await page.waitForSelector('.app-bottom-nav--v2')
+  await page.evaluate(() => {
+    document.documentElement.classList.add('capacitor-ios')
+    document.documentElement.style.setProperty('--app-safe-top', '59px')
+    document.documentElement.style.setProperty('--app-safe-bottom', '34px')
+  })
+  const read = () =>
+    page.evaluate(() => {
+      const rect = selector => document.querySelector(selector)?.getBoundingClientRect()
+      const header = rect('.app-tab-header')
+      const nav = rect('.app-bottom-nav--v2')
+      const navRow = rect('.app-bottom-nav__row')
+      const content = document.querySelector('.app-tab-page-content')
+      const scroll = document.querySelector('#app-scroll-root')
+      return {
+        path: window.location.pathname,
+        headerHeight: header?.height ?? null,
+        headerTop: header?.top ?? null,
+        navHeight: nav?.height ?? null,
+        navRowHeight: navRow?.height ?? null,
+        navBottomGap: nav ? window.innerHeight - nav.bottom : null,
+        contentBottomPadding: content
+          ? Number.parseFloat(getComputedStyle(content).paddingBottom)
+          : null,
+        scrollBottomPadding: scroll
+          ? Number.parseFloat(getComputedStyle(scroll).paddingBottom)
+          : null,
+        horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
+      }
+    })
+  const first = await read()
+  await new Promise(resolve => setTimeout(resolve, 250))
+  const second = await read()
+  if (JSON.stringify(first) !== JSON.stringify(second)) {
+    throw new Error(`Layout jump detected on ${path}`)
+  }
+  const screenshot = await page.screenshot({ encoding: 'binary' })
+  if (!screenshot.byteLength) throw new Error(`Empty viewport capture on ${path}`)
+  return first
 }
 
 try {
@@ -191,6 +236,25 @@ try {
   )
   const refreshPersisted = true
 
+  for (const path of ['/dashboard', '/weekly', '/progress', '/settings']) {
+    geometry.push(await measureTabGeometry(page, path))
+  }
+  const expectedHeaderHeight = geometry[0].headerHeight
+  const expectedNavHeight = geometry[0].navHeight
+  for (const item of geometry) {
+    if (
+      item.headerHeight !== expectedHeaderHeight ||
+      item.headerHeight !== 52 ||
+      item.navHeight !== expectedNavHeight ||
+      item.navRowHeight !== 52 ||
+      item.navBottomGap !== 34 ||
+      item.contentBottomPadding !== 16 ||
+      item.horizontalOverflow
+    ) {
+      throw new Error(`Shared tab geometry mismatch on ${item.path}`)
+    }
+  }
+
   await page.goto(`${baseUrl}/settings/profile`, { waitUntil: 'networkidle0' })
   await page.waitForSelector('#height-inline')
   const settingsHeight = await page.$eval('#height-inline', element => Number(element.value))
@@ -227,6 +291,8 @@ try {
       refreshPersisted,
       logoutLoginPersisted: true,
       settingsHeightMatches: true,
+      geometry,
+      viewportCaptureCount: geometry.length,
       transitionNotFoundErrors: transitionErrors.length,
       blockingApiOrPageErrors: blockingErrors,
       cleanup: 'pending',
@@ -259,6 +325,7 @@ try {
       failure: error instanceof Error ? error.message : String(error),
       pageState,
       transitionErrors,
+      geometry,
       blockingErrors,
     })
   )

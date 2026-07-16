@@ -114,7 +114,7 @@ export default function TodayV2Dashboard({
       <V2Header hideRight />
 
       <div
-        className="app-tab-column pb-4 space-y-4"
+        className="app-tab-page-content app-tab-column space-y-4"
         style={{ paddingLeft: BB_V2.pagePadding, paddingRight: BB_V2.pagePadding }}
       >
         {/* Main calorie card */}

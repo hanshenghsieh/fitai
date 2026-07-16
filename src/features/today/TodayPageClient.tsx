@@ -13,6 +13,7 @@ import TodayV2Skeleton from '@/features/today/TodayV2Skeleton'
 import TodayErrorState from '@/features/today/TodayErrorState'
 import TodayRefreshingBanner from '@/features/today/TodayRefreshingBanner'
 import StaleDataBanner from '@/features/shared/StaleDataBanner'
+import { safeGeneratePlanErrorForDisplay } from '@/lib/generate-plan-errors'
 
 const PLAN_FAILED_LINE = {
   text: GENTLE_ERROR_MESSAGE,
@@ -57,6 +58,16 @@ export default function TodayPageClient() {
 
   const showStaleBanner = Boolean(data) && (Boolean(error) || isOffline) && !isRefreshing
 
+  if (!todayPlan && planGenerateError) {
+    return (
+      <TodayErrorState
+        onRetry={() => void refetch()}
+        title="個人計畫暫時無法載入"
+        detail={safeGeneratePlanErrorForDisplay(planGenerateError)}
+      />
+    )
+  }
+
   const resolvedTodayPlan =
     todayPlan ?? buildFallbackTodayPlan(todayStr, profile, goal, safeDayIndex)
 
@@ -79,20 +90,6 @@ export default function TodayPageClient() {
       {isRefreshing ? <TodayRefreshingBanner /> : null}
       {showStaleBanner ? <StaleDataBanner /> : null}
       <NotificationPrompt />
-
-      {!todayPlan && planGenerateError ? (
-        <div className="app-tab-column px-[var(--v2-page-px,18px)] pt-2">
-          <ZaiJian
-            size="sm"
-            line={{
-              text: '目前先依你的身體資料顯示計算目標。',
-              subtext: planGenerateError,
-              expression: 'normal',
-            }}
-            layout="bubble"
-          />
-        </div>
-      ) : null}
 
       {weeklyPlan?.generation_status === 'generating' && <ZaiJianPanel moment="loading" />}
 

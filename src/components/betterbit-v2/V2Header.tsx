@@ -16,6 +16,8 @@ interface Props {
   onInfo?: () => void
   menuHref?: string
   rightSlot?: ReactNode
+  /** Keep the shared geometry while omitting the leading navigation control. */
+  hideLeft?: boolean
   /** Hide default right icon (history / progress link) */
   hideRight?: boolean
 }
@@ -29,6 +31,7 @@ export default function V2Header({
   onInfo,
   menuHref = '/settings',
   rightSlot,
+  hideLeft = false,
   hideRight = false,
 }: Props) {
   const iconBtn =
@@ -36,12 +39,12 @@ export default function V2Header({
 
   return (
     <header
-      className="sticky top-0 z-40 pt-[max(8px,var(--app-safe-top,0px))] pb-2"
+      className="app-tab-header sticky top-0 z-40"
       style={{ backgroundColor: BB_V2.bg.header }}
     >
-      <div className="app-tab-column flex items-center justify-between gap-2 min-h-[48px] px-[var(--v2-page-px,18px)]">
+      <div className="app-tab-header__row app-tab-column flex items-center justify-between gap-2 px-[var(--v2-page-px,18px)]">
         <div className="w-11 flex justify-start">
-          {variant === 'back' && onBack ? (
+          {hideLeft ? null : variant === 'back' && onBack ? (
             <button type="button" onClick={onBack} className={iconBtn} aria-label="返回">
               <ArrowLeft className="h-5 w-5" strokeWidth={BB_V2.iconStroke} style={{ color: BB_V2.text.deepGreen }} />
             </button>

@@ -45,10 +45,6 @@ function getLeanMass(profile: UserProfile): number {
   return weight * (1 - bf / 100)
 }
 
-function calculateDaysInGoal(goal: Goal): number {
-  return Math.max(7, differenceInDays(parseISO(goal.end_date), parseISO(goal.start_date)))
-}
-
 /** 依身高體重體脂、目標與減脂節奏，計算每日熱量與巨量營養素 */
 export function calculateGoalPlan(
   profile: UserProfile,
@@ -69,7 +65,12 @@ export function calculateGoalPlan(
 
   const targetFatMass = targetWeight * (targetBf / 100)
   const fatMassToChange = fatMass - targetFatMass
-  const days = calculateDaysInGoal(goal)
+  // Keep this calculation inline. Turbopack production minification previously
+  // reused the helper's mangled name for the later `daysInGoal` binding.
+  const days = Math.max(
+    7,
+    differenceInDays(parseISO(goal.end_date), parseISO(goal.start_date))
+  )
   const weeks = days / 7
   const fatToLoseKg = Math.max(0, fatMassToChange)
   const totalDeficitKcal = Math.round(fatToLoseKg * 7700)

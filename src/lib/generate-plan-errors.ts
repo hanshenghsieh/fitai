@@ -21,6 +21,19 @@ export function messageForGeneratePlanError(input: {
     case 'SAVE_FAILED':
       return '計畫存檔失敗，再試一次。'
     default:
-      return input.error ?? '沒送出去，再試一次。'
+      return '計畫暫時無法建立，請再試一次。'
   }
+}
+
+/** Final UI boundary for stale cached/server errors from older native builds. */
+export function safeGeneratePlanErrorForDisplay(message: string | null | undefined): string {
+  if (!message) return '計畫暫時無法建立，請再試一次。'
+  if (
+    /before initialization|referenceerror|typeerror|syntaxerror|at\s+\w+|webpack|turbopack/i.test(
+      message
+    )
+  ) {
+    return '計畫暫時無法建立，請再試一次。'
+  }
+  return message
 }

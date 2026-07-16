@@ -9,6 +9,8 @@
   --app-nav-fab-overhang: 24px;
   --app-page-top: calc(var(--app-safe-top) + 8px);
   --app-tab-max-width: 512px;
+  --app-tab-header-row-height: 44px;
+  --app-tab-edge-space: 4px;
 }
 
 .safe-area-pb {
@@ -166,6 +168,25 @@ html[data-app-overlay] .app-bottom-nav {
   width: calc(100% - 24px);
   max-width: var(--app-tab-max-width);
   margin-inline: auto;
+}
+
+/* The app shell owns the iOS top inset. Tab headers add compact visual spacing only. */
+.app-tab-header {
+  padding-block: var(--app-tab-edge-space);
+}
+
+.app-tab-header__row {
+  min-height: var(--app-tab-header-row-height);
+}
+
+.app-tab-header-skeleton {
+  height: var(--app-tab-header-row-height);
+  margin-block: var(--app-tab-edge-space);
+}
+
+/* Bottom-nav clearance belongs to app-scroll-with-nav, never to individual tabs. */
+.app-tab-page-content {
+  padding-bottom: 16px;
 }
 
 html {

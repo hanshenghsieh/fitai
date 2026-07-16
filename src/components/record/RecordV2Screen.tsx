@@ -297,7 +297,7 @@ export default function RecordV2Screen({
         }
       />
 
-      <div className="v2-record-inner app-tab-column">
+      <div className="v2-record-inner app-tab-page-content app-tab-column">
         <div className="v2-record-date-switch">
           <button
             type="button"

@@ -1176,7 +1176,7 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
   overflow-y: auto;
 }
 
-.app-bottom-nav--v2 {
+.app-bottom-nav.app-bottom-nav--v2 {
   left: 0;
   right: 0;
   width: calc(100% - 24px);
@@ -1193,11 +1193,12 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
 }
 
 .app-bottom-nav--v2 .app-bottom-nav__row {
-  height: calc(var(--app-nav-bar-height) + 4px);
+  box-sizing: border-box;
+  height: var(--app-nav-bar-height);
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 0 12px 8px;
+  padding: 0 12px;
 }
 
 .app-shell:has(.app-bottom-nav--v2) .app-scroll-with-nav {
@@ -1416,7 +1417,8 @@ html[data-betterbit-no-animations='true'] .v2-sv2-card {
 }
 
 .v2-record-inner {
-  padding: 0 18px 24px;
+  padding-left: 18px;
+  padding-right: 18px;
 }
 
 .v2-record-date-switch {
@@ -2020,7 +2022,8 @@ html[data-betterbit-reduced-motion='true'] .v2-record-meal-card {
 }
 
 .v2-analysis-inner {
-  padding: 0 18px calc(var(--app-nav-total, 72px) + 24px);
+  padding-left: 18px;
+  padding-right: 18px;
 }
 
 .v2-analysis-week-switch {

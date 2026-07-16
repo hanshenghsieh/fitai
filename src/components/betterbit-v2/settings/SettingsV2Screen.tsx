@@ -29,6 +29,7 @@ import V2SettingsRow from '@/components/betterbit-v2/settings/V2SettingsRow'
 import V2SettingsProCard from '@/components/betterbit-v2/settings/V2SettingsProCard'
 import V2SettingsSwitch from '@/components/betterbit-v2/settings/V2SettingsSwitch'
 import V2SettingsLogoutButton from '@/components/betterbit-v2/settings/V2SettingsLogoutButton'
+import V2Header from '@/components/betterbit-v2/V2Header'
 import SettingsDeleteAccountSection from '@/components/settings/SettingsDeleteAccountSection'
 import { apiFetch } from '@/lib/api/client'
 
@@ -61,18 +62,11 @@ export default function SettingsV2Screen({ access, appVersion }: Props) {
 
   return (
     <V2PageEnter>
+      <V2Header title="設定" hideLeft hideRight />
       <div
-        className="v2-settings-page app-tab-column pb-[calc(var(--app-nav-total,72px)+28px)]"
+        className="v2-settings-page app-tab-page-content app-tab-column"
         style={{ paddingLeft: 'var(--v2-page-px)', paddingRight: 'var(--v2-page-px)' }}
       >
-        <header
-          className="text-center pt-[max(12px,var(--app-safe-top,0px))] pb-5"
-        >
-          <h1 className="text-[18px]" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
-            設定
-          </h1>
-        </header>
-
         <div className="space-y-[18px]">
           <V2SettingsProCard
             subscribed={proActive}

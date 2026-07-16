@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from 'react'
 import { BB_V2 } from '@/lib/betterbit-v2'
+import V2Header from '@/components/betterbit-v2/V2Header'
 
 function SkeletonBlock({
   className = '',
@@ -53,27 +54,24 @@ function SettingsCardSkeleton({ rows = 4 }: { rows?: number }) {
 export default function V2SettingsLoadingSkeleton() {
   return (
     <div
-      className="v2-settings-page app-tab-column pb-[calc(var(--app-nav-total,72px)+28px)]"
-      style={{
-        paddingLeft: 'var(--v2-page-px)',
-        paddingRight: 'var(--v2-page-px)',
-        background: `linear-gradient(180deg, ${BB_V2.bg.canvas} 0%, ${BB_V2.bg.softGreen} 100%)`,
-        minHeight: '100dvh',
-      }}
       role="status"
       aria-live="polite"
       aria-label="正在整理你的設定"
     >
-      <header className="text-center pt-[max(12px,var(--app-safe-top,0px))] pb-5">
-        <h1 className="text-[18px]" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
-          設定
-        </h1>
+      <V2Header title="設定" hideLeft hideRight />
+      <div
+        className="v2-settings-page app-tab-page-content app-tab-column"
+        style={{
+          paddingLeft: 'var(--v2-page-px)',
+          paddingRight: 'var(--v2-page-px)',
+          background: `linear-gradient(180deg, ${BB_V2.bg.canvas} 0%, ${BB_V2.bg.softGreen} 100%)`,
+        }}
+      >
         <p className="text-[13px] mt-2" style={{ color: BB_V2.text.secondary }}>
           正在整理你的設定...
         </p>
-      </header>
 
-      <div className="space-y-[18px]">
+        <div className="space-y-[18px] mt-4">
         <SkeletonBlock
           className="w-full rounded-[28px]"
           style={{ height: 104, opacity: 0.85 }}
@@ -92,6 +90,7 @@ export default function V2SettingsLoadingSkeleton() {
         <div className="space-y-2.5">
           <SkeletonBlock className="h-3.5 rounded-md w-24 ml-1" style={{ opacity: 0.55 }} />
           <SettingsCardSkeleton rows={4} />
+        </div>
         </div>
       </div>
     </div>

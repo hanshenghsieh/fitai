@@ -15,17 +15,16 @@ export function buildFallbackTodayPlan(
     profile.height_cm == null ||
     profile.age == null ||
     profile.gender == null ||
-    !profile.activity_level
+    !profile.activity_level ||
+    !goal.start_date ||
+    !goal.end_date ||
+    Number.isNaN(Date.parse(goal.start_date)) ||
+    Number.isNaN(Date.parse(goal.end_date))
   ) {
     return null
   }
 
-  let calculated: ReturnType<typeof calculateGoalPlan>
-  try {
-    calculated = calculateGoalPlan(profile, goal)
-  } catch {
-    return null
-  }
+  const calculated = calculateGoalPlan(profile, goal)
 
   return {
     day: dayIndex + 1,
