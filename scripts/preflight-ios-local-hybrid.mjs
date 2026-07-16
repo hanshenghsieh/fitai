@@ -297,6 +297,27 @@ function checkBundles() {
   } else {
     fail('bundle.apiBaked', 'ios public JS missing remote API / CapacitorHttp markers — stale or wrong build')
   }
+
+  const supabaseRootPattern = /https:\/\/[a-z0-9-]+\.supabase\.co/i
+  const malformedSupabaseBase =
+    /https:\/\/[a-z0-9-]+\.supabase\.co\/(?:auth|rest|storage|functions|realtime)\/v1/i
+  if (!supabaseRootPattern.test(iosJs)) {
+    fail('bundle.supabase.host', 'iOS bundle missing Supabase project host')
+  } else if (malformedSupabaseBase.test(iosJs)) {
+    fail(
+      'bundle.supabase.root',
+      'NEXT_PUBLIC_SUPABASE_URL must be the project root, not a service /v1 URL'
+    )
+  } else {
+    pass('bundle.supabase.root', 'Supabase project root is baked without a service path')
+  }
+
+  const hasSupabasePublicKey =
+    /sb_publishable_[A-Za-z0-9_-]+/.test(iosJs) ||
+    /eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(iosJs)
+  hasSupabasePublicKey
+    ? pass('bundle.supabase.publicKey', 'Supabase public key marker found')
+    : fail('bundle.supabase.publicKey', 'Supabase publishable / anon key marker missing')
 }
 
 // ─────────────────────────────────────────────────────────────

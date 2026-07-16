@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@supabase/ssr'
 import { createClient as createSupabaseClient, type SupabaseClient } from '@supabase/supabase-js'
+import { normalizeSupabaseProjectUrl } from '@/lib/supabase/url'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -58,11 +59,13 @@ export function hasPersistedNativeSession(
 }
 
 export function createClient() {
+  const projectUrl = normalizeSupabaseProjectUrl(SUPABASE_URL)
+
   if (isCapacitorNative()) {
     // Single shared instance so the session persists across every createClient()
     // call and survives full page reloads (login → hard redirect → dashboard).
     if (!nativeClient) {
-      nativeClient = createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      nativeClient = createSupabaseClient(projectUrl, SUPABASE_ANON_KEY, {
         auth: {
           persistSession: true,
           autoRefreshToken: true,
@@ -76,5 +79,5 @@ export function createClient() {
   }
 
   // Web (Vercel / betterbit.app): keep cookie-based SSR client unchanged.
-  return createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  return createBrowserClient(projectUrl, SUPABASE_ANON_KEY)
 }
