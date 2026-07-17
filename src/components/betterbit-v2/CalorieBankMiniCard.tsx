@@ -10,6 +10,9 @@ import {
   resolveCalorieBankMiniState,
   shouldShowCalorieBankMini,
 } from '@/lib/calorie-bank-v2-ui'
+import { apiFetch } from '@/lib/api/client'
+import { invalidateUserPreferencesCache } from '@/lib/settings/calorie-bank-user-prefs'
+import type { UserSettingsPreferences } from '@/lib/settings/user-settings-types'
 import CalorieBankDetailView from './CalorieBankDetailView'
 
 interface Props {
@@ -18,6 +21,7 @@ interface Props {
   overTarget?: boolean
   calorieFloor?: number
   embedded?: boolean
+  onPreferencesChange?: (preferences: UserSettingsPreferences) => void
 }
 
 export default function CalorieBankMiniCard({
@@ -26,6 +30,7 @@ export default function CalorieBankMiniCard({
   overTarget = false,
   calorieFloor,
   embedded = false,
+  onPreferencesChange,
 }: Props) {
   const [open, setOpen] = useState(false)
 
@@ -88,6 +93,21 @@ export default function CalorieBankMiniCard({
         calorieFloor={calorieFloor}
         open={open}
         onClose={() => setOpen(false)}
+        onSavePlan={async spreadDays => {
+          const response = await apiFetch('/api/settings/preferences', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ calorie_bank_days: spreadDays }),
+          })
+          if (!response.ok) return false
+          const data = (await response.json()) as {
+            preferences?: UserSettingsPreferences
+          }
+          if (!data.preferences) return false
+          invalidateUserPreferencesCache()
+          onPreferencesChange?.(data.preferences)
+          return true
+        }}
       />
     </>
   )

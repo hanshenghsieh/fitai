@@ -121,7 +121,7 @@ describe('UI-RESTORE-001 accepted behavior', () => {
     assert.match(overview, /groupTodayMealOverviewLogs/)
     assert.match(overview, /onMoveLog\(logId,\s*slot\)/)
     assert.match(home, /moveTodayMealLogSlot/)
-    assert.match(home, /handleLogFood\(nextLogs/)
+    assert.match(home, /handleLogFood\(\s*nextLogs/)
     assert.match(record, /foodLogNutritionDayKey/)
     assert.match(record, /normalizeFoodLogSlot/)
   })

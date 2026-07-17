@@ -14,6 +14,8 @@ export interface NextMealEngineInput {
   normalTargetKcal: number
   internalTargetKcal?: number
   proteinTargetG: number
+  fatTargetG?: number
+  carbsTargetG?: number
   calorieBank?: CalorieBankRow | null
   mealSlot?: MealType
   hourOfDay?: number
@@ -31,9 +33,13 @@ export interface NextMealEngineInput {
 export interface TodayMealState {
   alreadyCalories: number
   alreadyProtein: number
+  alreadyFat: number
+  alreadyCarbs: number
   todayTarget: number
   remainingCalories: number
   proteinGap: number
+  remainingFat: number
+  remainingCarbs: number
   recoveryActive: boolean
   overTargetProtection: boolean
   skipMealRecommendation: boolean
@@ -93,9 +99,33 @@ export function sumLoggedProtein(logs: FoodLogEntry[]): number {
   }, 0)
 }
 
+function sumLoggedMacro(logs: FoodLogEntry[], key: 'fat_g' | 'carbs_g'): number {
+  return logs.reduce((sum, log) => {
+    if (
+      log.nutrition_status === 'unknown' ||
+      log.nutrition_status === 'pending_confirmation' ||
+      log.nutrition_status === 'pending_review' ||
+      log.nutrition_status === 'estimated_pending_confirmation'
+    ) {
+      return sum
+    }
+    if (
+      log.capture_status === 'photo_only' &&
+      log.nutrition_status !== 'user_entered' &&
+      log.nutrition_status !== 'auto_resolved'
+    ) {
+      return sum
+    }
+    const value = log[key]
+    return value == null ? sum : sum + value
+  }, 0)
+}
+
 export function computeTodayMealState(input: NextMealEngineInput): TodayMealState {
   const alreadyCalories = sumLoggedCalories(input.todayFoodLogs)
   const alreadyProtein = sumLoggedProtein(input.todayFoodLogs)
+  const alreadyFat = sumLoggedMacro(input.todayFoodLogs, 'fat_g')
+  const alreadyCarbs = sumLoggedMacro(input.todayFoodLogs, 'carbs_g')
   const internal =
     input.internalTargetKcal ??
     input.calorieBank?.internal_target_kcal ??
@@ -107,6 +137,8 @@ export function computeTodayMealState(input: NextMealEngineInput): TodayMealStat
   const todayTarget = recoveryActive ? internal : input.normalTargetKcal
   const remainingCalories = todayTarget - alreadyCalories
   const proteinGap = Math.max(0, input.proteinTargetG - alreadyProtein)
+  const remainingFat = (input.fatTargetG ?? Number.POSITIVE_INFINITY) - alreadyFat
+  const remainingCarbs = (input.carbsTargetG ?? Number.POSITIVE_INFINITY) - alreadyCarbs
 
   const overTargetProtection = alreadyCalories >= todayTarget
   const skipMealRecommendation = remainingCalories < 200 || overTargetProtection
@@ -132,9 +164,13 @@ export function computeTodayMealState(input: NextMealEngineInput): TodayMealStat
   return {
     alreadyCalories,
     alreadyProtein,
+    alreadyFat,
+    alreadyCarbs,
     todayTarget,
     remainingCalories,
     proteinGap,
+    remainingFat,
+    remainingCarbs,
     recoveryActive,
     overTargetProtection,
     skipMealRecommendation,

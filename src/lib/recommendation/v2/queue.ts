@@ -29,6 +29,8 @@ export function buildQueueContextKey(state: UserNutritionState): string {
     state.mealTime,
     Math.round(state.remainingCalories / 50),
     Math.round(state.proteinGap / 10),
+    Math.round(state.remainingFat / 5),
+    Math.round(state.remainingCarbs / 10),
     Math.round(state.effectiveMealCalTarget / 50),
   ].join(':')
 }

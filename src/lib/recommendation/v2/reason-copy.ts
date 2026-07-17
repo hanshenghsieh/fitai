@@ -9,7 +9,13 @@ import type {
   UserNutritionState,
 } from './types'
 import { filterAddonPool, filterMainRecommendablePool } from './pool-rules'
-import { compareScoredMeals, scoreAddonForProteinGap, scoreMealForUserToday, tierFilter } from './score-meal'
+import {
+  compareScoredMeals,
+  preciseRecommendationExcludeReason,
+  scoreAddonForProteinGap,
+  scoreMealForUserToday,
+  tierFilter,
+} from './score-meal'
 import {
   confidenceDisclaimer,
   confidenceDisplayLabel,
@@ -34,11 +40,17 @@ export function buildUserNutritionState(params: {
 }): UserNutritionState {
   const alreadyFat = sumMacro(params.todayFoodLogs, 'fat_g')
   const alreadyCarbs = sumMacro(params.todayFoodLogs, 'carbs_g')
+  const remainingFat = Number.isFinite(params.dayState.remainingFat)
+    ? params.dayState.remainingFat
+    : params.dailyTargets.fat_g - alreadyFat
+  const remainingCarbs = Number.isFinite(params.dayState.remainingCarbs)
+    ? params.dayState.remainingCarbs
+    : params.dailyTargets.carbs_g - alreadyCarbs
   return {
     remainingCalories: params.dayState.remainingCalories,
     proteinGap: params.dayState.proteinGap,
-    remainingFat: Math.max(0, params.dailyTargets.fat_g - alreadyFat),
-    remainingCarbs: Math.max(0, params.dailyTargets.carbs_g - alreadyCarbs),
+    remainingFat,
+    remainingCarbs,
     mealTime: params.mealTime,
     effectiveMealCalTarget: params.dayState.effectiveMealCalTarget,
   }
@@ -132,7 +144,11 @@ export function pickRecommendationWithFallback(
   const byId = new Map(items.map(i => [i.id, i]))
   if (preferredId) {
     const preferred = byId.get(preferredId)
-    if (preferred && filterMainRecommendablePool(items, state.mealTime).some(i => i.id === preferredId)) {
+    if (
+      preferred &&
+      !preciseRecommendationExcludeReason(preferred, state) &&
+      filterMainRecommendablePool(items, state.mealTime).some(i => i.id === preferredId)
+    ) {
       return finalizePick(preferred, [], state, 1)
     }
   }

@@ -16,7 +16,12 @@ import { enrichBrandItemsForTemplate } from './brand-enrichment'
 
 import { buildDishRecommendationReasons, dishDataNote } from './reason-copy'
 
-import { pickBestVariantForDay, scoreDishTemplateForUserDay, sortBrandItemsByTrust } from './score'
+import {
+  dishFitsRemainingNutrition,
+  pickBestFittingVariantForDay,
+  scoreDishTemplateForUserDay,
+  sortBrandItemsByTrust,
+} from './score'
 
 import type { DishRecommendationResult, DishTemplate } from './types'
 
@@ -165,7 +170,16 @@ export function rollDishFirstRecommendation(params: {
 
   const recently = [...(params.queue_state?.recentlyShownTemplateIds ?? [])]
 
-  const templates = getDishTemplates().filter(t => !exclude.has(t.id))
+  const templates = getDishTemplates().filter(template => {
+    if (exclude.has(template.id)) return false
+    const variants = getVariantsForTemplate(template.id)
+    if (variants.length > 0) {
+      return variants.some(variant =>
+        dishFitsRemainingNutrition(template, params.day_state, variant)
+      )
+    }
+    return dishFitsRemainingNutrition(template, params.day_state)
+  })
 
 
 
@@ -203,7 +217,7 @@ export function rollDishFirstRecommendation(params: {
 
   const variants = getVariantsForTemplate(template.id)
 
-  let variant = pickBestVariantForDay(variants, template, params.day_state)
+  let variant = pickBestFittingVariantForDay(variants, template, params.day_state)
   if (templateRequiresSpecificVariant(template) && variants.length > 0 && !variant) {
     variant = variants[0]!
   }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition, useCallback, useEffect, useRef, useMemo } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle2, Circle, ChevronDown, ChevronUp, Play } from 'lucide-react'
 import {
   initWorkoutItems,
@@ -69,7 +69,7 @@ import {
 } from '@/lib/workout-items-session-cache'
 import { preloadDiceMenuBulk } from '@/lib/dice-menu-pool'
 import { getVerifiedExerciseVideo, exerciseVideoPlaceholder } from '@/lib/exercise-video-map'
-import { getNutritionDayKey, getPreviousNutritionDayKey } from '@/lib/timezone'
+import { getNutritionDayKey, getPreviousNutritionDayKey, isLocalDateKey } from '@/lib/timezone'
 import { filterFoodLogsForNutritionDay } from '@/lib/nutrition-day-food-logs'
 import { addWaterMl, resetWaterMl, resolveDailyWaterGoalMl, setWaterMl as applyWaterTotal } from '@/lib/water-log'
 import { TODAY } from '@/lib/today-design'
@@ -81,8 +81,12 @@ import {
   dispatchRollDice,
   dispatchConfirmDice,
   TODAY_OPEN_RECORD_SHEET_EVENT,
+  todayActionContextFromSearch,
   todaySheetFromSearch,
+  takePendingCaptureContext,
   clearTodaySheetParams,
+  foodSlotForCaptureLabel,
+  type FoodCaptureContext,
 } from '@/lib/today-actions'
 import RecordActionSheet from '@/components/dashboard/today/RecordActionSheet'
 import Day1GuideBanner, {
@@ -102,6 +106,11 @@ import { invalidateMealMutation } from '@/lib/local-cache/invalidate'
 import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile } from '@/types'
 import { apiFetch } from '@/lib/api/client'
 import { moveTodayMealLogSlot } from '@/lib/today-meal-overview'
+import {
+  mergeCapturedFoodLogsForDate,
+  patchFoodLogsForDate,
+} from '@/lib/record/mutate-today-food-log'
+import { traceRecordDate } from '@/lib/record-date-trace'
 
 interface GoalSnapshot {
   current_body_fat?: number | null
@@ -163,6 +172,12 @@ export default function BetterBitHome({
 }: Props) {
   const pathname = usePathname()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const searchString = searchParams.toString()
+  const requestedRecordContext = useMemo(() => {
+    const context = todayActionContextFromSearch(searchString)
+    return context?.intent === 'record' && context.targetDate ? context : null
+  }, [searchString])
   const onDashboard = pathname === '/dashboard'
   const [isPending, startTransition] = useTransition()
   const [expandedWorkout, setExpandedWorkout] = useState(false)
@@ -221,6 +236,10 @@ export default function BetterBitHome({
   const [previousDayBank, setPreviousDayBank] = useState<CalorieBankRow | null>(null)
   const [userPrefs, setUserPrefs] = useState<UserSettingsPreferences | null>(null)
   const [recordSheetOpen, setRecordSheetOpen] = useState(false)
+  const [recordTargetDate, setRecordTargetDate] = useState(trackedDayKey)
+  const [recordTargetSlot, setRecordTargetSlot] = useState<FoodSlot | undefined>()
+  const [recordCaptureSource, setRecordCaptureSource] = useState<'record' | 'global'>('global')
+  const historicalLogDatesRef = useRef(new Map<string, string>())
   const [showDay1Guide, setShowDay1Guide] = useState(false)
   const recordUrlHandledRef = useRef(false)
   const [mealUiState, setMealUiState] = useState({
@@ -403,6 +422,8 @@ export default function BetterBitHome({
       normalTargetKcal: normalTarget,
       internalTargetKcal: effectiveCalorieBank?.internal_target_kcal,
       proteinTargetG: proteinTarget,
+      fatTargetG: todayPlan.daily_targets.fat_g,
+      carbsTargetG: todayPlan.daily_targets.carbs_g,
       calorieBank: effectiveCalorieBank,
     })
     const recoveryActive = isRecoveryActive(effectiveCalorieBank ?? { recovery_balance_kcal: 0, spread_days_remaining: 0 })
@@ -437,19 +458,56 @@ export default function BetterBitHome({
 
   useEffect(() => {
     if (!onDashboard) return
-    const openRecord = () => setRecordSheetOpen(true)
+    const openRecord = () => {
+      setRecordTargetDate(getNutritionDayKey())
+      setRecordTargetSlot(undefined)
+      setRecordCaptureSource('global')
+      setRecordSheetOpen(true)
+    }
     window.addEventListener(TODAY_OPEN_RECORD_SHEET_EVENT, openRecord)
     return () => window.removeEventListener(TODAY_OPEN_RECORD_SHEET_EVENT, openRecord)
   }, [onDashboard])
 
   useEffect(() => {
-    if (!onDashboard || recordUrlHandledRef.current) return
-    if (todaySheetFromSearch(window.location.search) !== 'record') return
+    if (!onDashboard) return
+    if (todaySheetFromSearch(searchString) !== 'record') {
+      recordUrlHandledRef.current = false
+      return
+    }
+    if (recordUrlHandledRef.current) return
+    const context = todayActionContextFromSearch(searchString)
+    const pendingContext = takePendingCaptureContext()
+    const source =
+      context?.source === 'record' || pendingContext?.source === 'record' ? 'record' : 'global'
+    const requestedTargetDate = context?.targetDate ?? pendingContext?.targetDate
+    if (source === 'record' && !requestedTargetDate) {
+      traceRecordDate('record-entry-rejected', {
+        targetDate: null,
+        targetMealSlot: context?.targetMealSlot ?? pendingContext?.targetMealSlot,
+        reason: 'missing-target-date',
+      })
+      toast.error('所選日期已遺失，未儲存餐點。請返回記錄頁重試。')
+      clearTodaySheetParams()
+      recordUrlHandledRef.current = true
+      return
+    }
+    const targetDate = requestedTargetDate ?? getNutritionDayKey()
+    const targetSlot = foodSlotForCaptureLabel(
+      context?.targetMealSlot ?? pendingContext?.targetMealSlot
+    )
+    traceRecordDate('dashboard-record-context', {
+      targetDate,
+      targetMealSlot: context?.targetMealSlot ?? pendingContext?.targetMealSlot,
+    })
     recordUrlHandledRef.current = true
-    clearTodaySheetParams()
-    const timer = window.setTimeout(() => setRecordSheetOpen(true), 0)
+    const timer = window.setTimeout(() => {
+      setRecordTargetDate(targetDate)
+      setRecordTargetSlot(targetSlot)
+      setRecordCaptureSource(source)
+      setRecordSheetOpen(true)
+    }, 0)
     return () => window.clearTimeout(timer)
-  }, [onDashboard])
+  }, [onDashboard, searchString])
 
   const handleMealUiState = useCallback(
     (state: {
@@ -622,12 +680,60 @@ export default function BetterBitHome({
     commitWaterMl(resetWaterMl())
   }, [commitWaterMl])
 
-  const handleLogFood = useCallback((logs: FoodLogEntry[], nextMemory: UserMemoryMeta) => {
+  const handleLogFood = useCallback((
+    logs: FoodLogEntry[],
+    nextMemory: UserMemoryMeta,
+    context: Required<Pick<FoodCaptureContext, 'targetDate'>> & FoodCaptureContext
+  ) => {
+    if (!isLocalDateKey(context.targetDate)) {
+      traceRecordDate('dashboard-mutation-rejected', {
+        targetDate: context.targetDate,
+        targetMealSlot: context.targetMealSlot,
+        reason: 'invalid-target-date',
+      })
+      toast.error('所選日期已遺失，未儲存餐點。請返回記錄頁重試。')
+      return
+    }
+    const candidate = [...logs].reverse().find(log => log.id)
+    traceRecordDate('dashboard-mutation-received', {
+      targetDate: context.targetDate,
+      targetMealSlot: context.targetMealSlot,
+      captureTargetDate: context.targetDate,
+      nutritionDate: context.targetDate,
+      loggedAt: candidate?.logged_at,
+      loggedAtLocalDate: candidate
+        ? getNutritionDayKey(new Date(candidate.logged_at))
+        : null,
+      mealSlot: candidate?.slot,
+      foodLogId: candidate?.id,
+    })
+    if (context.targetDate !== trackedDayKey) {
+      const incoming = filterFoodLogsForNutritionDay(logs, context.targetDate)
+      if (incoming.length === 0) {
+        traceRecordDate('dashboard-mutation-rejected', {
+          targetDate: context.targetDate,
+          targetMealSlot: context.targetMealSlot,
+          reason: 'no-log-for-target-date',
+        })
+        toast.error('餐點日期與所選日期不一致，已停止儲存')
+        return
+      }
+      for (const log of incoming) {
+        historicalLogDatesRef.current.set(log.id, context.targetDate)
+      }
+      void patchFoodLogsForDate(
+        context.targetDate,
+        existing => mergeCapturedFoodLogsForDate(existing, incoming, context.targetDate),
+        null
+      ).catch(() => toast.error('歷史餐點暫時無法儲存，請再試一次'))
+      return
+    }
+
     userMemoryRef.current = nextMemory
     writeFoodCache(logs)
     startTransition(() => setUserMemory(nextMemory))
     persist({ userMemory: nextMemory })
-  }, [persist, writeFoodCache])
+  }, [persist, trackedDayKey, writeFoodCache])
 
   useEffect(() => {
     if (didLocalReconcileRef.current) return
@@ -678,7 +784,18 @@ export default function BetterBitHome({
     dailyRolls: DailyRollState
     mealSuggest: Partial<Record<MealType, MealSuggestState>>
     userMemory: UserMemoryMeta
+    logEntry: FoodLogEntry
+    targetDate: string
   }) => {
+    if (payload.targetDate !== trackedDayKey) {
+      historicalLogDatesRef.current.set(payload.logEntry.id, payload.targetDate)
+      void patchFoodLogsForDate(
+        payload.targetDate,
+        logs => mergeCapturedFoodLogsForDate(logs, [payload.logEntry], payload.targetDate),
+        null
+      ).catch(() => toast.error('歷史餐點暫時無法儲存，請再試一次'))
+      return
+    }
     userMemoryRef.current = payload.userMemory
     dailyRollsRef.current = payload.dailyRolls
     mealSuggestRef.current = payload.mealSuggest
@@ -698,7 +815,7 @@ export default function BetterBitHome({
       setMealSuggest(payload.mealSuggest)
       setUserMemory(payload.userMemory)
     })
-  }, [persist])
+  }, [persist, trackedDayKey])
 
   const toggleExercise = useCallback((exerciseId: string) => {
     startTransition(() => {
@@ -745,13 +862,30 @@ export default function BetterBitHome({
 
   const patchFoodLog = useCallback(
     (logId: string, patch: Partial<FoodLogEntry>) => {
+      const historicalDate = historicalLogDatesRef.current.get(logId)
+      if (historicalDate) {
+        const applyPatch = (log: FoodLogEntry) =>
+          log.id === logId ? enrichFoodLog({ ...log, ...patch }) : log
+        setConfirmLog(current => (current ? applyPatch(current) : current))
+        setEditLog(current => (current ? applyPatch(current) : current))
+        void patchFoodLogsForDate(
+          historicalDate,
+          logs => logs.map(applyPatch),
+          null
+        ).catch(() => toast.error('歷史餐點更新失敗，請再試一次'))
+        return
+      }
       const nextLogs = displayFoodLogs.map(l => {
         if (l.id !== logId) return l
         return enrichFoodLog({ ...l, ...patch })
       })
-      handleLogFood(nextLogs, { ...userMemory, food_logs_today: nextLogs })
+      handleLogFood(
+        nextLogs,
+        { ...userMemory, food_logs_today: nextLogs },
+        { targetDate: trackedDayKey }
+      )
     },
-    [displayFoodLogs, userMemory, handleLogFood]
+    [displayFoodLogs, userMemory, handleLogFood, trackedDayKey]
   )
 
   const openNutritionConfirmation = useCallback((log: FoodLogEntry) => {
@@ -863,10 +997,14 @@ export default function BetterBitHome({
   const handleMoveLogSlot = useCallback(
     (logId: string, slot: FoodSlot) => {
       const nextLogs = moveTodayMealLogSlot(userMemory.food_logs_today ?? [], logId, slot)
-      handleLogFood(nextLogs, { ...userMemory, food_logs_today: nextLogs })
+      handleLogFood(
+        nextLogs,
+        { ...userMemory, food_logs_today: nextLogs },
+        { targetDate: trackedDayKey }
+      )
       toast.message('已移動餐點')
     },
-    [handleLogFood, userMemory]
+    [handleLogFood, trackedDayKey, userMemory]
   )
 
   return (
@@ -885,6 +1023,7 @@ export default function BetterBitHome({
         calorieBank={displayCalorieBank}
         excessDriver={intakeSummary.excessDriver}
         calorieFloor={calorieFloorFromGender(profile?.gender)}
+        onCalorieBankPreferencesChange={setUserPrefs}
         foodLogs={displayFoodLogs}
         hasDicePreview={mealUiState.hasDicePreview}
         mealActionsLoading={mealUiState.rolling || mealUiState.confirming}
@@ -1093,7 +1232,21 @@ export default function BetterBitHome({
       </div>
       ) : null}
 
-      <RecordActionSheet open={recordSheetOpen} onClose={() => setRecordSheetOpen(false)} />
+      <RecordActionSheet
+        open={recordSheetOpen || requestedRecordContext != null}
+        targetDate={requestedRecordContext?.targetDate ?? recordTargetDate}
+        targetSlot={
+          foodSlotForCaptureLabel(requestedRecordContext?.targetMealSlot) ?? recordTargetSlot
+        }
+        captureSource={requestedRecordContext?.source ?? recordCaptureSource}
+        onClose={() => {
+          setRecordSheetOpen(false)
+          setRecordTargetDate(getNutritionDayKey())
+          setRecordTargetSlot(undefined)
+          setRecordCaptureSource('global')
+          clearTodaySheetParams()
+        }}
+      />
 
       <PendingNutritionQueueSheet
         open={pendingQueueOpen}

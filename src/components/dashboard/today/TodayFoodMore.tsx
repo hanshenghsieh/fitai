@@ -12,6 +12,7 @@ import type { FoodSearchHit } from '@/lib/food-search'
 import { findP0FoodCandidates } from '@/lib/nutrition/p0-common-foods/resolve-p0-food'
 
 import { BB_V2 } from '@/lib/betterbit-v2'
+import { getNutritionDayKey } from '@/lib/timezone'
 
 const DS = {
   text: BB_V2.text.primary,
@@ -26,6 +27,7 @@ const font = 'var(--font-noto-tc), system-ui, sans-serif'
 
 interface Props {
   open: boolean
+  targetDate: string
   onClose: () => void
   activeSlot: FoodSlot
   query: string
@@ -66,6 +68,7 @@ function FrequentRow({ food, onClick, compact }: { food: FrequentFood; onClick: 
 
 export default function TodayFoodMore({
   open,
+  targetDate,
   onClose,
   activeSlot: _activeSlot,
   query,
@@ -134,6 +137,7 @@ export default function TodayFoodMore({
   return (
     <AppOverlay open={open} onClose={onClose} variant="sheet">
       <div
+        data-target-date={targetDate}
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
           fontFamily: font,
@@ -150,7 +154,7 @@ export default function TodayFoodMore({
                 文字紀錄
               </h2>
               <p className="text-[13px] leading-relaxed mt-1" style={{ color: DS.textSecondary, fontWeight: 400 }}>
-                搜尋或輸入菜名，確認後加入今日紀錄
+                搜尋或輸入菜名，確認後加入{targetDate === getNutritionDayKey() ? '今日' : '所選日期'}紀錄
               </p>
             </div>
             <button type="button" onClick={onClose} className="p-1.5 -mr-1 shrink-0" aria-label="關閉">

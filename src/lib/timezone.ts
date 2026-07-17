@@ -49,6 +49,45 @@ export function getPreviousNutritionDayKey(date = new Date()): string {
   return getNutritionDayKey(new Date(noon.getTime() - 24 * 60 * 60 * 1000))
 }
 
+export function isLocalDateKey(value: string | null | undefined): value is string {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const [year, month, day] = value.split('-').map(Number)
+  const probe = new Date(Date.UTC(year!, month! - 1, day!, 12))
+  return (
+    probe.getUTCFullYear() === year &&
+    probe.getUTCMonth() === month! - 1 &&
+    probe.getUTCDate() === day
+  )
+}
+
+const SLOT_HOUR: Record<string, number> = {
+  breakfast: 8,
+  meal1: 8,
+  lunch: 12,
+  meal2: 12,
+  snack: 15,
+  other: 15,
+  dinner: 18,
+  meal3: 18,
+  late_snack: 22,
+  before_sleep: 22,
+}
+
+/**
+ * Build an instant that always resolves back to the requested Taipei nutrition
+ * date. Today keeps the real instant; historical entries use a stable slot time.
+ */
+export function loggedAtForNutritionDate(
+  targetDate: string,
+  slot?: string | null,
+  now = new Date()
+): string {
+  if (!isLocalDateKey(targetDate)) throw new Error('Invalid targetDate')
+  if (targetDate === getNutritionDayKey(now)) return now.toISOString()
+  const hour = SLOT_HOUR[slot ?? ''] ?? 12
+  return new Date(`${targetDate}T${String(hour).padStart(2, '0')}:00:00+08:00`).toISOString()
+}
+
 export function nutritionDayResetLabel(): string {
   return `紀錄日於凌晨 ${NUTRITION_DAY_ROLLOVER_HOUR}:00（台北）換新`
 }

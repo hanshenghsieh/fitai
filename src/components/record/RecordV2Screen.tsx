@@ -29,7 +29,7 @@ import FoodPhotoThumb from '@/components/dashboard/today/FoodPhotoThumb'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { AnalysisDayPlanHint } from '@/lib/analytics/analysis-summary'
 import { getFoodLogDisplayLabel } from '@/lib/nutrition/food-log-display'
-import { resolveFoodLogsFromSession } from '@/lib/food-log-session-cache'
+import { resolveFoodLogsFromSession, writeFoodLogsSessionCache } from '@/lib/food-log-session-cache'
 import { foodLogNutritionDayKey, filterFoodLogsForNutritionDay } from '@/lib/nutrition-day-food-logs'
 import {
   buildRecordDayView,
@@ -45,6 +45,12 @@ import {
   deleteTodayFoodLog,
 } from '@/lib/record/mutate-today-food-log'
 import { addDays, format, parseISO } from 'date-fns'
+import {
+  recordCaptureHref,
+  storePendingCaptureContext,
+  targetMealSlotForCaptureLabel,
+} from '@/lib/today-actions'
+import { traceRecordDate } from '@/lib/record-date-trace'
 
 interface Props {
   todayStr: string
@@ -193,9 +199,22 @@ export default function RecordV2Screen({
 
   const isViewingToday = selectedDate === todayStr
 
-  const openAddMeal = useCallback(() => {
-    router.push('/dashboard?record=1')
-  }, [router])
+  const openAddMeal = useCallback((slot?: RecordMealGroup['bucket']) => {
+    const selectedLogs = filterFoodLogsForNutritionDay(foodLogs, selectedDate)
+    const targetMealSlot = targetMealSlotForCaptureLabel(slot)
+    traceRecordDate('record-entry-click', {
+      selectedDate,
+      targetDate: selectedDate,
+      targetMealSlot,
+    })
+    writeFoodLogsSessionCache(selectedLogs, selectedDate)
+    storePendingCaptureContext({ targetDate: selectedDate, targetMealSlot, source: 'record' })
+    router.push(recordCaptureHref({
+      targetDate: selectedDate,
+      targetMealSlot,
+      source: 'record',
+    }))
+  }, [foodLogs, router, selectedDate])
 
   const openCalendar = useCallback(() => {
     dateInputRef.current?.showPicker?.()
@@ -380,7 +399,7 @@ export default function RecordV2Screen({
                   <UtensilsCrossed className="h-10 w-10" strokeWidth={1.5} style={{ color: '#2f8f35' }} />
                   <p className="v2-record-empty-title">今天還沒有餐點紀錄</p>
                   <p className="v2-record-empty-desc">拍一餐，讓 Betterbit 幫你算熱量與營養。</p>
-                  <button type="button" className="v2-record-empty-cta touch-manipulation" onClick={openAddMeal}>
+                  <button type="button" className="v2-record-empty-cta touch-manipulation" onClick={() => openAddMeal()}>
                     <Camera className="h-5 w-5" />
                     拍照記錄第一餐
                   </button>
@@ -504,7 +523,7 @@ export default function RecordV2Screen({
                   <button
                     type="button"
                     className="v2-record-meal-add touch-manipulation"
-                    onClick={openAddMeal}
+                    onClick={() => openAddMeal(meal.bucket)}
                   >
                     + 新增{meal.label}
                   </button>

@@ -19,7 +19,10 @@ import {
   recommendationDisplayName,
   templateRequiresSpecificVariant,
 } from '@/lib/recommendation/dish-first/display'
-import { scoreDishVariantForUserDay } from '@/lib/recommendation/dish-first/score'
+import {
+  dishFitsRemainingNutrition,
+  scoreDishVariantForUserDay,
+} from '@/lib/recommendation/dish-first/score'
 import type { DishVariant, BrandItem } from '@/lib/recommendation/dish-first/types'
 import type { TodayMealState } from '@/lib/engines/next-meal-engine'
 
@@ -47,7 +50,15 @@ export default function DishRecommendationCard({
   const dish = suggestion.dish_recommendation
   const [brandsExpanded, setBrandsExpanded] = useState(false)
 
-  const variants = useMemo(() => (dish ? getVariantsForTemplate(dish.template.id) : []), [dish])
+  const variants = useMemo(
+    () =>
+      dish
+        ? getVariantsForTemplate(dish.template.id).filter(variant =>
+            dishFitsRemainingNutrition(dish.template, dayState, variant)
+          )
+        : [],
+    [dish, dayState]
+  )
   const activeVariant = useMemo(() => {
     if (!dish) return null
     const id = selectedVariantId ?? dish.selectedVariantId ?? dish.variant?.id ?? null
@@ -56,13 +67,29 @@ export default function DishRecommendationCard({
 
   const brandGroups = useMemo(() => {
     if (!dish) return []
+    const fatLimit =
+      dayState.remainingFat <= 0 ? 12 : Math.max(12, dayState.remainingFat * 1.1)
     return resolveBrandDisplayGroups({
       template: dish.template,
       selectedVariant: activeVariant,
       variants,
       brandItems: dish.brandItems,
     })
-  }, [dish, activeVariant, variants])
+      .map(group => ({
+        ...group,
+        items: group.items.filter(
+          item =>
+            Number.isFinite(item.calories) &&
+            item.calories > 0 &&
+            item.calories <= dayState.remainingCalories &&
+            item.protein != null &&
+            item.protein > 0 &&
+            item.fat != null &&
+            item.fat <= fatLimit
+        ),
+      }))
+      .filter(group => group.items.length > 0)
+  }, [dish, activeVariant, variants, dayState.remainingCalories, dayState.remainingFat])
 
   const flatBrands = useMemo(() => brandGroups.flatMap(g => g.items), [brandGroups])
 

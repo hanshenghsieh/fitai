@@ -7,6 +7,16 @@ import { loadRecordPageData, type RecordPageData } from '@/features/record/recor
 import { getNutritionDayKey } from '@/lib/timezone'
 import { getLastActiveUserId, readCache, writeCache } from '@/lib/local-cache'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
+import { isLocalDateKey } from '@/lib/timezone'
+import { traceRecordDate } from '@/lib/record-date-trace'
+
+const RECORD_SELECTED_DATE_KEY = 'betterbit:record:selected-date'
+
+function readStoredSelectedDate(): string | null {
+  if (typeof window === 'undefined') return null
+  const value = window.sessionStorage.getItem(RECORD_SELECTED_DATE_KEY)
+  return isLocalDateKey(value) ? value : null
+}
 
 export interface UseRecordDataResult {
   selectedDate: string | null
@@ -41,7 +51,7 @@ export function useRecordData(): UseRecordDataResult {
   const initialCache = useMemo(() => readInitialRecordCache(), [])
   const [data, setData] = useState<RecordPageData | null>(initialCache?.data ?? null)
   const [selectedDate, setSelectedDateState] = useState<string | null>(
-    initialCache?.data.todayStr ?? null
+    readStoredSelectedDate() ?? initialCache?.data.todayStr ?? null
   )
   const [isLoading, setIsLoading] = useState(!initialCache)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -78,9 +88,37 @@ export function useRecordData(): UseRecordDataResult {
 
       const loaded = await loadRecordPageData(supabase, session.user.id)
       if (!mountedRef.current) return
+      for (const row of loaded.checkins) {
+        try {
+          const logs = (
+            JSON.parse(row.notes || '{}') as {
+              user_memory?: { food_logs_today?: Array<{ id?: string; logged_at?: string; slot?: string }> }
+            }
+          ).user_memory?.food_logs_today ?? []
+          for (const log of logs) {
+            traceRecordDate('record-loader-persisted-row', {
+              checkinDate: row.checkin_date,
+              loggedAt: log.logged_at,
+              loggedAtLocalDate: log.logged_at
+                ? getNutritionDayKey(new Date(log.logged_at))
+                : null,
+              mealSlot: log.slot,
+              foodLogId: log.id,
+              persisted: true,
+            })
+          }
+        } catch {
+          traceRecordDate('record-loader-row-parse-failed', {
+            checkinDate: row.checkin_date,
+            reason: 'invalid-notes-json',
+          })
+        }
+      }
       setData(loaded)
       setIsStale(false)
-      setSelectedDateState(prev => prev ?? loaded.todayStr)
+      setSelectedDateState(prev =>
+        prev && isLocalDateKey(prev) && prev <= loaded.todayStr ? prev : loaded.todayStr
+      )
       writeCache('record', session.user.id, [loaded.todayStr], {
         userId: session.user.id,
         data: loaded,
@@ -112,6 +150,7 @@ export function useRecordData(): UseRecordDataResult {
   const setSelectedDate = useCallback((date: string) => {
     setIsDateTransitioning(true)
     setSelectedDateState(date)
+    window.sessionStorage.setItem(RECORD_SELECTED_DATE_KEY, date)
     if (dateTransitionTimerRef.current) clearTimeout(dateTransitionTimerRef.current)
     dateTransitionTimerRef.current = setTimeout(() => {
       if (mountedRef.current) setIsDateTransitioning(false)

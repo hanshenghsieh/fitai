@@ -8,11 +8,13 @@ import FoodTypePortionSheet from '@/components/dashboard/today/FoodTypePortionSh
 import { FOOD_TYPE_LABELS } from '@/lib/nutrition/food-type-ui'
 import { defaultFoodRecordDraft } from '@/lib/nutrition/p0-common-foods/calculate'
 import type { CommonFoodItem, FoodType } from '@/lib/nutrition/p0-common-foods/types'
+import { getNutritionDayKey } from '@/lib/timezone'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
 
 interface Props {
   open: boolean
+  targetDate: string
   query: string
   onClose: () => void
   onSave: (item: CommonFoodItem, draft: import('@/lib/nutrition/p0-common-foods/types').FoodRecordDraft) => void
@@ -61,11 +63,12 @@ function syntheticItem(name: string, foodType: FoodType): CommonFoodItem {
   }
 }
 
-export default function EstimateMealSheet({ open, query, onClose, onSave }: Props) {
+export default function EstimateMealSheet({ open, targetDate, query, onClose, onSave }: Props) {
   const [foodType, setFoodType] = useState<FoodType>('staple')
   const [step, setStep] = useState<'type' | 'portion'>('type')
 
   const item = useMemo(() => syntheticItem(query.trim(), foodType), [query, foodType])
+  const dateLabel = targetDate === getNutritionDayKey() ? '今日' : '所選日期'
 
   if (!open) return null
 
@@ -75,8 +78,8 @@ export default function EstimateMealSheet({ open, query, onClose, onSave }: Prop
         open
         item={item}
         title="建立估算餐點"
-        subtitle="這次紀錄只會留在今日，不會改動資料庫。"
-        saveLabel="加入今日紀錄"
+        subtitle={`這次紀錄只會留在${dateLabel}，不會改動資料庫。`}
+        saveLabel={`加入${dateLabel}紀錄`}
         initialDraft={defaultFoodRecordDraft(item)}
         onClose={() => setStep('type')}
         onSave={(draft, _n) => {
@@ -90,6 +93,7 @@ export default function EstimateMealSheet({ open, query, onClose, onSave }: Prop
   return (
     <AppOverlay open={open} onClose={onClose} variant="sheet">
       <div
+        data-target-date={targetDate}
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
           fontFamily: font,

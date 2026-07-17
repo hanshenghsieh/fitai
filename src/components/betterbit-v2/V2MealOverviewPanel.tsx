@@ -9,7 +9,7 @@ import { groupTodayMealOverviewLogs } from '@/lib/today-meal-overview'
 import { setAppScrollLocked } from '@/lib/today-actions'
 import V2Card from './V2Card'
 
-const LONG_PRESS_MS = 1500
+const LONG_PRESS_MS = 800
 const MOVE_CANCEL_PX = 12
 
 const SLOT_ROWS: { slot: FoodSlot; icon: typeof ShoppingBag }[] = [

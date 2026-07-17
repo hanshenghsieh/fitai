@@ -2,11 +2,10 @@ import { addDays, format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import {
-  clampDailyAdjust,
   computeRecoveryWindow,
   DEFAULT_CALORIE_FLOOR_FEMALE,
+  distributeRecoveryBalance,
   isRecoveryActive,
-  recoveryTargetsForDayOffsets,
 } from '@/lib/engines/calorie-bank-engine'
 
 export type CalorieBankMiniState = 'over' | 'space' | 'recovery'
@@ -94,25 +93,14 @@ export function previewSpreadDays(
 ): SpreadDayPreview[] {
   const normal = bank.daily_target_kcal
   const excess = getTodayExcessKcal(bank)
-  const window = computeRecoveryWindow(excess)
-  const adjust =
-    spreadDays === bank.spread_days_remaining && bank.daily_adjust_kcal < 0
-      ? bank.daily_adjust_kcal
-      : clampDailyAdjust(
-          window.dailyAdjustKcal !== 0
-            ? window.dailyAdjustKcal
-            : -Math.round(excess / spreadDays),
-          normal,
-          calorieFloor
-        )
+  const maxDailyReduction = Math.max(0, normal - calorieFloor)
+  const deductions = distributeRecoveryBalance(excess, spreadDays, maxDailyReduction)
 
-  const targets = recoveryTargetsForDayOffsets(normal, spreadDays, adjust, calorieFloor, spreadDays)
-
-  return targets.map((targetKcal, index) => ({
+  return deductions.map((deduction, index) => ({
     dateLabel: formatSpreadDayLabel(index + 1),
     originalKcal: normal,
-    adjustKcal: targetKcal - normal,
-    targetKcal,
+    adjustKcal: -deduction,
+    targetKcal: normal - deduction,
   }))
 }
 

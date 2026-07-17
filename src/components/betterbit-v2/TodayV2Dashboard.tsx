@@ -9,6 +9,7 @@ import { BB_V2 } from '@/lib/betterbit-v2'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import type { DailyExcessDriver } from '@/lib/engines/calorie-bank-engine'
+import type { UserSettingsPreferences } from '@/lib/settings/user-settings-types'
 import type { FoodSlot } from '@/lib/food-slots'
 import { sumLoggedCarbs, sumLoggedFat } from '@/lib/food-log-macros'
 import { countPendingNutritionLogs } from '@/lib/nutrition/food-log-display'
@@ -60,6 +61,7 @@ export interface TodayV2DashboardProps {
   onEditLog?: (log: FoodLogEntry) => void
   onDeleteLog?: (logId: string) => void
   onOpenPendingQueue?: () => void
+  onCalorieBankPreferencesChange?: (preferences: UserSettingsPreferences) => void
   interstitial?: ReactNode
 }
 
@@ -90,6 +92,7 @@ export default function TodayV2Dashboard({
   onEditLog,
   onDeleteLog,
   onOpenPendingQueue,
+  onCalorieBankPreferencesChange,
   interstitial,
 }: TodayV2DashboardProps) {
   const [mealLabelMode, setMealLabelMode] = useState<MealLabelMode>('named')
@@ -173,6 +176,7 @@ export default function TodayV2Dashboard({
             overTarget={overTarget}
             calorieFloor={calorieFloor}
             embedded
+            onPreferencesChange={onCalorieBankPreferencesChange}
           />
         </V2Card>
 

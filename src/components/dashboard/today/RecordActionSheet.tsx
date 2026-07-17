@@ -7,11 +7,19 @@ import {
   dispatchOpenPhotoSheet,
   dispatchOpenTextLogSheet,
   dispatchRollDice,
+  targetMealSlotForFoodSlot,
+  type FoodCaptureContext,
 } from '@/lib/today-actions'
+import type { FoodSlot } from '@/lib/food-slots'
+import { getNutritionDayKey } from '@/lib/timezone'
+import { traceRecordDate } from '@/lib/record-date-trace'
 
 interface Props {
   open: boolean
   onClose: () => void
+  targetDate: string
+  targetSlot?: FoodSlot
+  captureSource: 'record' | 'global'
 }
 
 const actions = [
@@ -38,15 +46,30 @@ const actions = [
   },
 ] as const
 
-export default function RecordActionSheet({ open, onClose }: Props) {
-  function handleSelect(onSelect: () => void) {
+export default function RecordActionSheet({
+  open,
+  onClose,
+  targetDate,
+  targetSlot,
+  captureSource,
+}: Props) {
+  const targetMealSlot = targetMealSlotForFoodSlot(targetSlot)
+
+  function handleSelect(onSelect: (context: FoodCaptureContext) => void) {
+    traceRecordDate('record-action-sheet-select', {
+      targetDate,
+      targetMealSlot,
+    })
+    onSelect({ targetDate, targetMealSlot, source: captureSource })
     onClose()
-    window.setTimeout(onSelect, 80)
   }
 
   return (
     <AppOverlay open={open} onClose={onClose} variant="sheet">
       <div
+        data-target-date={targetDate}
+        data-target-slot={targetSlot}
+        data-target-meal-slot={targetMealSlot}
         className="ios-bottom-sheet max-w-[640px] mx-auto w-full"
         style={{
           fontFamily: BB_V2.font,
@@ -62,7 +85,7 @@ export default function RecordActionSheet({ open, onClose }: Props) {
               ＋ 記錄
             </h2>
             <p className="text-[13px] mt-1" style={{ color: BB_V2.text.secondary, fontWeight: 400 }}>
-              選一種方式記錄今天的飲食
+              選一種方式記錄{targetDate === getNutritionDayKey() ? '今天' : '這天'}的飲食
             </p>
           </div>
           <button type="button" onClick={onClose} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center -mr-1 shrink-0 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" aria-label="關閉">

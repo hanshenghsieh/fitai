@@ -8,6 +8,38 @@ const SOURCE_CONFIDENCE: Record<DishTemplate['sourceType'], number> = {
   user_custom: 1,
 }
 
+const FAT_OVER_TARGET_MAX_G = 12
+
+export function dishFitsRemainingNutrition(
+  template: DishTemplate,
+  day: TodayMealState,
+  variant?: DishVariant | null
+): boolean {
+  const source = variant ?? template
+  const calories = source.typicalCalories?.max
+  const protein = source.typicalProtein?.mid
+  const fat = source.typicalFat?.max
+  const carbs = source.typicalCarbs?.mid
+  if (
+    !Number.isFinite(calories) ||
+    !Number.isFinite(protein) ||
+    !Number.isFinite(fat) ||
+    !Number.isFinite(carbs) ||
+    calories! <= 0 ||
+    protein! <= 0 ||
+    fat! < 0 ||
+    carbs! < 0
+  ) {
+    return false
+  }
+  if (day.remainingCalories <= 0 || calories! > day.remainingCalories) return false
+  const fatLimit =
+    day.remainingFat <= 0
+      ? FAT_OVER_TARGET_MAX_G
+      : Math.max(FAT_OVER_TARGET_MAX_G, day.remainingFat * 1.1)
+  return fat! <= fatLimit
+}
+
 export function scoreDishTemplateForUserDay(
   template: DishTemplate,
   day: TodayMealState,
@@ -32,6 +64,7 @@ export function scoreDishTemplateForUserDay(
   if (template.tags.includes('高蛋白')) proteinFit += 4
 
   let fatPenalty = 0
+  if (day.remainingFat <= 0 && fat) fatPenalty -= Math.max(0, fat.mid - FAT_OVER_TARGET_MAX_G) * 8
   if (fat && fat.mid >= 32 && remaining > 0) fatPenalty -= 10
   if (fat && fat.mid >= 40) fatPenalty -= 8
 
@@ -96,6 +129,18 @@ export function pickBestVariantForDay(
     (a, b) => scoreDishVariantForUserDay(b, template, day).total - scoreDishVariantForUserDay(a, template, day).total
   )
   return ranked[0] ?? null
+}
+
+export function pickBestFittingVariantForDay(
+  variants: DishVariant[],
+  template: DishTemplate,
+  day: TodayMealState
+): DishVariant | null {
+  return pickBestVariantForDay(
+    variants.filter(variant => dishFitsRemainingNutrition(template, day, variant)),
+    template,
+    day
+  )
 }
 
 export function sortBrandItemsByTrust<T extends { sourceType: DishTemplate['sourceType']; confidence: DishTemplate['confidence'] }>(

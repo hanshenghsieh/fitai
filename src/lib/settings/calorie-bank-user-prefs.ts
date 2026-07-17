@@ -62,9 +62,7 @@ export function applyCalorieBankUserPrefs(
   const spreadDays = intensitySpreadDays(baseDays, prefs?.calorie_bank_intensity ?? 'standard')
   const excess = getTodayExcessKcal(bank)
   const dailyAdjust = clampDailyAdjust(
-    bank.daily_adjust_kcal < 0
-      ? bank.daily_adjust_kcal
-      : -Math.round(excess / Math.max(1, spreadDays)),
+    -Math.ceil(excess / Math.max(1, spreadDays)),
     bank.daily_target_kcal,
     calorieFloor
   )

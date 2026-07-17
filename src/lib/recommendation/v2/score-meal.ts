@@ -23,6 +23,33 @@ function hasTag(item: RecommendationFoodV2, group: keyof typeof TAG_GROUPS): boo
   return TAG_GROUPS[group].some(t => item.tags.includes(t))
 }
 
+const FAT_OVER_TARGET_MAX_G = 12
+
+export function preciseRecommendationExcludeReason(
+  item: RecommendationFoodV2,
+  state: Pick<UserNutritionState, 'remainingCalories' | 'remainingFat'>
+): string | null {
+  const nutrition = [item.calories, item.protein, item.fat, item.carbs]
+  if (
+    nutrition.some(value => !Number.isFinite(value)) ||
+    item.calories <= 0 ||
+    item.protein <= 0 ||
+    item.fat < 0 ||
+    item.carbs < 0
+  ) {
+    return 'missing_nutrition'
+  }
+  if (state.remainingCalories <= 0 || item.calories > state.remainingCalories) {
+    return 'over_remaining_calories'
+  }
+  const fatLimit =
+    state.remainingFat <= 0
+      ? FAT_OVER_TARGET_MAX_G
+      : Math.max(FAT_OVER_TARGET_MAX_G, state.remainingFat * 1.1)
+  if (item.fat > fatLimit) return 'over_remaining_fat'
+  return null
+}
+
 function calorieFitScore(calories: number, target: number): number {
   if (target <= 0) return calories <= 400 ? 20 : 0
   const ratio = calories / target
@@ -59,6 +86,14 @@ export function scoreMealForUserToday(input: ScoreMealInput): ScoredMeal {
     return { item, score: -Infinity, tier: 0, excluded: true, excludeReason: 'not_main_pool' }
   }
 
+  const preciseExcludeReason = preciseRecommendationExcludeReason(item, {
+    remainingCalories,
+    remainingFat,
+  })
+  if (preciseExcludeReason) {
+    return { item, score: -Infinity, tier: 0, excluded: true, excludeReason: preciseExcludeReason }
+  }
+
   if (recentlyShownIds.includes(item.id)) {
     return { item, score: -Infinity, tier: 0, excluded: true, excludeReason: 'recently_shown' }
   }
@@ -72,7 +107,9 @@ export function scoreMealForUserToday(input: ScoreMealInput): ScoredMeal {
     score -= clamp((item.calories - remainingCalories) / 25, 8, 45)
   }
 
-  if (item.fat > remainingFat && remainingFat > 0) {
+  if (remainingFat <= 0) {
+    score += Math.max(0, 12 - item.fat) * 2
+  } else if (item.fat > remainingFat) {
     score -= clamp((item.fat - remainingFat) / 3, 5, 25)
   }
 

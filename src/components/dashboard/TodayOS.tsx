@@ -69,7 +69,12 @@ import {
 } from '@/lib/settings/photo-settings-runtime'
 import type { PhotoSettings } from '@/lib/settings/user-settings-types'
 import { DEFAULT_PHOTO_SETTINGS } from '@/lib/settings/user-settings-types'
-import { getTaipeiHour, getNutritionDayKey } from '@/lib/timezone'
+import {
+  getTaipeiHour,
+  getNutritionDayKey,
+  isLocalDateKey,
+  loggedAtForNutritionDate,
+} from '@/lib/timezone'
 import {
   rollMealSuggestion,
   suggestionToSelections,
@@ -81,13 +86,18 @@ import type { RecommendationQueueState } from '@/lib/recommendation/v2/types'
 import { preloadDiceMenuBulk, isDiceMenuBulkReady, getDiceMenuSource } from '@/lib/dice-menu-pool'
 import {
   clearTodaySheetParams,
+  todayActionContextFromSearch,
   todaySheetFromSearch,
   TODAY_OPEN_PHOTO_EVENT,
   TODAY_OPEN_TEXT_LOG_EVENT,
   TODAY_CONFIRM_DICE_EVENT,
   TODAY_ROLL_DICE_EVENT,
+  foodSlotForCaptureLabel,
+  targetMealSlotForFoodSlot,
+  type FoodCaptureContext,
 } from '@/lib/today-actions'
 import { linesToDisplayItems } from '@/lib/meal-suggest'
+import { traceRecordDate } from '@/lib/record-date-trace'
 import { formatEatOutDiceLabel, deserializeCustomCombo, selectedToDisplayItems } from '@/lib/eat-out-builder'
 import DiceMealPreview, { type MealPreviewItem } from '@/components/dashboard/DiceMealPreview'
 import DishRecommendationCard from '@/components/dashboard/DishRecommendationCard'
@@ -360,7 +370,11 @@ interface Props {
   workoutDone: number
   workoutTotal: number
   calorieBank?: CalorieBankRow | null
-  onLogFood: (logs: FoodLogEntry[], userMemory: UserMemoryMeta) => void
+  onLogFood: (
+    logs: FoodLogEntry[],
+    userMemory: UserMemoryMeta,
+    context: Required<Pick<FoodCaptureContext, 'targetDate'>> & FoodCaptureContext
+  ) => void
   onClearMealSelection?: (mealType: MealType) => void
   onPostureLine?: (line: string) => void
   onDiceApply: (payload: {
@@ -370,6 +384,7 @@ interface Props {
     mealSuggest: Partial<Record<MealType, MealSuggestState>>
     userMemory: UserMemoryMeta
     logEntry: FoodLogEntry
+    targetDate: string
   }) => void
   registerDeleteLog?: (handler: (logId: string) => void) => void
   onOpenNutritionConfirmation?: (log: FoodLogEntry) => void
@@ -459,7 +474,7 @@ export default function TodayOS({
     void loadPhotoSettingsRuntime().then(setPhotoSettings).catch(() => {})
   }, [])
 
-  const activeSlot = useMemo<FoodSlot>(
+  const automaticSlot = useMemo<FoodSlot>(
     () =>
       resolvePhotoMealSlotFromLogs(photoSettings, getTaipeiHour(), [
         ...recentFoodLogs,
@@ -467,6 +482,41 @@ export default function TodayOS({
       ]),
     [recentFoodLogs, foodLogs, photoSettings]
   )
+  const [captureContext, setCaptureContext] = useState<FoodCaptureContext>({
+    targetDate: getNutritionDayKey(),
+    source: 'global',
+  })
+  const requiredRecordTargetDateRef = useRef<string | null>(null)
+  const applyCaptureContext = useCallback((context: FoodCaptureContext): boolean => {
+    if (context.source === 'record') {
+      if (!isLocalDateKey(context.targetDate)) {
+        traceRecordDate('capture-context-rejected', {
+          targetDate: context.targetDate,
+          targetMealSlot: context.targetMealSlot,
+          reason: 'record-target-date-missing',
+        })
+        toast.error('所選日期已遺失，未儲存餐點。請返回記錄頁重試。')
+        return false
+      }
+      requiredRecordTargetDateRef.current = context.targetDate
+    } else {
+      requiredRecordTargetDateRef.current = null
+    }
+    traceRecordDate('capture-context-applied', {
+      targetDate: context.targetDate,
+      targetMealSlot: context.targetMealSlot,
+      captureTargetDate: context.targetDate,
+    })
+    setCaptureContext(context)
+    return true
+  }, [])
+  const clearCaptureContext = useCallback(() => {
+    requiredRecordTargetDateRef.current = null
+    setCaptureContext({ targetDate: getNutritionDayKey(), source: 'global' })
+  }, [])
+  const activeSlot = foodSlotForCaptureLabel(captureContext.targetMealSlot) ?? automaticSlot
+  const captureTargetDate =
+    requiredRecordTargetDateRef.current ?? captureContext.targetDate ?? getNutritionDayKey()
   const mealSlotLegacy = useMemo(
     () => mealTypeForFoodSlot(activeSlot, userMemory.work_schedule ?? 'standard'),
     [activeSlot, userMemory.work_schedule]
@@ -501,6 +551,8 @@ export default function TodayOS({
       normalTargetKcal: todayPlan.daily_targets.calories,
       internalTargetKcal: calorieBank?.internal_target_kcal,
       proteinTargetG: todayPlan.daily_targets.protein_g,
+      fatTargetG: todayPlan.daily_targets.fat_g,
+      carbsTargetG: todayPlan.daily_targets.carbs_g,
       calorieBank,
       mealSlot: mealSlotLegacy,
       hourOfDay: getTaipeiHour(),
@@ -683,13 +735,16 @@ export default function TodayOS({
       const nextMemory = { ...userMemory, food_logs_today: nextLogs, food_dna: nextDna }
       const delta =
         updated && prev ? (updated.calories ?? 0) - (prev.calories ?? 0) : 0
-      onLogFood(nextLogs, nextMemory)
+      onLogFood(nextLogs, nextMemory, {
+        targetDate: captureTargetDate,
+        targetMealSlot: targetMealSlotForFoodSlot(activeSlot),
+      })
       if (delta !== 0) schedulePostureLine(nextLogs, nextMemory, delta)
       queueMicrotask(() => {
         loggingRef.current = false
       })
     },
-    [userMemory, foodDna, onLogFood, schedulePostureLine]
+    [userMemory, foodDna, onLogFood, schedulePostureLine, captureTargetDate, activeSlot]
   )
 
   const commitLog = useCallback(
@@ -699,7 +754,10 @@ export default function TodayOS({
       const full: FoodLogEntry = enrichFoodLog({
         ...entry,
         slot: entry.slot ?? activeSlot,
-        logged_at: new Date().toISOString(),
+        logged_at: loggedAtForNutritionDate(
+          captureTargetDate,
+          entry.slot ?? activeSlot
+        ),
         user_declared: true,
       })
       const nextLogs = [...foodLogs, full]
@@ -709,13 +767,38 @@ export default function TodayOS({
       const nextMemory = { ...userMemory, food_logs_today: nextLogs, food_dna: nextDna }
       setQuery('')
       setMoreOpen(false)
-      onLogFood(nextLogs, nextMemory)
+      traceRecordDate('food-log-commit', {
+        targetDate: captureTargetDate,
+        captureTargetDate,
+        nutritionDate: captureTargetDate,
+        loggedAt: full.logged_at,
+        loggedAtLocalDate: getNutritionDayKey(new Date(full.logged_at)),
+        mealSlot: full.slot,
+        foodLogId: full.id,
+      })
+      onLogFood(nextLogs, nextMemory, {
+        targetDate: captureTargetDate,
+        targetMealSlot: targetMealSlotForFoodSlot(full.slot),
+        source: captureContext.source,
+      })
+      clearCaptureContext()
       schedulePostureLine(nextLogs, nextMemory, (full.calories ?? 0) - mealTargets.calories)
       queueMicrotask(() => {
         loggingRef.current = false
       })
     },
-    [foodLogs, userMemory, foodDna, activeSlot, mealTargets.calories, schedulePostureLine, onLogFood]
+    [
+      foodLogs,
+      userMemory,
+      foodDna,
+      activeSlot,
+      captureTargetDate,
+      mealTargets.calories,
+      schedulePostureLine,
+      onLogFood,
+      captureContext.source,
+      clearCaptureContext,
+    ]
   )
 
   const removeLogById = useCallback(
@@ -725,7 +808,7 @@ export default function TodayOS({
       const prevMemory = userMemory
       const nextLogs = foodLogs.filter(l => l.id !== logId)
       const nextMemory = { ...userMemory, food_logs_today: nextLogs }
-      onLogFood(nextLogs, nextMemory)
+      onLogFood(nextLogs, nextMemory, { targetDate: getNutritionDayKey() })
       if (removed) {
         const mt = customEatOutMealTypeForSlot(normalizeFoodLogSlot(removed))
         if (mt) onClearMealSelection?.(mt)
@@ -749,7 +832,7 @@ export default function TodayOS({
         action: {
           label: '復原',
           onClick: () => {
-            onLogFood(prevLogs, prevMemory)
+            onLogFood(prevLogs, prevMemory, { targetDate: getNutritionDayKey() })
             schedulePostureLine(prevLogs, prevMemory)
           },
         },
@@ -928,11 +1011,12 @@ export default function TodayOS({
     setPhotoDraft(null)
     setPhotoProcessing(false)
     setPhotoSaving(false)
+    clearCaptureContext()
     if (photoPreviewUrlRef.current) {
       URL.revokeObjectURL(photoPreviewUrlRef.current)
       photoPreviewUrlRef.current = null
     }
-  }, [])
+  }, [clearCaptureContext])
 
   const handleAccuracyChange = useCallback((patch: Partial<UserConfirmationAnswers>) => {
     setPhotoDraft(prev => {
@@ -1071,7 +1155,7 @@ export default function TodayOS({
         nutrition_confidence: payload.nutrition_confidence,
         slot: activeSlot,
         source: 'photo' as const,
-        logged_at: new Date().toISOString(),
+        logged_at: loggedAtForNutritionDate(captureTargetDate, activeSlot),
       }
       const needsConfirm = shouldRequirePhotoConfirmation(photoSettings.confirm_mode, {
         nutrition_confidence: payload.nutrition_confidence,
@@ -1090,7 +1174,7 @@ export default function TodayOS({
       setPhotoSaving(false)
     }
     void fileToDataUrl(photoDraft.file).then(finish)
-  }, [photoDraft, photoSaving, commitLog, closePhotoSheet, activeSlot, photoSettings, onOpenNutritionConfirmation])
+  }, [photoDraft, photoSaving, commitLog, closePhotoSheet, activeSlot, captureTargetDate, photoSettings, onOpenNutritionConfirmation])
 
   const handleManualPhotoCorrection = useCallback(
     (result: ManualPhotoCorrectionResult) => {
@@ -1135,13 +1219,18 @@ export default function TodayOS({
             nutrition_status: entry.nutrition_status,
           })
         if (needsConfirm || entry.nutrition_status === 'unknown') {
-          enqueueUnknownFromLog(entry)
-          onOpenNutritionConfirmation?.(entry)
+          const pendingEntry = {
+            ...entry,
+            slot: activeSlot,
+            logged_at: loggedAtForNutritionDate(captureTargetDate, activeSlot),
+          }
+          enqueueUnknownFromLog(pendingEntry)
+          onOpenNutritionConfirmation?.(pendingEntry)
         }
       }
       void fileToDataUrl(photoDraft.file).then(finish)
     },
-    [photoDraft, commitLog, activeSlot, closePhotoSheet, onOpenNutritionConfirmation, photoSettings]
+    [photoDraft, commitLog, activeSlot, captureTargetDate, closePhotoSheet, onOpenNutritionConfirmation, photoSettings]
   )
 
   const rollDice = useCallback(() => {
@@ -1280,10 +1369,24 @@ export default function TodayOS({
         source: 'dice',
       }
     }
+    logEntry = {
+      ...logEntry,
+      slot: activeSlot,
+      logged_at: loggedAtForNutritionDate(captureTargetDate, activeSlot),
+    }
 
     const nextLogs = [...foodLogs, logEntry]
     const nextDna = learnFromLog(userMemory.food_dna ?? foodDna, logEntry)
     const nextMemory = { ...userMemory, food_logs_today: nextLogs, food_dna: nextDna }
+    traceRecordDate('recommendation-log-commit', {
+      targetDate: captureTargetDate,
+      captureTargetDate,
+      nutritionDate: captureTargetDate,
+      loggedAt: logEntry.logged_at,
+      loggedAtLocalDate: getNutritionDayKey(new Date(logEntry.logged_at)),
+      mealSlot: logEntry.slot,
+      foodLogId: logEntry.id,
+    })
     onDiceApply({
       mealType: mealSlotLegacy,
       selection: suggestionToSelections(dicePreview),
@@ -1297,7 +1400,9 @@ export default function TodayOS({
       },
       userMemory: nextMemory,
       logEntry,
+      targetDate: captureTargetDate,
     })
+    clearCaptureContext()
     setDicePreviewByMeal(prev => {
       const next = { ...prev }
       delete next[mealSlotLegacy]
@@ -1306,7 +1411,7 @@ export default function TodayOS({
     schedulePostureLine(nextLogs, nextMemory, logEntry.calories - mealTargets.calories)
     confirmingRef.current = false
     setConfirming(false)
-  }, [dicePreview, dishVariantByMeal, activeSlot, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, schedulePostureLine, onDiceApply])
+  }, [dicePreview, dishVariantByMeal, activeSlot, captureTargetDate, foodLogs, userMemory, foodDna, mealSlotLegacy, dailyRolls, mealSuggest, mealTargets.calories, schedulePostureLine, onDiceApply, clearCaptureContext])
 
   const handleSelectDishVariant = useCallback(
     (variantId: string | null) => {
@@ -1347,17 +1452,29 @@ export default function TodayOS({
         null
       const variant = variantId ? getDishVariantById(variantId) : dicePreview.dish_recommendation.variant
 
-      const logEntry = buildFoodLogFromDishRecommendation({
-        result: dicePreview.dish_recommendation,
-        selectedVariant: variant,
-        selectedBrandItem: brandItem,
-        slot: activeSlot,
-        id: `dish-brand-${brandItem.id}-${Date.now()}`,
-      })
+      const logEntry = {
+        ...buildFoodLogFromDishRecommendation({
+          result: dicePreview.dish_recommendation,
+          selectedVariant: variant,
+          selectedBrandItem: brandItem,
+          slot: activeSlot,
+          id: `dish-brand-${brandItem.id}-${Date.now()}`,
+        }),
+        logged_at: loggedAtForNutritionDate(captureTargetDate, activeSlot),
+      }
 
       const nextLogs = [...foodLogs, logEntry]
       const nextDna = learnFromLog(userMemory.food_dna ?? foodDna, logEntry)
       const nextMemory = { ...userMemory, food_logs_today: nextLogs, food_dna: nextDna }
+      traceRecordDate('recommendation-brand-log-commit', {
+        targetDate: captureTargetDate,
+        captureTargetDate,
+        nutritionDate: captureTargetDate,
+        loggedAt: logEntry.logged_at,
+        loggedAtLocalDate: getNutritionDayKey(new Date(logEntry.logged_at)),
+        mealSlot: logEntry.slot,
+        foodLogId: logEntry.id,
+      })
       onDiceApply({
         mealType: mealSlotLegacy,
         selection: suggestionToSelections(dicePreview),
@@ -1371,7 +1488,9 @@ export default function TodayOS({
         },
         userMemory: nextMemory,
         logEntry,
+        targetDate: captureTargetDate,
       })
+      clearCaptureContext()
       setDicePreviewByMeal(prev => {
         const next = { ...prev }
         delete next[mealSlotLegacy]
@@ -1386,6 +1505,7 @@ export default function TodayOS({
       dicePreview,
       dishVariantByMeal,
       activeSlot,
+      captureTargetDate,
       foodLogs,
       userMemory,
       foodDna,
@@ -1395,6 +1515,7 @@ export default function TodayOS({
       mealTargets.calories,
       schedulePostureLine,
       onDiceApply,
+      clearCaptureContext,
     ]
   )
 
@@ -1474,7 +1595,10 @@ export default function TodayOS({
     }
   }, [dayState.overTargetProtection])
 
-  const closeMore = useCallback(() => setMoreOpen(false), [])
+  const closeMore = useCallback(() => {
+    setMoreOpen(false)
+    clearCaptureContext()
+  }, [clearCaptureContext])
   const closeAllOverlays = useCallback(() => {
     setMoreOpen(false)
     setPhotoOpen(false)
@@ -1501,7 +1625,7 @@ export default function TodayOS({
           setP0SearchQuery(trimmedQuery || item.name)
           setP0PortionFood(food)
           setQuery('')
-          closeMore()
+          setMoreOpen(false)
           return
         }
       }
@@ -1590,11 +1714,11 @@ export default function TodayOS({
       commitLog(patch)
       setP0PortionFood(null)
       setP0SearchQuery('')
-      toast.message('已加入今日紀錄', {
+      toast.message(captureTargetDate === getNutritionDayKey() ? '已加入今日紀錄' : '已加入所選日期紀錄', {
         description: item.sourceType === 'user_custom' ? '自訂估算' : '資料庫估算',
       })
     },
-    [commitLog, p0SearchQuery]
+    [commitLog, p0SearchQuery, captureTargetDate]
   )
 
   const handleEstimateSave = useCallback(
@@ -1610,9 +1734,14 @@ export default function TodayOS({
       commitLog(patch)
       setEstimateQuery(null)
       setQuery('')
-      toast.message('已建立估算餐點', { description: '這次紀錄只會留在今日。' })
+      toast.message('已建立估算餐點', {
+        description:
+          captureTargetDate === getNutritionDayKey()
+            ? '這次紀錄只會留在今日。'
+            : '這次紀錄只會留在所選日期。',
+      })
     },
-    [commitLog, estimateQuery]
+    [commitLog, estimateQuery, captureTargetDate]
   )
   const handleCreateFreeText = useCallback(
     (name: string, options?: { forceUnknown?: boolean }) => {
@@ -1624,7 +1753,7 @@ export default function TodayOS({
         setP0SearchQuery(trimmed)
         setP0PortionFood(p0)
         setQuery('')
-        closeMore()
+        setMoreOpen(false)
         return
       }
 
@@ -1638,7 +1767,7 @@ export default function TodayOS({
           setP0SearchQuery(trimmed)
           setP0PortionFood(p0)
           setQuery('')
-          closeMore()
+          setMoreOpen(false)
           return
         }
       }
@@ -1675,14 +1804,14 @@ export default function TodayOS({
         const full: FoodLogEntry = enrichFoodLog({
           ...pending,
           slot: activeSlot,
-          logged_at: new Date().toISOString(),
+          logged_at: loggedAtForNutritionDate(captureTargetDate, activeSlot),
           user_declared: true,
         })
         enqueueUnknownFromLog(full)
         onOpenNutritionConfirmation?.(full)
       }
     },
-    [commitLog, activeSlot, onOpenNutritionConfirmation, closeMore]
+    [commitLog, activeSlot, captureTargetDate, onOpenNutritionConfirmation, closeMore]
   )
   const handleCommitFrequent = useCallback(
     (frequentId?: string) => {
@@ -1697,10 +1826,38 @@ export default function TodayOS({
   }, [])
 
   useEffect(() => {
-    const openPhoto = () => setPhotoOpen(true)
-    const openTextLog = () => setMoreOpen(true)
-    const handleRollDice = () => {
-      if (onDashboard) rollDice()
+    const contextFromEvent = (event: Event): FoodCaptureContext => {
+      const detail = (event as CustomEvent<FoodCaptureContext | undefined>).detail
+      return {
+        targetDate: detail?.targetDate ?? getNutritionDayKey(),
+        targetMealSlot: detail?.targetMealSlot,
+        source: detail?.source ?? 'global',
+      }
+    }
+    const openPhoto = (event: Event) => {
+      if (!applyCaptureContext(contextFromEvent(event))) return
+      setPhotoOpen(true)
+    }
+    const openTextLog = (event: Event) => {
+      if (!applyCaptureContext(contextFromEvent(event))) return
+      setMoreOpen(true)
+    }
+    const handleRollDice = (event: Event) => {
+      if (!onDashboard) return
+      const detail = (event as CustomEvent<FoodCaptureContext & { contextApplied?: boolean }>).detail
+      if (detail?.contextApplied) {
+        rollDice()
+        return
+      }
+      const context = contextFromEvent(event)
+      if (!applyCaptureContext(context)) return
+      window.setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent(TODAY_ROLL_DICE_EVENT, {
+            detail: { ...context, contextApplied: true },
+          })
+        )
+      }, 0)
     }
     const handleConfirmDice = () => {
       if (!onDashboard) return
@@ -1719,13 +1876,19 @@ export default function TodayOS({
     window.addEventListener('betterbit:route-change', handleRouteChange)
 
     if (typeof window !== 'undefined' && onDashboard) {
-      const intent = todaySheetFromSearch(window.location.search)
-      if (intent === 'photo') {
-        setPhotoOpen(true)
+      const actionContext = todayActionContextFromSearch(window.location.search)
+      if (actionContext?.intent === 'photo') {
         clearTodaySheetParams()
-      } else if (intent === 'text') {
-        setMoreOpen(true)
+        window.setTimeout(() => {
+          if (!applyCaptureContext(actionContext)) return
+          setPhotoOpen(true)
+        }, 0)
+      } else if (actionContext?.intent === 'text') {
         clearTodaySheetParams()
+        window.setTimeout(() => {
+          if (!applyCaptureContext(actionContext)) return
+          setMoreOpen(true)
+        }, 0)
       }
     }
 
@@ -1736,7 +1899,7 @@ export default function TodayOS({
       window.removeEventListener(TODAY_CONFIRM_DICE_EVENT, handleConfirmDice)
       window.removeEventListener('betterbit:route-change', handleRouteChange)
     }
-  }, [closeAllOverlays, onDashboard, rollDice])
+  }, [applyCaptureContext, closeAllOverlays, onDashboard, rollDice])
 
   useEffect(() => {
     if (!onDashboard) closeAllOverlays()
@@ -1909,6 +2072,7 @@ export default function TodayOS({
 
       <TodayFoodMore
         open={moreOpen}
+        targetDate={captureTargetDate}
         onClose={closeMore}
         activeSlot={activeSlot}
         query={query}
@@ -1922,7 +2086,7 @@ export default function TodayOS({
         onCreateFreeText={handleCreateFreeText}
         onCreateEstimate={q => {
           setEstimateQuery(q)
-          closeMore()
+          setMoreOpen(false)
         }}
       />
 
@@ -1930,20 +2094,37 @@ export default function TodayOS({
         <FoodTypePortionSheet
           open
           item={p0PortionFood}
-          onClose={() => setP0PortionFood(null)}
+          title={captureTargetDate === getNutritionDayKey() ? '加入今日紀錄' : '加入所選日期紀錄'}
+          subtitle={
+            captureTargetDate === getNutritionDayKey()
+              ? '這次紀錄只會留在今日。'
+              : '這次紀錄只會留在所選日期。'
+          }
+          saveLabel={
+            captureTargetDate === getNutritionDayKey() ? '加入今日紀錄' : '加入所選日期紀錄'
+          }
+          onClose={() => {
+            setP0PortionFood(null)
+            clearCaptureContext()
+          }}
           onSave={(draft, _nutrition) => handleP0PortionSave(p0PortionFood, draft)}
         />
       ) : null}
 
       <EstimateMealSheet
         open={estimateQuery != null}
+        targetDate={captureTargetDate}
         query={estimateQuery ?? ''}
-        onClose={() => setEstimateQuery(null)}
+        onClose={() => {
+          setEstimateQuery(null)
+          clearCaptureContext()
+        }}
         onSave={handleEstimateSave}
       />
 
       <PhotoLogSheet
         open={photoOpen}
+        targetDate={captureTargetDate}
         draft={photoDraft}
         processing={photoProcessing}
         accuracyEnabled={isNutritionAccuracyV1()}

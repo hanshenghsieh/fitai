@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, Check, Heart, Info, Landmark } from 'lucide-react'
+import { ArrowRight, Check, Heart, Landmark } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import {
@@ -30,6 +30,7 @@ interface Props {
   calorieFloor?: number
   open: boolean
   onClose: () => void
+  onSavePlan?: (spreadDays: SpreadDayOption) => Promise<boolean>
 }
 
 export default function CalorieBankDetailView({
@@ -38,12 +39,18 @@ export default function CalorieBankDetailView({
   calorieFloor = DEFAULT_CALORIE_FLOOR_FEMALE,
   open,
   onClose,
+  onSavePlan,
 }: Props) {
   const suggested = defaultSpreadDays(bank)
   const [spreadDays, setSpreadDays] = useState<SpreadDayOption>(suggested)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (open) setSpreadDays(defaultSpreadDays(bank))
+    if (open) {
+      setSpreadDays(defaultSpreadDays(bank))
+      setSaveError(null)
+    }
   }, [open, bank])
 
   const todayExcess = getTodayExcessKcal(bank)
@@ -56,7 +63,7 @@ export default function CalorieBankDetailView({
   return (
     <AppOverlay open={open} onClose={onClose} variant="fullscreen" ariaLabel="Calorie Bank">
       <div
-        className="v2-calorie-bank-detail h-full overflow-y-auto"
+        className="v2-calorie-bank-detail app-fullscreen-safe-shell h-full overflow-y-auto"
         style={{
           backgroundColor: BB_V2.bg.canvas,
           backgroundImage: BB_V2.bg.gradient,
@@ -67,16 +74,7 @@ export default function CalorieBankDetailView({
           title="Betterbit"
           variant="back"
           onBack={onClose}
-          rightSlot={
-            <button
-              type="button"
-              onClick={onClose}
-              className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-xl"
-              aria-label="說明"
-            >
-              <Info className="h-5 w-5" strokeWidth={BB_V2.iconStroke} style={{ color: BB_V2.text.deepGreen }} />
-            </button>
-          }
+          hideRight
         />
 
         <div
@@ -243,7 +241,28 @@ export default function CalorieBankDetailView({
             </p>
           </div>
 
-          <V2PrimaryButton onClick={onClose}>{getDetailCtaLabel(bank)}</V2PrimaryButton>
+          {saveError ? (
+            <p className="text-[13px] text-center" role="alert" style={{ color: '#B45309' }}>
+              {saveError}
+            </p>
+          ) : null}
+          <V2PrimaryButton
+            disabled={saving}
+            onClick={async () => {
+              if (!onSavePlan) {
+                onClose()
+                return
+              }
+              setSaving(true)
+              setSaveError(null)
+              const saved = await onSavePlan(spreadDays).catch(() => false)
+              setSaving(false)
+              if (saved) onClose()
+              else setSaveError('分攤設定暫時無法儲存，請再試一次。')
+            }}
+          >
+            {saving ? '儲存中…' : getDetailCtaLabel(bank)}
+          </V2PrimaryButton>
         </div>
       </div>
     </AppOverlay>

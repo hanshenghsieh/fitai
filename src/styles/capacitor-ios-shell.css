@@ -133,6 +133,12 @@ html[data-app-overlay] .app-bottom-nav {
   animation: v2-calorie-bank-slide-up 240ms ease-out forwards;
 }
 
+/* Fullscreen portals sit outside .app-shell and therefore own one safe-top inset. */
+.app-fullscreen-safe-shell {
+  box-sizing: border-box;
+  padding-top: var(--app-safe-top);
+}
+
 .app-overlay-dialog-card {
   width: 100%;
   max-width: 28rem;

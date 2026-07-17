@@ -45,6 +45,7 @@ export interface PhotoLogDraft {
 
 interface Props {
   open: boolean
+  targetDate: string
   draft: PhotoLogDraft | null
   processing?: boolean
   accuracyEnabled?: boolean
@@ -844,6 +845,7 @@ function ProcessingStep({ onClose }: { onClose: () => void }) {
 
 export default function PhotoLogSheet({
   open,
+  targetDate,
   draft,
   processing = false,
   accuracyEnabled,
@@ -862,6 +864,7 @@ export default function PhotoLogSheet({
   return (
     <AppOverlay open={open} onClose={onClose} variant="sheet">
       <div
+        data-target-date={targetDate}
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
         style={{
           fontFamily: BB_V2.font,

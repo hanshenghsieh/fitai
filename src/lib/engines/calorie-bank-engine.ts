@@ -34,16 +34,23 @@ export function computeRecoveryWindow(excessKcal: number): RecoveryWindow {
   if (excessKcal <= 0) {
     return { spreadDays: 0, dailyAdjustKcal: 0 }
   }
+  let spreadDays: number
+  let maxDailyAdjust: number
   if (excessKcal <= 500) {
-    return { spreadDays: 2, dailyAdjustKcal: -100 }
+    spreadDays = 2
+    maxDailyAdjust = 100
+  } else if (excessKcal <= 1200) {
+    spreadDays = 4
+    maxDailyAdjust = 120
+  } else if (excessKcal <= 2500) {
+    spreadDays = 6
+    maxDailyAdjust = 150
+  } else {
+    spreadDays = 8
+    maxDailyAdjust = 180
   }
-  if (excessKcal <= 1200) {
-    return { spreadDays: 4, dailyAdjustKcal: -120 }
-  }
-  if (excessKcal <= 2500) {
-    return { spreadDays: 6, dailyAdjustKcal: -150 }
-  }
-  return { spreadDays: 8, dailyAdjustKcal: -180 }
+  const dailyAdjust = Math.min(maxDailyAdjust, Math.ceil(excessKcal / spreadDays))
+  return { spreadDays, dailyAdjustKcal: -dailyAdjust }
 }
 
 /** Clamp daily reduction so internal target never drops below calorie floor. */
@@ -114,7 +121,7 @@ export function tickRecoveryFromPrevious(
   const applied = Math.min(previous.recovery_balance_kcal, Math.abs(adjust))
   const nextBalance = Math.max(0, previous.recovery_balance_kcal - applied)
   const nextSpread = Math.max(0, previous.spread_days_remaining - 1)
-  const internal = Math.max(calorieFloor, normalTargetKcal + adjust)
+  const internal = Math.max(calorieFloor, normalTargetKcal - applied)
 
   if (nextBalance <= 0) {
     return {
@@ -129,7 +136,7 @@ export function tickRecoveryFromPrevious(
     const window = computeRecoveryWindow(nextBalance)
     const rolledAdjust = clampDailyAdjust(window.dailyAdjustKcal, normalTargetKcal, calorieFloor)
     return {
-      internal_target_kcal: Math.max(calorieFloor, normalTargetKcal + rolledAdjust),
+      internal_target_kcal: internal,
       recovery_balance_kcal: nextBalance,
       spread_days_remaining: window.spreadDays,
       daily_adjust_kcal: rolledAdjust,
@@ -258,6 +265,25 @@ export function recoveryTargetsForDayOffsets(
   }
 
   return targets
+}
+
+/** Split a finite recovery balance without creating extra calorie debt. */
+export function distributeRecoveryBalance(
+  recoveryBalanceKcal: number,
+  spreadDays: number,
+  maxDailyReduction: number
+): number[] {
+  const total = Math.max(0, Math.round(recoveryBalanceKcal))
+  const days = Math.max(0, Math.floor(spreadDays))
+  const dailyCap = Math.max(0, Math.floor(maxDailyReduction))
+  if (total === 0 || days === 0 || dailyCap === 0) {
+    return Array.from({ length: days }, () => 0)
+  }
+
+  const recoverable = Math.min(total, days * dailyCap)
+  const base = Math.floor(recoverable / days)
+  const remainder = recoverable % days
+  return Array.from({ length: days }, (_, index) => base + (index < remainder ? 1 : 0))
 }
 
 function recoveryReductionForDay(dayIndex: number, spreadDays: number, dailyAdjust: number): number {
