@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState, useTransition, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ChevronLeft,
@@ -50,6 +50,12 @@ function formatNum(n: number | null, digits = 1): string {
 function formatInt(n: number | null): string {
   if (n == null || !Number.isFinite(n)) return '—'
   return Math.round(n).toLocaleString('zh-TW')
+}
+
+export function formatAnalysisTrendDate(date: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
+  if (!match) return date
+  return `${Number(match[2])} 月 ${Number(match[3])} 日`
 }
 
 function DeltaBadge({ value, unit, invert = false }: { value: number | null; unit?: string; invert?: boolean }) {
@@ -103,15 +109,28 @@ function LineChartCard({
   points,
   emptyMessage,
   stagger,
+  interactive = false,
 }: {
   title: string
   unit: string
   points: AnalysisTrendPoint[]
   emptyMessage: string
   stagger: number
+  interactive?: boolean
 }) {
+  const cardRef = useRef<HTMLElement>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const values = points.map(p => p.value).filter((v): v is number => v != null)
   const hasData = values.length >= 2
+
+  useEffect(() => {
+    if (!interactive || selectedDate == null) return
+    const closeOutside = (event: PointerEvent) => {
+      if (!cardRef.current?.contains(event.target as Node)) setSelectedDate(null)
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    return () => document.removeEventListener('pointerdown', closeOutside)
+  }, [interactive, selectedDate])
 
   if (!hasData) {
     return (
@@ -146,6 +165,9 @@ function LineChartCard({
 
   const linePath = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x} ${c.y}`).join(' ')
   const areaPath = `${linePath} L ${coords.at(-1)!.x} ${padT + innerH} L ${coords[0].x} ${padT + innerH} Z`
+  const selectedIndex = interactive ? points.findIndex(point => point.date === selectedDate) : -1
+  const selectedPoint = selectedIndex >= 0 ? points[selectedIndex] : null
+  const selectedCoord = selectedIndex >= 0 ? coords[selectedIndex] : null
 
   const yTicks = 4
   const yLabels = Array.from({ length: yTicks }, (_, i) => {
@@ -155,13 +177,25 @@ function LineChartCard({
   })
 
   return (
-    <section className="v2-analysis-chart-card v2-analysis-stagger" style={{ animationDelay: `${stagger}ms` }}>
+    <section
+      ref={cardRef}
+      className="v2-analysis-chart-card v2-analysis-stagger"
+      style={{ animationDelay: `${stagger}ms` }}
+      onClick={event => {
+        if (!(event.target as Element).closest('[data-analysis-point]')) setSelectedDate(null)
+      }}
+    >
       <div className="v2-analysis-chart-head">
         <h3 className="v2-analysis-chart-title">{title}</h3>
         <span className="v2-analysis-chart-unit">單位：{unit}</span>
       </div>
       <div className="v2-analysis-chart-wrap">
-        <svg viewBox={`0 0 ${w} ${h}`} className="v2-analysis-line-chart" aria-hidden>
+        <svg
+          viewBox={`0 0 ${w} ${h}`}
+          className="v2-analysis-line-chart"
+          aria-hidden={interactive ? undefined : true}
+          aria-label={interactive ? `${title}，點選資料點查看日期與${unit}` : undefined}
+        >
           {yLabels.map(t => (
             <g key={t.v}>
               <line x1={padL} y1={t.y} x2={w - padR} y2={t.y} className="v2-analysis-grid-line" />
@@ -172,13 +206,59 @@ function LineChartCard({
           ))}
           <path d={areaPath} className="v2-analysis-area-fill" />
           <path d={linePath} className="v2-analysis-line" fill="none" />
-          {coords.map((c, i) =>
-            c.value != null ? <circle key={i} cx={c.x} cy={c.y} r="4" className="v2-analysis-dot" /> : null
-          )}
+          {coords.map((c, i) => {
+            if (c.value == null) return null
+            if (!interactive) {
+              return <circle key={points[i].date} cx={c.x} cy={c.y} r="4" className="v2-analysis-dot" />
+            }
+            const active = points[i].date === selectedDate
+            const toggle = () => setSelectedDate(current => (current === points[i].date ? null : points[i].date))
+            return (
+              <g
+                key={points[i].date}
+                data-analysis-point={points[i].date}
+                data-active={active ? 'true' : 'false'}
+                className="v2-analysis-point-target"
+                role="button"
+                tabIndex={0}
+                aria-label={`${formatAnalysisTrendDate(points[i].date)}，${formatNum(c.value)} ${unit}`}
+                aria-pressed={active}
+                onClick={event => {
+                  event.stopPropagation()
+                  toggle()
+                }}
+                onKeyDown={event => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    toggle()
+                  }
+                }}
+              >
+                <circle cx={c.x} cy={c.y} r="12" className="v2-analysis-dot-hit" />
+                <circle
+                  cx={c.x}
+                  cy={c.y}
+                  r={active ? 6 : 4}
+                  className={`v2-analysis-dot ${active ? 'v2-analysis-dot--active' : ''}`}
+                />
+              </g>
+            )
+          })}
           <text x={w - padR + 4} y={coords.at(-1)!.y + 4} className="v2-analysis-latest-value">
             {latest}
           </text>
         </svg>
+        {selectedPoint?.value != null && selectedCoord && (
+          <div
+            className="v2-analysis-point-tooltip"
+            style={{ left: `clamp(58px, ${(selectedCoord.x / w) * 100}%, calc(100% - 58px))` }}
+            role="status"
+            data-analysis-tooltip
+          >
+            <span>{formatAnalysisTrendDate(selectedPoint.date)}</span>
+            <strong>{formatNum(selectedPoint.value)} {unit}</strong>
+          </div>
+        )}
         <div className="v2-analysis-x-labels">
           {points.map(p => (
             <span key={p.date} className="v2-analysis-x-label">
@@ -363,6 +443,7 @@ export default function AnalysisV2Screen({
             points={weekView.weightTrend}
             emptyMessage="尚未有足夠體重紀錄。到「我的 → 身體數據」新增後，這裡會顯示趨勢。"
             stagger={160}
+            interactive
           />
 
           <LineChartCard

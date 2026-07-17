@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { AccessStatus } from '@/lib/subscription-access'
@@ -20,6 +20,19 @@ import V2Header from './V2Header'
 import V2PricingCard from './V2PricingCard'
 import V2FeatureRow from './V2FeatureRow'
 import V2PrimaryButton from './V2PrimaryButton'
+
+const PAYWALL_PLAN_SESSION_KEY = 'betterbit:paywall:selected-plan'
+const PAYWALL_PLAN_EVENT = 'betterbit:paywall-plan-change'
+
+function readSavedPaywallPlan(): ProPlanId {
+  const saved = window.sessionStorage.getItem(PAYWALL_PLAN_SESSION_KEY)
+  return saved === 'monthly' || saved === 'yearly' ? saved : 'yearly'
+}
+
+function subscribeToPaywallPlan(onStoreChange: () => void): () => void {
+  window.addEventListener(PAYWALL_PLAN_EVENT, onStoreChange)
+  return () => window.removeEventListener(PAYWALL_PLAN_EVENT, onStoreChange)
+}
 
 export interface ProPaywallV2Handlers {
   onSubscribe: (plan: ProPlanId) => void
@@ -45,9 +58,12 @@ export default function ProSubscriptionV2View({
 }: Props) {
   const router = useRouter()
   const monthlyOnly = availablePlans === 'monthly-only'
-  const [plan, setPlan] = useState<ProPlanId>(
-    monthlyOnly ? 'monthly' : 'yearly'
+  const savedPlan = useSyncExternalStore(
+    subscribeToPaywallPlan,
+    readSavedPaywallPlan,
+    () => 'yearly'
   )
+  const plan: ProPlanId = monthlyOnly ? 'monthly' : savedPlan
   const trialWhisper = premiumTrialWhisper(access)
   const [yearlyPerMonth, yearlySavings] = yearlyPlanSubtextLines()
 
@@ -63,7 +79,8 @@ export default function ProSubscriptionV2View({
   const selectPlan = (next: ProPlanId) => {
     if (next === plan) return
     triggerV2Haptic('light')
-    setPlan(next)
+    window.sessionStorage.setItem(PAYWALL_PLAN_SESSION_KEY, next)
+    window.dispatchEvent(new Event(PAYWALL_PLAN_EVENT))
   }
 
   const handleSubscribe = () => {

@@ -252,35 +252,46 @@ html.capacitor-ios .auth-page-shell {
   padding-right: env(safe-area-inset-right, 0px);
 }
 
-/* Legal / support — scroll shell; safe area lives on sticky header, not outer padding */
+/* Legal documents — fixed viewport shell with one independent scroll region. */
 .legal-page-shell {
   box-sizing: border-box;
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
   width: 100%;
   background-color: var(--app-canvas);
   overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
 }
 
 html.capacitor-ios .legal-page-shell {
   height: 100%;
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
-  overflow-y: auto;
-  overscroll-behavior: none;
+  max-height: 100dvh;
+  min-height: 0;
 }
 
 .legal-page-header {
-  position: sticky;
-  top: 0;
+  flex: 0 0 auto;
   z-index: 20;
   padding-top: max(var(--app-safe-top, 0px), env(safe-area-inset-top, 0px));
   padding-bottom: 12px;
   background-color: var(--app-canvas);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.legal-page-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .legal-page-main {

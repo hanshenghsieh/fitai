@@ -2162,6 +2162,7 @@ html[data-betterbit-reduced-motion='true'] .v2-record-meal-card {
   box-shadow: 0 10px 30px rgba(18, 61, 36, 0.06);
   padding: 16px 14px 14px;
   margin-bottom: 12px;
+  overflow: visible;
 }
 
 .v2-analysis-chart-head {
@@ -2184,13 +2185,16 @@ html[data-betterbit-reduced-motion='true'] .v2-record-meal-card {
 }
 
 .v2-analysis-chart-wrap {
+  position: relative;
   width: 100%;
+  overflow: visible;
 }
 
 .v2-analysis-line-chart {
   width: 100%;
   height: auto;
   display: block;
+  touch-action: pan-y;
 }
 
 .v2-analysis-grid-line {
@@ -2219,6 +2223,54 @@ html[data-betterbit-reduced-motion='true'] .v2-record-meal-card {
   fill: #fff;
   stroke: #2f8f35;
   stroke-width: 2;
+  transition: r 120ms ease, fill 120ms ease, stroke-width 120ms ease;
+}
+
+.v2-analysis-dot-hit {
+  fill: transparent;
+  stroke: transparent;
+  pointer-events: all;
+}
+
+.v2-analysis-point-target {
+  cursor: pointer;
+  outline: none;
+  touch-action: pan-y;
+}
+
+.v2-analysis-point-target:focus-visible .v2-analysis-dot,
+.v2-analysis-dot--active {
+  fill: #2f8f35;
+  stroke: #fff;
+  stroke-width: 3;
+  filter: drop-shadow(0 2px 4px rgba(18, 61, 36, 0.25));
+}
+
+.v2-analysis-point-tooltip {
+  position: absolute;
+  top: 4px;
+  z-index: 5;
+  width: 108px;
+  box-sizing: border-box;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid rgba(47, 143, 53, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 8px 22px rgba(18, 61, 36, 0.14);
+  color: #123d24;
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+}
+
+.v2-analysis-point-tooltip strong {
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .v2-analysis-latest-value {
