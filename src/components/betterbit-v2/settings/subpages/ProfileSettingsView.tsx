@@ -80,10 +80,24 @@ const TIMEZONE_OPTIONS = [
 ]
 
 function formatBirthDisplay(raw: string): string {
-  if (!raw) return '未設定'
+  if (!raw) return 'YYYY/MM/DD'
   const parts = raw.split('-')
-  if (parts.length === 3) return `${parts[0]} / ${parts[1]} / ${parts[2]}`
+  if (parts.length === 3) return `${parts[0]}/${parts[1]}/${parts[2]}`
   return raw
+}
+
+function initialBirthDraft(raw: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw
+  return `${new Date().getFullYear() - 30}-01-01`
+}
+
+function updateBirthDraft(raw: string, part: 'year' | 'month' | 'day', value: number): string {
+  const [rawYear, rawMonth, rawDay] = initialBirthDraft(raw).split('-').map(Number)
+  const year = part === 'year' ? value : rawYear
+  const month = part === 'month' ? value : rawMonth
+  const maxDay = new Date(year, month, 0).getDate()
+  const day = Math.min(part === 'day' ? value : rawDay, maxDay)
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
 function labelOf(options: { value: string; label: string }[], value: string) {
@@ -98,6 +112,8 @@ export default function ProfileSettingsView({ initial }: { initial: SettingsBund
   const [displayName, setDisplayName] = useState(initial.profile.display_name ?? '')
   const [gender, setGender] = useState(initial.profile.gender ?? 'male')
   const [birthDate, setBirthDate] = useState(prefs.birth_date ?? '')
+  const [birthPickerOpen, setBirthPickerOpen] = useState(false)
+  const [birthDraft, setBirthDraft] = useState(() => initialBirthDraft(prefs.birth_date ?? ''))
   const [height, setHeight] = useState(String(initial.profile.height_cm ?? ''))
   const [location, setLocation] = useState(initial.preferences.location ?? 'TW')
   const [timezone, setTimezone] = useState(initial.preferences.timezone ?? 'Asia/Taipei')
@@ -192,22 +208,10 @@ export default function ProfileSettingsView({ initial }: { initial: SettingsBund
             icon={<Calendar className="h-4 w-4" />}
             label="生日"
             value={formatBirthDisplay(birthDate)}
-            onClick={() =>
-              openPicker({
-                key: 'birth',
-                title: '選擇生日',
-                options: [],
-                value: birthDate,
-                onSelect: setBirthDate,
-              })
-            }
-          />
-          <input
-            type="date"
-            value={birthDate}
-            onChange={e => setBirthDate(e.target.value)}
-            className="sr-only"
-            id="birth-date-input"
+            onClick={() => {
+              setBirthDraft(initialBirthDraft(birthDate))
+              setBirthPickerOpen(true)
+            }}
           />
           <V2VisualChevronRow
             icon={<Ruler className="h-4 w-4" />}
@@ -326,34 +330,95 @@ export default function ProfileSettingsView({ initial }: { initial: SettingsBund
         </V2SettingsVisualCard>
       </V2SettingsVisualShell>
 
-      {picker && picker.key === 'birth' ? (
-        <V2OverlayPortal open onClose={closePicker}>
-          <div className="v2-sv2-picker-sheet" onClick={e => e.stopPropagation()}>
-            <p className="text-[16px] font-bold mb-3" style={{ color: '#123d24' }}>
+      {birthPickerOpen && (
+        <V2OverlayPortal open onClose={() => setBirthPickerOpen(false)}>
+          <div
+            className="v2-sv2-picker-sheet"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="birth-picker-title"
+          >
+            <p id="birth-picker-title" className="text-[16px] font-bold mb-4" style={{ color: '#123d24' }}>
               選擇生日
             </p>
-            <input
-              type="date"
-              value={birthDate}
-              onChange={e => {
-                setBirthDate(e.target.value)
-                closePicker()
-              }}
-              className="v2-sv2-input"
-            />
+            <div className="grid grid-cols-3 gap-2" aria-label="生日年月日">
+              <label className="space-y-1">
+                <span className="text-[12px]" style={{ color: '#7a807a' }}>年</span>
+                <select
+                  aria-label="出生年份"
+                  value={Number(birthDraft.slice(0, 4))}
+                  onChange={e => setBirthDraft(current => updateBirthDraft(current, 'year', Number(e.target.value)))}
+                  className="v2-sv2-input"
+                >
+                  {Array.from({ length: 101 }, (_, index) => new Date().getFullYear() - index).map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="space-y-1">
+                <span className="text-[12px]" style={{ color: '#7a807a' }}>月</span>
+                <select
+                  aria-label="出生月份"
+                  value={Number(birthDraft.slice(5, 7))}
+                  onChange={e => setBirthDraft(current => updateBirthDraft(current, 'month', Number(e.target.value)))}
+                  className="v2-sv2-input"
+                >
+                  {Array.from({ length: 12 }, (_, index) => index + 1).map(month => (
+                    <option key={month} value={month}>{month}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="space-y-1">
+                <span className="text-[12px]" style={{ color: '#7a807a' }}>日</span>
+                <select
+                  aria-label="出生日期"
+                  value={Number(birthDraft.slice(8, 10))}
+                  onChange={e => setBirthDraft(current => updateBirthDraft(current, 'day', Number(e.target.value)))}
+                  className="v2-sv2-input"
+                >
+                  {Array.from(
+                    { length: new Date(Number(birthDraft.slice(0, 4)), Number(birthDraft.slice(5, 7)), 0).getDate() },
+                    (_, index) => index + 1
+                  ).map(day => (
+                    <option key={day} value={day}>{day}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button
+                type="button"
+                className="flex-1 py-3 rounded-xl text-[15px] font-semibold"
+                style={{ backgroundColor: '#f2f4f1', color: '#123d24' }}
+                onClick={() => setBirthPickerOpen(false)}
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                className="flex-1 py-3 rounded-xl text-[15px] font-semibold"
+                style={{ backgroundColor: '#2f8f35', color: '#fff' }}
+                onClick={() => {
+                  setBirthDate(birthDraft)
+                  setBirthPickerOpen(false)
+                }}
+              >
+                ✓ 完成
+              </button>
+            </div>
           </div>
         </V2OverlayPortal>
-      ) : (
-        picker && (
-          <V2VisualPickerSheet
-            open
-            title={picker.title}
-            options={picker.options}
-            value={picker.value}
-            onSelect={picker.onSelect}
-            onClose={closePicker}
-          />
-        )
+      )}
+      {picker && (
+        <V2VisualPickerSheet
+          open
+          title={picker.title}
+          options={picker.options}
+          value={picker.value}
+          onSelect={picker.onSelect}
+          onClose={closePicker}
+        />
       )}
     </>
   )

@@ -11,6 +11,7 @@ import { GENTLE_ERROR_MESSAGE } from '@/lib/copy/gentle-errors'
 import SettingsSection from './SettingsSection'
 import SettingsRow from './SettingsRow'
 import { apiFetch } from '@/lib/api/client'
+import V2OverlayPortal from '@/components/betterbit-v2/settings/visual-v2/V2OverlayPortal'
 
 export default function SettingsDeleteAccountSection({ compact = false }: { compact?: boolean }) {
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -65,11 +66,12 @@ export default function SettingsDeleteAccountSection({ compact = false }: { comp
       )}
 
       {confirmOpen && (
-        <div
-          className="fixed inset-0 z-[60] flex items-end justify-center px-5 pb-[max(env(safe-area-inset-bottom),32px)]"
-          style={{ backgroundColor: 'rgba(47, 36, 29, 0.22)', backdropFilter: 'blur(4px)' }}
-          onClick={() => !deleting && setConfirmOpen(false)}
-          role="presentation"
+        <V2OverlayPortal
+          open
+          className="v2-delete-account-overlay"
+          onClose={() => {
+            if (!deleting) setConfirmOpen(false)
+          }}
         >
           <div
             className="w-full max-w-md p-6 space-y-5 rounded-2xl"
@@ -108,7 +110,7 @@ export default function SettingsDeleteAccountSection({ compact = false }: { comp
               </button>
             </div>
           </div>
-        </div>
+        </V2OverlayPortal>
       )}
     </>
   )

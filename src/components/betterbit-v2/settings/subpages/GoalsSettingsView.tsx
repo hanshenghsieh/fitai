@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, type ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 import { addDays, differenceInDays, format, parseISO } from 'date-fns'
 import {
   Flag,
@@ -49,6 +50,8 @@ import {
 } from '@/components/betterbit-v2/settings/visual-v2/V2SettingsVisualPrimitives'
 import V2SettingsSwitch from '@/components/betterbit-v2/settings/V2SettingsSwitch'
 import { apiFetch } from '@/lib/api/client'
+import { invalidateSettingsSave } from '@/lib/local-cache/invalidate'
+import { invalidateUserPreferencesCache } from '@/lib/settings/calorie-bank-user-prefs'
 
 const GOAL_TYPES = [
   { value: 'lose_fat', label: '減脂' },
@@ -111,6 +114,7 @@ function labelOf(options: { value: string; label: string }[], value: string) {
 }
 
 export default function GoalsSettingsView({ initial }: { initial: SettingsBundle }) {
+  const router = useRouter()
   const { picker, openPicker, closePicker } = useVisualPicker()
   const goal = initial.goal
   const profile = initial.profile as UserProfile
@@ -131,9 +135,7 @@ export default function GoalsSettingsView({ initial }: { initial: SettingsBundle
   const [manualFat, setManualFat] = useState(String(initial.preferences.manual_fat_g ?? ''))
   const [bankEnabled, setBankEnabled] = useState(initial.preferences.calorie_bank_enabled ?? true)
   const [bankDays, setBankDays] = useState(String(initial.preferences.calorie_bank_days ?? 5))
-  const [bankIntensity, setBankIntensity] = useState(
-    initial.preferences.calorie_bank_intensity ?? paceToCalorieBankIntensity(pace)
-  )
+  const bankIntensity = paceToCalorieBankIntensity(pace)
 
   const goalDraft = useMemo(() => {
     const start = goal?.start_date ?? format(new Date(), 'yyyy-MM-dd')
@@ -177,7 +179,6 @@ export default function GoalsSettingsView({ initial }: { initial: SettingsBundle
 
   function selectPace(next: FatLossPace) {
     setPace(next)
-    setBankIntensity(paceToCalorieBankIntensity(next))
   }
 
   const formSnapshot = {
@@ -243,6 +244,9 @@ export default function GoalsSettingsView({ initial }: { initial: SettingsBundle
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || '儲存失敗')
+      invalidateUserPreferencesCache()
+      invalidateSettingsSave(initial.profile.id)
+      router.refresh()
     },
     onSuccess: markSaved,
     successMessage: '目標設定已更新，今天的計畫會重新計算',
@@ -446,15 +450,7 @@ export default function GoalsSettingsView({ initial }: { initial: SettingsBundle
             icon={<Gauge className="h-4 w-4" />}
             label="回補強度"
             value={labelOf(BANK_INTENSITY, bankIntensity)}
-            onClick={() =>
-              openPicker({
-                key: 'bankint',
-                title: '回補強度',
-                options: BANK_INTENSITY,
-                value: bankIntensity,
-                onSelect: setBankIntensity,
-              })
-            }
+            subtitle="與減脂節奏同步"
           />
         </V2SettingsVisualCard>
       </V2SettingsVisualShell>

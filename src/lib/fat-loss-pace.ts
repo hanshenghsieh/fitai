@@ -259,12 +259,10 @@ export function analyzePaceGoal(
           warnings.tooAggressiveMessage = TOO_AGGRESSIVE_MESSAGE
         }
       }
-      dailyDeficit = Math.min(requiredDeficit, deficitRange.max)
-      if (pace === 'aggressive') {
-        dailyDeficit = Math.min(requiredDeficit, deficitRange.max)
-      } else {
-        dailyDeficit = Math.min(Math.max(requiredDeficit, deficitRange.min), deficitRange.max)
-      }
+      // The selected pace remains the source of truth even when a deadline is
+      // present. Letting aggressive use a small deadline-derived deficit could
+      // otherwise give it more calories than standard or conservative.
+      dailyDeficit = Math.min(Math.max(requiredDeficit, deficitRange.min), deficitRange.max)
     }
   } else if (goal.end_date && goal.start_date && weightToLose > 0) {
     daysInGoal = Math.max(7, differenceInDays(parseISO(goal.end_date), parseISO(goal.start_date)))
