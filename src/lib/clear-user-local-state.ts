@@ -5,6 +5,7 @@ import { clearWeightMeasurementsSessionCache } from '@/lib/weight-measurements-s
 import { clearPendingSync } from '@/lib/offline-pending-sync'
 import { clearAllLocalCache } from '@/lib/local-cache'
 import { getNutritionDayKey } from '@/lib/timezone'
+import { clearLegacyHealthStorage } from '@/lib/health-sync'
 
 /**
  * Clear device-local caches that are date-scoped but not user-scoped.
@@ -19,6 +20,7 @@ export function clearUserLocalState(): void {
   clearWorkoutItemsSessionCache(today)
   clearWeightMeasurementsSessionCache()
   clearPendingSync()
+  clearLegacyHealthStorage()
   // 1F local read-through cache (all namespaces + last-user marker).
   clearAllLocalCache()
 
@@ -41,7 +43,9 @@ export function clearUserLocalState(): void {
   }
 
   try {
-    void import('@/lib/apple-iap-client').then(m => m.resetAppleIapConfiguration?.())
+    localStorage.removeItem('betterbit_health_sync')
+    localStorage.removeItem('betterbit:health-sync-cache')
+    sessionStorage.removeItem('betterbit:barcode-draft')
   } catch {
     // ignore
   }

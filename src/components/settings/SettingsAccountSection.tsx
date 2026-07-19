@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation'
 import { Loader2, LogOut } from 'lucide-react'
 import { colors } from '@/lib/design-system'
-import { clearUserLocalState } from '@/lib/clear-user-local-state'
+import { signOut } from '@/lib/auth/auth-service'
 import SettingsSection from './SettingsSection'
 import SettingsRow from './SettingsRow'
 
@@ -19,11 +19,7 @@ export default function SettingsAccountSection({
   const router = useRouter()
 
   async function handleLogout() {
-    const { createClient } = await import('@/lib/supabase/client')
-    const supabase = createClient()
-    clearUserLocalState()
-    await supabase.auth.signOut()
-    clearUserLocalState()
+    await signOut()
     router.push('/login')
     router.refresh()
   }

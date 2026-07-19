@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useMemo } from 'react'
-import { Check, Search, X, PenLine } from 'lucide-react'
+import { Check, Search, X, PenLine, ScanBarcode } from 'lucide-react'
 import type { FrequentFood } from '@/lib/food-memory'
 import { primaryFoodLabel } from '@/lib/food-photography'
 import type { FoodSlot } from '@/lib/food-slots'
@@ -40,6 +40,7 @@ interface Props {
   onCommitFrequent: (frequentId?: string) => void
   onCreateFreeText?: (name: string, options?: { forceUnknown?: boolean }) => void
   onCreateEstimate?: (name: string) => void
+  onOpenBarcode?: () => void
 }
 
 function FrequentRow({ food, onClick, compact }: { food: FrequentFood; onClick: () => void; compact?: boolean }) {
@@ -79,6 +80,7 @@ export default function TodayFoodMore({
   onCommitFrequent,
   onCreateFreeText,
   onCreateEstimate,
+  onOpenBarcode,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -199,6 +201,20 @@ export default function TodayFoodMore({
               style={{ color: DS.text, fontWeight: 400 }}
             />
           </div>
+          {onOpenBarcode ? (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedSearchHit(null)
+                onOpenBarcode()
+              }}
+              className="mt-3 w-full h-11 rounded-[18px] flex items-center justify-center gap-2 active:opacity-90"
+              style={{ backgroundColor: BB_V2.bg.canvas, color: DS.mocha, fontWeight: 600 }}
+            >
+              <ScanBarcode className="h-4 w-4" strokeWidth={ICON_STROKE} />
+              掃描包裝食品條碼
+            </button>
+          ) : null}
         </div>
 
         <div ref={scrollRef} className="ios-bottom-sheet__scroll px-5 pb-2">

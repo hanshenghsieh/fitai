@@ -70,6 +70,7 @@ export function createClient() {
           persistSession: true,
           autoRefreshToken: true,
           detectSessionInUrl: false,
+          flowType: 'pkce',
           storage: window.localStorage,
           storageKey: NATIVE_AUTH_STORAGE_KEY,
         },

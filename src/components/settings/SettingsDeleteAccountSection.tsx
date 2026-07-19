@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { signOut } from '@/lib/auth/auth-service'
 import { toast } from 'sonner'
 import { colors } from '@/lib/design-system'
 import { BB_V2 } from '@/lib/betterbit-v2'
@@ -27,11 +27,7 @@ export default function SettingsDeleteAccountSection({ compact = false }: { comp
         throw new Error(typeof data.error === 'string' ? data.error : GENTLE_ERROR_MESSAGE)
       }
 
-      const supabase = createClient()
-      const { clearUserLocalState } = await import('@/lib/clear-user-local-state')
-      clearUserLocalState()
-      await supabase.auth.signOut()
-      clearUserLocalState()
+      await signOut()
       toast.message('帳號已刪除')
       router.push('/')
       router.refresh()

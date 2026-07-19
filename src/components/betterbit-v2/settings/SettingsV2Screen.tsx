@@ -16,6 +16,7 @@ import {
   CircleHelp,
   Headphones,
   Info,
+  HeartPulse,
 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { BB_V2 } from '@/lib/betterbit-v2'
@@ -91,6 +92,12 @@ export default function SettingsV2Screen({ access, appVersion }: Props) {
               title="身體數據"
               subtitle="管理你的身高、體重等數據"
               onClick={() => router.push('/settings/body')}
+            />
+            <V2SettingsRow
+              icon={<HeartPulse className="h-5 w-5" strokeWidth={BB_V2.iconStroke} />}
+              title="Apple Health"
+              subtitle="讀取活動與身體數據"
+              onClick={() => router.push('/settings/health')}
             />
             <V2SettingsRow
               icon={<Bell className="h-5 w-5" strokeWidth={BB_V2.iconStroke} />}

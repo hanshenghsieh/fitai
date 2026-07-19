@@ -1,16 +1,16 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { clearUserLocalState } from './clear-user-local-state.ts'
-import { writeFoodLogsSessionCache, readFoodLogsSessionCache } from './food-log-session-cache.ts'
-import { writeTodayOfflineSnapshot, readTodayOfflineSnapshot } from './today-offline-cache.ts'
-import { writeWorkoutItemsSessionCache, readWorkoutItemsSessionCache } from './workout-items-session-cache.ts'
+import { clearUserLocalState } from './clear-user-local-state'
+import { writeFoodLogsSessionCache, readFoodLogsSessionCache } from './food-log-session-cache'
+import { writeTodayOfflineSnapshot, readTodayOfflineSnapshot } from './today-offline-cache'
+import { writeWorkoutItemsSessionCache, readWorkoutItemsSessionCache } from './workout-items-session-cache'
 import {
   writeWeightMeasurementsSessionCache,
   readWeightMeasurementsSessionCache,
-} from './weight-measurements-session-cache.ts'
-import { markPendingSync, hasPendingSync } from './offline-pending-sync.ts'
-import { getNutritionDayKey } from './timezone.ts'
-import type { FoodLogEntry } from './banks/types.ts'
+} from './weight-measurements-session-cache'
+import { markPendingSync, hasPendingSync } from './offline-pending-sync'
+import { getNutritionDayKey } from './timezone'
+import type { FoodLogEntry } from './banks/types'
 
 function log(id: string): FoodLogEntry {
   return {
@@ -19,6 +19,7 @@ function log(id: string): FoodLogEntry {
     slot: 'meal1',
     calories: 100,
     protein_g: 10,
+    source: 'search',
     logged_at: '2026-07-08T12:00:00.000Z',
     user_declared: true,
   }
@@ -112,6 +113,7 @@ describe('clearUserLocalState', () => {
           measured_at: day,
           weight_kg: 70,
           body_fat_pct: null,
+          muscle_mass_kg: null,
           waist_cm: null,
           hip_cm: null,
           chest_cm: null,
@@ -120,6 +122,9 @@ describe('clearUserLocalState', () => {
       ])
       markPendingSync(day)
       sessionStorage.setItem(`dice-session-${day}-lunch`, '[]')
+      localStorage.setItem('betterbit_health_sync', '1')
+      localStorage.setItem('betterbit_health_cache', '{"steps":1234}')
+      localStorage.setItem('betterbit_health_snapshot', '{"weight":70}')
 
       clearUserLocalState()
 
@@ -129,6 +134,9 @@ describe('clearUserLocalState', () => {
       assert.equal(readWeightMeasurementsSessionCache(), null)
       assert.equal(hasPendingSync(day), false)
       assert.equal(sessionStorage.getItem(`dice-session-${day}-lunch`), null)
+      assert.equal(localStorage.getItem('betterbit_health_sync'), null)
+      assert.equal(localStorage.getItem('betterbit_health_cache'), null)
+      assert.equal(localStorage.getItem('betterbit_health_snapshot'), null)
     } finally {
       mock.restore()
     }

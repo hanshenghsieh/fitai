@@ -26,7 +26,11 @@ export default function PrivacyPage() {
           <li>食物照片：若你使用拍照記錄，照片會上傳以供 AI 估算營養（你可選擇不使用）</li>
           <li>訂閱資料：Apple In-App Purchase／Stripe 付款與訂閱狀態（由 RevenueCat 協助管理 iOS 訂閱；我們不儲存完整信用卡號）</li>
           <li>推播 token：若你開啟通知，我們儲存裝置推播識別碼</li>
-          <li>健康資料（選填）：體重歷史；目前版本不含 Apple Health／INBODY 帳號同步</li>
+          <li>
+            健康資料（選填）：你手動輸入的身體數據會儲存在帳號中。若你在 iPhone 主動授權 Apple Health，Betterbit
+            可讀取體重、體脂、身高、步數、活動熱量與運動紀錄；目前版本只在裝置上的健康頁面顯示這些 Apple Health
+            資料，不會寫回 Apple Health，也不會上傳至 Betterbit 資料庫。
+          </li>
         </ul>
       </LegalSection>
 

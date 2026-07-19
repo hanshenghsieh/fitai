@@ -2,8 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient, isCapacitorNative, clientType, NATIVE_AUTH_STORAGE_KEY } from '@/lib/supabase/client'
-import { waitForSession } from '@/lib/supabase/wait-for-session'
+import {
+  AuthCancelledError,
+  signInWithApple,
+  signInWithEmail,
+  signInWithGoogle,
+  type AuthCompletion,
+} from '@/lib/auth/auth-service'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
@@ -16,70 +21,57 @@ import V2Card from '@/components/betterbit-v2/V2Card'
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loadingProvider, setLoadingProvider] = useState<'email' | 'google' | 'apple' | null>(null)
+
+  function finishLogin(completion: AuthCompletion | null) {
+    // Web OAuth navigates away from this page itself.
+    if (!completion) return
+    window.location.assign(`${completion.nextPath}?login=1`)
+  }
+
+  function showAuthError(err: unknown) {
+    if (err instanceof AuthCancelledError) return
+    const msg = err instanceof Error ? err.message : ''
+    let friendly: string
+    if (/invalid login credentials/i.test(msg)) {
+      friendly = '帳號或密碼不對。再試一次。'
+    } else if (/email not confirmed/i.test(msg)) {
+      friendly = '這個 email 還沒完成驗證。'
+    } else if (/failed to fetch|network|timeout|fetch/i.test(msg)) {
+      friendly = '網路連線有問題，請確認網路後再試。'
+    } else {
+      friendly = msg || pickZaiJianLine('error').text
+    }
+    console.log('[login] failed:', msg || '(unknown)')
+    toast.error(friendly)
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
-    console.log('[LOGIN] submit start')
-    console.log('[LOGIN] isNative =', isCapacitorNative())
-    console.log('[LOGIN] clientType =', clientType())
-    setLoading(true)
-    const supabase = createClient()
+    if (loadingProvider !== null) return
+    console.log('[LOGIN] submit start', { provider: 'email' })
+    setLoadingProvider('email')
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) {
-        console.log('[LOGIN] signIn success = false', error.message)
-        throw error
-      }
-      console.log('[LOGIN] signIn success =', true, '| immediate session =', !!data.session)
+      finishLogin(await signInWithEmail(email, password))
+    } catch (err) {
+      showAuthError(err)
+    } finally {
+      setLoadingProvider(null)
+    }
+  }
 
-      const { clearUserLocalState } = await import('@/lib/clear-user-local-state')
-      clearUserLocalState()
-
-      // Confirm the session is actually persisted (localStorage on native)
-      // before navigating — avoids redirecting into a guard that sees no session.
-      const session = await waitForSession(supabase, { retries: 6, delayMs: 300 })
-      console.log('[LOGIN] session after signIn =', !!session?.user)
-      if (typeof window !== 'undefined') {
-        const authKeys = Object.keys(window.localStorage).filter(
-          k => k.includes(NATIVE_AUTH_STORAGE_KEY) || k.includes('auth-token')
-        )
-        console.log('[LOGIN] localStorage auth keys =', authKeys)
-      }
-      if (!session?.user) {
-        toast.error('登入連線建立失敗，請確認網路後再試一次。')
-        setLoading(false)
-        return
-      }
-
-      console.log('[LOGIN] redirect to /dashboard?login=1')
-      // Hard navigation (NOT router.push): forces a clean page load so the
-      // dashboard guard reads the freshly-restored session instead of bouncing.
-      // No success toast — the redirect itself is the confirmation.
-      window.location.assign('/dashboard?login=1')
-      // Safety net: if assign somehow didn't navigate (rare WKWebView quirk),
-      // force a replace so we never sit stuck on /login.
-      setTimeout(() => {
-        if (typeof window !== 'undefined' && window.location.pathname.includes('/login')) {
-          console.log('[LOGIN] assign stalled — forcing replace')
-          window.location.replace('/dashboard?login=1')
-        }
-      }, 1000)
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : ''
-      let friendly: string
-      if (/invalid login credentials/i.test(msg)) {
-        friendly = '帳號或密碼不對。再試一次。'
-      } else if (/email not confirmed/i.test(msg)) {
-        friendly = '這個 email 還沒完成驗證。'
-      } else if (/failed to fetch|network|timeout|fetch/i.test(msg)) {
-        friendly = '網路連線有問題，請確認網路後再試。'
-      } else {
-        friendly = pickZaiJianLine('error').text
-      }
-      console.log('[login] failed:', msg || '(unknown)')
-      toast.error(friendly)
-      setLoading(false)
+  async function handleProvider(provider: 'google' | 'apple') {
+    if (loadingProvider !== null) return
+    console.log('[LOGIN] submit start', { provider })
+    setLoadingProvider(provider)
+    try {
+      const completion =
+        provider === 'google' ? await signInWithGoogle() : await signInWithApple()
+      finishLogin(completion)
+    } catch (err) {
+      showAuthError(err)
+    } finally {
+      setLoadingProvider(null)
     }
   }
 
@@ -115,8 +107,39 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <button type="submit" disabled={loading} className="v2-btn-primary w-full disabled:opacity-40">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : '登入'}
+            <button type="submit" disabled={loadingProvider === 'email'} className="v2-btn-primary w-full disabled:opacity-40">
+              {loadingProvider === 'email' ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : '登入'}
+            </button>
+            <div className="flex items-center gap-3" aria-hidden="true">
+              <span className="h-px flex-1" style={{ backgroundColor: BB_V2.border }} />
+              <span className="text-[12px]" style={{ color: BB_V2.text.muted }}>或</span>
+              <span className="h-px flex-1" style={{ backgroundColor: BB_V2.border }} />
+            </div>
+            <button
+              type="button"
+              disabled={loadingProvider === 'google'}
+              onClick={() => void handleProvider('google')}
+              className="w-full min-h-[44px] rounded-xl border flex items-center justify-center gap-2 text-[14px] font-semibold disabled:opacity-40"
+              style={{ borderColor: BB_V2.border, color: BB_V2.text.primary, backgroundColor: BB_V2.bg.card }}
+            >
+              {loadingProvider === 'google' ? <Loader2 className="h-4 w-4 animate-spin" /> : <span aria-hidden="true">G</span>}
+              使用 Google 登入
+            </button>
+            <button
+              type="button"
+              disabled={loadingProvider === 'apple'}
+              onClick={() => void handleProvider('apple')}
+              className="w-full min-h-[44px] rounded-md flex items-center justify-center gap-2 text-[14px] font-semibold disabled:opacity-40"
+              style={{ color: '#fff', backgroundColor: '#000' }}
+            >
+              {loadingProvider === 'apple' ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <span aria-hidden="true" className="text-[20px] leading-none" style={{ fontFamily: '-apple-system, BlinkMacSystemFont' }}>
+                  
+                </span>
+              )}
+              使用 Apple 登入
             </button>
             <p className="text-[13px] text-center" style={{ color: BB_V2.text.muted }}>
               還沒有帳號？{' '}

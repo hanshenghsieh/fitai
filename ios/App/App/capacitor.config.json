@@ -41,6 +41,8 @@
 	},
 	"packageClassList": [
 		"AppPlugin",
+		"CapacitorBarcodeScannerPlugin",
+		"CAPBrowserPlugin",
 		"CAPCameraPlugin",
 		"LocalNotificationsPlugin",
 		"SplashScreenPlugin",

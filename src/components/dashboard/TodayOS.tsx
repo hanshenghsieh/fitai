@@ -123,6 +123,7 @@ import {
 import type { BrandItem } from '@/lib/recommendation/dish-first/types'
 import { buildRecommendationCoachBullets } from '@/lib/recommendation/recommendation-coach-copy'
 import TodayFoodMore from '@/components/dashboard/today/TodayFoodMore'
+import BarcodeLogSheet from '@/components/dashboard/today/BarcodeLogSheet'
 import PhotoLogSheet, { type PhotoLogDraft } from '@/components/dashboard/today/PhotoLogSheet'
 import ManualPhotoCorrectionSheet from '@/components/dashboard/today/ManualPhotoCorrectionSheet'
 import {
@@ -639,6 +640,7 @@ export default function TodayOS({
   )
   const [localDiceRolls, setLocalDiceRolls] = useState(0)
   const [moreOpen, setMoreOpen] = useState(false)
+  const [barcodeOpen, setBarcodeOpen] = useState(false)
   const [p0PortionFood, setP0PortionFood] = useState<CommonFoodItem | null>(null)
   const [p0SearchQuery, setP0SearchQuery] = useState('')
   const [p0InitialDraft, setP0InitialDraft] = useState<FoodRecordDraft | undefined>(undefined)
@@ -1680,6 +1682,7 @@ export default function TodayOS({
   }, [clearCaptureContext])
   const closeAllOverlays = useCallback(() => {
     setMoreOpen(false)
+    setBarcodeOpen(false)
     setPhotoOpen(false)
     setManualPhotoOpen(false)
     setPhotoDraft(null)
@@ -1767,6 +1770,37 @@ export default function TodayOS({
       })
     },
     [commitLog, p0SearchQuery, captureTargetDate]
+  )
+  const handleBarcodeSave = useCallback(
+    (item: CommonFoodItem, draft: FoodRecordDraft) => {
+      const gtin = item.barcodeMetadata?.gtin
+      const patch = applyFoodRecordToLog(item, draft, {
+        id: `barcode-${gtin ?? item.id}-${Date.now()}`,
+        user_input_label: gtin,
+        matched_item_label: item.name,
+        matched_restaurant: item.brand,
+        match_type: 'barcode_open_food_facts',
+        slot: activeSlotRef.current,
+        source: 'search',
+        nutrition_accuracy_meta: {
+          accuracy_level: 'B',
+          source_type: 'open_food_facts_barcode',
+          user_confirmed: true,
+          portion_adjustments: {
+            amount: draft.amount,
+            unit: draft.unit,
+            nutrition_basis: item.barcodeMetadata?.nutritionBasis,
+          },
+          candidate_label: item.name,
+        },
+      })
+      commitLog(patch as Omit<FoodLogEntry, 'logged_at' | 'user_declared'>)
+      setBarcodeOpen(false)
+      toast.message(captureTargetDate === getNutritionDayKey() ? '已加入今日紀錄' : '已加入所選日期紀錄', {
+        description: 'Open Food Facts · 資料庫估算',
+      })
+    },
+    [commitLog, captureTargetDate]
   )
 
   const handleEstimateSave = useCallback(
@@ -2141,7 +2175,23 @@ export default function TodayOS({
           setPendingEstimate({ query: q })
           setMoreOpen(false)
         }}
+        onOpenBarcode={() => {
+          setMoreOpen(false)
+          setBarcodeOpen(true)
+        }}
       />
+
+      {barcodeOpen ? (
+        <BarcodeLogSheet
+          open
+          targetDate={captureTargetDate}
+          onClose={() => {
+            setBarcodeOpen(false)
+            clearCaptureContext()
+          }}
+          onCommit={handleBarcodeSave}
+        />
+      ) : null}
 
       {p0PortionFood ? (
         <FoodTypePortionSheet

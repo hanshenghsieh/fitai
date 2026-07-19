@@ -8,6 +8,11 @@ import WebKit
 class BridgeViewController: CAPBridgeViewController {
     private let canvasColor = UIColor(red: 255 / 255, green: 249 / 255, blue: 242 / 255, alpha: 1)
 
+    override open func capacitorDidLoad() {
+        bridge?.registerPluginInstance(AppleAuthPlugin())
+        bridge?.registerPluginInstance(HealthKitPlugin())
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = canvasColor

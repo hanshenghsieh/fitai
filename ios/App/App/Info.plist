@@ -16,6 +16,19 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>Betterbit</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>app.fitai.betterbit.auth</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>betterbit</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -40,11 +53,13 @@
 		<string>en</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>拍照記錄食物時需要使用相機。</string>
+	<string>BetterBit 需要使用相機拍攝餐點或掃描商品條碼，以協助您建立飲食紀錄。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>從相簿選擇食物照片時需要存取相簿。</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>儲存食物照片時需要寫入相簿。</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>BetterBit 會讀取您的體重、體脂、步數、活動熱量及運動紀錄，用於個人化每日健康與減脂分析。</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>UISupportedInterfaceOrientations</key>

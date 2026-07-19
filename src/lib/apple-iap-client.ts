@@ -112,8 +112,8 @@ function assertNativePurchaseEnvironment(): void {
   }
 }
 
-async function probePurchasesPlugin(): Promise<void> {
-  await withTimeout(
+async function probePurchasesPlugin(): Promise<{ isConfigured: boolean }> {
+  return withTimeout(
     Purchases.isConfigured(),
     PLUGIN_PROBE_TIMEOUT_MS,
     '付款模組無回應。請安裝 TestFlight Build 13（含 RevenueCat 原生插件）'
@@ -130,9 +130,9 @@ export async function configureAppleIap(userId: string): Promise<boolean> {
   assertNativePurchaseEnvironment()
 
   try {
-    await probePurchasesPlugin()
+    const currentStatus = await probePurchasesPlugin()
 
-    if (configuredForUser == null) {
+    if (!currentStatus.isConfigured) {
       await withTimeout(
         Purchases.configure({ apiKey, appUserID: userId }),
         CONFIGURE_TIMEOUT_MS,
@@ -161,6 +161,21 @@ export async function configureAppleIap(userId: string): Promise<boolean> {
     configuredForUser = null
     throw humanizePurchaseError(err)
   }
+}
+
+export async function logOutAppleIap(): Promise<void> {
+  configuredForUser = null
+  if (!isRevenueCatConfigured() || !isNativeIOS() || !isPurchasesNativePluginAvailable()) {
+    return
+  }
+
+  const status = await probePurchasesPlugin()
+  if (!status.isConfigured) return
+  await withTimeout(
+    Purchases.logOut(),
+    CONFIGURE_TIMEOUT_MS,
+    '登出付款帳號逾時，請重新啟動 App 後再試'
+  )
 }
 
 function readEntitlement(customerInfo: {

@@ -50,6 +50,14 @@ export interface CommonFoodItem {
   dishFamily?: string
   estimationAssumption?: string
   estimatedWeight_g?: number
+  barcodeMetadata?: {
+    gtin: string
+    provider: 'open_food_facts'
+    nutritionBasis: 'per_100g' | 'per_100ml'
+    servingQuantity?: number
+    servingUnit: 'g' | 'ml'
+    servingLabel?: string
+  }
 }
 
 export type PortionPresetId = 'small' | 'normal' | 'large' | 'custom'
@@ -78,6 +86,8 @@ export interface FoodRecordDraft {
     fat_g?: number | null
     sodium_mg?: number | null
   }
+  /** Runtime provenance stored with barcode-originated food logs. */
+  barcodeMetadata?: CommonFoodItem['barcodeMetadata']
 }
 
 export interface FoodRecordNutrition {

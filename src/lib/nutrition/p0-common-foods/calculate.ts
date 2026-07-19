@@ -55,6 +55,7 @@ export function defaultFoodRecordDraft(item: CommonFoodItem): FoodRecordDraft {
     riceAmount: item.supportsRiceAmount ? 'normal' : undefined,
     sugarLevel: item.supportsSugarLevel ? 'none' : undefined,
     toppings: [],
+    barcodeMetadata: item.barcodeMetadata,
   }
 }
 
