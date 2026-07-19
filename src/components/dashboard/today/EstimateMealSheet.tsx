@@ -8,6 +8,13 @@ import FoodTypePortionSheet from '@/components/dashboard/today/FoodTypePortionSh
 import { FOOD_TYPE_LABELS } from '@/lib/nutrition/food-type-ui'
 import { defaultFoodRecordDraft } from '@/lib/nutrition/p0-common-foods/calculate'
 import type { CommonFoodItem, FoodType } from '@/lib/nutrition/p0-common-foods/types'
+import {
+  classifyEstimatedFood,
+  createEstimatedFoodItem,
+  FOOD_TYPE_EXAMPLES,
+  type SelectedEstimateMetadata,
+} from '@/lib/nutrition/estimated-meal-model'
+import type { FoodSearchHit } from '@/lib/food-search'
 import { getNutritionDayKey } from '@/lib/timezone'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
@@ -16,75 +23,71 @@ interface Props {
   open: boolean
   targetDate: string
   query: string
+  selectedHit?: FoodSearchHit
   onClose: () => void
   onSave: (item: CommonFoodItem, draft: import('@/lib/nutrition/p0-common-foods/types').FoodRecordDraft) => void
 }
 
 const FOOD_TYPES: FoodType[] = ['meal', 'ingredient', 'staple', 'sauce', 'drink', 'snack']
 
-function syntheticItem(name: string, foodType: FoodType): CommonFoodItem {
-  return {
-    id: `user-custom-${Date.now()}`,
-    name,
-    category: '自訂估算',
-    foodType,
-    sourceType: 'user_custom',
-    aliases: [name],
-    tags: [],
-    defaultServing: { amount: 150, unit: foodType === 'drink' ? 'ml' : 'g' },
-    servingOptions: [
-      { label: '小份', amount: 100, unit: foodType === 'drink' ? 'ml' : 'g' },
-      { label: '一般', amount: 150, unit: foodType === 'drink' ? 'ml' : 'g' },
-      { label: '大份', amount: 220, unit: foodType === 'drink' ? 'ml' : 'g' },
-      { label: '自訂', amount: null, unit: foodType === 'drink' ? 'ml' : 'g' },
-    ],
-    baseAmount: 100,
-    baseUnit: foodType === 'drink' ? 'ml' : 'g',
-    kcalBase: 200,
-    proteinBase_g: 8,
-    fatBase_g: 8,
-    carbsBase_g: 20,
-    sodiumBase_mg: 300,
-    smallAmount: 100,
-    normalAmount: 150,
-    largeAmount: 220,
-    defaultUnit: foodType === 'drink' ? 'ml' : 'g',
-    kcalDefault: 300,
-    proteinDefault_g: 12,
-    fatDefault_g: 12,
-    carbsDefault_g: 30,
-    sodiumDefault_mg: 450,
-    supportsOilOptions: foodType === 'ingredient',
-    supportsCookingMethod: foodType === 'ingredient',
-    supportsSauce: foodType === 'meal' || foodType === 'ingredient',
-    supportsRiceAmount: foodType === 'meal',
-    supportsSugarLevel: foodType === 'drink',
-    supportsToppings: foodType === 'drink',
-  }
-}
-
-export default function EstimateMealSheet({ open, targetDate, query, onClose, onSave }: Props) {
-  const [foodType, setFoodType] = useState<FoodType>('staple')
-  const [step, setStep] = useState<'type' | 'portion'>('type')
-
-  const item = useMemo(() => syntheticItem(query.trim(), foodType), [query, foodType])
+export default function EstimateMealSheet({ open, targetDate, query, selectedHit, onClose, onSave }: Props) {
+  const selectedMetadata = useMemo((): SelectedEstimateMetadata | undefined => {
+    if (!selectedHit) return undefined
+    return {
+      canonicalName: selectedHit.name,
+      category: selectedHit.canonicalCategory ?? selectedHit.store,
+      foodType: selectedHit.foodType,
+      sourceType: selectedHit.sourceType,
+      calories: selectedHit.calories,
+      protein_g: selectedHit.protein_g,
+      carbs_g: selectedHit.carbs_g,
+      fat_g: selectedHit.fat_g,
+      aliases: selectedHit.aliases,
+      dishTemplateId: selectedHit.dishTemplateId,
+      dishVariantId: selectedHit.dishVariantId,
+    }
+  }, [selectedHit])
+  const classification = useMemo(
+    () => classifyEstimatedFood(query, selectedMetadata),
+    [query, selectedMetadata]
+  )
+  const autoClassified = classification.foodType != null && classification.confidence !== 'low'
+  const [foodType, setFoodType] = useState<FoodType | null>(() => classification.foodType)
+  const [manualOverride, setManualOverride] = useState(false)
+  const [step, setStep] = useState<'type' | 'portion'>(() => autoClassified ? 'portion' : 'type')
+  const item = useMemo(
+    () => foodType ? createEstimatedFoodItem(query.trim(), classification, manualOverride ? foodType : undefined) : null,
+    [query, classification, foodType, manualOverride]
+  )
   const dateLabel = targetDate === getNutritionDayKey() ? '今日' : '所選日期'
 
   if (!open) return null
 
-  if (step === 'portion') {
+  if (step === 'portion' && item && foodType) {
+    const contextLabel = manualOverride
+      ? `${FOOD_TYPE_LABELS[foodType]}・手動選擇`
+      : `${FOOD_TYPE_LABELS[foodType]}・${classification.familyLabel}・${
+          selectedHit ? '已選搜尋結果' : '系統估算'
+        }`
     return (
       <FoodTypePortionSheet
         open
         item={item}
-        title="建立估算餐點"
+        title={selectedHit ? '確認餐點份量' : '建立估算餐點'}
         subtitle={`這次紀錄只會留在${dateLabel}，不會改動資料庫。`}
+        contextLabel={contextLabel}
+        onEditType={() => {
+          setManualOverride(true)
+          setStep('type')
+        }}
         saveLabel={`加入${dateLabel}紀錄`}
         initialDraft={defaultFoodRecordDraft(item)}
-        onClose={() => setStep('type')}
-        onSave={(draft, _n) => {
-          onSave(item, { ...draft, sourceType: 'user_custom' })
-          setStep('type')
+        onClose={() => {
+          if (manualOverride || !autoClassified) setStep('type')
+          else onClose()
+        }}
+        onSave={draft => {
+          onSave(item, { ...draft, sourceType: item.sourceType })
         }}
       />
     )
@@ -117,32 +120,48 @@ export default function EstimateMealSheet({ open, targetDate, query, onClose, on
         </div>
         <div className="px-5 pb-5 space-y-3">
           <p className="text-[13px]" style={{ color: BB_V2.text.secondary }}>
-            選擇類型，我們會顯示對應欄位
+            無法可靠判定時才需要選擇。選擇後會立即套用對應份量與估算模型。
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-1 gap-2">
             {FOOD_TYPES.map(t => (
               <button
                 key={t}
                 type="button"
-                onClick={() => setFoodType(t)}
-                className="px-3.5 h-10 rounded-full text-[14px]"
+                onClick={() => {
+                  setFoodType(t)
+                  setManualOverride(true)
+                }}
+                className="px-4 py-3 rounded-2xl text-left"
                 style={{
                   backgroundColor: foodType === t ? BB_V2.accent.orange : BB_V2.bg.canvas,
                   color: foodType === t ? '#FFF' : BB_V2.text.secondary,
                   fontWeight: foodType === t ? 600 : 400,
                 }}
               >
-                {FOOD_TYPE_LABELS[t]}
+                <span className="block text-[14px]">{FOOD_TYPE_LABELS[t]}</span>
+                <span
+                  className="block text-[12px] mt-0.5"
+                  style={{ color: foodType === t ? 'rgba(255,255,255,0.82)' : BB_V2.text.secondary }}
+                >
+                  {FOOD_TYPE_EXAMPLES[t]}
+                </span>
               </button>
             ))}
           </div>
           <button
             type="button"
-            onClick={() => setStep('portion')}
+            disabled={!foodType}
+            onClick={() => {
+              if (foodType) setStep('portion')
+            }}
             className="w-full h-14 rounded-[22px] text-[15px] mt-4"
-            style={{ backgroundColor: BB_V2.accent.orange, color: '#FFF', fontWeight: 500 }}
+            style={{
+              backgroundColor: foodType ? BB_V2.accent.orange : BB_V2.bg.canvas,
+              color: foodType ? '#FFF' : BB_V2.text.secondary,
+              fontWeight: 500,
+            }}
           >
-            下一步
+            套用類型並查看估算
           </button>
         </div>
       </div>

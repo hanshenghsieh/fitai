@@ -5,7 +5,7 @@ import type { EatOutPreferences, MealSuggestion, SuggestContext, UserMemoryState
 import { suggestNextMeal, suggestionToCustomSelection } from './meal-suggest'
 import { suggestLightSnack } from './light-snack-suggest'
 import { nearbyBrands } from './nearby-engine'
-import { getDiceMenuSource, lookupDiceMenuItem } from './dice-menu-pool'
+import { lookupDiceMenuItem } from './dice-menu-pool'
 import { rollRecommendationV2, USE_RECOMMENDATION_V2 } from '@/lib/recommendation/v2/engine'
 import {
   dishRecommendationToMealSuggestion,
@@ -16,6 +16,10 @@ import {
 import { getRecommendationFoodsV2 } from '@/lib/recommendation/v2/food-data'
 import type { RecommendationQueueState } from '@/lib/recommendation/v2/types'
 import type { FoodLogEntry } from '@/lib/banks/types'
+import {
+  foodAllowedByDiet,
+  type DietaryPreferenceContext,
+} from '@/lib/recommendation/dietary-preference-filter'
 
 export type { MealSuggestion, UserMemoryState, EatOutPreferences }
 export { suggestNextMeal, suggestionToCustomSelection }
@@ -35,6 +39,40 @@ export function currentMealSlot(): MealType {
   if (h < 10) return 'breakfast'
   if (h < 15) return 'lunch'
   return 'dinner'
+}
+
+/** Final defensive gate shared by every recommendation pipeline and fallback. */
+export function mealSuggestionAllowedByDiet(
+  suggestion: MealSuggestion | null,
+  context?: DietaryPreferenceContext | null
+): boolean {
+  if (!suggestion) return true
+  if (
+    !suggestion.lines.every(line =>
+      foodAllowedByDiet(
+        {
+          name: line.item.name,
+          tags: line.item.tags,
+          category: line.item.category,
+          description: line.item.description,
+        },
+        context
+      )
+    )
+  ) {
+    return false
+  }
+
+  const dish = suggestion.dish_recommendation
+  if (!dish) return true
+  if (!foodAllowedByDiet(dish.template, context)) return false
+  if (dish.variant && !foodAllowedByDiet(dish.variant, context)) return false
+  return dish.brandItems.every(item =>
+    foodAllowedByDiet(
+      { name: item.itemName, aliases: item.aliases, tags: item.tags },
+      context
+    )
+  )
 }
 
 export function namesFromSeenIds(seenIds: string[]): string[] {
@@ -105,6 +143,7 @@ export function rollMealSuggestion(params: {
   queue_state?: RecommendationQueueState | null
   dish_queue_state?: DishRecommendationQueueState | null
   exclude_template_ids?: string[]
+  dietary_preferences?: DietaryPreferenceContext | null
   seed?: number
 }): {
   suggestion: MealSuggestion | null
@@ -118,12 +157,23 @@ export function rollMealSuggestion(params: {
       meal_type: params.meal_type,
       day_state: params.day_state,
       exclude_template_ids: params.exclude_template_ids ?? [],
+      dietary_preferences: params.dietary_preferences,
       seed: params.seed ?? Date.now() + params.rolls_used * 9973,
       queue_state: params.dish_queue_state ?? null,
     })
     if (dishRoll.result) {
+      const suggestion = dishRecommendationToMealSuggestion(dishRoll.result, params.meal_type)
+      if (!mealSuggestionAllowedByDiet(suggestion, params.dietary_preferences)) {
+        return {
+          suggestion: null,
+          rolls_used: params.rolls_used + 1,
+          pool_exhausted: true,
+          queue_state: params.queue_state,
+          dish_queue_state: dishRoll.queue_state,
+        }
+      }
       return {
-        suggestion: dishRecommendationToMealSuggestion(dishRoll.result, params.meal_type),
+        suggestion,
         rolls_used: params.rolls_used + 1,
         pool_exhausted: dishRoll.pool_exhausted,
         queue_state: params.queue_state,
@@ -140,12 +190,16 @@ export function rollMealSuggestion(params: {
       today_food_logs: params.today_food_logs ?? [],
       queue_state: params.queue_state ?? null,
       exclude_names: params.exclude_names,
+      dietary_preferences: params.dietary_preferences,
       seed: params.seed ?? Date.now() + params.rolls_used * 9973,
     })
+    const suggestion = mealSuggestionAllowedByDiet(v2.suggestion, params.dietary_preferences)
+      ? v2.suggestion
+      : null
     return {
-      suggestion: v2.suggestion,
+      suggestion,
       rolls_used: params.rolls_used + 1,
-      pool_exhausted: v2.pool_exhausted,
+      pool_exhausted: v2.pool_exhausted || suggestion === null,
       queue_state: v2.queue_state,
     }
   }
@@ -203,6 +257,11 @@ export function rollMealSuggestion(params: {
       fast_dice: true,
     })
     suggestion = suggestLightSnack(lightCtx)
+  }
+
+  if (!mealSuggestionAllowedByDiet(suggestion, params.dietary_preferences)) {
+    suggestion = null
+    pool_exhausted = true
   }
 
   return {

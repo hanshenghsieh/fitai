@@ -88,22 +88,29 @@ export function V2VisualChevronRow({
   value,
   subtitle,
   onClick,
+  disabled = false,
 }: {
   icon: ReactNode
   label: string
   value?: string
   subtitle?: string
   onClick?: () => void
+  disabled?: boolean
 }) {
   return (
-    <button type="button" onClick={onClick} className="v2-sv2-row touch-manipulation">
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="v2-sv2-row touch-manipulation disabled:cursor-default disabled:opacity-70"
+    >
       <div className="v2-sv2-row-icon">{icon}</div>
       <div className="flex-1 min-w-0">
         <div className="v2-sv2-row-label">{label}</div>
         {subtitle && <div className="v2-sv2-row-sub">{subtitle}</div>}
       </div>
       {value && <span className="v2-sv2-row-value shrink-0">{value}</span>}
-      {onClick && <ChevronRight className="h-4 w-4 v2-sv2-row-chevron shrink-0" />}
+      {onClick && !disabled && <ChevronRight className="h-4 w-4 v2-sv2-row-chevron shrink-0" />}
     </button>
   )
 }

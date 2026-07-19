@@ -22,6 +22,10 @@ let menuIdIndex: Map<string, ConvenienceItem> | null = null
 let menuIdIndexLen = 0
 const dicePoolCache = new Map<string, ConvenienceItem[]>()
 
+export function invalidateDiceMenuPoolCache(): void {
+  dicePoolCache.clear()
+}
+
 function getMenuIdIndex(menu: ConvenienceItem[]): Map<string, ConvenienceItem> {
   if (menuIdIndex && menuIdIndexLen === menu.length) return menuIdIndex
   menuIdIndex = new Map(menu.map(i => [i.id, i]))
@@ -48,6 +52,9 @@ function dicePoolCacheKey(
     p?.is_vegetarian ? 1 : 0,
     p?.is_vegan ? 1 : 0,
     p?.is_halal ? 1 : 0,
+    (p?.diet_restrictions ?? []).slice().sort().join(','),
+    (p?.allergens ?? []).slice().sort().join(','),
+    [...(p?.blocked_foods ?? []), ...(p?.disliked_foods ?? [])].slice().sort().join(','),
     prefs?.breakfast_max_price ?? '',
     prefs?.lunch_max_price ?? '',
     prefs?.dinner_max_price ?? '',

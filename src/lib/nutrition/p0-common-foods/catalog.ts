@@ -2,6 +2,7 @@ import seedRows from '../../../../data/nutrition/p0-common-foods-seed.json'
 import { P0_ITEM_OVERRIDES, applyStapleCategoryHeuristic } from './p0-alias-overrides'
 import { dedupeKey, normalizeP0Name, seedRowToCommonFood } from './normalize'
 import type { CommonFoodItem, P0SeedRow } from './types'
+import { WHITE_RICE_DEPRECATED_VARIANT_IDS } from '@/lib/nutrition/rice-portion-profile'
 
 function applyItemOverrides(item: CommonFoodItem): CommonFoodItem {
   const ov = P0_ITEM_OVERRIDES[item.id]
@@ -39,6 +40,7 @@ function buildCatalog(): {
   const seen = new Set<string>()
 
   for (const row of seedRows as P0SeedRow[]) {
+    if (WHITE_RICE_DEPRECATED_VARIANT_IDS.has(row.food_id)) continue
     let item = applyItemOverrides(seedRowToCommonFood(row))
     if (!P0_ITEM_OVERRIDES[row.food_id]) {
       item = applyStapleCategoryHeuristic(item)

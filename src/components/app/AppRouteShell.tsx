@@ -3,7 +3,15 @@
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { setAppScrollLocked } from '@/lib/today-actions'
-import { hydrateUiPreferencesFromStorage } from '@/lib/settings/ui-preferences-runtime'
+import {
+  applyUiPreferencesRuntime,
+  hydrateUiPreferencesFromStorage,
+} from '@/lib/settings/ui-preferences-runtime'
+import {
+  invalidateUserPreferencesCache,
+  loadUserPreferencesClient,
+} from '@/lib/settings/calorie-bank-user-prefs'
+import { reconcileLocalReminders } from '@/lib/notifications/local-reminders'
 
 /** Remount page content on tab change and reset scroll so Today UI never bleeds into Week. */
 export default function AppRouteShell({ children }: { children: React.ReactNode }) {
@@ -11,6 +19,23 @@ export default function AppRouteShell({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     hydrateUiPreferencesFromStorage()
+    invalidateUserPreferencesCache()
+    const reconcileRuntimeSettings = () => {
+      void loadUserPreferencesClient()
+        .then(preferences => {
+          if (preferences.ui) applyUiPreferencesRuntime(preferences.ui)
+          if (preferences.notifications) {
+            return reconcileLocalReminders(preferences.notifications)
+          }
+        })
+        .catch(() => {})
+    }
+    reconcileRuntimeSettings()
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') reconcileRuntimeSettings()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange)
   }, [])
 
   useEffect(() => {

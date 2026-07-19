@@ -165,7 +165,7 @@ describe('RECORD-DATE-002 real persistence contract', () => {
       todayOs,
       /setP0PortionFood\(food\)[\s\S]{0,120}setMoreOpen\(false\)/
     )
-    assert.match(todayOs, /setEstimateQuery\(q\)[\s\S]{0,80}setMoreOpen\(false\)/)
+    assert.match(todayOs, /setPendingEstimate\(\{ query: q \}\)[\s\S]{0,80}setMoreOpen\(false\)/)
   })
 
   it('uses one targetDate for photo, text, recommendation and pending confirmation', () => {

@@ -25,6 +25,10 @@ import {
 } from '@/lib/recommendation/dish-first/score'
 import type { DishVariant, BrandItem } from '@/lib/recommendation/dish-first/types'
 import type { TodayMealState } from '@/lib/engines/next-meal-engine'
+import {
+  foodAllowedByDiet,
+  type DietaryPreferenceContext,
+} from '@/lib/recommendation/dietary-preference-filter'
 
 interface Props {
   suggestion: MealSuggestion
@@ -34,6 +38,7 @@ interface Props {
   onSelectBrand?: (brand: BrandItem) => void
   brandLogging?: boolean
   coachBullets?: string[]
+  dietaryPreferences?: DietaryPreferenceContext | null
 }
 
 const BRAND_PREVIEW_COUNT = 4
@@ -46,24 +51,33 @@ export default function DishRecommendationCard({
   onSelectBrand,
   brandLogging = false,
   coachBullets = [],
+  dietaryPreferences,
 }: Props) {
   const dish = suggestion.dish_recommendation
   const [brandsExpanded, setBrandsExpanded] = useState(false)
+  const dishAllowed =
+    !!dish &&
+    foodAllowedByDiet(dish.template, dietaryPreferences) &&
+    (!dish.variant || foodAllowedByDiet(dish.variant, dietaryPreferences))
 
   const variants = useMemo(
     () =>
-      dish
-        ? getVariantsForTemplate(dish.template.id).filter(variant =>
-            dishFitsRemainingNutrition(dish.template, dayState, variant)
+      dishAllowed && dish
+        ? getVariantsForTemplate(dish.template.id).filter(
+            variant =>
+              foodAllowedByDiet(variant, dietaryPreferences) &&
+              dishFitsRemainingNutrition(dish.template, dayState, variant)
           )
         : [],
-    [dish, dayState]
+    [dishAllowed, dish, dayState, dietaryPreferences]
   )
   const activeVariant = useMemo(() => {
     if (!dish) return null
     const id = selectedVariantId ?? dish.selectedVariantId ?? dish.variant?.id ?? null
-    return variants.find(v => v.id === id) ?? dish.variant
-  }, [dish, selectedVariantId, variants])
+    const fallbackVariant =
+      dish.variant && foodAllowedByDiet(dish.variant, dietaryPreferences) ? dish.variant : null
+    return variants.find(v => v.id === id) ?? fallbackVariant
+  }, [dish, selectedVariantId, variants, dietaryPreferences])
 
   const brandGroups = useMemo(() => {
     if (!dish) return []
@@ -79,6 +93,10 @@ export default function DishRecommendationCard({
         ...group,
         items: group.items.filter(
           item =>
+            foodAllowedByDiet(
+              { name: item.itemName, aliases: item.aliases, tags: item.tags },
+              dietaryPreferences
+            ) &&
             Number.isFinite(item.calories) &&
             item.calories > 0 &&
             item.calories <= dayState.remainingCalories &&
@@ -89,11 +107,11 @@ export default function DishRecommendationCard({
         ),
       }))
       .filter(group => group.items.length > 0)
-  }, [dish, activeVariant, variants, dayState.remainingCalories, dayState.remainingFat])
+  }, [dish, activeVariant, variants, dayState.remainingCalories, dayState.remainingFat, dietaryPreferences])
 
   const flatBrands = useMemo(() => brandGroups.flatMap(g => g.items), [brandGroups])
 
-  if (!dish) return null
+  if (!dish || !dishAllowed) return null
 
   const isSpecific = templateRequiresSpecificVariant(dish.template)
   const title = recommendationDisplayName(dish.template, activeVariant)
@@ -123,7 +141,11 @@ export default function DishRecommendationCard({
       </p>
 
       <div className="space-y-1.5">
-        <p className="text-[22px] leading-snug" style={{ color: TODAY.text, fontWeight: 700 }}>
+        <p
+          data-dietary-recommendation-name
+          className="text-[22px] leading-snug"
+          style={{ color: TODAY.text, fontWeight: 700 }}
+        >
           {title}
         </p>
         {categoryLine ? (

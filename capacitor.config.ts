@@ -46,6 +46,10 @@ const config: CapacitorConfig = {
       backgroundColor: '#FDFCF8',
       overlaysWebView: true,
     },
+    LocalNotifications: {
+      // Show deterministic local reminders while the app is in the foreground too.
+      presentationOptions: ['badge', 'sound', 'banner', 'list'],
+    },
   },
 }
 

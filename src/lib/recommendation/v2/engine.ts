@@ -13,6 +13,10 @@ import {
 } from './queue'
 import { buildUserNutritionState, pickRecommendationWithFallback } from './reason-copy'
 import type { RecommendationFoodV2, RecommendationQueueState, UserNutritionState } from './types'
+import {
+  foodAllowedByDiet,
+  type DietaryPreferenceContext,
+} from '@/lib/recommendation/dietary-preference-filter'
 
 export const USE_RECOMMENDATION_V2 = true
 
@@ -56,6 +60,7 @@ export function rollRecommendationV2(params: {
   today_food_logs: FoodLogEntry[]
   queue_state?: RecommendationQueueState | null
   exclude_names?: string[]
+  dietary_preferences?: DietaryPreferenceContext | null
   seed?: number
 }): {
   suggestion: MealSuggestion | null
@@ -72,7 +77,20 @@ export function rollRecommendationV2(params: {
     todayFoodLogs: params.today_food_logs,
     mealTime: params.meal_type,
   })
-  const items = fitAdjustablePortionsToBudget(getRecommendationFoodsV2(), state)
+  const dietaryPool = getRecommendationFoodsV2().filter(item =>
+    foodAllowedByDiet(
+      {
+        name: item.name,
+        aliases: [item.brand],
+        tags: item.tags,
+        category: `${item.meal_role} ${item.venue_type}`,
+        description: `${item.source_note} ${item.estimate_basis?.main_protein ?? ''}`,
+        mainIngredient: item.estimate_basis?.main_protein,
+      },
+      params.dietary_preferences
+    )
+  )
+  const items = fitAdjustablePortionsToBudget(dietaryPool, state)
   const blockedNames = new Set(params.exclude_names ?? [])
   const pool = blockedNames.size
     ? items.filter(item => !blockedNames.has(item.name))
@@ -98,6 +116,21 @@ export function rollRecommendationV2(params: {
   }
 
   const suggestion = recommendationResultToMealSuggestion(result, params.meal_type)
+  if (
+    !suggestion.lines.every(line =>
+      foodAllowedByDiet(
+        {
+          name: line.item.name,
+          tags: line.item.tags,
+          category: line.item.category,
+          description: line.item.description,
+        },
+        params.dietary_preferences
+      )
+    )
+  ) {
+    return { suggestion: null, queue_state: queue, pool_exhausted: true }
+  }
   const nextQueue = advanceQueue(queue)
 
   return {

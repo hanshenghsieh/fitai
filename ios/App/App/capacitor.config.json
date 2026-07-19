@@ -21,6 +21,14 @@
 			"style": "DARK",
 			"backgroundColor": "#FDFCF8",
 			"overlaysWebView": true
+		},
+		"LocalNotifications": {
+			"presentationOptions": [
+				"badge",
+				"sound",
+				"banner",
+				"list"
+			]
 		}
 	},
 	"server": {
@@ -34,6 +42,7 @@
 	"packageClassList": [
 		"AppPlugin",
 		"CAPCameraPlugin",
+		"LocalNotificationsPlugin",
 		"SplashScreenPlugin",
 		"StatusBarPlugin",
 		"PurchasesPlugin"

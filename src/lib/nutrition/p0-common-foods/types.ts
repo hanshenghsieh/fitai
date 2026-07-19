@@ -6,11 +6,15 @@ export interface ServingOption {
   label: string
   amount: number | null
   unit: string
+  /** Secondary display only; nutrition remains based on the serving amount/model. */
+  estimatedWeight_g?: number
 }
 
 export interface CommonFoodItem {
   id: string
   name: string
+  /** Selected canonical search label when the displayed name preserves user wording. */
+  canonicalName?: string
   category: string
   foodType: FoodType
   sourceType: FoodSourceType
@@ -41,6 +45,11 @@ export interface CommonFoodItem {
   supportsRiceAmount: boolean
   supportsSugarLevel: boolean
   supportsToppings: boolean
+  /** Runtime-only metadata used by custom estimates; no database migration required. */
+  servingModel?: 'weight' | 'volume' | 'whole_meal'
+  dishFamily?: string
+  estimationAssumption?: string
+  estimatedWeight_g?: number
 }
 
 export type PortionPresetId = 'small' | 'normal' | 'large' | 'custom'

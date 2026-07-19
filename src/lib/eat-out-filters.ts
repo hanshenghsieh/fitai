@@ -7,6 +7,7 @@ import { isSanitizedMenuItem } from './meal-combo-validity'
 import { isPlausibleBrandItem } from './store-menu-plausibility'
 import { canonicalDiceStore } from './dice-store-aliases'
 import { passesMenuAccessGate, type MenuAccessMode } from './nutrition/menu-confidence-runtime'
+import { foodAllowedByDiet } from './recommendation/dietary-preference-filter'
 
 function mealCategoryOk(
   item: ConvenienceItem,
@@ -23,17 +24,20 @@ function mealCategoryOk(
   )
 }
 
-const MEAT_KEYWORDS = ['雞', '鴨', '肉', '蝦', '鮪', '牛', '豬', '魚', '蛤', '蚵', '鮭', '培根', '香腸']
-const DAIRY_KEYWORDS = ['蛋', '乳', '奶', '起司', '優格']
-
 export function isPlantBasedItem(
   item: { name: string; description?: string },
   profile?: UserProfile | null
 ): boolean {
   if (!profile?.is_vegetarian && !profile?.is_vegan) return true
-  if (MEAT_KEYWORDS.some(k => item.name.includes(k))) return false
-  if (profile.is_vegan && DAIRY_KEYWORDS.some(k => item.name.includes(k))) return false
-  return true
+  return foodAllowedByDiet(
+    { name: item.name, description: item.description },
+    {
+      restrictions: [
+        'vegetarian',
+        ...(profile.is_vegan ? ['no_egg', 'no_dairy'] : []),
+      ],
+    }
+  )
 }
 
 export function filterByProfile(items: ConvenienceItem[], profile?: UserProfile | null): ConvenienceItem[] {
@@ -52,16 +56,27 @@ export function filterByProfile(items: ConvenienceItem[], profile?: UserProfile 
     filtered = filtered.filter(i => !i.name.includes('麵') && !i.name.includes('麵包') && !i.tags?.includes('noodle'))
   }
 
-  for (const a of profile.allergens ?? []) {
-    filtered = filtered.filter(i => !i.name.includes(a) && !(i.description ?? '').includes(a))
-  }
-  for (const d of profile.disliked_foods ?? []) {
-    filtered = filtered.filter(i => !i.name.includes(d))
-  }
+  filtered = filtered.filter(item =>
+    foodAllowedByDiet(
+      {
+        name: item.name,
+        tags: item.tags,
+        category: item.category,
+        description: item.description,
+      },
+      {
+        restrictions: [
+          ...(profile.diet_restrictions ?? []),
+          ...(profile.is_vegan ? ['no_egg', 'no_dairy'] : []),
+        ],
+        allergens: profile.allergens,
+        blockedFoods: [...(profile.blocked_foods ?? []), ...(profile.disliked_foods ?? [])],
+      }
+    )
+  )
 
-  return filtered.length ? filtered : profile.is_vegetarian || profile.is_vegan
-    ? items.filter(i => isPlantBasedItem(i, profile))
-    : items.filter(i => i.category === items[0]?.category)
+  // Explicit safety preferences must never be undone just to make a pool non-empty.
+  return filtered
 }
 
 export function filterByBudget(

@@ -27,6 +27,10 @@ import type { DishRecommendationResult, DishTemplate } from './types'
 
 import { getBrandItemsForTemplate as getSeedBrandItemsForTemplate } from './catalog'
 import { templateRequiresSpecificVariant } from './display'
+import {
+  foodAllowedByDiet,
+  type DietaryPreferenceContext,
+} from '@/lib/recommendation/dietary-preference-filter'
 
 
 
@@ -96,7 +100,7 @@ function pickTemplateFromPool(
 
 
 
-  let pool = ranked
+  const pool = ranked
 
   const recentSet = new Set(recentlyShown)
 
@@ -144,6 +148,8 @@ export function rollDishFirstRecommendation(params: {
 
   queue_state?: DishRecommendationQueueState | null
 
+  dietary_preferences?: DietaryPreferenceContext | null
+
 }): {
 
   result: DishRecommendationResult | null
@@ -172,9 +178,12 @@ export function rollDishFirstRecommendation(params: {
 
   const templates = getDishTemplates().filter(template => {
     if (exclude.has(template.id)) return false
+    if (!foodAllowedByDiet(template, params.dietary_preferences)) return false
     const variants = getVariantsForTemplate(template.id)
     if (variants.length > 0) {
-      return variants.some(variant =>
+      return variants
+        .filter(variant => foodAllowedByDiet(variant, params.dietary_preferences))
+        .some(variant =>
         dishFitsRemainingNutrition(template, params.day_state, variant)
       )
     }
@@ -215,7 +224,9 @@ export function rollDishFirstRecommendation(params: {
 
   const template = picked.template
 
-  const variants = getVariantsForTemplate(template.id)
+  const variants = getVariantsForTemplate(template.id).filter(variant =>
+    foodAllowedByDiet(variant, params.dietary_preferences)
+  )
 
   let variant = pickBestFittingVariantForDay(variants, template, params.day_state)
   if (templateRequiresSpecificVariant(template) && variants.length > 0 && !variant) {
@@ -227,6 +238,18 @@ export function rollDishFirstRecommendation(params: {
   const seedBrands = getSeedBrandItemsForTemplate(template.id)
 
   const brandItems = sortBrandItemsByTrust(enrichBrandItemsForTemplate(template, seedBrands))
+    .filter(item =>
+      foodAllowedByDiet(
+        {
+          name: item.itemName,
+          aliases: item.aliases,
+          tags: item.tags,
+          canonicalName: template.name,
+          category: template.category,
+        },
+        params.dietary_preferences
+      )
+    )
 
   const copy = buildDishRecommendationReasons({ template, variant, day: params.day_state })
 
@@ -250,6 +273,18 @@ export function rollDishFirstRecommendation(params: {
 
     dataNote: dishDataNote(template),
 
+  }
+  const resultAllowed =
+    foodAllowedByDiet(result.template, params.dietary_preferences) &&
+    (!result.variant || foodAllowedByDiet(result.variant, params.dietary_preferences)) &&
+    result.brandItems.every(item =>
+      foodAllowedByDiet(
+        { name: item.itemName, aliases: item.aliases, tags: item.tags },
+        params.dietary_preferences
+      )
+    )
+  if (!resultAllowed) {
+    return { result: null, queue_state: emptyQueue, pool_exhausted: true }
   }
 
 

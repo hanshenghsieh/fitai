@@ -27,6 +27,14 @@ import {
   labelsOf,
 } from '@/components/betterbit-v2/settings/visual-v2/V2SettingsVisualPrimitives'
 import { apiFetch } from '@/lib/api/client'
+import { invalidateUserPreferencesCache } from '@/lib/settings/calorie-bank-user-prefs'
+import { invalidateDiceMenuPoolCache } from '@/lib/dice-menu-pool'
+import { invalidateSettingsSave } from '@/lib/local-cache/invalidate'
+import {
+  invalidateDietaryRecommendationCaches,
+  normalizeDietaryRestrictions,
+  persistDietaryPreferenceContext,
+} from '@/lib/recommendation/dietary-preference-filter'
 
 const RESTRICTIONS = [
   { value: 'no_beef', label: '不吃牛' },
@@ -36,7 +44,7 @@ const RESTRICTIONS = [
   { value: 'no_egg', label: '不吃蛋' },
   { value: 'no_dairy', label: '不喝奶' },
   { value: 'vegetarian', label: '素食' },
-  { value: 'ovo_lacto', label: '蛋奶素' },
+  { value: 'ovo_lacto_vegetarian', label: '蛋奶素' },
   { value: 'low_carb', label: '低碳' },
   { value: 'high_protein', label: '高蛋白' },
   { value: 'low_sodium', label: '低鈉' },
@@ -101,7 +109,9 @@ export default function DietPreferencesSettingsView({ initial }: { initial: Sett
     onSelect: (v: string[]) => void
   } | null>(null)
 
-  const [restrictions, setRestrictions] = useState<string[]>(extras.diet_restrictions ?? [])
+  const [restrictions, setRestrictions] = useState<string[]>(
+    normalizeDietaryRestrictions(extras.diet_restrictions)
+  )
   const [allergens, setAllergens] = useState<string[]>(initial.profile.allergens ?? [])
   const [mealTimes, setMealTimes] = useState<string[]>(extras.favorite_meal_times ?? [])
   const [locations, setLocations] = useState<string[]>(extras.favorite_locations ?? [])
@@ -116,15 +126,33 @@ export default function DietPreferencesSettingsView({ initial }: { initial: Sett
   const formSnapshot = { restrictions, allergens, mealTimes, locations, taste, budget, blockedTags }
   const { isDirty, markSaved } = useSettingsDirtyTracker(formSnapshot)
 
+  const updateRestrictions = (next: string[]) => {
+    const added = next.find(value => !restrictions.includes(value))
+    if (added === 'vegetarian') {
+      setRestrictions(
+        normalizeDietaryRestrictions(next.filter(value => value !== 'ovo_lacto_vegetarian'))
+      )
+      return
+    }
+    if (added === 'ovo_lacto_vegetarian') {
+      setRestrictions(normalizeDietaryRestrictions(next.filter(value => value !== 'vegetarian')))
+      return
+    }
+    setRestrictions(normalizeDietaryRestrictions(next))
+  }
+
   const { saving, save: handleSave } = useSettingsSave({
     onSave: async () => {
       const profileRes = await apiFetch('/api/settings/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          is_vegetarian: restrictions.includes('vegetarian'),
+          is_vegetarian:
+            restrictions.includes('vegetarian') ||
+            restrictions.includes('ovo_lacto_vegetarian'),
           is_vegan:
-            restrictions.includes('vegetarian') &&
+            (restrictions.includes('vegetarian') ||
+              restrictions.includes('ovo_lacto_vegetarian')) &&
             restrictions.includes('no_dairy') &&
             restrictions.includes('no_egg'),
           is_halal: restrictions.includes('no_pork'),
@@ -152,10 +180,19 @@ export default function DietPreferencesSettingsView({ initial }: { initial: Sett
           },
         }),
       })
-      if (!prefRes.ok && prefRes.status !== 503) {
+      if (!prefRes.ok) {
         const d = await prefRes.json()
         throw new Error(d.error || 'preferences save failed')
       }
+      persistDietaryPreferenceContext(initial.profile.id, {
+        restrictions,
+        allergens,
+        blockedFoods: blockedTags,
+      })
+      invalidateSettingsSave(initial.profile.id)
+      invalidateUserPreferencesCache()
+      invalidateDiceMenuPoolCache()
+      invalidateDietaryRecommendationCaches()
     },
     onSuccess: markSaved,
     successMessage: '設定已更新',
@@ -178,7 +215,7 @@ export default function DietPreferencesSettingsView({ initial }: { initial: Sett
         }
       >
         <V2SettingsVisualCard icon={<UtensilsCrossed className="h-4 w-4" />} title="飲食限制" staggerIndex={0}>
-          <V2VisualChipGroup options={RESTRICTIONS} value={restrictions} onChange={setRestrictions} />
+          <V2VisualChipGroup options={RESTRICTIONS} value={restrictions} onChange={updateRestrictions} />
         </V2SettingsVisualCard>
 
         <V2SettingsVisualCard icon={<AlertTriangle className="h-4 w-4" />} title="過敏原" staggerIndex={1}>

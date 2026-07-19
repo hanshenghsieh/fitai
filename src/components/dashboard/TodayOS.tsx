@@ -11,6 +11,10 @@ import { resolveP0FoodByLabel } from '@/lib/nutrition/p0-common-foods/resolve-p0
 import { applyFoodRecordToLog } from '@/lib/nutrition/p0-common-foods/apply-to-log'
 import type { CommonFoodItem, FoodRecordDraft } from '@/lib/nutrition/p0-common-foods/types'
 import {
+  defaultFoodRecordDraft,
+  inferPresetFromAmount,
+} from '@/lib/nutrition/p0-common-foods/calculate'
+import {
   createUnknownFreeTextMeal,
   resolveOrEstimateFreeTextMeal,
 } from '@/lib/food-estimate'
@@ -67,7 +71,7 @@ import {
   shouldRequirePhotoConfirmation,
   isLowConfidencePhotoResult,
 } from '@/lib/settings/photo-settings-runtime'
-import type { PhotoSettings } from '@/lib/settings/user-settings-types'
+import type { PhotoSettings, UserSettingsPreferences } from '@/lib/settings/user-settings-types'
 import { DEFAULT_PHOTO_SETTINGS } from '@/lib/settings/user-settings-types'
 import {
   getTaipeiHour,
@@ -77,11 +81,17 @@ import {
 } from '@/lib/timezone'
 import {
   rollMealSuggestion,
+  mealSuggestionAllowedByDiet,
   suggestionToSelections,
   memoryFromCheckinMeta,
   type MealSuggestion,
 } from '@/lib/meal-engine'
 import { USE_RECOMMENDATION_V2 } from '@/lib/recommendation/v2/engine'
+import {
+  foodAllowedByDiet,
+  normalizeDietaryPreferenceContext,
+  readPersistedDietaryPreferenceContext,
+} from '@/lib/recommendation/dietary-preference-filter'
 import type { RecommendationQueueState } from '@/lib/recommendation/v2/types'
 import { preloadDiceMenuBulk, isDiceMenuBulkReady, getDiceMenuSource } from '@/lib/dice-menu-pool'
 import {
@@ -105,9 +115,6 @@ import {
   buildFoodLogFromDishRecommendation,
   buildDishRecommendationReasons,
   dishRecommendationToMealSuggestion,
-  getBrandItemById,
-  getBrandItemsForTemplateResolved,
-  getDishTemplateById,
   getDishVariantById,
   recommendationDisplayName,
   scoreDishTemplateForUserDay,
@@ -357,6 +364,7 @@ function mealTypeForFoodSlot(slot: FoodSlot, schedule: WorkSchedule): MealType {
 interface Props {
   todayPlan: DayPlan
   profile?: UserProfile | null
+  userPreferences?: UserSettingsPreferences | null
   goalSnapshot?: GoalSnapshot | null
   userMemory: UserMemoryMeta
   foodDna: FoodDna
@@ -440,6 +448,7 @@ function buildAdherenceContext(
 export default function TodayOS({
   todayPlan,
   profile,
+  userPreferences,
   goalSnapshot,
   userMemory,
   foodDna,
@@ -465,6 +474,43 @@ export default function TodayOS({
   const onDashboard = pathname === '/dashboard'
   const coords = useGeolocation(userMemory.eat_out_prefs?.work_location)
   const memory = memoryFromCheckinMeta({ user_memory: userMemory })
+  const [dietaryContextRevision, setDietaryContextRevision] = useState(0)
+  const recommendationProfile = useMemo(
+    () =>
+      profile
+        ? {
+            ...profile,
+            diet_restrictions: userPreferences?.diet_extras?.diet_restrictions ?? [],
+            blocked_foods: userPreferences?.diet_extras?.blocked_foods ?? [],
+          }
+        : profile,
+    [profile, userPreferences]
+  )
+  const dietaryPreferences = useMemo(
+    () => {
+      const persisted = readPersistedDietaryPreferenceContext(recommendationProfile?.id)
+      return normalizeDietaryPreferenceContext({
+        restrictions: [
+          ...(recommendationProfile?.diet_restrictions ?? []),
+          ...(persisted?.restrictions ?? []),
+          ...(recommendationProfile?.is_vegetarian ? ['vegetarian'] : []),
+          ...(recommendationProfile?.is_vegan
+            ? ['vegetarian', 'no_egg', 'no_dairy']
+            : []),
+        ],
+        allergens: [
+          ...(recommendationProfile?.allergens ?? []),
+          ...(persisted?.allergens ?? []),
+        ],
+        blockedFoods: [
+          ...(recommendationProfile?.blocked_foods ?? []),
+          ...(recommendationProfile?.disliked_foods ?? []),
+          ...(persisted?.blockedFoods ?? []),
+        ],
+      })
+    },
+    [recommendationProfile, dietaryContextRevision]
+  )
 
   const foodLogs = userMemory.food_logs_today ?? []
 
@@ -583,12 +629,38 @@ export default function TodayOS({
   const [dicePreviewByMeal, setDicePreviewByMeal] = useState<Partial<Record<MealType, MealSuggestion>>>({})
   const [dishVariantByMeal, setDishVariantByMeal] = useState<Partial<Record<MealType, string | null>>>({})
   const [diceRollHint, setDiceRollHint] = useState<string | null>(null)
-  const dicePreview = dicePreviewByMeal[mealSlotLegacy] ?? null
+  const rawDicePreview = dicePreviewByMeal[mealSlotLegacy] ?? null
+  const dicePreview = useMemo(
+    () =>
+      mealSuggestionAllowedByDiet(rawDicePreview, dietaryPreferences)
+        ? rawDicePreview
+        : null,
+    [rawDicePreview, dietaryPreferences]
+  )
   const [localDiceRolls, setLocalDiceRolls] = useState(0)
   const [moreOpen, setMoreOpen] = useState(false)
   const [p0PortionFood, setP0PortionFood] = useState<CommonFoodItem | null>(null)
   const [p0SearchQuery, setP0SearchQuery] = useState('')
-  const [estimateQuery, setEstimateQuery] = useState<string | null>(null)
+  const [p0InitialDraft, setP0InitialDraft] = useState<FoodRecordDraft | undefined>(undefined)
+  const [pendingEstimate, setPendingEstimate] = useState<{
+    query: string
+    selectedHit?: FoodSearchHit
+  } | null>(null)
+
+  useEffect(() => {
+    const clearStaleDietaryRecommendations = () => {
+      setDicePreviewByMeal({})
+      setDishVariantByMeal({})
+      setDietaryContextRevision(value => value + 1)
+      autoRollKeyRef.current = ''
+    }
+    window.addEventListener('betterbit:diet-preferences-changed', clearStaleDietaryRecommendations)
+    return () =>
+      window.removeEventListener(
+        'betterbit:diet-preferences-changed',
+        clearStaleDietaryRecommendations
+      )
+  }, [])
   const [photoOpen, setPhotoOpen] = useState(false)
   const [photoDraft, setPhotoDraft] = useState<PhotoLogDraft | null>(null)
   const [photoProcessing, setPhotoProcessing] = useState(false)
@@ -606,7 +678,13 @@ export default function TodayOS({
     dayStateRef.current = dayState
   }, [foodLogs, activeSlot, dayState])
 
-  const frequentList = useMemo(() => displayFrequent(foodDna), [foodDna])
+  const frequentList = useMemo(
+    () =>
+      displayFrequent(foodDna).filter(item =>
+        foodAllowedByDiet({ name: item.name }, dietaryPreferences)
+      ),
+    [foodDna, dietaryPreferences]
+  )
   const [selectedFrequentId, setSelectedFrequentId] = useState('')
 
   const slotLogs = useMemo(
@@ -1265,7 +1343,7 @@ export default function TodayOS({
           return rollMealSuggestion({
             meal_type: slot,
             daily_targets: todayPlan.daily_targets,
-            profile,
+            profile: recommendationProfile,
             memory,
             day_index: dayIndex,
             seen_ids: excludeIds,
@@ -1281,6 +1359,7 @@ export default function TodayOS({
             today_food_logs: foodLogsRef.current,
             queue_state: queueState,
             dish_queue_state: session.dishQueue ?? null,
+            dietary_preferences: dietaryPreferences,
             seed: Date.now() + (localDiceRolls + seedBump) * 9973,
           })
         }
@@ -1331,7 +1410,7 @@ export default function TodayOS({
     } else {
       void preloadDiceMenuBulk().finally(() => scheduleDiceRoll(runRoll))
     }
-  }, [mealSlotLegacy, dicePreviewByMeal, foodLogs, customEatOut, todayPlan, profile, memory, dayIndex, coords, localDiceRolls, dailyRolls, adherenceState, calorieBank, onClearMealSelection])
+  }, [mealSlotLegacy, dicePreviewByMeal, foodLogs, customEatOut, todayPlan, recommendationProfile, dietaryPreferences, memory, dayIndex, coords, localDiceRolls, dailyRolls, adherenceState, calorieBank, onClearMealSelection])
 
   const confirmDice = useCallback(() => {
     if (!dicePreview || confirmingRef.current) return
@@ -1622,6 +1701,17 @@ export default function TodayOS({
       if (item.p0FoodId) {
         const food = getP0FoodById(item.p0FoodId)
         if (food) {
+          const initialDraft = defaultFoodRecordDraft(food)
+          setP0InitialDraft(
+            item.initialPortionAmount != null
+              ? {
+                  ...initialDraft,
+                  amount: item.initialPortionAmount,
+                  unit: item.initialPortionUnit ?? food.defaultUnit,
+                  portionPreset: inferPresetFromAmount(food, item.initialPortionAmount),
+                }
+              : undefined
+          )
           setP0SearchQuery(trimmedQuery || item.name)
           setP0PortionFood(food)
           setQuery('')
@@ -1630,53 +1720,10 @@ export default function TodayOS({
         }
       }
       if (item.dishTemplateId) {
-        const template = getDishTemplateById(item.dishTemplateId)
-        if (template) {
-          const variant = item.dishVariantId ? getDishVariantById(item.dishVariantId) : null
-          const brand = item.dishBrandItemId ? getBrandItemById(item.dishBrandItemId) : null
-          const result = {
-            template,
-            variant,
-            brandItems: getBrandItemsForTemplateResolved(template.id),
-            score: {
-              total: 0,
-              calorieFit: 0,
-              proteinFit: 0,
-              fatPenalty: 0,
-              adjustability: 0,
-              confidence: 0,
-              variantPenalty: 0,
-            },
-            reasons: [{ code: 'search_pick', label: '你選了這個餐點類型' }],
-            benefitPoints: [],
-            eatingTips: template.recommendedAdjustments ?? [],
-          }
-          const logEntry = buildFoodLogFromDishRecommendation({
-            result,
-            selectedVariant: variant,
-            selectedBrandItem: brand,
-            slot: activeSlot,
-            id: item.id,
-          })
-          commitLog({
-            id: logEntry.id,
-            name: logEntry.name,
-            display_label: logEntry.display_label,
-            store: logEntry.store,
-            calories: logEntry.calories,
-            protein_g: logEntry.protein_g,
-            carbs_g: logEntry.carbs_g,
-            fat_g: logEntry.fat_g,
-            source: 'search',
-            nutrition_status: logEntry.nutrition_status,
-            nutrition_confidence: logEntry.nutrition_confidence,
-            capture_status: logEntry.capture_status,
-            dish_log_meta: logEntry.dish_log_meta,
-          })
-          setQuery('')
-          closeMore()
-          return
-        }
+        setPendingEstimate({ query: trimmedQuery || item.name, selectedHit: item })
+        setQuery('')
+        setMoreOpen(false)
+        return
       }
       commitLog({
         id: item.id,
@@ -1713,6 +1760,7 @@ export default function TodayOS({
       })
       commitLog(patch)
       setP0PortionFood(null)
+      setP0InitialDraft(undefined)
       setP0SearchQuery('')
       toast.message(captureTargetDate === getNutritionDayKey() ? '已加入今日紀錄' : '已加入所選日期紀錄', {
         description: item.sourceType === 'user_custom' ? '自訂估算' : '資料庫估算',
@@ -1723,16 +1771,18 @@ export default function TodayOS({
 
   const handleEstimateSave = useCallback(
     (item: CommonFoodItem, draft: FoodRecordDraft) => {
-      const trimmedQuery = estimateQuery?.trim() ?? item.name
-      const patch = applyFoodRecordToLog(item, { ...draft, sourceType: 'user_custom' }, {
+      const trimmedQuery = pendingEstimate?.query.trim() ?? item.name
+      const selectedHit = pendingEstimate?.selectedHit
+      const patch = applyFoodRecordToLog(item, draft, {
         user_input_label: trimmedQuery,
-        matched_item_label: item.name,
-        match_type: 'user_custom_estimate',
+        matched_item_label: item.canonicalName ?? item.name,
+        matched_restaurant: selectedHit?.store,
+        match_type: selectedHit ? 'user_selected_search_estimate' : 'user_custom_estimate',
         slot: activeSlotRef.current,
-        source: 'free_text',
+        source: selectedHit ? 'search' : 'free_text',
       })
       commitLog(patch)
-      setEstimateQuery(null)
+      setPendingEstimate(null)
       setQuery('')
       toast.message('已建立估算餐點', {
         description:
@@ -1741,7 +1791,7 @@ export default function TodayOS({
             : '這次紀錄只會留在所選日期。',
       })
     },
-    [commitLog, estimateQuery, captureTargetDate]
+    [commitLog, pendingEstimate, captureTargetDate]
   )
   const handleCreateFreeText = useCallback(
     (name: string, options?: { forceUnknown?: boolean }) => {
@@ -1750,6 +1800,7 @@ export default function TodayOS({
 
       const p0 = resolveP0FoodByLabel(trimmed)
       if (p0) {
+        setP0InitialDraft(undefined)
         setP0SearchQuery(trimmed)
         setP0PortionFood(p0)
         setQuery('')
@@ -1764,6 +1815,7 @@ export default function TodayOS({
       if (est.match_type === 'p0_common_food_pending_portion') {
         const p0 = resolveP0FoodByLabel(trimmed)
         if (p0) {
+          setP0InitialDraft(undefined)
           setP0SearchQuery(trimmed)
           setP0PortionFood(p0)
           setQuery('')
@@ -1955,6 +2007,7 @@ export default function TodayOS({
                 onSelectBrand={handleSelectDishBrand}
                 brandLogging={confirming}
                 coachBullets={previewCoachBullets}
+                dietaryPreferences={dietaryPreferences}
               />
             ) : (
               <DiceMealPreview
@@ -2085,7 +2138,7 @@ export default function TodayOS({
         onCommitFrequent={handleCommitFrequent}
         onCreateFreeText={handleCreateFreeText}
         onCreateEstimate={q => {
-          setEstimateQuery(q)
+          setPendingEstimate({ query: q })
           setMoreOpen(false)
         }}
       />
@@ -2103,8 +2156,10 @@ export default function TodayOS({
           saveLabel={
             captureTargetDate === getNutritionDayKey() ? '加入今日紀錄' : '加入所選日期紀錄'
           }
+          initialDraft={p0InitialDraft}
           onClose={() => {
             setP0PortionFood(null)
+            setP0InitialDraft(undefined)
             clearCaptureContext()
           }}
           onSave={(draft, _nutrition) => handleP0PortionSave(p0PortionFood, draft)}
@@ -2112,11 +2167,13 @@ export default function TodayOS({
       ) : null}
 
       <EstimateMealSheet
-        open={estimateQuery != null}
+        key={pendingEstimate ? `${pendingEstimate.query}:${pendingEstimate.selectedHit?.id ?? 'custom'}` : 'estimate-closed'}
+        open={pendingEstimate != null}
         targetDate={captureTargetDate}
-        query={estimateQuery ?? ''}
+        query={pendingEstimate?.query ?? ''}
+        selectedHit={pendingEstimate?.selectedHit}
         onClose={() => {
-          setEstimateQuery(null)
+          setPendingEstimate(null)
           clearCaptureContext()
         }}
         onSave={handleEstimateSave}

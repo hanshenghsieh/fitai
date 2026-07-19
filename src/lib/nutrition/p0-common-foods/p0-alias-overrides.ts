@@ -1,4 +1,10 @@
 import type { CommonFoodItem } from './types'
+import {
+  WHITE_RICE_ALIASES,
+  WHITE_RICE_BASE,
+  WHITE_RICE_PORTIONS,
+  WHITE_RICE_SERVING_OPTIONS,
+} from '@/lib/nutrition/rice-portion-profile'
 
 export type P0ItemOverride = Partial<
   Pick<
@@ -78,6 +84,27 @@ export const P0_ITEM_OVERRIDES: Record<string, P0ItemOverride> = {
     aliases: ['紐約客', 'new york strip', 'strip steak', 'ny strip'],
   },
   bb_p0_0281: {
+    foodType: 'staple',
+    category: '主食 / 飯類',
+    aliases: WHITE_RICE_ALIASES,
+    defaultServing: { amount: WHITE_RICE_PORTIONS.bowl.amount, unit: 'g' },
+    servingOptions: WHITE_RICE_SERVING_OPTIONS,
+    baseAmount: WHITE_RICE_BASE.amount,
+    baseUnit: WHITE_RICE_BASE.unit,
+    kcalBase: WHITE_RICE_BASE.calories,
+    proteinBase_g: WHITE_RICE_BASE.protein_g,
+    carbsBase_g: WHITE_RICE_BASE.carbs_g,
+    fatBase_g: WHITE_RICE_BASE.fat_g,
+    sodiumBase_mg: WHITE_RICE_BASE.sodium_mg,
+    smallAmount: WHITE_RICE_PORTIONS.half_bowl.amount,
+    normalAmount: WHITE_RICE_PORTIONS.bowl.amount,
+    largeAmount: WHITE_RICE_PORTIONS.large_bowl.amount,
+    defaultUnit: 'g',
+    kcalDefault: 195,
+    proteinDefault_g: 4.1,
+    carbsDefault_g: 42,
+    fatDefault_g: 0.5,
+    sodiumDefault_mg: 2,
     supportsSauce: false,
     supportsRiceAmount: false,
     supportsOilOptions: false,

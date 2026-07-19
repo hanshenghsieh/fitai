@@ -282,7 +282,12 @@ export default function BetterBitHome({
   }, [])
 
   useEffect(() => {
-    void loadUserPreferencesClient().then(setUserPrefs).catch(() => {})
+    const refreshPreferences = () => {
+      void loadUserPreferencesClient().then(setUserPrefs).catch(() => {})
+    }
+    refreshPreferences()
+    window.addEventListener('betterbit:diet-preferences-changed', refreshPreferences)
+    return () => window.removeEventListener('betterbit:diet-preferences-changed', refreshPreferences)
   }, [])
 
   useEffect(() => {
@@ -1041,8 +1046,10 @@ export default function BetterBitHome({
         interstitial={
           onDashboard ? (
             <TodayOS
+              key={`today-os:${(userPrefs?.diet_extras?.diet_restrictions ?? []).join(',')}:${(userPrefs?.diet_extras?.blocked_foods ?? []).join(',')}`}
               todayPlan={todayPlan}
               profile={profile}
+              userPreferences={userPrefs}
               goalSnapshot={goalSnapshot}
               userMemory={displayUserMemory}
               foodDna={userMemory.food_dna ?? foodDna}

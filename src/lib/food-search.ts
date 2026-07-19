@@ -5,6 +5,11 @@ import type { FoodSourceType, FoodType } from '@/lib/nutrition/p0-common-foods/t
 import { searchP0CommonFoods } from '@/lib/nutrition/p0-common-foods/search'
 import { searchDishCatalog } from '@/lib/recommendation/dish-first/search'
 import { normalizeFoodName } from '@/lib/food-kb/normalize'
+import {
+  calculateWhiteRiceNutrition,
+  resolveWhiteRicePortion,
+  WHITE_RICE_CANONICAL_ID,
+} from '@/lib/nutrition/rice-portion-profile'
 
 export interface FoodSearchHit {
   id: string
@@ -23,6 +28,11 @@ export interface FoodSearchHit {
   dishVariantId?: string
   dishBrandItemId?: string
   dishSearchKind?: 'template' | 'variant' | 'brand'
+  canonicalCategory?: string
+  aliases?: string[]
+  initialPortionAmount?: number
+  initialPortionUnit?: string
+  portionLabel?: string
   searchSource: 'official' | 'p0' | 'runtime' | 'dish'
   sourceLabel?: string
 }
@@ -96,21 +106,30 @@ function officialToHit(hit: {
   }
 }
 
-function p0ToHit(item: import('@/lib/nutrition/p0-common-foods/types').CommonFoodItem, score: number): FoodSearchHit {
+export function foodSearchHitForP0(
+  item: import('@/lib/nutrition/p0-common-foods/types').CommonFoodItem,
+  score: number,
+  query: string
+): FoodSearchHit {
+  const ricePortion = item.id === WHITE_RICE_CANONICAL_ID ? resolveWhiteRicePortion(query) : null
+  const riceNutrition = ricePortion ? calculateWhiteRiceNutrition(ricePortion.amount) : null
   return {
     id: `p0-${item.id}`,
     name: item.name,
     store: item.category,
-    calories: Math.round(item.kcalDefault),
-    protein_g: item.proteinDefault_g,
-    carbs_g: item.carbsDefault_g,
-    fat_g: item.fatDefault_g,
+    calories: riceNutrition?.calories ?? Math.round(item.kcalDefault),
+    protein_g: riceNutrition?.protein_g ?? item.proteinDefault_g,
+    carbs_g: riceNutrition?.carbs_g ?? item.carbsDefault_g,
+    fat_g: riceNutrition?.fat_g ?? item.fatDefault_g,
     foodType: item.foodType,
     sourceType: item.sourceType,
     p0FoodId: item.id,
     p0MatchScore: score,
     searchSource: 'p0',
     sourceLabel: item.sourceType === 'official' ? '官方資料' : '資料庫估算',
+    initialPortionAmount: ricePortion?.amount,
+    initialPortionUnit: ricePortion ? 'g' : undefined,
+    portionLabel: ricePortion?.label,
   }
 }
 
@@ -139,10 +158,25 @@ export function searchFoodMenu(query: string, limit = 8): FoodSearchHit[] {
     const template = hit.template
     if (!template) continue
     const macros = hit.brandItem
-      ? { mid: hit.brandItem.calories, protein: hit.brandItem.protein ?? 0 }
+      ? {
+          mid: hit.brandItem.calories,
+          protein: hit.brandItem.protein ?? 0,
+          carbs: hit.brandItem.carbs,
+          fat: hit.brandItem.fat,
+        }
       : hit.variant
-        ? { mid: hit.variant.typicalCalories.mid, protein: hit.variant.typicalProtein?.mid ?? 0 }
-        : { mid: template.typicalCalories.mid, protein: template.typicalProtein?.mid ?? 0 }
+        ? {
+            mid: hit.variant.typicalCalories.mid,
+            protein: hit.variant.typicalProtein?.mid ?? 0,
+            carbs: hit.variant.typicalCarbs?.mid,
+            fat: hit.variant.typicalFat?.mid,
+          }
+        : {
+            mid: template.typicalCalories.mid,
+            protein: template.typicalProtein?.mid ?? 0,
+            carbs: template.typicalCarbs?.mid,
+            fat: template.typicalFat?.mid,
+          }
     addHit({
       id:
         hit.kind === 'brand'
@@ -154,12 +188,20 @@ export function searchFoodMenu(query: string, limit = 8): FoodSearchHit[] {
       store: hit.subtitle ?? template.category,
       calories: macros.mid,
       protein_g: macros.protein,
+      carbs_g: macros.carbs,
+      fat_g: macros.fat,
       foodType: template.foodType,
       sourceType: hit.brandItem?.sourceType ?? template.sourceType,
       dishTemplateId: template.id,
       dishVariantId: hit.variant?.id,
       dishBrandItemId: hit.brandItem?.id,
       dishSearchKind: hit.kind,
+      canonicalCategory: template.category,
+      aliases: [
+        ...template.aliases,
+        ...(hit.variant?.aliases ?? []),
+        ...(hit.brandItem?.aliases ?? []),
+      ],
       searchSource: 'dish',
       sourceLabel: hit.brandItem?.sourceType === 'official' ? '官方資料' : '資料庫估算',
     })
@@ -172,7 +214,7 @@ export function searchFoodMenu(query: string, limit = 8): FoodSearchHit[] {
 
   const p0Hits = searchP0CommonFoods(query, limit * 2)
   for (const { item, score } of p0Hits) {
-    addHit(p0ToHit(item, score))
+    addHit(foodSearchHitForP0(item, score, query))
   }
 
   if (out.length < limit) {

@@ -6,7 +6,16 @@ import SettingsSubpageClient from '@/features/settings/SettingsSubpageClient'
 export default function DietSettingsPage() {
   return (
     <SettingsSubpageClient>
-      {bundle => <DietPreferencesSettingsView initial={bundle} />}
+      {bundle => (
+        <DietPreferencesSettingsView
+          key={[
+            bundle.profile.updated_at ?? '',
+            ...(bundle.preferences.diet_extras?.diet_restrictions ?? []),
+            ...(bundle.profile.allergens ?? []),
+          ].join('|')}
+          initial={bundle}
+        />
+      )}
     </SettingsSubpageClient>
   )
 }

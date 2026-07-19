@@ -67,6 +67,11 @@ export interface UiSettings {
   nutrient_display: NutrientDisplay
   card_density: UiDensity
   primary_fab: PrimaryFab
+  theme_color: ThemeColor
+  animations_enabled: boolean
+  dark_mode: boolean
+  reduced_motion: boolean
+  large_text: boolean
 }
 
 export interface UserSettingsPreferences {
@@ -110,8 +115,8 @@ export const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
   weekly_review_enabled: true,
   weekly_review_day: 0,
   weekly_review_time: '20:00',
-  over_target_comfort_enabled: true,
-  in_app_enabled: true,
+  over_target_comfort_enabled: false,
+  in_app_enabled: false,
   push_enabled: false,
   email_enabled: false,
   quiet_hours_enabled: true,

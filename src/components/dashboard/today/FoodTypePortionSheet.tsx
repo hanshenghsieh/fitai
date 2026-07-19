@@ -12,6 +12,7 @@ import {
   defaultFoodRecordDraft,
   foodTypeSubtitle,
 } from '@/lib/nutrition/p0-common-foods/calculate'
+import { estimatedWeightForDraft } from '@/lib/nutrition/estimated-meal-model'
 import type { CommonFoodItem, FoodRecordDraft, PortionPresetId, SugarLevel } from '@/lib/nutrition/p0-common-foods/types'
 
 const font = 'var(--font-noto-tc), system-ui, sans-serif'
@@ -54,6 +55,8 @@ export interface FoodTypePortionSheetProps {
   subtitle?: string
   saveLabel?: string
   initialDraft?: FoodRecordDraft
+  contextLabel?: string
+  onEditType?: () => void
 }
 
 function parseNum(raw: string): number | null {
@@ -70,7 +73,7 @@ function ChipRow<T extends string>({
   onChange,
 }: {
   label: string
-  options: { id: T; label: string }[]
+  options: { id: T; label: string; detail?: string }[]
   value: T
   onChange: (v: T) => void
 }) {
@@ -87,14 +90,22 @@ function ChipRow<T extends string>({
               key={opt.id}
               type="button"
               onClick={() => onChange(opt.id)}
-              className="px-3.5 h-10 rounded-full text-[14px]"
+              className={`px-3.5 rounded-2xl text-[14px] ${opt.detail ? 'min-h-14 py-2' : 'h-10'}`}
               style={{
                 backgroundColor: active ? BB_V2.accent.orange : BB_V2.bg.canvas,
                 color: active ? '#FFF' : BB_V2.text.secondary,
                 fontWeight: active ? 600 : 400,
               }}
             >
-              {opt.label}
+              <span className="block">{opt.label}</span>
+              {opt.detail ? (
+                <span
+                  className="block text-[11px] mt-0.5"
+                  style={{ color: active ? 'rgba(255,255,255,0.82)' : BB_V2.text.secondary, fontWeight: 400 }}
+                >
+                  {opt.detail}
+                </span>
+              ) : null}
             </button>
           )
         })}
@@ -112,6 +123,8 @@ export default function FoodTypePortionSheet({
   subtitle,
   saveLabel = '加入今日紀錄',
   initialDraft,
+  contextLabel,
+  onEditType,
 }: FoodTypePortionSheetProps) {
   const fields = useMemo(() => getFoodTypeFieldVisibility(item), [item])
   const [draft, setDraft] = useState<FoodRecordDraft>(() => initialDraft ?? defaultFoodRecordDraft(item))
@@ -168,11 +181,19 @@ export default function FoodTypePortionSheet({
       item.servingOptions.map((opt, i) => {
         const presetIds: PortionPresetId[] = ['small', 'normal', 'large', 'custom']
         const id = presetIds[i] ?? 'custom'
-        const label =
-          opt.amount != null ? `${opt.label} ${opt.amount}${opt.unit}` : opt.label
-        return { id, label }
+        const label = item.servingModel === 'whole_meal'
+          ? opt.label
+          : opt.amount != null
+            ? `${opt.label} ${opt.amount}${opt.unit}`
+            : opt.label
+        const detail = opt.estimatedWeight_g != null ? `約 ${opt.estimatedWeight_g}g` : undefined
+        return { id, label, detail }
       }),
-    [item.servingOptions]
+    [item.servingModel, item.servingOptions]
+  )
+  const estimatedWeight = useMemo(
+    () => estimatedWeightForDraft(item, effectiveDraft),
+    [item, effectiveDraft]
   )
 
   function applyPreset(preset: PortionPresetId) {
@@ -232,6 +253,23 @@ export default function FoodTypePortionSheet({
             <p className="text-[17px] mt-2" style={{ color: BB_V2.text.primary, fontWeight: 600 }}>
               {item.name}
             </p>
+            {contextLabel ? (
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-[13px]" style={{ color: BB_V2.text.secondary }}>
+                  {contextLabel}
+                </p>
+                {onEditType ? (
+                  <button
+                    type="button"
+                    onClick={onEditType}
+                    className="text-[12px] underline underline-offset-2"
+                    style={{ color: BB_V2.accent.orange }}
+                  >
+                    修改類型
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
             <p className="text-[13px] mt-1" style={{ color: BB_V2.text.secondary }}>
               {foodTypeSubtitle(item, nutrition)}
             </p>
@@ -335,12 +373,23 @@ export default function FoodTypePortionSheet({
             <p className="text-[14px]" style={{ color: BB_V2.text.primary, fontWeight: 500 }}>
               估算約 {nutrition.calories} kcal
             </p>
+            {estimatedWeight != null ? (
+              <p className="text-[12px] mt-1" style={{ color: BB_V2.text.secondary }}>
+                估算重量約 {estimatedWeight}g
+              </p>
+            ) : null}
             {item.foodType === 'ingredient' && (
               <p className="text-[12px] mt-1" style={{ color: BB_V2.text.secondary }}>
                 蛋白質 {nutrition.protein_g}g · 碳水 {nutrition.carbs_g}g · 脂肪 {nutrition.fat_g}g
               </p>
             )}
           </section>
+
+          {item.estimationAssumption ? (
+            <p className="text-[12px] leading-relaxed px-1" style={{ color: BB_V2.text.secondary }}>
+              估算假設：{item.estimationAssumption}
+            </p>
+          ) : null}
 
           <section>
             <button

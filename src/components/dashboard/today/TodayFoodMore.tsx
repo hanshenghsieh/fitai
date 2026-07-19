@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useMemo } from 'react'
-import { Search, X, PenLine } from 'lucide-react'
+import { Check, Search, X, PenLine } from 'lucide-react'
 import type { FrequentFood } from '@/lib/food-memory'
 import { primaryFoodLabel } from '@/lib/food-photography'
 import type { FoodSlot } from '@/lib/food-slots'
@@ -70,14 +70,12 @@ export default function TodayFoodMore({
   open,
   targetDate,
   onClose,
-  activeSlot: _activeSlot,
   query,
   onQueryChange,
   searchResults,
   onPickSearch,
   frequentList,
   selectedFrequentId,
-  onSelectFrequent: _onSelectFrequent,
   onCommitFrequent,
   onCreateFreeText,
   onCreateEstimate,
@@ -85,12 +83,10 @@ export default function TodayFoodMore({
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [showAllFrequent, setShowAllFrequent] = useState(false)
+  const [selectedSearchHit, setSelectedSearchHit] = useState<FoodSearchHit | null>(null)
 
   useEffect(() => {
-    if (!open) {
-      setShowAllFrequent(false)
-      return
-    }
+    if (!open) return
     // Auto-focus triggers iOS keyboard zoom on <16px inputs; skip on native shell.
     let t: number | undefined
     if (!isNativeIOS()) {
@@ -129,13 +125,30 @@ export default function TodayFoodMore({
     sourceLabel: '資料庫估算',
   })
 
-  const handleCreate = () => {
-    if (!trimmed || !onCreateFreeText) return
-    onCreateFreeText(trimmed)
+  const handleClose = () => {
+    setSelectedSearchHit(null)
+    setShowAllFrequent(false)
+    onClose()
+  }
+
+  const handlePrimaryAction = () => {
+    if (!trimmed) return
+    setShowAllFrequent(false)
+    if (selectedSearchHit) {
+      const selected = selectedSearchHit
+      setSelectedSearchHit(null)
+      onPickSearch(selected)
+      return
+    }
+    if (onCreateEstimate) {
+      onCreateEstimate(trimmed)
+      return
+    }
+    onCreateFreeText?.(trimmed)
   }
 
   return (
-    <AppOverlay open={open} onClose={onClose} variant="sheet">
+    <AppOverlay open={open} onClose={handleClose} variant="sheet">
       <div
         data-target-date={targetDate}
         className="ios-bottom-sheet max-w-lg mx-auto w-full"
@@ -157,7 +170,7 @@ export default function TodayFoodMore({
                 搜尋或輸入菜名，確認後加入{targetDate === getNutritionDayKey() ? '今日' : '所選日期'}紀錄
               </p>
             </div>
-            <button type="button" onClick={onClose} className="p-1.5 -mr-1 shrink-0" aria-label="關閉">
+            <button type="button" onClick={handleClose} className="p-1.5 -mr-1 shrink-0" aria-label="關閉">
               <X className="h-5 w-5" strokeWidth={ICON_STROKE} style={{ color: DS.textSecondary }} />
             </button>
           </div>
@@ -171,11 +184,14 @@ export default function TodayFoodMore({
               ref={inputRef}
               type="text"
               value={query}
-              onChange={e => onQueryChange(e.target.value)}
+              onChange={e => {
+                setSelectedSearchHit(null)
+                onQueryChange(e.target.value)
+              }}
               onKeyDown={e => {
-                if (e.key === 'Enter' && trimmed && onCreateFreeText) {
+                if (e.key === 'Enter' && trimmed) {
                   e.preventDefault()
-                  handleCreate()
+                  handlePrimaryAction()
                 }
               }}
               placeholder="例如：鐵板燒、雞腿便當…"
@@ -192,13 +208,23 @@ export default function TodayFoodMore({
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => onPickSearch(item)}
-                  className="w-full text-left py-1 active:opacity-90"
+                  onClick={() => setSelectedSearchHit(item)}
+                  className="w-full text-left py-3 px-3 rounded-2xl active:opacity-90"
+                  style={{
+                    backgroundColor: selectedSearchHit?.id === item.id ? 'rgba(205, 122, 77, 0.10)' : 'transparent',
+                    border: selectedSearchHit?.id === item.id ? `1px solid ${DS.mocha}` : '1px solid transparent',
+                  }}
                 >
-                  <p className="text-[16px] font-medium" style={{ color: DS.text, fontWeight: 500 }}>
-                    {item.name}
-                  </p>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[16px] font-medium" style={{ color: DS.text, fontWeight: 500 }}>
+                      {item.name}
+                    </p>
+                    {selectedSearchHit?.id === item.id ? (
+                      <Check className="h-4 w-4 shrink-0" style={{ color: DS.mocha }} />
+                    ) : null}
+                  </div>
                   <p className="text-[14px] mt-1" style={{ color: DS.textSecondary }}>
+                    {item.portionLabel ? `${item.portionLabel} · ` : ''}
                     {item.store ? `${item.store} · ` : ''}
                     {item.calories} kcal · 蛋白質 {item.protein_g}g
                     {item.sourceLabel ? ` · ${item.sourceLabel}` : ''}
@@ -217,8 +243,14 @@ export default function TodayFoodMore({
                 <button
                   key={hit.item.id}
                   type="button"
-                  onClick={() => onPickSearch(toSearchHit(hit.item))}
-                  className="w-full text-left py-2 active:opacity-90"
+                  onClick={() => setSelectedSearchHit(toSearchHit(hit.item))}
+                  className="w-full text-left py-2 px-3 rounded-2xl active:opacity-90"
+                  style={{
+                    backgroundColor:
+                      selectedSearchHit?.id === `p0-${hit.item.id}` ? 'rgba(205, 122, 77, 0.10)' : 'transparent',
+                    border:
+                      selectedSearchHit?.id === `p0-${hit.item.id}` ? `1px solid ${DS.mocha}` : '1px solid transparent',
+                  }}
                 >
                   <p className="text-[16px] font-medium" style={{ color: DS.text }}>
                     {hit.item.name}
@@ -245,16 +277,6 @@ export default function TodayFoodMore({
               <p className="text-[13px] mt-2 leading-relaxed" style={{ color: DS.textSecondary, fontWeight: 400 }}>
                 你可以先用估算方式記錄，我們會幫你算一個大概值。
               </p>
-              {onCreateEstimate ? (
-                <button
-                  type="button"
-                  onClick={() => onCreateEstimate(trimmed)}
-                  className="mt-4 px-5 h-11 rounded-full text-[14px] active:opacity-90"
-                  style={{ backgroundColor: DS.mocha, color: '#FFF', fontWeight: 500 }}
-                >
-                  建立估算餐點
-                </button>
-              ) : null}
             </div>
           )}
 
@@ -297,7 +319,7 @@ export default function TodayFoodMore({
           )}
         </div>
 
-        {onCreateFreeText && (
+        {(onCreateEstimate || onCreateFreeText) && (
           <div
             className="ios-bottom-sheet__footer px-5 pt-2 pb-3 border-t"
             style={{ borderColor: 'rgba(142, 131, 120, 0.12)' }}
@@ -305,12 +327,16 @@ export default function TodayFoodMore({
             <button
               type="button"
               disabled={!trimmed}
-              onClick={handleCreate}
+              onClick={handlePrimaryAction}
               className="w-full h-14 rounded-[22px] text-[15px] flex items-center justify-center gap-2 disabled:opacity-40 active:opacity-90"
               style={{ backgroundColor: DS.mocha, color: '#FFFFFF', fontWeight: 500 }}
             >
               <PenLine className="h-4 w-4" strokeWidth={ICON_STROKE} />
-              {trimmed ? '加入今日紀錄' : '輸入菜名後加入今日紀錄'}
+              {trimmed
+                ? selectedSearchHit
+                  ? `加入${targetDate === getNutritionDayKey() ? '今日' : '所選日期'}紀錄`
+                  : `建立「${trimmed}」`
+                : '輸入菜名後建立估算餐點'}
             </button>
           </div>
         )}

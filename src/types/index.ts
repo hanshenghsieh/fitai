@@ -21,6 +21,9 @@ export interface UserProfile {
   is_gluten_free: boolean
   allergens: string[]
   disliked_foods: string[]
+  /** Runtime-only recommendation context loaded from settings_preferences. */
+  diet_restrictions?: string[]
+  blocked_foods?: string[]
   cuisine_preference: string
   cooking_time_mins: number
   food_budget: FoodBudget
