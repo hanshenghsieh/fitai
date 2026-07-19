@@ -1,7 +1,6 @@
 'use client'
 
 import { App } from '@capacitor/app'
-import { Browser } from '@capacitor/browser'
 import { Capacitor, registerPlugin, type PluginListenerHandle } from '@capacitor/core'
 import type { Session, User } from '@supabase/supabase-js'
 import { configureAppleIap } from '@/lib/apple-iap-client'
@@ -29,6 +28,17 @@ interface AppleAuthPlugin {
   ): Promise<PluginListenerHandle>
 }
 
+interface GoogleAuthPlugin {
+  signIn(options: {
+    nonce: string
+  }): Promise<{
+    identityToken?: string
+    email?: string
+    name?: string
+  }>
+  signOut(): Promise<void>
+}
+
 export interface AuthCompletion {
   session: Session
   user: User
@@ -44,15 +54,14 @@ export class AuthCancelledError extends Error {
 }
 
 const AppleAuth = registerPlugin<AppleAuthPlugin>('AppleAuth')
+const GoogleAuth = registerPlugin<GoogleAuthPlugin>('GoogleAuth')
 const callbackPromises = new Map<string, Promise<AuthCompletion>>()
 
-let pendingNativeOAuth:
-  | {
-      resolve: (completion: AuthCompletion) => void
-      reject: (error: Error) => void
-      removeBrowserListener?: () => Promise<void>
-    }
-  | undefined
+function createOidcNonce(): string {
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('')
+}
 
 function isCancellation(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error ?? '')
@@ -159,52 +168,51 @@ export async function signInWithEmail(email: string, password: string): Promise<
   return verifyAndComplete(data.session)
 }
 
-async function startOAuth(provider: OAuthProvider): Promise<AuthCompletion | null> {
+async function startWebOAuth(provider: OAuthProvider): Promise<null> {
+  if (isCapacitorNative()) {
+    throw new Error(`${provider} 原生登入不可使用網頁 OAuth。`)
+  }
   const supabase = createClient()
-  const native = isCapacitorNative()
-  const redirectTo = native
-    ? NATIVE_AUTH_CALLBACK_URL
-    : `${window.location.origin}/auth/callback`
+  const redirectTo = `${window.location.origin}/auth/callback`
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
       redirectTo,
-      skipBrowserRedirect: native,
     },
   })
   if (error) throw error
-
-  if (!native) return null
   if (!data.url) throw new Error('登入服務未提供授權網址。')
-  if (pendingNativeOAuth) throw new Error('另一個登入流程仍在進行。')
-
-  return new Promise<AuthCompletion>(async (resolve, reject) => {
-    const browserListener = await Browser.addListener('browserFinished', () => {
-      if (!pendingNativeOAuth) return
-      pendingNativeOAuth = undefined
-      reject(new AuthCancelledError())
-    })
-    pendingNativeOAuth = {
-      resolve,
-      reject,
-      removeBrowserListener: () => browserListener.remove(),
-    }
-    try {
-      await Browser.open({ url: data.url! })
-    } catch (openError) {
-      pendingNativeOAuth = undefined
-      await browserListener.remove()
-      reject(openError instanceof Error ? openError : new Error('無法開啟登入頁面。'))
-    }
-  })
+  return null
 }
 
-export function signInWithGoogle(): Promise<AuthCompletion | null> {
-  return startOAuth('google')
+export async function signInWithGoogle(): Promise<AuthCompletion | null> {
+  if (!isCapacitorNative()) return startWebOAuth('google')
+  if (!Capacitor.isPluginAvailable('GoogleAuth')) {
+    throw new Error('此版本未安裝 Google 原生登入模組，請更新 App 後再試。')
+  }
+
+  try {
+    const nonce = createOidcNonce()
+    const credential = await GoogleAuth.signIn({ nonce })
+    if (!credential.identityToken) {
+      throw new Error('Google 未回傳有效的 ID token。')
+    }
+    const supabase = createClient()
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: credential.identityToken,
+      nonce,
+    })
+    if (error) throw error
+    return verifyAndComplete(data.session, credential.name)
+  } catch (error) {
+    if (isCancellation(error)) throw new AuthCancelledError()
+    throw error
+  }
 }
 
 export async function signInWithApple(): Promise<AuthCompletion | null> {
-  if (!isCapacitorNative()) return startOAuth('apple')
+  if (!isCapacitorNative()) return startWebOAuth('apple')
   if (!Capacitor.isPluginAvailable('AppleAuth')) {
     throw new Error('此版本未安裝 Apple 登入模組，請更新 App 後再試。')
   }
@@ -258,24 +266,9 @@ export async function completeOAuthCallback(url: string): Promise<AuthCompletion
 
   callbackPromises.set(url, operation)
   try {
-    const completion = await operation
-    if (pendingNativeOAuth) {
-      const pending = pendingNativeOAuth
-      pendingNativeOAuth = undefined
-      await pending.removeBrowserListener?.()
-      pending.resolve(completion)
-    }
-    return completion
-  } catch (error) {
-    if (pendingNativeOAuth) {
-      const pending = pendingNativeOAuth
-      pendingNativeOAuth = undefined
-      await pending.removeBrowserListener?.()
-      pending.reject(error instanceof Error ? error : new Error('登入失敗'))
-    }
-    throw error
+    return await operation
   } finally {
-    if (isCapacitorNative()) await Browser.close().catch(() => undefined)
+    callbackPromises.delete(url)
   }
 }
 
@@ -319,6 +312,11 @@ export async function listenForAppleCredentialRevocation(
 export async function signOut(): Promise<void> {
   const supabase = createClient()
   clearUserLocalState()
+  if (isCapacitorNative() && Capacitor.isPluginAvailable('GoogleAuth')) {
+    await GoogleAuth.signOut().catch(error => {
+      console.error('[AUTH] Google native logout failed', error)
+    })
+  }
   try {
     const { logOutAppleIap } = await import('@/lib/apple-iap-client')
     await logOutAppleIap()

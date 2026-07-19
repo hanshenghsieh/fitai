@@ -9,12 +9,12 @@ secrets in `NEXT_PUBLIC_*`, the iOS bundle, or source control.
 - Configure the OAuth consent screen, support email, privacy URL, and production
   publishing status.
 - Request only `openid`, `email`, and `profile`.
-- Create a Web OAuth client for Supabase.
+- Create a Web OAuth client for Supabase and native ID-token verification.
 - Add Supabase's callback URL as an authorized redirect URI:
   `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback`.
-- If a separate iOS client is created later, its Bundle ID must be
-  `app.fitai.betterbit`. The current Supabase browser-based PKCE flow uses the
-  Web client and does not embed a Google client secret in the app.
+- Create an iOS OAuth client whose Bundle ID is exactly `app.fitai.betterbit`.
+- Client IDs are public identifiers, but the Google client secret must remain
+  only in Supabase and must never be put in a `NEXT_PUBLIC_*` variable.
 
 ## Supabase Auth
 
@@ -60,11 +60,18 @@ secrets in `NEXT_PUBLIC_*`, the iOS bundle, or source control.
 
 ## Xcode / device acceptance
 
+- Add these App target user-defined build settings for both Debug and Release:
+  - `GOOGLE_IOS_CLIENT_ID`: the iOS OAuth client ID
+  - `GOOGLE_WEB_CLIENT_ID`: the Web OAuth client ID configured in Supabase
+  - `GOOGLE_REVERSED_IOS_CLIENT_ID`: the reversed iOS client ID, for example
+    `com.googleusercontent.apps.<client-prefix>`
 - Run `npm ci`, `npm run build:ios-local`, then `npx cap sync ios` on the Mac.
-- Confirm SPM resolves Browser, Barcode Scanner, Camera, Local Notifications,
-  RevenueCat, and Capacitor packages.
-- Confirm URL scheme `betterbit` exists in the built target.
-- Verify Google returns through `betterbit://auth/callback`.
+- Confirm SPM resolves the official `GoogleSignIn` 9.2.0 package plus Barcode
+  Scanner, Camera, Local Notifications, RevenueCat, and Capacitor packages.
+- Confirm URL schemes `betterbit` and the reversed Google iOS client ID exist in
+  the built target.
+- Verify native Google presents the Google iOS SDK sheet, returns an ID token to
+  the WebView, and never opens Safari or `localhost`.
 - Verify native Apple presents the system AuthenticationServices sheet.
 - Verify HealthKit displays the system authorization sheet and real samples.
 - Verify barcode scanning requests camera permission and resolves a real GTIN.

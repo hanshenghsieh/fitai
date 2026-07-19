@@ -23,10 +23,13 @@ describe('BETTERBIT-NATIVE-INTEGRATIONS-001 native contracts', () => {
     assert.match(plist, /掃描商品條碼/)
   })
 
-  it('registers real Apple Auth and HealthKit plugins in the bridge', () => {
+  it('registers real Google, Apple Auth, and HealthKit plugins in the bridge', () => {
     const bridge = source('ios/App/App/BridgeViewController.swift')
     const plugins = source('ios/App/App/NativeIntegrationsPlugins.swift')
+    assert.match(bridge, /registerPluginInstance\(GoogleAuthPlugin\(\)\)/)
     assert.match(bridge, /registerPluginInstance\(AppleAuthPlugin\(\)\)/)
+    assert.match(plugins, /GIDSignIn\.sharedInstance\.signIn/)
+    assert.match(plugins, /GIDConfiguration/)
     assert.match(bridge, /registerPluginInstance\(HealthKitPlugin\(\)\)/)
     assert.match(plugins, /ASAuthorizationAppleIDProvider/)
     assert.match(plugins, /request\.nonce = sha256\(rawNonce\)/)
@@ -45,16 +48,19 @@ describe('BETTERBIT-NATIVE-INTEGRATIONS-001 native contracts', () => {
     assert.match(project, /NativeIntegrationsPlugins\.swift in Sources/)
   })
 
-  it('syncs maintained Browser and Barcode Scanner packages through SPM', () => {
+  it('uses official GoogleSignIn SPM and syncs Barcode Scanner through Capacitor', () => {
     const packageJson = source('package.json')
     const swiftPackage = source('ios/App/CapApp-SPM/Package.swift')
     const capacitorJson = source('ios/App/App/capacitor.config.json')
-    assert.match(packageJson, /"@capacitor\/browser"/)
+    const project = source('ios/App/App.xcodeproj/project.pbxproj')
+    assert.doesNotMatch(packageJson, /"@capacitor\/browser"/)
     assert.match(packageJson, /"@capacitor\/barcode-scanner"/)
-    assert.match(swiftPackage, /CapacitorBrowser/)
+    assert.doesNotMatch(swiftPackage, /CapacitorBrowser/)
     assert.match(swiftPackage, /CapacitorBarcodeScanner/)
-    assert.match(capacitorJson, /CAPBrowserPlugin/)
+    assert.doesNotMatch(capacitorJson, /CAPBrowserPlugin/)
     assert.match(capacitorJson, /CapacitorBarcodeScannerPlugin/)
+    assert.match(project, /github\.com\/google\/GoogleSignIn-iOS/)
+    assert.match(project, /version = 9\.2\.0/)
   })
 
   it('routes barcode records through the accepted Today commit contract', () => {

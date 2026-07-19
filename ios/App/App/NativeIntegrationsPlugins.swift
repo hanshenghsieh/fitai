@@ -1,9 +1,113 @@
 import AuthenticationServices
 import Capacitor
 import CryptoKit
+import GoogleSignIn
 import HealthKit
 import Security
 import UIKit
+
+@objc(GoogleAuthPlugin)
+public final class GoogleAuthPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "GoogleAuthPlugin"
+    public let jsName = "GoogleAuth"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "signIn", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "signOut", returnType: CAPPluginReturnPromise)
+    ]
+
+    @objc public func signIn(_ call: CAPPluginCall) {
+        guard let iosClientId = Bundle.main.object(forInfoDictionaryKey: "GIDClientID")
+                as? String,
+              iosClientId.hasSuffix(".apps.googleusercontent.com"),
+              !iosClientId.contains("$("),
+              let serverClientId = Bundle.main.object(forInfoDictionaryKey: "GIDServerClientID")
+                as? String,
+              serverClientId.hasSuffix(".apps.googleusercontent.com"),
+              !serverClientId.contains("$(") else {
+            call.reject(
+                "Google OAuth Client ID 設定不完整。",
+                "GOOGLE_CONFIGURATION_MISSING"
+            )
+            return
+        }
+        let reversedClientId = iosClientId
+            .split(separator: ".")
+            .reversed()
+            .joined(separator: ".")
+
+        guard registeredUrlSchemes().contains(reversedClientId) else {
+            call.reject(
+                "Google iOS callback URL scheme 未加入 App 設定。",
+                "GOOGLE_URL_SCHEME_MISSING"
+            )
+            return
+        }
+
+        guard let presenter = bridge?.viewController else {
+            call.reject("無法顯示 Google 登入畫面。", "GOOGLE_PRESENTER_MISSING")
+            return
+        }
+
+        GIDSignIn.sharedInstance.configuration = GIDConfiguration(
+            clientID: iosClientId,
+            serverClientID: serverClientId
+        )
+        let nonce = call.getString("nonce")
+
+        DispatchQueue.main.async {
+            GIDSignIn.sharedInstance.signIn(
+                withPresenting: presenter,
+                hint: nil,
+                additionalScopes: nil,
+                nonce: nonce
+            ) { result, error in
+                if let error = error {
+                    let nsError = error as NSError
+                    if nsError.code == -5 && nsError.domain.contains("GIDSignIn") {
+                        call.reject("已取消 Google 登入。", "GOOGLE_AUTH_CANCELLED", error)
+                    } else {
+                        call.reject("Google 登入失敗。", "GOOGLE_AUTH_FAILED", error)
+                    }
+                    return
+                }
+
+                guard let user = result?.user,
+                      let identityToken = user.idToken?.tokenString,
+                      !identityToken.isEmpty else {
+                    call.reject(
+                        "Google 未回傳有效的 ID token。",
+                        "GOOGLE_ID_TOKEN_MISSING"
+                    )
+                    return
+                }
+
+                var response: JSObject = ["identityToken": identityToken]
+                if let email = user.profile?.email, !email.isEmpty {
+                    response["email"] = email
+                }
+                if let name = user.profile?.name, !name.isEmpty {
+                    response["name"] = name
+                }
+                call.resolve(response)
+            }
+        }
+    }
+
+    @objc public func signOut(_ call: CAPPluginCall) {
+        GIDSignIn.sharedInstance.signOut()
+        call.resolve()
+    }
+
+    private func registeredUrlSchemes() -> Set<String> {
+        guard let urlTypes = Bundle.main.object(forInfoDictionaryKey: "CFBundleURLTypes")
+            as? [[String: Any]] else {
+            return []
+        }
+        return Set(urlTypes.flatMap { type in
+            type["CFBundleURLSchemes"] as? [String] ?? []
+        })
+    }
+}
 
 @objc(AppleAuthPlugin)
 public final class AppleAuthPlugin: CAPPlugin, CAPBridgedPlugin,

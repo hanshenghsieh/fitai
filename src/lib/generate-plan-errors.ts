@@ -2,6 +2,7 @@ export type GeneratePlanErrorCode =
   | 'UNAUTHORIZED'
   | 'MISSING_PROFILE'
   | 'MISSING_GOAL'
+  | 'MISSING_REQUIRED_FIELDS'
   | 'SUBSCRIPTION_REQUIRED'
   | 'SAVE_FAILED'
   | 'UNKNOWN'
@@ -15,6 +16,7 @@ export function messageForGeneratePlanError(input: {
       return '請先登入後再試一次。'
     case 'MISSING_PROFILE':
     case 'MISSING_GOAL':
+    case 'MISSING_REQUIRED_FIELDS':
       return input.error ?? '請先到「我的」完成基本設定。'
     case 'SUBSCRIPTION_REQUIRED':
       return input.error ?? '試用期已結束，請訂閱後繼續使用。'

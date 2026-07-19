@@ -9,11 +9,23 @@ function source(path: string): string {
 describe('BETTERBIT-NATIVE-INTEGRATIONS-001 auth contract', () => {
   const auth = source('src/lib/auth/auth-service.ts')
 
-  it('uses PKCE callback exchange and native browser handoff', () => {
-    assert.match(auth, /betterbit:\/\/auth\/callback/)
-    assert.match(auth, /skipBrowserRedirect:\s*native/)
-    assert.match(auth, /Browser\.open/)
+  it('keeps OAuth callback exchange on web only', () => {
+    assert.match(auth, /startWebOAuth/)
+    assert.match(auth, /if \(isCapacitorNative\(\)\)/)
+    assert.match(auth, /window\.location\.origin/)
     assert.match(auth, /exchangeCodeForSession\(code\)/)
+    assert.doesNotMatch(auth, /Browser\.open/)
+    assert.doesNotMatch(auth, /skipBrowserRedirect/)
+  })
+
+  it('uses the native Google SDK ID token and matching nonce on iOS', () => {
+    assert.match(auth, /registerPlugin<GoogleAuthPlugin>\('GoogleAuth'\)/)
+    assert.match(auth, /GoogleAuth\.signIn\(\{ nonce \}\)/)
+    assert.match(
+      auth,
+      /signInWithIdToken\(\{\s*provider:\s*'google',\s*token:\s*credential\.identityToken,\s*nonce/
+    )
+    assert.doesNotMatch(auth, /signInWithOAuth\(\{\s*provider:\s*'google'/)
   })
 
   it('uses the native Apple identity token and raw nonce', () => {

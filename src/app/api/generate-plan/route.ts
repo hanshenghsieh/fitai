@@ -12,6 +12,9 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const endpoint = '/api/generate-plan'
+  let diagnosticUserId: string | undefined
+  let diagnosticProvider = 'unknown'
   try {
     const cronAuth = req.headers.get('authorization')
     const cronUserId = req.headers.get('x-user-id')
@@ -23,17 +26,34 @@ export async function POST(req: NextRequest) {
     let supabase
     let userId: string
     let userEmail: string | null = null
+    let provider = isCron ? 'cron' : 'unknown'
+    let timeZone: string | null = null
 
     if (isCron) {
       supabase = await createServiceClient()
       userId = cronUserId!
     } else {
       const auth = await requireApiUser(req)
-      if (!auth.ok) return auth.response
+      if (!auth.ok) {
+        console.warn('[PLAN_GENERATION]', {
+          endpoint,
+          status: auth.response.status,
+          errorCode: 'UNAUTHORIZED',
+          message: 'Bearer authentication failed',
+          validationFields: ['authorization'],
+        })
+        return auth.response
+      }
       supabase = auth.supabase
       userId = auth.user.id
       userEmail = auth.user.email ?? null
+      provider =
+        (auth.user.app_metadata?.provider as string | undefined) ??
+        auth.user.identities?.[0]?.provider ??
+        'unknown'
     }
+    diagnosticUserId = userId
+    diagnosticProvider = provider
 
     let profile: UserProfile | null = null
     let goal: Goal | null = null
@@ -42,6 +62,7 @@ export async function POST(req: NextRequest) {
     try {
       const body = await req.json()
       if (body.regen_reason) regenReason = String(body.regen_reason)
+      if (typeof body.timezone === 'string') timeZone = body.timezone
       if (body.profile && body.goal) {
         const dbProfile = (
           await supabase.from('user_profiles').select('*').eq('id', userId).single()
@@ -65,16 +86,52 @@ export async function POST(req: NextRequest) {
       regenReason,
       profile,
       goal,
+      timeZone,
       iosNativeReview: shouldGrantFullAccessPreIap(req.headers),
     })
 
     if (!result.ok) {
-      return jsonWithCors({ error: result.error, code: result.code }, req, { status: result.status })
+      console.error('[PLAN_GENERATION]', {
+        userId,
+        provider,
+        endpoint,
+        status: result.status,
+        errorCode: result.code,
+        message: result.error,
+        validationFields: result.validationFields ?? [],
+      })
+      return jsonWithCors(
+        {
+          error: result.error,
+          code: result.code,
+          validation_fields: result.validationFields ?? [],
+        },
+        req,
+        { status: result.status }
+      )
     }
 
-    return jsonWithCors({ success: true, data: result.data }, req)
+    console.info('[PLAN_GENERATION]', {
+      userId,
+      provider,
+      endpoint,
+      status: 200,
+      weekStart: result.weekStart,
+    })
+    return jsonWithCors(
+      { success: true, data: result.data, week_start: result.weekStart },
+      req
+    )
   } catch (err) {
-    console.error('Error generating plan:', err)
+    console.error('[PLAN_GENERATION]', {
+      userId: diagnosticUserId,
+      provider: diagnosticProvider,
+      endpoint,
+      status: 500,
+      errorCode: 'UNKNOWN',
+      message: err instanceof Error ? err.message : 'Failed to generate plan',
+      validationFields: [],
+    })
     return jsonWithCors(
       { error: err instanceof Error ? err.message : 'Failed to generate plan' },
       req,

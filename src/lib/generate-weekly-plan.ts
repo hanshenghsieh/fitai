@@ -1,5 +1,4 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { format, startOfWeek, addMonths, subWeeks } from 'date-fns'
 import { buildScaledHomeMeal, generateWorkoutPlan } from '@/lib/plan-engine'
 import {
   calculateGoalPlan,
@@ -29,10 +28,21 @@ import {
 import type { Goal, UserProfile, WeeklyFeedback, WeeklyPlanData } from '@/types'
 import { mergePreferences, type UserSettingsPreferences } from '@/lib/settings/user-settings-types'
 import { goalPlanOptionsFromPreferences } from '@/lib/fat-loss-pace'
+import {
+  addDaysToDateKey,
+  normalizePlanTimeZone,
+  weekStartForTimeZone,
+} from '@/lib/weekly-plan-week'
 
 export type GenerateWeeklyPlanResult =
-  | { ok: true; data: WeeklyPlanData }
-  | { ok: false; error: string; code: string; status: number }
+  | { ok: true; data: WeeklyPlanData; weekStart: string }
+  | {
+      ok: false
+      error: string
+      code: string
+      status: number
+      validationFields?: string[]
+    }
 
 interface GenerateWeeklyPlanInput {
   userId: string
@@ -40,8 +50,27 @@ interface GenerateWeeklyPlanInput {
   regenReason?: string | null
   profile?: UserProfile | null
   goal?: Goal | null
+  timeZone?: string | null
   /** Capacitor iOS / review build — unlock plan generation until Apple IAP ships. */
   iosNativeReview?: boolean
+}
+
+function requiredPlanFields(profile: UserProfile, goal: Goal): string[] {
+  const missing: string[] = []
+  if (!profile.gender) missing.push('gender')
+  if (!Number.isFinite(Number(profile.age)) || Number(profile.age) <= 0) missing.push('age')
+  if (!Number.isFinite(Number(profile.height_cm)) || Number(profile.height_cm) <= 0) {
+    missing.push('height_cm')
+  }
+  if (!Number.isFinite(Number(profile.weight_kg)) || Number(profile.weight_kg) <= 0) {
+    missing.push('weight_kg')
+  }
+  if (!profile.activity_level) missing.push('activity_level')
+  if (!profile.fitness_level) missing.push('fitness_level')
+  if (!goal.goal_type) missing.push('goal_type')
+  if (!goal.start_date) missing.push('start_date')
+  if (!goal.end_date) missing.push('end_date')
+  return missing
 }
 
 export async function generateWeeklyPlanForUser(
@@ -71,7 +100,19 @@ export async function generateWeeklyPlanForUser(
         error: '請先完成設定：需要體重資料與目標',
         code: profile ? 'MISSING_GOAL' : 'MISSING_PROFILE',
         status: 400,
+        validationFields: profile ? ['goal'] : ['profile'],
       }
+    }
+  }
+
+  const missingFields = requiredPlanFields(profile, goal)
+  if (missingFields.length) {
+    return {
+      ok: false,
+      error: `請完成必要欄位：${missingFields.join(', ')}`,
+      code: 'MISSING_REQUIRED_FIELDS',
+      status: 422,
+      validationFields: missingFields,
     }
   }
 
@@ -96,10 +137,14 @@ export async function generateWeeklyPlanForUser(
     }
   }
 
-  const today = new Date()
-  const weekStart = startOfWeek(today, { weekStartsOn: 1 })
-  const currentWeekStart = format(weekStart, 'yyyy-MM-dd')
-  const lastWeekStart = format(startOfWeek(subWeeks(today, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+  const settingsPrefs = mergePreferences(
+    (profile as UserProfile & { settings_preferences?: UserSettingsPreferences | null })
+      .settings_preferences
+  )
+  const planTimeZone = normalizePlanTimeZone(input.timeZone ?? settingsPrefs.timezone)
+  const weekStartStr = weekStartForTimeZone(new Date(), planTimeZone)
+  const currentWeekStart = weekStartStr
+  const lastWeekStart = addDaysToDateKey(weekStartStr, -7)
   const latestFeedback = await getLatestWeeklyFeedback(supabase, input.userId)
 
   const feedbackForAdjust =
@@ -108,10 +153,6 @@ export async function generateWeeklyPlanForUser(
       ? (latestFeedback as WeeklyFeedback)
       : null
 
-  const settingsPrefs = mergePreferences(
-    (profile as UserProfile & { settings_preferences?: UserSettingsPreferences | null })
-      .settings_preferences
-  )
   const planOptions = goalPlanOptionsFromPreferences(settingsPrefs)
 
   const goalPlan = calculateGoalPlan(profile, goal, planOptions)
@@ -213,7 +254,7 @@ export async function generateWeeklyPlanForUser(
 
     return {
       day: dayIndex + 1,
-      date: format(new Date(weekStart.getTime() + dayIndex * 86400000), 'yyyy-MM-dd'),
+      date: addDaysToDateKey(weekStartStr, dayIndex),
       meals,
       convenience_meals,
       workout,
@@ -258,8 +299,6 @@ export async function generateWeeklyPlanForUser(
 
   const workoutBurn = estimateWeeklyWorkoutBurn(days.map(d => d.workout))
   const workoutDays = days.filter(d => d.workout.type !== 'rest').length
-  const weekStartStr = format(weekStart, 'yyyy-MM-dd')
-
   const [{ data: existingPlan }, { data: maxPlan }] = await Promise.all([
     supabase
       .from('weekly_plans')
@@ -325,10 +364,11 @@ export async function generateWeeklyPlanForUser(
       error: 'Failed to save plan',
       code: 'SAVE_FAILED',
       status: 500,
+      validationFields: ['weekly_plans'],
     }
   }
 
-  return { ok: true, data: planData }
+  return { ok: true, data: planData, weekStart: weekStartStr }
 }
 
 function generateGroceryList(days: { meals: { items: { name_zh: string }[] }[] }[]) {

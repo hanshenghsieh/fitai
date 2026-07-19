@@ -38,7 +38,7 @@ describe('UI-RESTORE-001 accepted behavior', () => {
     const login = source('src/app/login/page.tsx')
     const guard = source('src/features/auth/AppAuthGuard.tsx')
     const today = source('src/features/today/TodayPageClient.tsx')
-    assert.match(login, /window\.location\.assign\(['"]\/dashboard\?login=1['"]\)/)
+    assert.match(login, /window\.location\.assign\(`\$\{completion\.nextPath\}\?login=1`\)/)
     assert.match(guard, /waitForSession/)
     assert.match(guard, /login=1/)
     assert.match(today, /<BetterBitHome/)

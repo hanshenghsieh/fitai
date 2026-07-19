@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { Loader2, ChevronRight, ChevronLeft } from 'lucide-react'
-import { addMonths, format, startOfWeek } from 'date-fns'
+import { addMonths, format } from 'date-fns'
 import { colors, cardStyle } from '@/lib/design-system'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { calculateGoalPlan } from '@/lib/goal-calculator'
@@ -16,7 +16,7 @@ import { pickZaiJianLine, zaijian } from '@/lib/copy/zaijian'
 import ZaiJian from '@/components/character/ZaiJian'
 import { OnboardingCard, OnboardingChip } from '@/components/onboarding/OnboardingChip'
 import type { ActivityLevel, FitnessLevel, Goal, UserProfile } from '@/types'
-import { apiFetch } from '@/lib/api/client'
+import { apiFetch, apiUrl } from '@/lib/api/client'
 import AppAuthLoadingShell from '@/features/auth/AppAuthLoadingShell'
 import { messageForGeneratePlanError } from '@/lib/generate-plan-errors'
 
@@ -61,6 +61,42 @@ const initialData: FormData = {
   activity_level: 'moderate', fitness_level: 'beginner', equipment: ['none'],
   is_vegetarian: false, is_vegan: false, allergens: [], disliked_foods: '', food_budget: 'medium',
   injuries: [],
+}
+
+const requiredFieldLabels: Record<string, string> = {
+  authorization: '登入憑證',
+  profile: '個人資料',
+  goal: '目標',
+  gender: '性別',
+  age: '年齡',
+  height_cm: '身高',
+  weight_kg: '體重',
+  activity_level: '活動量',
+  fitness_level: '運動程度',
+  goal_type: '目標類型',
+  start_date: '開始日期',
+  end_date: '結束日期',
+  weekly_plans: '每週計畫',
+}
+
+function missingOnboardingFields(data: FormData): string[] {
+  const missing: string[] = []
+  if (!data.gender) missing.push('gender')
+  if (!Number.isFinite(Number(data.age)) || Number(data.age) <= 0) missing.push('age')
+  if (!Number.isFinite(Number(data.height_cm)) || Number(data.height_cm) <= 0) {
+    missing.push('height_cm')
+  }
+  if (!Number.isFinite(Number(data.weight_kg)) || Number(data.weight_kg) <= 0) {
+    missing.push('weight_kg')
+  }
+  if (!data.activity_level) missing.push('activity_level')
+  if (!data.fitness_level) missing.push('fitness_level')
+  if (!data.goal_type) missing.push('goal_type')
+  return missing
+}
+
+function fieldsMessage(fields: string[]): string {
+  return fields.map(field => requiredFieldLabels[field] ?? field).join('、')
 }
 
 function toggle<T>(arr: T[], val: T): T[] {
@@ -139,14 +175,53 @@ export default function OnboardingPage() {
       toast.error('登入連線尚未建立，請稍後再試。')
       return
     }
+    const missingFields = missingOnboardingFields(data)
+    if (missingFields.length) {
+      toast.error(`請先完成：${fieldsMessage(missingFields)}`)
+      return
+    }
     setLoading(true)
     const supabase = createClient()
+    const endpoint = apiUrl('/api/generate-plan')
+    let diagnosticContext: {
+      userId?: string
+      provider?: string
+      status?: number
+      errorCode?: string
+      validationFields?: string[]
+    } = {}
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('未登入')
+      const [
+        {
+          data: { session },
+        },
+        {
+          data: { user },
+          error: userError,
+        },
+      ] = await Promise.all([supabase.auth.getSession(), supabase.auth.getUser()])
+      if (userError || !user || !session?.access_token) {
+        diagnosticContext = {
+          status: 401,
+          errorCode: 'UNAUTHORIZED',
+          validationFields: ['authorization'],
+        }
+        throw new Error('登入憑證已失效，請重新登入。')
+      }
+      const provider =
+        (user.app_metadata?.provider as string | undefined) ??
+        user.identities?.[0]?.provider ??
+        'unknown'
+      diagnosticContext = { userId: user.id, provider }
+      console.info('[ONBOARDING_PLAN_SUBMIT]', {
+        userId: user.id,
+        provider,
+        endpoint,
+        authorization: 'Bearer present',
+        validationFields: [],
+      })
 
       const weightKg = parseFloat(data.weight_kg) || 70
-      const gender = data.gender
       const endDate = format(addMonths(new Date(), parseInt(data.goal_months) || 3), 'yyyy-MM-dd')
       const equipment = data.equipment.length ? data.equipment : ['none']
 
@@ -169,10 +244,19 @@ export default function OnboardingPage() {
         onboarding_completed: false,
         water_ml_target: Math.round(weightKg * 35),
       }
-      const { error: profileError } = await supabase
+      const { data: savedProfile, error: profileError } = await supabase
         .from('user_profiles')
         .upsert(profilePayload, { onConflict: 'id' })
-      if (profileError) throw new Error(profileError.message)
+        .select('id')
+        .single()
+      if (profileError || savedProfile?.id !== user.id) {
+        diagnosticContext = {
+          ...diagnosticContext,
+          errorCode: profileError?.code ?? 'PROFILE_UPSERT_FAILED',
+          validationFields: ['profile'],
+        }
+        throw new Error(profileError?.message || '個人資料未正確儲存。')
+      }
 
       const goalPayload = {
         user_id: user.id,
@@ -191,13 +275,27 @@ export default function OnboardingPage() {
         .eq('user_id', user.id)
         .eq('is_active', true)
         .order('created_at', { ascending: false })
-      if (activeGoalError) throw new Error(activeGoalError.message)
+      if (activeGoalError) {
+        diagnosticContext = {
+          ...diagnosticContext,
+          errorCode: activeGoalError.code,
+          validationFields: ['goal'],
+        }
+        throw new Error(activeGoalError.message)
+      }
 
       const primaryGoalId = activeGoals?.[0]?.id as string | undefined
       const { error: goalError } = primaryGoalId
         ? await supabase.from('goals').update(goalPayload).eq('id', primaryGoalId)
         : await supabase.from('goals').insert(goalPayload)
-      if (goalError) throw new Error(goalError.message)
+      if (goalError) {
+        diagnosticContext = {
+          ...diagnosticContext,
+          errorCode: goalError.code,
+          validationFields: ['goal'],
+        }
+        throw new Error(goalError.message)
+      }
       const duplicateGoalIds = (activeGoals ?? [])
         .slice(1)
         .map(goal => goal.id as string)
@@ -206,41 +304,72 @@ export default function OnboardingPage() {
           .from('goals')
           .update({ is_active: false })
           .in('id', duplicateGoalIds)
-        if (duplicateGoalError) throw new Error(duplicateGoalError.message)
+        if (duplicateGoalError) {
+          diagnosticContext = {
+            ...diagnosticContext,
+            errorCode: duplicateGoalError.code,
+            validationFields: ['goal'],
+          }
+          throw new Error(duplicateGoalError.message)
+        }
       }
 
       toast.message(zaijian.generating)
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Taipei'
       const generateRes = await apiFetch('/api/generate-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ timezone: timeZone }),
       })
       const result = (await generateRes.json().catch(() => ({}))) as {
         error?: string
         code?: string
+        validation_fields?: string[]
+        week_start?: string
         data?: { days?: Array<{ daily_targets?: { calories?: number } }> }
       }
+      diagnosticContext = {
+        ...diagnosticContext,
+        status: generateRes.status,
+        errorCode: result.code,
+        validationFields: result.validation_fields ?? [],
+      }
+      console.info('[ONBOARDING_PLAN_RESPONSE]', {
+        userId: user.id,
+        provider,
+        endpoint,
+        status: generateRes.status,
+        errorCode: result.code ?? null,
+        message: result.error ?? null,
+        validationFields: result.validation_fields ?? [],
+        weekStart: result.week_start ?? null,
+      })
       if (!generateRes.ok) {
+        const fieldSuffix = result.validation_fields?.length
+          ? `（${fieldsMessage(result.validation_fields)}）`
+          : ''
         throw new Error(
-          messageForGeneratePlanError({ error: result.error, code: result.code })
+          `${messageForGeneratePlanError({ error: result.error, code: result.code })}${fieldSuffix}`
         )
       }
       if (!result.data?.days?.length) {
+        diagnosticContext = {
+          ...diagnosticContext,
+          errorCode: 'PLAN_DAYS_MISSING',
+          validationFields: ['weekly_plans'],
+        }
         throw new Error('計畫尚未完成，請再試一次。')
       }
-
-      const { data: completedProfile, error: completionError } = await supabase
-        .from('user_profiles')
-        .update({ onboarding_completed: true })
-        .eq('id', user.id)
-        .select('id, onboarding_completed')
-        .single()
-      if (completionError || !completedProfile?.onboarding_completed) {
-        throw new Error(completionError?.message || '個人設定尚未完成，請再試一次。')
+      if (!result.week_start) {
+        diagnosticContext = {
+          ...diagnosticContext,
+          errorCode: 'PLAN_WEEK_START_MISSING',
+          validationFields: ['weekly_plans'],
+        }
+        throw new Error('計畫回應缺少週期資訊，請再試一次。')
       }
 
-      const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
-      const [{ data: verifiedGoal }, { data: verifiedPlan }] = await Promise.all([
+      const [goalVerification, planVerification] = await Promise.all([
         supabase
           .from('goals')
           .select('id')
@@ -252,9 +381,20 @@ export default function OnboardingPage() {
           .from('weekly_plans')
           .select('generation_status, plan_data')
           .eq('user_id', user.id)
-          .eq('week_start', weekStart)
+          .eq('week_start', result.week_start)
           .maybeSingle(),
       ])
+      if (goalVerification.error || planVerification.error) {
+        const verificationError = goalVerification.error ?? planVerification.error
+        diagnosticContext = {
+          ...diagnosticContext,
+          errorCode: verificationError?.code ?? 'PLAN_VERIFY_QUERY_FAILED',
+          validationFields: goalVerification.error ? ['goal'] : ['weekly_plans'],
+        }
+        throw new Error(verificationError?.message || '無法驗證計畫資料。')
+      }
+      const verifiedGoal = goalVerification.data
+      const verifiedPlan = planVerification.data
       const verifiedDays = (
         verifiedPlan?.plan_data as { days?: unknown[] } | null | undefined
       )?.days
@@ -263,7 +403,34 @@ export default function OnboardingPage() {
         verifiedPlan?.generation_status !== 'completed' ||
         !verifiedDays?.length
       ) {
-        throw new Error('計畫驗證尚未完成，請再試一次。')
+        const failedFields = [
+          ...(!verifiedGoal ? ['goal'] : []),
+          ...(verifiedPlan?.generation_status !== 'completed'
+            ? ['weekly_plans.generation_status']
+            : []),
+          ...(!verifiedDays?.length ? ['weekly_plans.plan_data.days'] : []),
+        ]
+        diagnosticContext = {
+          ...diagnosticContext,
+          errorCode: 'PLAN_VERIFY_FAILED',
+          validationFields: failedFields,
+        }
+        throw new Error(`計畫資料驗證未完成：${fieldsMessage(failedFields)}`)
+      }
+
+      const { data: completedProfile, error: completionError } = await supabase
+        .from('user_profiles')
+        .update({ onboarding_completed: true })
+        .eq('id', user.id)
+        .select('id, onboarding_completed')
+        .single()
+      if (completionError || !completedProfile?.onboarding_completed) {
+        diagnosticContext = {
+          ...diagnosticContext,
+          errorCode: completionError?.code ?? 'PROFILE_COMPLETION_FAILED',
+          validationFields: ['profile'],
+        }
+        throw new Error(completionError?.message || '個人設定尚未完成，請再試一次。')
       }
 
       // Hard navigation so the dashboard guard reads the freshly-written
@@ -271,6 +438,11 @@ export default function OnboardingPage() {
       toast.success('計畫已就緒，照著做就好。')
       window.location.assign('/dashboard?welcome=1&login=1')
     } catch (err: unknown) {
+      console.error('[ONBOARDING_PLAN_FAILURE]', {
+        ...diagnosticContext,
+        endpoint,
+        message: err instanceof Error ? err.message : 'Unknown onboarding plan error',
+      })
       toast.error(err instanceof Error ? err.message : pickZaiJianLine('error').text)
       setLoading(false)
     }

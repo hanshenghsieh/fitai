@@ -32,9 +32,9 @@ describe('REG-BOOTSTRAP-001 registration and onboarding contract', () => {
     assert.ok(pending >= 0)
     assert.ok(goal > pending)
     assert.ok(generate > goal)
-    assert.ok(complete > generate)
-    assert.ok(verify > complete)
-    assert.ok(redirect > verify)
+    assert.ok(verify > generate)
+    assert.ok(complete > verify)
+    assert.ok(redirect > complete)
   })
 
   it('makes onboarding retries idempotent without schema changes', () => {
