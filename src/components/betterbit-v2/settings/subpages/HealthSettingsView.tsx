@@ -18,14 +18,22 @@ import {
   classifyHealthKitError,
   healthKitErrorMessage,
   localDayRange,
-  recentWorkoutRange,
+  logHealthKitQueryRange,
+  logHealthKitRangeRejection,
+  resolveHealthTimeZone,
   type HealthAuthorizationSummary,
   type HealthBodyMetrics,
   type HealthDailyActivity,
   type HealthWorkout,
 } from '@/lib/health-sync'
+import { isNativeIOS } from '@/lib/capacitor-native'
 
 type LoadingState = 'initial' | 'authorizing' | 'refreshing' | null
+type HealthQueryErrors = {
+  bodyMeasurements?: string
+  todayActivity?: string
+  workouts?: string
+}
 
 function formatNumber(value: number | undefined, maximumFractionDigits = 1): string {
   if (value === undefined || !Number.isFinite(value)) return '—'
@@ -101,6 +109,7 @@ export default function HealthSettingsView() {
   const [workouts, setWorkouts] = useState<HealthWorkout[]>([])
   const [loading, setLoading] = useState<LoadingState>('initial')
   const [error, setError] = useState<string | null>(null)
+  const [queryErrors, setQueryErrors] = useState<HealthQueryErrors>({})
   const [authorizationDenied, setAuthorizationDenied] = useState(false)
 
   const loadHealthData = useCallback(async (authorization: HealthAuthorizationSummary) => {
@@ -108,24 +117,43 @@ export default function HealthSettingsView() {
       setBodyMetrics(null)
       setActivity(null)
       setWorkouts([])
+      setQueryErrors({})
       return
     }
 
+    const now = new Date()
+    const timeZone = resolveHealthTimeZone()
+    const activityRange = localDayRange(now, timeZone)
+    const workoutRange = localDayRange(now, timeZone)
+    logHealthKitQueryRange('bodyMeasurements')
+    logHealthKitQueryRange('todayActivity', activityRange)
+    logHealthKitQueryRange('workouts', workoutRange)
     const results = await Promise.allSettled([
       HealthKit.getLatestBodyMetrics(),
-      HealthKit.getDailyActivity(localDayRange()),
-      HealthKit.getWorkouts(recentWorkoutRange()),
+      HealthKit.getDailyActivity(activityRange),
+      HealthKit.getWorkouts(workoutRange),
     ])
 
     if (results[0].status === 'fulfilled') setBodyMetrics(results[0].value)
     if (results[1].status === 'fulfilled') setActivity(results[1].value)
     if (results[2].status === 'fulfilled') setWorkouts(results[2].value.workouts)
 
-    const failure = results.find(result => result.status === 'rejected')
-    if (failure?.status === 'rejected') {
-      const denied = classifyHealthKitError(failure.reason) === 'denied'
-      setAuthorizationDenied(denied)
-      setError(healthKitErrorMessage(failure.reason))
+    const queryTypes = ['bodyMeasurements', 'todayActivity', 'workouts'] as const
+    const nextErrors: HealthQueryErrors = {}
+    results.forEach((result, index) => {
+      if (result.status !== 'rejected') return
+      const queryType = queryTypes[index]
+      logHealthKitRangeRejection(queryType, result.reason)
+      const kind = classifyHealthKitError(result.reason)
+      if (kind === 'denied') setAuthorizationDenied(true)
+      nextErrors[queryType] =
+        kind === 'invalidDateRange'
+          ? '日期範圍錯誤，請重新整理後再試。'
+          : healthKitErrorMessage(result.reason)
+    })
+    setQueryErrors(nextErrors)
+    if (results.every(result => result.status === 'fulfilled')) {
+      setAuthorizationDenied(false)
     }
   }, [])
 
@@ -133,6 +161,11 @@ export default function HealthSettingsView() {
     setLoading(mode)
     setError(null)
     try {
+      if (!isNativeIOS()) {
+        setAvailable(false)
+        setSummary(null)
+        return
+      }
       const availability = await HealthKit.isAvailable()
       setAvailable(availability.available)
       if (!availability.available) {
@@ -249,7 +282,11 @@ export default function HealthSettingsView() {
       {available && canQuery ? (
         <>
           <HealthCard icon={<Scale className="h-4 w-4" />} title="最新身體數據">
-            {noBodyData ? (
+            {queryErrors.bodyMeasurements ? (
+              <p className="py-3 text-[14px] leading-relaxed text-[#a53d2e]">
+                {queryErrors.bodyMeasurements}
+              </p>
+            ) : noBodyData ? (
               <p className="py-3 text-[14px] leading-relaxed text-[#7a807a]">
                 Apple Health 未回傳身體數據；可能尚無紀錄，或此資料類型未允許讀取。
               </p>
@@ -263,7 +300,11 @@ export default function HealthSettingsView() {
           </HealthCard>
 
           <HealthCard icon={<Activity className="h-4 w-4" />} title="今天的活動">
-            {noActivityData ? (
+            {queryErrors.todayActivity ? (
+              <p className="py-3 text-[14px] leading-relaxed text-[#a53d2e]">
+                {queryErrors.todayActivity}
+              </p>
+            ) : noActivityData ? (
               <p className="py-3 text-[14px] leading-relaxed text-[#7a807a]">
                 Apple Health 未回傳今天的活動資料；可能尚無紀錄，或此資料類型未允許讀取。
               </p>
@@ -275,10 +316,14 @@ export default function HealthSettingsView() {
             )}
           </HealthCard>
 
-          <HealthCard icon={<Dumbbell className="h-4 w-4" />} title="最近運動">
-            {workouts.length === 0 ? (
+          <HealthCard icon={<Dumbbell className="h-4 w-4" />} title="今天的運動">
+            {queryErrors.workouts ? (
+              <p className="py-3 text-[14px] leading-relaxed text-[#a53d2e]">
+                {queryErrors.workouts}
+              </p>
+            ) : workouts.length === 0 ? (
               <p className="py-3 text-[14px] leading-relaxed text-[#7a807a]">
-                最近 14 天未回傳運動紀錄；可能沒有紀錄，或運動資料未允許讀取。
+                Apple Health 未回傳今天的運動紀錄；可能沒有紀錄，或運動資料未允許讀取。
               </p>
             ) : (
               <div className="divide-y divide-black/5">

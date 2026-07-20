@@ -77,6 +77,7 @@ export interface HealthWorkoutsResult {
 export interface HealthDateRange {
   startDate: string
   endDate: string
+  timeZone: string
 }
 
 export interface HealthKitPlugin {
@@ -129,7 +130,17 @@ export function classifyHealthKitError(error: unknown): HealthKitErrorKind {
   ) {
     return 'unavailable'
   }
-  if (['HEALTHKIT_INVALID_DATE', 'INVALID_DATE_RANGE', 'INVALID_ARGUMENT'].includes(code)) {
+  if (
+    [
+      'HEALTHKIT_INVALID_DATE',
+      'HEALTHKIT_INVALID_START_DATE',
+      'HEALTHKIT_INVALID_END_DATE',
+      'HEALTHKIT_START_AFTER_END',
+      'HEALTHKIT_RANGE_TOO_LARGE',
+      'INVALID_DATE_RANGE',
+      'INVALID_ARGUMENT',
+    ].includes(code)
+  ) {
     return 'invalidDateRange'
   }
   if (['QUERY_FAILED', 'HEALTHKIT_QUERY_FAILED', 'NATIVE_FAILURE'].includes(code)) return 'nativeFailure'
@@ -144,17 +155,129 @@ export function canQueryHealthData(summary: HealthAuthorizationSummary | null): 
   return summary?.available === true && summary.requestStatus === 'unnecessary'
 }
 
-export function localDayRange(now = new Date()): HealthDateRange {
-  const start = new Date(now)
-  start.setHours(0, 0, 0, 0)
-  return { startDate: start.toISOString(), endDate: now.toISOString() }
+export type HealthKitQueryType = 'bodyMeasurements' | 'todayActivity' | 'workouts'
+
+function validTimeZone(timeZone: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone }).format(new Date())
+    return true
+  } catch {
+    return false
+  }
 }
 
-export function recentWorkoutRange(now = new Date(), days = 14): HealthDateRange {
+export function resolveHealthTimeZone(requested?: string | null): string {
+  const candidate =
+    requested?.trim() ||
+    Intl.DateTimeFormat().resolvedOptions().timeZone ||
+    'Asia/Taipei'
+  return validTimeZone(candidate) ? candidate : 'Asia/Taipei'
+}
+
+function dateTimeParts(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date)
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find(part => part.type === type)?.value)
+  return {
+    year: value('year'),
+    month: value('month'),
+    day: value('day'),
+    hour: value('hour'),
+    minute: value('minute'),
+    second: value('second'),
+  }
+}
+
+function offsetAt(date: Date, timeZone: string): number {
+  const parts = dateTimeParts(date, timeZone)
+  const representedAsUtc = Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second
+  )
+  return representedAsUtc - Math.floor(date.getTime() / 1000) * 1000
+}
+
+export function startOfDayInTimeZone(now: Date, requestedTimeZone?: string | null): Date {
+  const timeZone = resolveHealthTimeZone(requestedTimeZone)
+  const { year, month, day } = dateTimeParts(now, timeZone)
+  const localMidnightAsUtc = Date.UTC(year, month - 1, day)
+  let start = new Date(localMidnightAsUtc - offsetAt(new Date(localMidnightAsUtc), timeZone))
+  start = new Date(localMidnightAsUtc - offsetAt(start, timeZone))
+  return start
+}
+
+export function localDayRange(
+  now = new Date(),
+  requestedTimeZone?: string | null
+): HealthDateRange {
+  const timeZone = resolveHealthTimeZone(requestedTimeZone)
+  const start = startOfDayInTimeZone(now, timeZone)
+  const end = now.getTime() <= start.getTime()
+    ? new Date(start.getTime() + 1)
+    : new Date(now)
+  return {
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+    timeZone,
+  }
+}
+
+export function recentWorkoutRange(
+  now = new Date(),
+  days = 14,
+  requestedTimeZone?: string | null
+): HealthDateRange {
+  const timeZone = resolveHealthTimeZone(requestedTimeZone)
   const end = new Date(now)
   const start = new Date(now)
   start.setDate(start.getDate() - days)
-  return { startDate: start.toISOString(), endDate: end.toISOString() }
+  return {
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+    timeZone,
+  }
+}
+
+export function logHealthKitQueryRange(
+  queryType: HealthKitQueryType,
+  range?: HealthDateRange
+): void {
+  const startEpoch = range ? Date.parse(range.startDate) : Number.NaN
+  const endEpoch = range ? Date.parse(range.endDate) : Number.NaN
+  const validEpochs = Number.isFinite(startEpoch) && Number.isFinite(endEpoch)
+  console.info('[HEALTHKIT_QUERY_RANGE]', {
+    queryType,
+    timeZone: range?.timeZone ?? resolveHealthTimeZone(),
+    startDatePresent: Boolean(range?.startDate),
+    endDatePresent: Boolean(range?.endDate),
+    startEpoch: validEpochs ? startEpoch : null,
+    endEpoch: validEpochs ? endEpoch : null,
+    startBeforeEnd: validEpochs ? startEpoch <= endEpoch : false,
+    rangeHours: validEpochs ? (endEpoch - startEpoch) / 3_600_000 : null,
+  })
+}
+
+export function logHealthKitRangeRejection(
+  queryType: HealthKitQueryType,
+  error: unknown
+): void {
+  console.warn('[HEALTHKIT_QUERY_RANGE_REJECTED]', {
+    queryType,
+    reason: healthKitErrorCode(error) || 'HEALTHKIT_QUERY_FAILED',
+  })
 }
 
 export function clearLegacyHealthStorage(storage?: Pick<Storage, 'removeItem'>): void {

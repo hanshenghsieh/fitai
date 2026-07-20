@@ -482,8 +482,18 @@ public final class HealthKitPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc public func getDailyActivity(_ call: CAPPluginCall) {
         guard ensureAvailable(call) else { return }
-        guard let range = dateRange(call) else { return }
-        let calendar = Calendar.autoupdatingCurrent
+        let now = Date()
+        var defaultCalendar = Calendar(identifier: .gregorian)
+        defaultCalendar.timeZone = .autoupdatingCurrent
+        guard let range = dateRange(
+            call,
+            queryType: "todayActivity",
+            defaultStart: defaultCalendar.startOfDay(for: now),
+            defaultEnd: now,
+            maximumHours: 32 * 24
+        ) else { return }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = range.timeZone
         let startDay = calendar.startOfDay(for: range.start)
         let endDay = calendar.startOfDay(for: range.end)
         var days: [Date] = []
@@ -500,12 +510,14 @@ public final class HealthKitPlugin: CAPPlugin, CAPBridgedPlugin {
         var firstError: Error?
 
         for day in days {
-            let key = Self.localDay(day)
+            let key = Self.localDay(day, timeZone: range.timeZone)
             rows[key] = ["date": key, "steps": 0, "activeEnergyKcal": 0]
             guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day) else { continue }
+            let queryEnd = min(nextDay, range.end)
+            guard day <= queryEnd else { continue }
             let predicate = HKQuery.predicateForSamples(
                 withStart: day,
-                end: nextDay,
+                end: queryEnd,
                 options: [.strictStartDate, .strictEndDate]
             )
 
@@ -561,7 +573,7 @@ public final class HealthKitPlugin: CAPPlugin, CAPBridgedPlugin {
             }
             let sortedRows = rows.keys.sorted().compactMap { rows[$0] }
             call.resolve([
-                "timezone": TimeZone.autoupdatingCurrent.identifier,
+                "timezone": range.timeZone.identifier,
                 "days": sortedRows
             ])
         }
@@ -569,7 +581,16 @@ public final class HealthKitPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc public func getWorkouts(_ call: CAPPluginCall) {
         guard ensureAvailable(call) else { return }
-        guard let range = dateRange(call) else { return }
+        let now = Date()
+        var defaultCalendar = Calendar(identifier: .gregorian)
+        defaultCalendar.timeZone = .autoupdatingCurrent
+        guard let range = dateRange(
+            call,
+            queryType: "workouts",
+            defaultStart: defaultCalendar.startOfDay(for: now),
+            defaultEnd: now,
+            maximumHours: 32 * 24
+        ) else { return }
         let predicate = HKQuery.predicateForSamples(
             withStart: range.start,
             end: range.end,
@@ -607,7 +628,7 @@ public final class HealthKitPlugin: CAPPlugin, CAPBridgedPlugin {
                 return row
             }
             call.resolve([
-                "timezone": TimeZone.autoupdatingCurrent.identifier,
+                "timezone": range.timeZone.identifier,
                 "workouts": workouts
             ])
         }
@@ -635,38 +656,99 @@ public final class HealthKitPlugin: CAPPlugin, CAPBridgedPlugin {
         return true
     }
 
-    private func dateRange(_ call: CAPPluginCall) -> (start: Date, end: Date)? {
-        guard let startRaw = call.getString("startDate"),
-              let endRaw = call.getString("endDate"),
-              let start = Self.parseDate(startRaw),
-              let end = Self.parseDate(endRaw),
-              start <= end else {
-            call.reject("日期範圍無效。", "HEALTHKIT_INVALID_DATE")
+    private func dateRange(
+        _ call: CAPPluginCall,
+        queryType: String,
+        defaultStart: Date,
+        defaultEnd: Date,
+        maximumHours: Double
+    ) -> (start: Date, end: Date, timeZone: TimeZone)? {
+        let timeZone = call.getString("timeZone")
+            .flatMap { TimeZone(identifier: $0) } ?? .autoupdatingCurrent
+        let start: Date
+        if let startRaw = call.getString("startDate") {
+            guard let parsed = Self.parseDate(startRaw) else {
+                call.reject(
+                    "\(queryType) startDate 無法解析。",
+                    "HEALTHKIT_INVALID_START_DATE"
+                )
+                return nil
+            }
+            start = parsed
+        } else {
+            start = defaultStart
+        }
+
+        var end: Date
+        if let endRaw = call.getString("endDate") {
+            guard let parsed = Self.parseDate(endRaw) else {
+                call.reject(
+                    "\(queryType) endDate 無法解析。",
+                    "HEALTHKIT_INVALID_END_DATE"
+                )
+                return nil
+            }
+            end = parsed
+        } else {
+            end = defaultEnd
+        }
+
+        let earliestReasonableDate = Date(timeIntervalSince1970: 0)
+        let latestReasonableDate = Date().addingTimeInterval(366 * 24 * 3_600)
+        guard start >= earliestReasonableDate else {
+            call.reject(
+                "\(queryType) startDate 超出合理範圍。",
+                "HEALTHKIT_INVALID_START_DATE"
+            )
             return nil
         }
-        return (start, end)
+        guard end <= latestReasonableDate else {
+            call.reject(
+                "\(queryType) endDate 超出合理範圍。",
+                "HEALTHKIT_INVALID_END_DATE"
+            )
+            return nil
+        }
+        guard start <= end else {
+            call.reject(
+                "\(queryType) startDate 晚於 endDate。",
+                "HEALTHKIT_START_AFTER_END"
+            )
+            return nil
+        }
+        if start == end {
+            end = start.addingTimeInterval(0.001)
+        }
+        let rangeHours = end.timeIntervalSince(start) / 3_600
+        guard rangeHours.isFinite, rangeHours >= 0, rangeHours <= maximumHours else {
+            call.reject(
+                "\(queryType) 日期範圍過大。",
+                "HEALTHKIT_RANGE_TOO_LARGE"
+            )
+            return nil
+        }
+        return (start, end, timeZone)
     }
 
     private static func parseDate(_ value: String) -> Date? {
-        if let date = ISO8601DateFormatter().date(from: value) {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractional.date(from: value) {
             return date
         }
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar.autoupdatingCurrent
-        formatter.timeZone = TimeZone.autoupdatingCurrent
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.date(from: value)
+        let standard = ISO8601DateFormatter()
+        standard.formatOptions = [.withInternetDateTime]
+        return standard.date(from: value)
     }
 
     private static func isoDate(_ date: Date) -> String {
         ISO8601DateFormatter().string(from: date)
     }
 
-    private static func localDay(_ date: Date) -> String {
+    private static func localDay(_ date: Date, timeZone: TimeZone) -> String {
         let formatter = DateFormatter()
-        formatter.calendar = Calendar.autoupdatingCurrent
-        formatter.timeZone = TimeZone.autoupdatingCurrent
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = timeZone
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: date)
