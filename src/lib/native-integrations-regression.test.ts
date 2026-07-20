@@ -8,11 +8,11 @@ function source(path: string): string {
 
 describe('BETTERBIT-NATIVE-INTEGRATIONS-001 native contracts', () => {
   const iosClientId =
-    '403467297093-8rae251r35a652fq4h0fplarl0u0m4lu.apps.googleusercontent.com'
+    '403467297093-roq8l6b583110qqeh90rpurmugnhd3do.apps.googleusercontent.com'
   const webClientId =
     '403467297093-85u48ft29ma5t4ijj19r331rr4pda8ep.apps.googleusercontent.com'
   const reversedIosClientId =
-    'com.googleusercontent.apps.403467297093-8rae251r35a652fq4h0fplarl0u0m4lu'
+    'com.googleusercontent.apps.403467297093-roq8l6b583110qqeh90rpurmugnhd3do'
 
   it('keeps native Supabase PKCE on persistent storage', () => {
     const client = source('src/lib/supabase/client.ts')

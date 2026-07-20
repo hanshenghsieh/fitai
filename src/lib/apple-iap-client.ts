@@ -15,9 +15,17 @@ export interface AppleIapPurchaseResult {
   active: boolean
   productId?: string
   expiresAt?: string | null
+  backendSynced?: boolean
 }
 
 export type AppleIapPurchaseStep = 'configure' | 'offerings' | 'purchase' | 'sync'
+
+export class AppleIapCancelledError extends Error {
+  constructor() {
+    super('已取消購買')
+    this.name = 'AppleIapCancelledError'
+  }
+}
 
 let configuredForUser: string | null = null
 
@@ -65,12 +73,21 @@ function ascProductUnavailableError(): Error {
   )
 }
 
+export function isAppleIapCancellation(err: unknown): boolean {
+  if (err instanceof AppleIapCancelledError) return true
+  const record =
+    err != null && typeof err === 'object' ? (err as Record<string, unknown>) : null
+  const message = err instanceof Error ? err.message : String(record?.message ?? '')
+  return (
+    record?.userCancelled === true ||
+    /cancel|PurchaseCancelledError|user cancelled|已取消/i.test(message)
+  )
+}
+
 function humanizePurchaseError(err: unknown): Error {
+  if (isAppleIapCancellation(err)) return new AppleIapCancelledError()
   if (!(err instanceof Error)) return new Error('無法完成訂閱')
   const msg = err.message || ''
-  if (/cancel/i.test(msg) || /PurchaseCancelledError/i.test(msg) || /user cancelled/i.test(msg)) {
-    return new Error('已取消購買')
-  }
   if (
     /could not be fetched from App Store Connect|offerings empty|why-are-offerings-empty|issue with your configuration|ConfigurationError|None of the products registered/i.test(
       msg
@@ -178,7 +195,7 @@ export async function logOutAppleIap(): Promise<void> {
   )
 }
 
-function readEntitlement(customerInfo: {
+interface RevenueCatCustomerInfoLike {
   entitlements?: {
     active?: Record<
       string,
@@ -189,7 +206,16 @@ function readEntitlement(customerInfo: {
       }
     >
   }
-}) {
+}
+
+interface ActiveAppleIapEntitlement {
+  productId: string
+  expiresAt: string | null
+}
+
+export function readAppleIapEntitlement(
+  customerInfo: RevenueCatCustomerInfoLike
+): ActiveAppleIapEntitlement | null {
   const active = customerInfo.entitlements?.active ?? {}
   const entitlement = active[APPLE_IAP_ENTITLEMENT_ID]
 
@@ -201,7 +227,32 @@ function readEntitlement(customerInfo: {
   }
 }
 
+function readAndLogEntitlement(
+  customerInfo: RevenueCatCustomerInfoLike,
+  source: 'purchase' | 'restore' | 'refresh'
+): ActiveAppleIapEntitlement | null {
+  const activeIds = Object.keys(customerInfo.entitlements?.active ?? {})
+  const entitlement = readAppleIapEntitlement(customerInfo)
+  console.info('[IAP_CUSTOMER_INFO]', {
+    source,
+    activeEntitlementIds: activeIds,
+    premiumEntitlementPresent: activeIds.includes(APPLE_IAP_ENTITLEMENT_ID),
+  })
+  console.info('[IAP_ENTITLEMENT_STATUS]', {
+    source,
+    entitlementId: APPLE_IAP_ENTITLEMENT_ID,
+    active: entitlement != null,
+    expectedProduct: entitlement?.productId === APPLE_IAP_PRODUCT_ID,
+    expirationPresent: Boolean(entitlement?.expiresAt),
+  })
+  return entitlement
+}
+
 async function syncToBackend(isRestore = false): Promise<AppleIapPurchaseResult> {
+  console.info('[IAP_VERIFY_REQUEST]', {
+    endpoint: '/api/apple-iap/sync',
+    isRestore,
+  })
   const res = await apiFetch('/api/apple-iap/sync', {
     method: 'POST',
     headers: {
@@ -211,6 +262,13 @@ async function syncToBackend(isRestore = false): Promise<AppleIapPurchaseResult>
     body: JSON.stringify({ isRestore }),
   })
   const data = await res.json().catch(() => ({}))
+  console.info('[IAP_VERIFY_RESPONSE]', {
+    status: res.status,
+    ok: res.ok,
+    verified: data.verified === true,
+    active: data.active === true,
+    productMatches: data.product_id === APPLE_IAP_PRODUCT_ID,
+  })
   if (!res.ok) {
     throw new Error(data.error || '無法同步訂閱狀態')
   }
@@ -225,6 +283,33 @@ async function syncToBackend(isRestore = false): Promise<AppleIapPurchaseResult>
     active: true,
     productId: data.product_id,
     expiresAt: data.subscription?.current_period_end ?? null,
+  }
+}
+
+export async function finalizeActiveAppleIapEntitlement(
+  entitlement: ActiveAppleIapEntitlement,
+  syncBackend: () => Promise<AppleIapPurchaseResult>
+): Promise<AppleIapPurchaseResult> {
+  try {
+    const synced = await syncBackend()
+    return {
+      active: true,
+      productId: entitlement.productId,
+      expiresAt: entitlement.expiresAt,
+      backendSynced: synced.active,
+    }
+  } catch {
+    console.warn('[IAP_VERIFY_RESPONSE]', {
+      ok: false,
+      optionalSyncFailed: true,
+      entitlementStillActive: true,
+    })
+    return {
+      active: true,
+      productId: entitlement.productId,
+      expiresAt: entitlement.expiresAt,
+      backendSynced: false,
+    }
   }
 }
 
@@ -292,7 +377,7 @@ export async function getAppleIapStatus(userId: string): Promise<AppleIapPurchas
     OFFERINGS_TIMEOUT_MS,
     '讀取會員狀態逾時'
   )
-  const entitlement = readEntitlement(customerInfo)
+  const entitlement = readAndLogEntitlement(customerInfo, 'refresh')
   if (!entitlement) return { active: false }
 
   return {
@@ -307,6 +392,10 @@ export async function purchaseAppleIap(
   onStep?: (step: AppleIapPurchaseStep) => void
 ): Promise<AppleIapPurchaseResult> {
   try {
+    console.info('[IAP_PURCHASE_STARTED]', {
+      productId: APPLE_IAP_PRODUCT_ID,
+      entitlementId: APPLE_IAP_ENTITLEMENT_ID,
+    })
     onStep?.('configure')
     const ready = await configureAppleIap(userId)
     if (!ready) throw new Error('訂閱尚未開放')
@@ -316,15 +405,25 @@ export async function purchaseAppleIap(
 
     onStep?.('purchase')
     const purchaseResult = await executePurchase(Purchases, target)
-    const entitlement = readEntitlement(purchaseResult.customerInfo)
+    console.info('[IAP_PURCHASE_RESULT]', {
+      completed: true,
+      purchaseTarget: target.kind,
+    })
+    const entitlement = readAndLogEntitlement(purchaseResult.customerInfo, 'purchase')
     if (!entitlement) {
       throw new Error('購買未完成')
     }
 
     onStep?.('sync')
-    return await syncToBackend()
+    return await finalizeActiveAppleIapEntitlement(entitlement, () => syncToBackend())
   } catch (err) {
-    throw humanizePurchaseError(err)
+    const normalized = humanizePurchaseError(err)
+    console.info('[IAP_PURCHASE_RESULT]', {
+      completed: false,
+      cancelled: normalized instanceof AppleIapCancelledError,
+      errorType: normalized.name,
+    })
+    throw normalized
   }
 }
 
@@ -338,12 +437,12 @@ export async function restoreAppleIap(userId: string): Promise<AppleIapPurchaseR
       OFFERINGS_TIMEOUT_MS,
       '還原逾時，請稍後再試'
     )
-    const entitlement = readEntitlement(customerInfo)
+    const entitlement = readAndLogEntitlement(customerInfo, 'restore')
     if (!entitlement) {
       return { active: false }
     }
 
-    return await syncToBackend(true)
+    return await finalizeActiveAppleIapEntitlement(entitlement, () => syncToBackend(true))
   } catch (err) {
     throw humanizePurchaseError(err)
   }

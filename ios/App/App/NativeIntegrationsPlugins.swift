@@ -18,11 +18,11 @@ public final class GoogleAuthPlugin: CAPPlugin, CAPBridgedPlugin {
 
     private static let expectedBundleId = "app.fitai.betterbit"
     private static let expectedIosClientId =
-        "403467297093-8rae251r35a652fq4h0fplarl0u0m4lu.apps.googleusercontent.com"
+        "403467297093-roq8l6b583110qqeh90rpurmugnhd3do.apps.googleusercontent.com"
     private static let expectedServerClientId =
         "403467297093-85u48ft29ma5t4ijj19r331rr4pda8ep.apps.googleusercontent.com"
     private static let expectedReversedScheme =
-        "com.googleusercontent.apps.403467297093-8rae251r35a652fq4h0fplarl0u0m4lu"
+        "com.googleusercontent.apps.403467297093-roq8l6b583110qqeh90rpurmugnhd3do"
 
     @objc public func getConfiguration(_ call: CAPPluginCall) {
         let iosClientId = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String

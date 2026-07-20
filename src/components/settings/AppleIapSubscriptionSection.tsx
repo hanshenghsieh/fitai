@@ -7,22 +7,22 @@ import { Loader2 } from 'lucide-react'
 import type { AccessStatus } from '@/lib/subscription-access'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { isRevenueCatConfigured } from '@/lib/apple-iap-config'
-import { purchaseAppleIap, restoreAppleIap, type AppleIapPurchaseStep } from '@/lib/apple-iap-client'
-import { isCapacitorNative } from '@/lib/capacitor-native'
 import {
-  formatProRenewalDate,
-  type ProPlanId,
-} from '@/lib/pro-subscription-v2'
+  getAppleIapStatus,
+  isAppleIapCancellation,
+  purchaseAppleIap,
+  restoreAppleIap,
+  type AppleIapPurchaseStep,
+} from '@/lib/apple-iap-client'
+import { isCapacitorNative } from '@/lib/capacitor-native'
+import { formatProRenewalDate } from '@/lib/pro-subscription-v2'
 import { triggerV2Haptic } from '@/lib/v2-haptics'
 import ProSubscriptionV2View from '@/components/betterbit-v2/ProSubscriptionV2View'
-import ProPaymentSuccessV2View from '@/components/betterbit-v2/ProPaymentSuccessV2View'
 import ProActiveStatusV2View, {
   openAppleSubscriptionManagement,
 } from '@/components/betterbit-v2/ProActiveStatusV2View'
 import { createClient } from '@/lib/supabase/client'
 import { apiFetch } from '@/lib/api/client'
-
-type SubscriptionView = 'paywall' | 'success' | 'active'
 
 interface Props {
   access: AccessStatus
@@ -41,8 +41,6 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
   const [purchasing, setPurchasing] = useState(false)
   const [purchaseStep, setPurchaseStep] = useState<AppleIapPurchaseStep | null>(null)
   const [restoring, setRestoring] = useState(false)
-  const [view, setView] = useState<SubscriptionView>('paywall')
-  const [purchasedPlan, setPurchasedPlan] = useState<ProPlanId>('monthly')
 
   const iapReady = isRevenueCatConfigured()
   const isSubscribed = subscription?.status === 'active' || access.isSubscribed
@@ -64,30 +62,38 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       } = await supabase.auth.getUser()
       setUserId(user?.id ?? null)
 
-      const res = await apiFetch('/api/get-subscription')
+      const [res, nativeStatus] = await Promise.all([
+        apiFetch('/api/get-subscription'),
+        user?.id && isRevenueCatConfigured()
+          ? getAppleIapStatus(user.id).catch(() => {
+              console.info('[IAP_ENTITLEMENT_STATUS]', {
+                source: 'refresh',
+                active: false,
+                unavailable: true,
+              })
+              return { active: false }
+            })
+          : Promise.resolve({ active: false }),
+      ])
+      let backendSubscription: typeof subscription = null
       if (res.ok) {
         const data = await res.json()
-        setSubscription(data.subscription)
+        backendSubscription = data.subscription
       }
+      setSubscription(
+        nativeStatus.active
+          ? {
+              status: 'active',
+              current_period_end: nativeStatus.expiresAt ?? null,
+              subscription_source: 'revenuecat_sdk',
+            }
+          : backendSubscription
+      )
       setLoading(false)
     })()
   }, [])
 
-  useEffect(() => {
-    if (loading || view === 'success') return
-    if (isSubscribed) setView('active')
-    else setView('paywall')
-  }, [loading, isSubscribed, view])
-
-  async function refreshSubscription() {
-    const res = await apiFetch('/api/get-subscription')
-    if (res.ok) {
-      const data = await res.json()
-      setSubscription(data.subscription)
-    }
-  }
-
-  async function handleSubscribe(plan: ProPlanId) {
+  async function handleSubscribe() {
     if (!userId) {
       toast.error('請先登入')
       return
@@ -98,21 +104,35 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
     }
     if (purchasing) return
 
-    setPurchasedPlan(plan)
     setPurchasing(true)
     setPurchaseStep('configure')
     try {
       const result = await purchaseAppleIap(userId, step => setPurchaseStep(step))
       if (result.active) {
         triggerV2Haptic('success')
-        setPurchasedPlan('monthly')
-        await refreshSubscription()
-        setView('success')
+        setSubscription({
+          status: 'active',
+          current_period_end: result.expiresAt ?? null,
+          subscription_source: result.backendSynced
+            ? 'revenuecat'
+            : 'revenuecat_sdk',
+        })
+        toast.success('Betterbit Pro 已啟用')
+        console.info('[IAP_POST_PURCHASE_NAVIGATION]', {
+          entitlementActive: true,
+          backendSynced: result.backendSynced === true,
+          destination: '/settings',
+          method: 'replace',
+        })
+        router.replace('/settings')
+        router.refresh()
       }
     } catch (err) {
-      triggerV2Haptic('error')
-      const message = err instanceof Error ? err.message : '無法完成訂閱'
-      if (!/cancel|已取消/i.test(message)) toast.error(message)
+      if (!isAppleIapCancellation(err)) {
+        triggerV2Haptic('error')
+        const message = err instanceof Error ? err.message : '無法完成訂閱'
+        toast.error(message)
+      }
     } finally {
       setPurchasing(false)
       setPurchaseStep(null)
@@ -134,8 +154,13 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       if (result.active) {
         triggerV2Haptic('success')
         toast.message('已恢復你的 Betterbit Pro 權限')
-        await refreshSubscription()
-        setView('active')
+        setSubscription({
+          status: 'active',
+          current_period_end: result.expiresAt ?? null,
+          subscription_source: result.backendSynced
+            ? 'revenuecat'
+            : 'revenuecat_sdk',
+        })
       } else {
         toast.message('目前找不到可恢復的訂閱')
       }
@@ -184,20 +209,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
     )
   }
 
-  if (view === 'success') {
-    return (
-      <ProPaymentSuccessV2View
-        plan={purchasedPlan}
-        renewalDate={renewalDate}
-        onStart={() => router.push('/dashboard')}
-        onViewSubscription={() => setView('active')}
-        onRestore={() => void handleRestore()}
-        restoring={restoring}
-      />
-    )
-  }
-
-  if (view === 'active' && isSubscribed) {
+  if (isSubscribed) {
     return (
       <ProActiveStatusV2View
         plan="monthly"
@@ -214,7 +226,7 @@ export default function AppleIapSubscriptionSection({ access, compact = false }:
       access={access}
       availablePlans="monthly-only"
       handlers={{
-        onSubscribe: plan => void handleSubscribe(plan),
+        onSubscribe: () => void handleSubscribe(),
         onRestore: () => void handleRestore(),
         purchasing,
         restoring,

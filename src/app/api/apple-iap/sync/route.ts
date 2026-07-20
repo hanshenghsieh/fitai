@@ -3,7 +3,10 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { requireApiUser } from '@/lib/api/auth'
 import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { upsertAppleIapSubscription } from '@/lib/apple-iap-store'
-import { isAppleIapEnabled } from '@/lib/apple-iap-config'
+import {
+  APPLE_IAP_PRODUCT_ID,
+  isAppleIapEnabled,
+} from '@/lib/apple-iap-config'
 import { shouldBlockExternalPaymentsOnServer } from '@/lib/ios-payment-gate'
 import {
   fetchVerifiedRevenueCatSubscription,
@@ -36,12 +39,24 @@ export async function POST(req: NextRequest) {
       return jsonWithCors({ error: 'Invalid payload' }, req, { status: 400 })
     }
 
+    console.info('[IAP_VERIFY_REQUEST]', {
+      source: 'server',
+      authenticated: true,
+      isRestore: parsed.isRestore,
+    })
     const verified = await fetchVerifiedRevenueCatSubscription(user.id)
     const row = await upsertAppleIapSubscription(
       createAdminClient(),
       verified
     )
 
+    console.info('[IAP_VERIFY_RESPONSE]', {
+      source: 'server',
+      status: 200,
+      active: verified.active,
+      productMatches: verified.productId === APPLE_IAP_PRODUCT_ID,
+      persisted: true,
+    })
     return jsonWithCors(
       {
         success: true,
@@ -59,7 +74,10 @@ export async function POST(req: NextRequest) {
     )
   } catch (err) {
     const configurationError = err instanceof RevenueCatConfigurationError
-    console.error('Apple IAP sync failed:', {
+    console.error('[IAP_VERIFY_RESPONSE]', {
+      source: 'server',
+      status: configurationError ? 503 : 502,
+      ok: false,
       reason: configurationError ? 'not_configured' : 'verification_failed',
     })
     return jsonWithCors(

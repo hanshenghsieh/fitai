@@ -62,11 +62,11 @@ secrets in `NEXT_PUBLIC_*`, the iOS bundle, or source control.
 
 - Add these App target user-defined build settings for both Debug and Release:
   - `GOOGLE_IOS_CLIENT_ID`:
-    `403467297093-8rae251r35a652fq4h0fplarl0u0m4lu.apps.googleusercontent.com`
+    `403467297093-roq8l6b583110qqeh90rpurmugnhd3do.apps.googleusercontent.com`
   - `GOOGLE_WEB_CLIENT_ID`:
     `403467297093-85u48ft29ma5t4ijj19r331rr4pda8ep.apps.googleusercontent.com`
   - `GOOGLE_REVERSED_IOS_CLIENT_ID`:
-    `com.googleusercontent.apps.403467297093-8rae251r35a652fq4h0fplarl0u0m4lu`
+    `com.googleusercontent.apps.403467297093-roq8l6b583110qqeh90rpurmugnhd3do`
 - Run `npm ci`, `npm run build:ios-local`, then `npx cap sync ios` on the Mac.
 - Confirm SPM resolves the official `GoogleSignIn` 9.2.0 package plus Barcode
   Scanner, Camera, Local Notifications, RevenueCat, and Capacitor packages.
