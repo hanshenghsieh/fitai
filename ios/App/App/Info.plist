@@ -73,7 +73,9 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>儲存食物照片時需要寫入相簿。</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>BetterBit 會讀取您的體重、體脂、步數、活動熱量及運動紀錄，用於個人化每日健康與減脂分析。</string>
+	<string>BetterBit 會讀取 Apple Health 的運動與健康資料，協助計算熱量消耗、追蹤進度並提供更精準的健康分析。</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>BetterBit 會在你同意後將運動與健康紀錄寫入 Apple Health，方便你在 Apple Health 中集中管理健康資料。</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>UISupportedInterfaceOrientations</key>

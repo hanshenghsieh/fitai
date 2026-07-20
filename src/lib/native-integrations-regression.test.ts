@@ -19,7 +19,9 @@ describe('BETTERBIT-NATIVE-INTEGRATIONS-001 native contracts', () => {
     const plist = source('ios/App/App/Info.plist')
     assert.match(plist, /<string>betterbit<\/string>/)
     assert.match(plist, /<key>NSHealthShareUsageDescription<\/key>/)
-    assert.match(plist, /體重、體脂、步數、活動熱量及運動紀錄/)
+    assert.match(plist, /讀取 Apple Health 的運動與健康資料/)
+    assert.match(plist, /<key>NSHealthUpdateUsageDescription<\/key>/)
+    assert.match(plist, /寫入 Apple Health/)
     assert.match(plist, /掃描商品條碼/)
   })
 

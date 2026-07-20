@@ -4,6 +4,7 @@ import { describe, it } from 'node:test'
 import {
   addDaysToDateKey,
   normalizePlanTimeZone,
+  resolveGeneratePlanWeekStart,
   weekStartForTimeZone,
 } from './weekly-plan-week'
 
@@ -25,13 +26,40 @@ describe('AUTH-ONBOARDING-RUNTIME-FIX-005 weekly plan contract', () => {
   it('returns the generated server week key and verifies that exact key before completion', () => {
     const route = source('src/app/api/generate-plan/route.ts')
     const onboarding = source('src/app/onboarding/page.tsx')
-    const verify = onboarding.indexOf(".eq('week_start', result.week_start)")
+    const verify = onboarding.indexOf(".eq('week_start', resolvedWeek.weekStart)")
     const complete = onboarding.indexOf(".update({ onboarding_completed: true })")
 
     assert.match(route, /week_start:\s*result\.weekStart/)
+    assert.match(route, /PLAN_GENERATION_RESPONSE_JSON/)
+    assert.match(onboarding, /ONBOARDING_PLAN_RESPONSE_JSON/)
     assert.match(onboarding, /JSON\.stringify\(\{ timezone: timeZone \}\)/)
+    assert.doesNotMatch(onboarding, /PLAN_WEEK_START_MISSING/)
     assert.ok(verify >= 0)
     assert.ok(complete > verify)
+  })
+
+  it('accepts canonical, legacy, nested, and generated-day week start contracts', () => {
+    assert.deepEqual(resolveGeneratePlanWeekStart({ week_start: '2026-07-20' }), {
+      weekStart: '2026-07-20',
+      source: 'week_start',
+    })
+    assert.equal(
+      resolveGeneratePlanWeekStart({ weekStart: '2026-07-20' })?.source,
+      'weekStart'
+    )
+    assert.equal(
+      resolveGeneratePlanWeekStart({ weekly_plan: { week_start: '2026-07-20' } })?.source,
+      'weekly_plan.week_start'
+    )
+    assert.equal(
+      resolveGeneratePlanWeekStart({ plan: { week_start: '2026-07-20' } })?.source,
+      'plan.week_start'
+    )
+    assert.deepEqual(
+      resolveGeneratePlanWeekStart({ data: { days: [{ date: '2026-07-13' }] } }),
+      { weekStart: '2026-07-13', source: 'data.days[0].date' }
+    )
+    assert.equal(resolveGeneratePlanWeekStart({ data: { days: [{}] } }), null)
   })
 
   it('keeps full name and injuries out of required plan validation', () => {

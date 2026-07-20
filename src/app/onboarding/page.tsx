@@ -19,6 +19,7 @@ import type { ActivityLevel, FitnessLevel, Goal, UserProfile } from '@/types'
 import { apiFetch, apiUrl } from '@/lib/api/client'
 import AppAuthLoadingShell from '@/features/auth/AppAuthLoadingShell'
 import { messageForGeneratePlanError } from '@/lib/generate-plan-errors'
+import { resolveGeneratePlanWeekStart } from '@/lib/weekly-plan-week'
 
 const TOTAL_STEPS = 3
 
@@ -326,8 +327,15 @@ export default function OnboardingPage() {
         code?: string
         validation_fields?: string[]
         week_start?: string
-        data?: { days?: Array<{ daily_targets?: { calories?: number } }> }
+        weekStart?: string
+        weekly_plan?: { week_start?: string }
+        plan?: { week_start?: string }
+        data?: {
+          days?: Array<{ date?: string; daily_targets?: { calories?: number } }>
+        }
       }
+      console.info('[ONBOARDING_PLAN_RESPONSE_JSON]', result)
+      const resolvedWeek = resolveGeneratePlanWeekStart(result)
       diagnosticContext = {
         ...diagnosticContext,
         status: generateRes.status,
@@ -343,6 +351,8 @@ export default function OnboardingPage() {
         message: result.error ?? null,
         validationFields: result.validation_fields ?? [],
         weekStart: result.week_start ?? null,
+        resolvedWeekStart: resolvedWeek?.weekStart ?? null,
+        weekStartSource: resolvedWeek?.source ?? null,
       })
       if (!generateRes.ok) {
         const fieldSuffix = result.validation_fields?.length
@@ -360,15 +370,25 @@ export default function OnboardingPage() {
         }
         throw new Error('計畫尚未完成，請再試一次。')
       }
-      if (!result.week_start) {
-        diagnosticContext = {
-          ...diagnosticContext,
-          errorCode: 'PLAN_WEEK_START_MISSING',
-          validationFields: ['weekly_plans'],
-        }
-        throw new Error('計畫回應缺少週期資訊，請再試一次。')
+      if (!resolvedWeek) {
+        console.warn('[ONBOARDING_PLAN_WEEK_START_FALLBACK]', {
+          userId: user.id,
+          provider,
+          endpoint,
+          message: 'Successful response omitted week_start; verifying latest completed plan.',
+        })
       }
 
+      const planVerificationQuery = supabase
+        .from('weekly_plans')
+        .select('week_start, generation_status, plan_data')
+        .eq('user_id', user.id)
+        .eq('generation_status', 'completed')
+        .order('week_start', { ascending: false })
+        .limit(1)
+      const planVerificationPromise = resolvedWeek
+        ? planVerificationQuery.eq('week_start', resolvedWeek.weekStart).maybeSingle()
+        : planVerificationQuery.maybeSingle()
       const [goalVerification, planVerification] = await Promise.all([
         supabase
           .from('goals')
@@ -377,12 +397,7 @@ export default function OnboardingPage() {
           .eq('is_active', true)
           .limit(1)
           .maybeSingle(),
-        supabase
-          .from('weekly_plans')
-          .select('generation_status, plan_data')
-          .eq('user_id', user.id)
-          .eq('week_start', result.week_start)
-          .maybeSingle(),
+        planVerificationPromise,
       ])
       if (goalVerification.error || planVerification.error) {
         const verificationError = goalVerification.error ?? planVerification.error

@@ -118,10 +118,13 @@ export async function POST(req: NextRequest) {
       status: 200,
       weekStart: result.weekStart,
     })
-    return jsonWithCors(
-      { success: true, data: result.data, week_start: result.weekStart },
-      req
-    )
+    const responsePayload = {
+      success: true,
+      data: result.data,
+      week_start: result.weekStart,
+    }
+    console.info('[PLAN_GENERATION_RESPONSE_JSON]', responsePayload)
+    return jsonWithCors(responsePayload, req)
   } catch (err) {
     console.error('[PLAN_GENERATION]', {
       userId: diagnosticUserId,

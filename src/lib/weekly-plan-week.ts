@@ -1,5 +1,34 @@
 const DATE_KEY = /^(\d{4})-(\d{2})-(\d{2})$/
 
+export type GeneratePlanWeekStartSource =
+  | 'week_start'
+  | 'weekStart'
+  | 'weekly_plan.week_start'
+  | 'plan.week_start'
+  | 'data.days[0].date'
+
+export function resolveGeneratePlanWeekStart(response: {
+  week_start?: unknown
+  weekStart?: unknown
+  weekly_plan?: { week_start?: unknown } | null
+  plan?: { week_start?: unknown } | null
+  data?: { days?: Array<{ date?: unknown }> } | null
+}): { weekStart: string; source: GeneratePlanWeekStartSource } | null {
+  const candidates: Array<[GeneratePlanWeekStartSource, unknown]> = [
+    ['week_start', response.week_start],
+    ['weekStart', response.weekStart],
+    ['weekly_plan.week_start', response.weekly_plan?.week_start],
+    ['plan.week_start', response.plan?.week_start],
+    ['data.days[0].date', response.data?.days?.[0]?.date],
+  ]
+  for (const [source, value] of candidates) {
+    if (typeof value === 'string' && DATE_KEY.test(value)) {
+      return { weekStart: value, source }
+    }
+  }
+  return null
+}
+
 export function isValidTimeZone(timeZone: string): boolean {
   try {
     new Intl.DateTimeFormat('en-US', { timeZone }).format(new Date())

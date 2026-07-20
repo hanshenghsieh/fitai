@@ -26,7 +26,7 @@ describe('REG-BOOTSTRAP-001 registration and onboarding contract', () => {
     const goal = onboarding.indexOf("from('goals')")
     const generate = onboarding.indexOf("apiFetch('/api/generate-plan'")
     const complete = onboarding.indexOf(".update({ onboarding_completed: true })")
-    const verify = onboarding.indexOf("select('generation_status, plan_data')")
+    const verify = onboarding.indexOf("select('week_start, generation_status, plan_data')")
     const redirect = onboarding.indexOf("window.location.assign('/dashboard?welcome=1&login=1')")
 
     assert.ok(pending >= 0)
