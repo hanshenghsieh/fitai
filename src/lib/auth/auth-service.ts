@@ -39,9 +39,11 @@ interface GoogleAuthPlugin {
     reversedSchemePresent: boolean
   }>
   signIn(options: {
-    nonce: string
+    hashedNonce: string
+    requestId: string
   }): Promise<{
     identityToken?: string
+    requestId?: string
     email?: string
     name?: string
   }>
@@ -66,10 +68,50 @@ const AppleAuth = registerPlugin<AppleAuthPlugin>('AppleAuth')
 const GoogleAuth = registerPlugin<GoogleAuthPlugin>('GoogleAuth')
 const callbackPromises = new Map<string, Promise<AuthCompletion>>()
 
-function createOidcNonce(): string {
-  const bytes = new Uint8Array(32)
+interface GoogleNonceContext {
+  requestId: string
+  rawNonce: string
+  hashedNonce: string
+}
+
+function randomHex(byteLength: number): string {
+  const bytes = new Uint8Array(byteLength)
   crypto.getRandomValues(bytes)
   return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('')
+}
+
+function createGoogleRawNonce(): string {
+  return randomHex(32)
+}
+
+async function sha256Hex(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
+  return Array.from(new Uint8Array(digest), byte =>
+    byte.toString(16).padStart(2, '0')
+  ).join('')
+}
+
+async function createGoogleNonceContext(): Promise<GoogleNonceContext> {
+  const rawNonce = createGoogleRawNonce()
+  const hashedNonce = await sha256Hex(rawNonce)
+  return {
+    requestId: randomHex(8),
+    rawNonce,
+    hashedNonce,
+  }
+}
+
+function readGoogleIdTokenNonceClaim(identityToken: string): string | null {
+  try {
+    const encodedPayload = identityToken.split('.')[1]
+    if (!encodedPayload) return null
+    const base64 = encodedPayload.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')
+    const payload = JSON.parse(atob(padded)) as { nonce?: unknown }
+    return typeof payload.nonce === 'string' && payload.nonce ? payload.nonce : null
+  } catch {
+    return null
+  }
 }
 
 function isCancellation(error: unknown): boolean {
@@ -211,6 +253,7 @@ export async function signInWithGoogle(): Promise<AuthCompletion | null> {
     throw new Error('此版本未安裝 Google 原生登入模組，請更新 App 後再試。')
   }
 
+  let nonceContext: GoogleNonceContext | null = null
   try {
     const runtimeConfig = await GoogleAuth.getConfiguration()
     console.info('[GOOGLE_CONFIG_RUNTIME]', runtimeConfig)
@@ -223,22 +266,53 @@ export async function signInWithGoogle(): Promise<AuthCompletion | null> {
     ) {
       throw new Error('Google iOS 登入設定不完整，請重新安裝最新版本後再試。')
     }
-    const nonce = createOidcNonce()
-    const credential = await GoogleAuth.signIn({ nonce })
+    nonceContext = await createGoogleNonceContext()
+    console.info('[GOOGLE_NONCE_GENERATED]', {
+      requestId: nonceContext.requestId,
+      rawPresent: true,
+      rawLength: nonceContext.rawNonce.length,
+      hashedPresent: true,
+      hashedLength: nonceContext.hashedNonce.length,
+      hashPrefix: nonceContext.hashedNonce.slice(0, 6),
+    })
+    const credential = await GoogleAuth.signIn({
+      hashedNonce: nonceContext.hashedNonce,
+      requestId: nonceContext.requestId,
+    })
     if (!credential.identityToken) {
       throw new Error('Google 未回傳有效的 ID token。')
     }
+    if (credential.requestId !== nonceContext.requestId) {
+      throw new Error('Google 登入請求識別不一致，請再試一次。')
+    }
+    const tokenNonceClaim = readGoogleIdTokenNonceClaim(credential.identityToken)
+    console.info('[GOOGLE_NATIVE_TOKEN_RETURNED]', {
+      requestId: nonceContext.requestId,
+      idTokenPresent: true,
+      tokenNonceClaimPresent: tokenNonceClaim != null,
+    })
+    if (tokenNonceClaim != null && tokenNonceClaim !== nonceContext.hashedNonce) {
+      throw new Error('Google 登入安全驗證不一致，請再試一次。')
+    }
+    const nonceIncluded = tokenNonceClaim === nonceContext.hashedNonce
+    console.info('[GOOGLE_SUPABASE_EXCHANGE]', {
+      requestId: nonceContext.requestId,
+      nonceIncluded,
+      nonceSource: nonceIncluded ? 'original_raw' : 'omitted',
+    })
     const supabase = createClient()
     const { data, error } = await supabase.auth.signInWithIdToken({
       provider: 'google',
       token: credential.identityToken,
-      nonce,
+      ...(nonceIncluded ? { nonce: nonceContext.rawNonce } : {}),
     })
     if (error) throw error
     return verifyAndComplete(data.session, credential.name)
   } catch (error) {
     if (isCancellation(error)) throw new AuthCancelledError()
     throw error
+  } finally {
+    nonceContext = null
   }
 }
 

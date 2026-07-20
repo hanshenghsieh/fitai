@@ -73,6 +73,20 @@ public final class GoogleAuthPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
 
+        guard let hashedNonce = call.getString("hashedNonce"),
+              hashedNonce.count == 64,
+              hashedNonce.unicodeScalars.allSatisfy({
+                  CharacterSet(charactersIn: "0123456789abcdef").contains($0)
+              }),
+              let requestId = call.getString("requestId"),
+              !requestId.isEmpty else {
+            call.reject(
+                "Google nonce contract 設定不完整。",
+                "GOOGLE_NONCE_CONFIGURATION_INVALID"
+            )
+            return
+        }
+
         guard let presenter = bridge?.viewController else {
             call.reject("無法顯示 Google 登入畫面。", "GOOGLE_PRESENTER_MISSING")
             return
@@ -82,14 +96,13 @@ public final class GoogleAuthPlugin: CAPPlugin, CAPBridgedPlugin {
             clientID: iosClientId,
             serverClientID: serverClientId
         )
-        let nonce = call.getString("nonce")
 
         DispatchQueue.main.async {
             GIDSignIn.sharedInstance.signIn(
                 withPresenting: presenter,
                 hint: nil,
                 additionalScopes: nil,
-                nonce: nonce
+                nonce: hashedNonce
             ) { result, error in
                 if let error = error {
                     let nsError = error as NSError
@@ -111,7 +124,10 @@ public final class GoogleAuthPlugin: CAPPlugin, CAPBridgedPlugin {
                     return
                 }
 
-                var response: JSObject = ["identityToken": identityToken]
+                var response: JSObject = [
+                    "identityToken": identityToken,
+                    "requestId": requestId
+                ]
                 if let email = user.profile?.email, !email.isEmpty {
                     response["email"] = email
                 }
