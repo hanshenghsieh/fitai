@@ -8,6 +8,26 @@ function source(path: string): string {
 }
 
 describe('Today dashboard section order', () => {
+  it('embeds the existing Day 1 guide between the date and calorie ring', () => {
+    const dashboard = source('src/components/betterbit-v2/TodayV2Dashboard.tsx')
+    const home = source('src/components/dashboard/BetterBitHome.tsx')
+    const guide = source('src/components/dashboard/today/Day1GuideBanner.tsx')
+    const mainCard = dashboard.indexOf('{/* Main calorie card */}')
+    const date = dashboard.indexOf('{todayLabel}', mainCard)
+    const embeddedGuide = dashboard.indexOf('{day1Guide ? <div', date)
+    const ring = dashboard.indexOf('<V2ProgressRing', embeddedGuide)
+
+    assert.ok(mainCard >= 0)
+    assert.ok(date > mainCard)
+    assert.ok(embeddedGuide > date)
+    assert.ok(ring > embeddedGuide)
+    assert.equal(home.match(/<Day1GuideBanner/g)?.length, 1)
+    assert.match(home, /day1Guide=\{[\s\S]*?<Day1GuideBanner/)
+    assert.match(guide, /今日飲食總覽中的餐點可長按拖移順序或刪除/)
+    assert.match(guide, /bb_day1_guide_dismissed/)
+    assert.doesNotMatch(guide, /<BBCard|absolute/)
+  })
+
   it('renders actions and recommendation before the always-visible meal overview', () => {
     const dashboard = source('src/components/betterbit-v2/TodayV2Dashboard.tsx')
     const macros = dashboard.indexOf('{/* Macros row */}')

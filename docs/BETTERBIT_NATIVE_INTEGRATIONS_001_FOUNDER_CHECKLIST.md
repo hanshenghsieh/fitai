@@ -61,10 +61,12 @@ secrets in `NEXT_PUBLIC_*`, the iOS bundle, or source control.
 ## Xcode / device acceptance
 
 - Add these App target user-defined build settings for both Debug and Release:
-  - `GOOGLE_IOS_CLIENT_ID`: the iOS OAuth client ID
-  - `GOOGLE_WEB_CLIENT_ID`: the Web OAuth client ID configured in Supabase
-  - `GOOGLE_REVERSED_IOS_CLIENT_ID`: the reversed iOS client ID, for example
-    `com.googleusercontent.apps.<client-prefix>`
+  - `GOOGLE_IOS_CLIENT_ID`:
+    `403467297093-8rae251r35a652fq4h0fplarl0u0m4lu.apps.googleusercontent.com`
+  - `GOOGLE_WEB_CLIENT_ID`:
+    `403467297093-85u48ft29ma5t4ijj19r331rr4pda8ep.apps.googleusercontent.com`
+  - `GOOGLE_REVERSED_IOS_CLIENT_ID`:
+    `com.googleusercontent.apps.403467297093-8rae251r35a652fq4h0fplarl0u0m4lu`
 - Run `npm ci`, `npm run build:ios-local`, then `npx cap sync ios` on the Mac.
 - Confirm SPM resolves the official `GoogleSignIn` 9.2.0 package plus Barcode
   Scanner, Camera, Local Notifications, RevenueCat, and Capacitor packages.
@@ -77,6 +79,30 @@ secrets in `NEXT_PUBLIC_*`, the iOS bundle, or source control.
 - Verify barcode scanning requests camera permission and resolves a real GTIN.
 - Confirm RevenueCat App User ID equals the authenticated Supabase `user.id`
   before and after logout/re-login.
+
+### Mac rebuild and expanded Info.plist verification
+
+```sh
+npm ci
+npm run build:ios-local
+npx cap sync ios
+cd ios/App
+xcodebuild -resolvePackageDependencies -project App.xcodeproj -scheme App
+xcodebuild -project App.xcodeproj -scheme App -configuration Debug \
+  -sdk iphoneos -destination 'generic/platform=iOS' \
+  -derivedDataPath ../../.derived-data CODE_SIGNING_ALLOWED=NO build
+
+APP_PLIST='../../.derived-data/Build/Products/Debug-iphoneos/App.app/Info.plist'
+/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PLIST"
+/usr/libexec/PlistBuddy -c 'Print :GIDClientID' "$APP_PLIST"
+/usr/libexec/PlistBuddy -c 'Print :GIDServerClientID' "$APP_PLIST"
+/usr/libexec/PlistBuddy -c 'Print :CFBundleURLTypes' "$APP_PLIST"
+```
+
+The four outputs must show bundle ID `app.fitai.betterbit`, the exact iOS and
+Web client IDs above, and the exact reversed iOS client scheme. Resolve any
+literal `$(GOOGLE_...)`, blank value, or different client before installing on
+a device.
 
 ## Open Food Facts
 

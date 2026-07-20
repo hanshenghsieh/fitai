@@ -7,6 +7,13 @@ function source(path: string): string {
 }
 
 describe('BETTERBIT-NATIVE-INTEGRATIONS-001 native contracts', () => {
+  const iosClientId =
+    '403467297093-8rae251r35a652fq4h0fplarl0u0m4lu.apps.googleusercontent.com'
+  const webClientId =
+    '403467297093-85u48ft29ma5t4ijj19r331rr4pda8ep.apps.googleusercontent.com'
+  const reversedIosClientId =
+    'com.googleusercontent.apps.403467297093-8rae251r35a652fq4h0fplarl0u0m4lu'
+
   it('keeps native Supabase PKCE on persistent storage', () => {
     const client = source('src/lib/supabase/client.ts')
     assert.match(client, /persistSession:\s*true/)
@@ -32,6 +39,8 @@ describe('BETTERBIT-NATIVE-INTEGRATIONS-001 native contracts', () => {
     assert.match(bridge, /registerPluginInstance\(AppleAuthPlugin\(\)\)/)
     assert.match(plugins, /GIDSignIn\.sharedInstance\.signIn/)
     assert.match(plugins, /GIDConfiguration/)
+    assert.match(plugins, /CAPPluginMethod\(name: "getConfiguration"/)
+    assert.match(plugins, /Bundle\.main\.bundleIdentifier/)
     assert.match(bridge, /registerPluginInstance\(HealthKitPlugin\(\)\)/)
     assert.match(plugins, /ASAuthorizationAppleIDProvider/)
     assert.match(plugins, /request\.nonce = sha256\(rawNonce\)/)
@@ -39,6 +48,29 @@ describe('BETTERBIT-NATIVE-INTEGRATIONS-001 native contracts', () => {
     assert.match(plugins, /options: \.cumulativeSum/)
     assert.match(plugins, /workout\.uuid\.uuidString/)
     assert.doesNotMatch(plugins, /print\(|NSLog\(/)
+  })
+
+  it('defines complete Google iOS settings for Debug and Release without empty URL types', () => {
+    const plist = source('ios/App/App/Info.plist')
+    const project = source('ios/App/App.xcodeproj/project.pbxproj')
+    const plugins = source('ios/App/App/NativeIntegrationsPlugins.swift')
+
+    assert.match(plist, /<key>GIDClientID<\/key>\s*<string>\$\(GOOGLE_IOS_CLIENT_ID\)<\/string>/)
+    assert.match(plist, /<key>GIDServerClientID<\/key>\s*<string>\$\(GOOGLE_WEB_CLIENT_ID\)<\/string>/)
+    assert.match(plist, /\$\(GOOGLE_REVERSED_IOS_CLIENT_ID\)/)
+    assert.doesNotMatch(plist, /<dict\s*\/>|<dict>\s*<\/dict>/)
+    assert.doesNotMatch(plist, /<string>\s*<\/string>/)
+
+    assert.equal(project.split(`GOOGLE_IOS_CLIENT_ID = "${iosClientId}"`).length - 1, 2)
+    assert.equal(project.split(`GOOGLE_WEB_CLIENT_ID = "${webClientId}"`).length - 1, 2)
+    assert.equal(
+      project.split(`GOOGLE_REVERSED_IOS_CLIENT_ID = "${reversedIosClientId}"`).length - 1,
+      2
+    )
+    assert.equal(project.split('PRODUCT_BUNDLE_IDENTIFIER = app.fitai.betterbit').length - 1, 2)
+    assert.match(plugins, new RegExp(iosClientId.replace(/\./g, '\\.')))
+    assert.match(plugins, new RegExp(webClientId.replace(/\./g, '\\.')))
+    assert.match(plugins, new RegExp(reversedIosClientId.replace(/\./g, '\\.')))
   })
 
   it('prepares Apple Sign In and HealthKit entitlements for Mac signing', () => {

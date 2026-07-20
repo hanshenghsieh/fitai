@@ -62,6 +62,7 @@ export interface TodayV2DashboardProps {
   onDeleteLog?: (logId: string) => void
   onOpenPendingQueue?: () => void
   onCalorieBankPreferencesChange?: (preferences: UserSettingsPreferences) => void
+  day1Guide?: ReactNode
   interstitial?: ReactNode
 }
 
@@ -93,6 +94,7 @@ export default function TodayV2Dashboard({
   onDeleteLog,
   onOpenPendingQueue,
   onCalorieBankPreferencesChange,
+  day1Guide,
   interstitial,
 }: TodayV2DashboardProps) {
   const [mealLabelMode, setMealLabelMode] = useState<MealLabelMode>('named')
@@ -122,7 +124,7 @@ export default function TodayV2Dashboard({
       >
         {/* Main calorie card */}
         <V2Card padding="20px 18px">
-          <div className="mb-4">
+          <div className={day1Guide ? 'mb-3' : 'mb-4'}>
             <p className="text-[18px]" style={{ color: BB_V2.text.primary, fontWeight: 700 }}>
               今天
             </p>
@@ -130,6 +132,8 @@ export default function TodayV2Dashboard({
               {todayLabel}
             </p>
           </div>
+
+          {day1Guide ? <div className="mb-4">{day1Guide}</div> : null}
 
           <div className="flex items-center gap-3">
             <V2ProgressRing

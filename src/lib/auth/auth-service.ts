@@ -29,6 +29,15 @@ interface AppleAuthPlugin {
 }
 
 interface GoogleAuthPlugin {
+  getConfiguration(): Promise<{
+    platform: string
+    bundleId: string
+    iosClientIdPresent: boolean
+    iosClientIdSuffix: string
+    serverClientIdPresent: boolean
+    serverClientIdSuffix: string
+    reversedSchemePresent: boolean
+  }>
   signIn(options: {
     nonce: string
   }): Promise<{
@@ -186,12 +195,34 @@ async function startWebOAuth(provider: OAuthProvider): Promise<null> {
 }
 
 export async function signInWithGoogle(): Promise<AuthCompletion | null> {
-  if (!isCapacitorNative()) return startWebOAuth('google')
-  if (!Capacitor.isPluginAvailable('GoogleAuth')) {
+  const platform = Capacitor.getPlatform()
+  const native = isCapacitorNative()
+  const pluginAvailable = Capacitor.isPluginAvailable('GoogleAuth')
+  console.info('[GOOGLE_AUTH_PLATFORM]', { platform, native })
+  console.info('[GOOGLE_NATIVE_PLUGIN_AVAILABLE]', { available: pluginAvailable })
+
+  if (!native) {
+    console.info('[GOOGLE_AUTH_PATH]', { path: 'web-supabase-oauth' })
+    return startWebOAuth('google')
+  }
+
+  console.info('[GOOGLE_AUTH_PATH]', { path: 'native-google-signin-bridge' })
+  if (!pluginAvailable) {
     throw new Error('此版本未安裝 Google 原生登入模組，請更新 App 後再試。')
   }
 
   try {
+    const runtimeConfig = await GoogleAuth.getConfiguration()
+    console.info('[GOOGLE_CONFIG_RUNTIME]', runtimeConfig)
+    if (
+      runtimeConfig.platform !== 'ios' ||
+      runtimeConfig.bundleId !== 'app.fitai.betterbit' ||
+      !runtimeConfig.iosClientIdPresent ||
+      !runtimeConfig.serverClientIdPresent ||
+      !runtimeConfig.reversedSchemePresent
+    ) {
+      throw new Error('Google iOS 登入設定不完整，請重新安裝最新版本後再試。')
+    }
     const nonce = createOidcNonce()
     const credential = await GoogleAuth.signIn({ nonce })
     if (!credential.identityToken) {

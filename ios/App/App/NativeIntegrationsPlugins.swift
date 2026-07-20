@@ -11,9 +11,33 @@ public final class GoogleAuthPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "GoogleAuthPlugin"
     public let jsName = "GoogleAuth"
     public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "getConfiguration", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "signIn", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "signOut", returnType: CAPPluginReturnPromise)
     ]
+
+    private static let expectedBundleId = "app.fitai.betterbit"
+    private static let expectedIosClientId =
+        "403467297093-8rae251r35a652fq4h0fplarl0u0m4lu.apps.googleusercontent.com"
+    private static let expectedServerClientId =
+        "403467297093-85u48ft29ma5t4ijj19r331rr4pda8ep.apps.googleusercontent.com"
+    private static let expectedReversedScheme =
+        "com.googleusercontent.apps.403467297093-8rae251r35a652fq4h0fplarl0u0m4lu"
+
+    @objc public func getConfiguration(_ call: CAPPluginCall) {
+        let iosClientId = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String
+        let serverClientId = Bundle.main.object(forInfoDictionaryKey: "GIDServerClientID") as? String
+        let schemes = registeredUrlSchemes()
+        call.resolve([
+            "platform": "ios",
+            "bundleId": Bundle.main.bundleIdentifier ?? "",
+            "iosClientIdPresent": configuredValuePresent(iosClientId),
+            "iosClientIdSuffix": safeSuffix(iosClientId),
+            "serverClientIdPresent": configuredValuePresent(serverClientId),
+            "serverClientIdSuffix": safeSuffix(serverClientId),
+            "reversedSchemePresent": schemes.contains(Self.expectedReversedScheme)
+        ])
+    }
 
     @objc public func signIn(_ call: CAPPluginCall) {
         guard let iosClientId = Bundle.main.object(forInfoDictionaryKey: "GIDClientID")
@@ -30,12 +54,18 @@ public final class GoogleAuthPlugin: CAPPlugin, CAPBridgedPlugin {
             )
             return
         }
-        let reversedClientId = iosClientId
-            .split(separator: ".")
-            .reversed()
-            .joined(separator: ".")
 
-        guard registeredUrlSchemes().contains(reversedClientId) else {
+        guard Bundle.main.bundleIdentifier == Self.expectedBundleId,
+              iosClientId == Self.expectedIosClientId,
+              serverClientId == Self.expectedServerClientId else {
+            call.reject(
+                "Google OAuth Client ID 與 BetterBit iOS 設定不一致。",
+                "GOOGLE_CONFIGURATION_MISMATCH"
+            )
+            return
+        }
+
+        guard registeredUrlSchemes().contains(Self.expectedReversedScheme) else {
             call.reject(
                 "Google iOS callback URL scheme 未加入 App 設定。",
                 "GOOGLE_URL_SCHEME_MISSING"
@@ -96,6 +126,16 @@ public final class GoogleAuthPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc public func signOut(_ call: CAPPluginCall) {
         GIDSignIn.sharedInstance.signOut()
         call.resolve()
+    }
+
+    private func configuredValuePresent(_ value: String?) -> Bool {
+        guard let value = value, !value.isEmpty, !value.contains("$(") else { return false }
+        return true
+    }
+
+    private func safeSuffix(_ value: String?) -> String {
+        guard configuredValuePresent(value), let value = value else { return "" }
+        return String(value.suffix(24))
     }
 
     private func registeredUrlSchemes() -> Set<String> {

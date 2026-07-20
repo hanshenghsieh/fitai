@@ -1029,6 +1029,16 @@ export default function BetterBitHome({
         excessDriver={intakeSummary.excessDriver}
         calorieFloor={calorieFloorFromGender(profile?.gender)}
         onCalorieBankPreferencesChange={setUserPrefs}
+        day1Guide={
+          showDay1Guide && onDashboard ? (
+            <Day1GuideBanner
+              onDismiss={() => {
+                dismissDay1Guide()
+                setShowDay1Guide(false)
+              }}
+            />
+          ) : undefined
+        }
         foodLogs={displayFoodLogs}
         hasDicePreview={mealUiState.hasDicePreview}
         mealActionsLoading={mealUiState.rolling || mealUiState.confirming}
@@ -1074,17 +1084,6 @@ export default function BetterBitHome({
           ) : undefined
         }
       />
-
-      {showDay1Guide && onDashboard ? (
-        <div className="px-[18px] max-w-[640px] mx-auto -mt-2">
-          <Day1GuideBanner
-            onDismiss={() => {
-              dismissDay1Guide()
-              setShowDay1Guide(false)
-            }}
-          />
-        </div>
-      ) : null}
 
       {onDashboard ? (
       <div className="px-5 pb-6 max-w-[640px] mx-auto space-y-6" style={{ fontFamily: TODAY.font }}>

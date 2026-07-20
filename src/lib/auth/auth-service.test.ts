@@ -19,13 +19,37 @@ describe('BETTERBIT-NATIVE-INTEGRATIONS-001 auth contract', () => {
   })
 
   it('uses the native Google SDK ID token and matching nonce on iOS', () => {
+    const googleStart = auth.indexOf('export async function signInWithGoogle')
+    const appleStart = auth.indexOf('export async function signInWithApple')
+    const google = auth.slice(googleStart, appleStart)
+    const nativePath = google.indexOf("path: 'native-google-signin-bridge'")
+    const pluginGuard = google.indexOf('if (!pluginAvailable)')
+    const nativeSignIn = google.indexOf('GoogleAuth.signIn({ nonce })')
+
     assert.match(auth, /registerPlugin<GoogleAuthPlugin>\('GoogleAuth'\)/)
-    assert.match(auth, /GoogleAuth\.signIn\(\{ nonce \}\)/)
+    assert.match(google, /GoogleAuth\.getConfiguration\(\)/)
+    assert.ok(nativePath >= 0)
+    assert.ok(pluginGuard > nativePath)
+    assert.ok(nativeSignIn > pluginGuard)
     assert.match(
-      auth,
+      google,
       /signInWithIdToken\(\{\s*provider:\s*'google',\s*token:\s*credential\.identityToken,\s*nonce/
     )
-    assert.doesNotMatch(auth, /signInWithOAuth\(\{\s*provider:\s*'google'/)
+    assert.doesNotMatch(google.slice(nativePath), /startWebOAuth|signInWithOAuth|Browser\.open/)
+  })
+
+  it('logs safe path diagnostics and fails closed when the native bridge is unavailable', () => {
+    const googleStart = auth.indexOf('export async function signInWithGoogle')
+    const appleStart = auth.indexOf('export async function signInWithApple')
+    const google = auth.slice(googleStart, appleStart)
+
+    assert.match(google, /\[GOOGLE_AUTH_PLATFORM\]/)
+    assert.match(google, /\[GOOGLE_AUTH_PATH\]/)
+    assert.match(google, /\[GOOGLE_NATIVE_PLUGIN_AVAILABLE\]/)
+    assert.match(google, /\[GOOGLE_CONFIG_RUNTIME\]/)
+    assert.match(google, /if \(!native\)[\s\S]*?return startWebOAuth\('google'\)/)
+    assert.match(google, /if \(!pluginAvailable\)[\s\S]*?throw new Error/)
+    assert.doesNotMatch(google, /console\.(?:log|info|warn|error)\([^\n]*(?:nonce|identityToken|token)/)
   })
 
   it('uses the native Apple identity token and raw nonce', () => {

@@ -323,6 +323,9 @@
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 24;
+				GOOGLE_IOS_CLIENT_ID = "403467297093-8rae251r35a652fq4h0fplarl0u0m4lu.apps.googleusercontent.com";
+				GOOGLE_REVERSED_IOS_CLIENT_ID = "com.googleusercontent.apps.403467297093-8rae251r35a652fq4h0fplarl0u0m4lu";
+				GOOGLE_WEB_CLIENT_ID = "403467297093-85u48ft29ma5t4ijj19r331rr4pda8ep.apps.googleusercontent.com";
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -346,6 +349,9 @@
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 24;
+				GOOGLE_IOS_CLIENT_ID = "403467297093-8rae251r35a652fq4h0fplarl0u0m4lu.apps.googleusercontent.com";
+				GOOGLE_REVERSED_IOS_CLIENT_ID = "com.googleusercontent.apps.403467297093-8rae251r35a652fq4h0fplarl0u0m4lu";
+				GOOGLE_WEB_CLIENT_ID = "403467297093-85u48ft29ma5t4ijj19r331rr4pda8ep.apps.googleusercontent.com";
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
