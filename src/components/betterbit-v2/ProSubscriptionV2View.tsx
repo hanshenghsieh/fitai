@@ -43,11 +43,25 @@ export interface ProPaywallV2Handlers {
   iapReady?: boolean
 }
 
+export interface ProPaywallPlanOption {
+  price: string
+  subtext?: string
+  subtextLines?: string[]
+  savingsHighlight?: string
+  badge?: string
+  hasEligible14DayTrial?: boolean
+}
+
 interface Props {
   access: AccessStatus
   handlers: ProPaywallV2Handlers
   showClose?: boolean
   availablePlans?: 'all' | 'monthly-only'
+  planOptions?: Partial<Record<ProPlanId, ProPaywallPlanOption>>
+  selectedPlan?: ProPlanId
+  onSelectPlan?: (plan: ProPlanId) => void
+  offeringsError?: string | null
+  onReloadOfferings?: () => void
 }
 
 export default function ProSubscriptionV2View({
@@ -55,15 +69,23 @@ export default function ProSubscriptionV2View({
   handlers,
   showClose = true,
   availablePlans = 'all',
+  planOptions,
+  selectedPlan,
+  onSelectPlan,
+  offeringsError,
+  onReloadOfferings,
 }: Props) {
   const router = useRouter()
   const monthlyOnly = availablePlans === 'monthly-only'
-  const savedPlan = useSyncExternalStore(
+  const savedPlan = useSyncExternalStore<ProPlanId>(
     subscribeToPaywallPlan,
     readSavedPaywallPlan,
     () => 'yearly'
   )
-  const plan: ProPlanId = monthlyOnly ? 'monthly' : savedPlan
+  const dynamicPlans = planOptions !== undefined
+  const plan: ProPlanId =
+    selectedPlan ??
+    (monthlyOnly ? 'monthly' : savedPlan)
   const trialWhisper = premiumTrialWhisper(access)
   const [yearlyPerMonth, yearlySavings] = yearlyPlanSubtextLines()
 
@@ -79,9 +101,32 @@ export default function ProSubscriptionV2View({
   const selectPlan = (next: ProPlanId) => {
     if (next === plan) return
     triggerV2Haptic('light')
+    if (onSelectPlan) {
+      onSelectPlan(next)
+      return
+    }
     window.sessionStorage.setItem(PAYWALL_PLAN_SESSION_KEY, next)
     window.dispatchEvent(new Event(PAYWALL_PLAN_EVENT))
   }
+
+  const monthlyOption: ProPaywallPlanOption | undefined = dynamicPlans
+    ? planOptions.monthly
+    : {
+        price: PRO_PLAN_PRICES.monthly,
+        subtext: '隨時取消',
+      }
+  const yearlyOption: ProPaywallPlanOption | undefined =
+    monthlyOnly
+      ? undefined
+      : dynamicPlans
+        ? planOptions.yearly
+        : {
+            price: PRO_PLAN_PRICES.yearly,
+            subtextLines: [yearlyPerMonth, yearlySavings],
+            savingsHighlight: yearlySavings,
+            badge: '最優惠',
+          }
+  const selectedOption = plan === 'yearly' ? yearlyOption : monthlyOption
 
   const handleSubscribe = () => {
     triggerV2Haptic('medium')
@@ -91,7 +136,7 @@ export default function ProSubscriptionV2View({
   return (
     <V2PageBackground>
       <V2Header
-        title="Betterbit Pro"
+        title="BetterBit Pro"
         variant={showClose ? 'close' : 'back'}
         onClose={showClose ? () => router.back() : undefined}
         onBack={!showClose ? () => router.back() : undefined}
@@ -117,26 +162,57 @@ export default function ProSubscriptionV2View({
             )}
           </div>
 
-          <div className={monthlyOnly ? 'flex' : 'flex gap-3'}>
-            <V2PricingCard
-              title="月訂方案"
-              price={PRO_PLAN_PRICES.monthly}
-              subtext="隨時取消"
-              selected={plan === 'monthly'}
-              onSelect={() => selectPlan('monthly')}
-            />
-            {!monthlyOnly && (
-              <V2PricingCard
-                title="年訂方案"
-                price={PRO_PLAN_PRICES.yearly}
-                subtextLines={[yearlyPerMonth, yearlySavings]}
-                savingsHighlight={yearlySavings}
-                badge="最優惠"
-                selected={plan === 'yearly'}
-                onSelect={() => selectPlan('yearly')}
-              />
-            )}
-          </div>
+          {(monthlyOption || yearlyOption) && (
+            <div className="grid grid-cols-2 max-[350px]:grid-cols-1 gap-3">
+              {monthlyOption && (
+                <V2PricingCard
+                  title="月訂方案"
+                  price={monthlyOption.price}
+                  subtext={monthlyOption.subtext}
+                  subtextLines={monthlyOption.subtextLines}
+                  selected={plan === 'monthly'}
+                  onSelect={() => selectPlan('monthly')}
+                />
+              )}
+              {yearlyOption && (
+                <V2PricingCard
+                  title="年訂方案"
+                  price={yearlyOption.price}
+                  subtext={yearlyOption.subtext}
+                  subtextLines={yearlyOption.subtextLines}
+                  savingsHighlight={yearlyOption.savingsHighlight}
+                  badge={yearlyOption.badge}
+                  selected={plan === 'yearly'}
+                  onSelect={() => selectPlan('yearly')}
+                />
+              )}
+            </div>
+          )}
+
+          {offeringsError && !monthlyOption && !yearlyOption && (
+            <div
+              className="rounded-[20px] border px-4 py-5 text-center"
+              style={{ background: BB_V2.bg.card, borderColor: BB_V2.border }}
+            >
+              <p className="text-[14px]" style={{ color: BB_V2.text.secondary }}>
+                {offeringsError}
+              </p>
+              {onReloadOfferings && (
+                <button
+                  type="button"
+                  onClick={onReloadOfferings}
+                  className="mt-3 rounded-full px-5 py-2 text-[13px]"
+                  style={{
+                    background: BB_V2.bg.softGreen,
+                    color: BB_V2.accent.green,
+                    fontWeight: 600,
+                  }}
+                >
+                  重新整理
+                </button>
+              )}
+            </div>
+          )}
 
           <div className="space-y-2.5">
             <p className="text-[16px] px-1" style={{ color: BB_V2.text.deepGreen, fontWeight: 700 }}>
@@ -159,7 +235,11 @@ export default function ProSubscriptionV2View({
               loading={purchasing}
               loadingText={purchaseLabel}
             >
-              {iapReady ? '立即升級 Betterbit Pro' : '訂閱準備中'}
+              {iapReady
+                ? selectedOption?.hasEligible14DayTrial
+                  ? '開始 14 天免費試用'
+                  : '立即升級 BetterBit Pro'
+                : '訂閱準備中'}
             </V2PrimaryButton>
 
             <p className="text-[11px] text-center leading-relaxed px-2" style={{ color: BB_V2.text.muted }}>

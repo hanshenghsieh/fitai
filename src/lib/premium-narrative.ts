@@ -42,5 +42,5 @@ export const PREMIUM_TESTFLIGHT_FOOTNOTE =
 
 export function premiumTrialWhisper(access: AccessStatus): string | null {
   if (!access.isTrial || access.isSubscribed) return null
-  return `試用中 · 剩餘 ${access.trialDaysLeft} 天`
+  return `試用中・剩餘 ${access.trialDaysLeft} 天`
 }

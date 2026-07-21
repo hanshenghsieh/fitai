@@ -85,7 +85,7 @@ describe('apple-iap sync regression', () => {
     assert.equal(row.stripe_subscription_id, 'apple_iap_user-2')
   })
 
-  it('grants premium only from the exact verified monthly entitlement', () => {
+  it('grants premium only from exact supported monthly or annual entitlements', () => {
     const now = new Date('2026-07-15T10:00:00.000Z')
     const active = parseVerifiedRevenueCatSubscriber(
       'user-1',
@@ -111,6 +111,31 @@ describe('apple-iap sync regression', () => {
     assert.equal(active.active, true)
     assert.equal(active.productId, 'betterbit_pro_monthly')
     assert.equal(active.willRenew, true)
+
+    const annual = parseVerifiedRevenueCatSubscriber(
+      'user-1',
+      {
+        subscriber: {
+          original_app_user_id: 'user-1',
+          entitlements: {
+            premium: {
+              product_identifier: 'Betterbit_pro_annual',
+              purchase_date: '2026-07-01T00:00:00.000Z',
+              expires_date: '2027-07-01T00:00:00.000Z',
+            },
+          },
+          subscriptions: {
+            Betterbit_pro_annual: {
+              unsubscribe_detected_at: null,
+            },
+          },
+        },
+      },
+      now
+    )
+    assert.equal(annual.active, true)
+    assert.equal(annual.productId, 'Betterbit_pro_annual')
+    assert.equal(annual.willRenew, true)
 
     const wrongEntitlement = parseVerifiedRevenueCatSubscriber(
       'user-1',

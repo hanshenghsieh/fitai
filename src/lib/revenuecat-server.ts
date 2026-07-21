@@ -1,6 +1,8 @@
 import {
   APPLE_IAP_ENTITLEMENT_ID,
   APPLE_IAP_PRODUCT_ID,
+  isSupportedAppleIapProductId,
+  type AppleIapProductId,
 } from '@/lib/apple-iap-config'
 
 const REVENUECAT_API_BASE = 'https://api.revenuecat.com/v1'
@@ -9,7 +11,7 @@ const REVENUECAT_TIMEOUT_MS = 10_000
 export interface VerifiedRevenueCatSubscription {
   userId: string
   active: boolean
-  productId: typeof APPLE_IAP_PRODUCT_ID
+  productId: AppleIapProductId
   purchasedAt: string
   expiresAt: string
   willRenew: boolean
@@ -67,7 +69,7 @@ export function parseVerifiedRevenueCatSubscriber(
   const purchasedAt = validIso(entitlement?.purchase_date)
   const expiresAt = validIso(entitlement?.expires_date)
   if (
-    productId !== APPLE_IAP_PRODUCT_ID ||
+    !isSupportedAppleIapProductId(productId) ||
     !purchasedAt ||
     !expiresAt
   ) {
@@ -82,13 +84,13 @@ export function parseVerifiedRevenueCatSubscriber(
   }
 
   const subscriptions = asRecord(subscriber.subscriptions)
-  const productSubscription = asRecord(subscriptions?.[APPLE_IAP_PRODUCT_ID])
+  const productSubscription = asRecord(subscriptions?.[productId])
   const unsubscribeDetectedAt = validIso(productSubscription?.unsubscribe_detected_at)
 
   return {
     userId,
     active: new Date(expiresAt).getTime() > now.getTime(),
-    productId: APPLE_IAP_PRODUCT_ID,
+    productId,
     purchasedAt,
     expiresAt,
     willRenew: !unsubscribeDetectedAt,

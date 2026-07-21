@@ -4,7 +4,7 @@ import { requireApiUser } from '@/lib/api/auth'
 import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { upsertAppleIapSubscription } from '@/lib/apple-iap-store'
 import {
-  APPLE_IAP_PRODUCT_ID,
+  isSupportedAppleIapProductId,
   isAppleIapEnabled,
 } from '@/lib/apple-iap-config'
 import { shouldBlockExternalPaymentsOnServer } from '@/lib/ios-payment-gate'
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       source: 'server',
       status: 200,
       active: verified.active,
-      productMatches: verified.productId === APPLE_IAP_PRODUCT_ID,
+      productMatches: isSupportedAppleIapProductId(verified.productId),
       persisted: true,
     })
     return jsonWithCors(

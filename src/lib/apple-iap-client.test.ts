@@ -10,6 +10,14 @@ import {
   readAppleIapEntitlement,
   resetAppleIapConfiguration,
 } from './apple-iap-client'
+import {
+  APPLE_IAP_ANNUAL_PACKAGE_ID,
+  APPLE_IAP_ANNUAL_PRODUCT_ID,
+  APPLE_IAP_MONTHLY_PACKAGE_ID,
+  APPLE_IAP_MONTHLY_PRODUCT_ID,
+  APPLE_IAP_OFFERING_ID,
+} from './apple-iap-config'
+import { buildDynamicAnnualPriceCopy } from './pro-subscription-v2'
 
 describe('apple-iap-client', () => {
   it('does not report native Purchases plugin on server', () => {
@@ -24,25 +32,39 @@ describe('apple-iap-client', () => {
   it('humanizes RevenueCat ASC product fetch errors on server guard', async () => {
     resetAppleIapConfiguration()
     await assert.rejects(
-      () => purchaseAppleIap('user-1'),
+      () => purchaseAppleIap('user-1', {} as never),
       /訂閱尚未開放|瀏覽器|付款模組/
     )
   })
 
-  it('accepts only the active premium entitlement for the expected product', () => {
-    const premium = readAppleIapEntitlement({
+  it('accepts monthly and case-sensitive annual products for premium entitlement', () => {
+    const monthly = readAppleIapEntitlement({
       entitlements: {
         active: {
           premium: {
-            productIdentifier: 'betterbit_pro_monthly',
+            productIdentifier: APPLE_IAP_MONTHLY_PRODUCT_ID,
             expirationDate: '2026-08-20T00:00:00.000Z',
           },
         },
       },
     })
-    assert.deepEqual(premium, {
-      productId: 'betterbit_pro_monthly',
+    assert.deepEqual(monthly, {
+      productId: APPLE_IAP_MONTHLY_PRODUCT_ID,
       expiresAt: '2026-08-20T00:00:00.000Z',
+    })
+    const annual = readAppleIapEntitlement({
+      entitlements: {
+        active: {
+          premium: {
+            productIdentifier: APPLE_IAP_ANNUAL_PRODUCT_ID,
+            expirationDate: '2027-07-21T00:00:00.000Z',
+          },
+        },
+      },
+    })
+    assert.deepEqual(annual, {
+      productId: APPLE_IAP_ANNUAL_PRODUCT_ID,
+      expiresAt: '2027-07-21T00:00:00.000Z',
     })
     assert.equal(
       readAppleIapEntitlement({
@@ -55,6 +77,29 @@ describe('apple-iap-client', () => {
       null
     )
     assert.equal(readAppleIapEntitlement({ entitlements: { active: {} } }), null)
+  })
+
+  it('uses the exact RevenueCat offering, package, and product identifiers', () => {
+    assert.equal(APPLE_IAP_OFFERING_ID, 'default')
+    assert.equal(APPLE_IAP_MONTHLY_PACKAGE_ID, '$rc_monthly')
+    assert.equal(APPLE_IAP_ANNUAL_PACKAGE_ID, '$rc_annual')
+    assert.equal(APPLE_IAP_MONTHLY_PRODUCT_ID, 'betterbit_pro_monthly')
+    assert.equal(APPLE_IAP_ANNUAL_PRODUCT_ID, 'Betterbit_pro_annual')
+  })
+
+  it('derives annual monthly average and savings from StoreKit numeric prices', () => {
+    assert.deepEqual(
+      buildDynamicAnnualPriceCopy({
+        monthlyPrice: 190,
+        annualPrice: 990,
+        annualLocalizedPrice: 'NT$990',
+        currencyCode: 'TWD',
+      }),
+      {
+        perMonth: '約 NT$83／月',
+        savings: '現省 NT$1,290（57%）',
+      }
+    )
   })
 
   it('does not let optional backend sync failure revoke an active entitlement', async () => {
@@ -113,6 +158,16 @@ describe('apple-iap-client', () => {
     assert.match(ui, /if \(!isAppleIapCancellation\(err\)\)/)
     assert.match(ui, /restoreAppleIap\(userId\)[\s\S]*if \(result\.active\)/)
     assert.match(client, /if \(!entitlement\) \{[\s\S]*throw new Error\('購買未完成'\)/)
+    assert.match(client, /Purchases\.getOfferings\(\)/)
+    assert.match(client, /current\.monthly/)
+    assert.match(client, /current\.annual/)
+    assert.match(client, /Purchases\.purchasePackage/)
+    assert.match(client, /Purchases\.getCustomerInfo\(\)/)
+    assert.doesNotMatch(client, /Purchases\.getProducts/)
+    assert.match(ui, /selectedPackage/)
+    assert.match(ui, /setSelectedPlan\(loadedOffering\.annual \? 'yearly' : 'monthly'\)/)
+    assert.match(ui, /plan === 'yearly' \? offering\?\.annual/)
+    assert.match(ui, /onSubscribe: plan => void handleSubscribe\(plan\)/)
   })
 
   it('logs only safe IAP summaries and never customer info or tokens', () => {

@@ -1,11 +1,22 @@
 'use client'
 
 import { Capacitor } from '@capacitor/core'
-import { Purchases } from '@revenuecat/purchases-capacitor'
+import {
+  INTRO_ELIGIBILITY_STATUS,
+  Purchases,
+  type IntroEligibility,
+  type PurchasesPackage,
+} from '@revenuecat/purchases-capacitor'
 import { isNativeIOS } from '@/lib/capacitor-native'
 import {
   APPLE_IAP_ENTITLEMENT_ID,
-  APPLE_IAP_PRODUCT_ID,
+  APPLE_IAP_ANNUAL_PACKAGE_ID,
+  APPLE_IAP_ANNUAL_PRODUCT_ID,
+  APPLE_IAP_MONTHLY_PACKAGE_ID,
+  APPLE_IAP_MONTHLY_PRODUCT_ID,
+  APPLE_IAP_OFFERING_ID,
+  isSupportedAppleIapProductId,
+  type AppleIapProductId,
   getRevenueCatIosApiKey,
   isRevenueCatConfigured,
 } from '@/lib/apple-iap-config'
@@ -69,7 +80,7 @@ function toNativePayload<T>(value: T): T {
 
 function ascProductUnavailableError(): Error {
   return new Error(
-    'Apple 抓不到訂閱商品 betterbit_pro_monthly。請到 App Store Connect 確認：① 付費 App 協議已生效 ② 訂閱已設價格+本地化 ③ Product ID 完全一致。新建商品可能需等數小時。'
+    'Apple 抓不到目前的訂閱方案。請確認 RevenueCat default Offering、App Store 商品價格與本地化均已生效。'
   )
 }
 
@@ -209,7 +220,7 @@ interface RevenueCatCustomerInfoLike {
 }
 
 interface ActiveAppleIapEntitlement {
-  productId: string
+  productId: AppleIapProductId
   expiresAt: string | null
 }
 
@@ -219,7 +230,7 @@ export function readAppleIapEntitlement(
   const active = customerInfo.entitlements?.active ?? {}
   const entitlement = active[APPLE_IAP_ENTITLEMENT_ID]
 
-  if (entitlement?.productIdentifier !== APPLE_IAP_PRODUCT_ID) return null
+  if (!isSupportedAppleIapProductId(entitlement?.productIdentifier)) return null
 
   return {
     productId: entitlement.productIdentifier,
@@ -242,7 +253,7 @@ function readAndLogEntitlement(
     source,
     entitlementId: APPLE_IAP_ENTITLEMENT_ID,
     active: entitlement != null,
-    expectedProduct: entitlement?.productId === APPLE_IAP_PRODUCT_ID,
+    expectedProduct: entitlement != null,
     expirationPresent: Boolean(entitlement?.expiresAt),
   })
   return entitlement
@@ -267,7 +278,7 @@ async function syncToBackend(isRestore = false): Promise<AppleIapPurchaseResult>
     ok: res.ok,
     verified: data.verified === true,
     active: data.active === true,
-    productMatches: data.product_id === APPLE_IAP_PRODUCT_ID,
+    productMatches: isSupportedAppleIapProductId(data.product_id),
   })
   if (!res.ok) {
     throw new Error(data.error || '無法同步訂閱狀態')
@@ -275,7 +286,7 @@ async function syncToBackend(isRestore = false): Promise<AppleIapPurchaseResult>
   if (
     data.verified !== true ||
     data.active !== true ||
-    data.product_id !== APPLE_IAP_PRODUCT_ID
+    !isSupportedAppleIapProductId(data.product_id)
   ) {
     throw new Error('訂閱尚未通過伺服器驗證，請稍後使用「恢復購買」重試')
   }
@@ -313,56 +324,149 @@ export async function finalizeActiveAppleIapEntitlement(
   }
 }
 
-type PurchasesClient = typeof Purchases
-
-type PurchaseTarget =
-  | { kind: 'package'; value: { identifier: string; product: { identifier: string } } }
-  | { kind: 'product'; value: { identifier: string } }
-
-async function resolvePurchaseTarget(Purchases: PurchasesClient): Promise<PurchaseTarget> {
-  const productId = APPLE_IAP_PRODUCT_ID
-
-  // Prefer direct StoreKit product fetch — avoids RevenueCat offerings config error spam.
-  const direct = await withTimeout(
-    Purchases.getProducts({ productIdentifiers: [productId] }),
-    OFFERINGS_TIMEOUT_MS,
-    '讀取 App Store 商品逾時。請確認 Sandbox 已登入'
-  )
-  const fromDirect = direct.products?.[0]
-  if (fromDirect?.identifier) {
-    return { kind: 'product', value: fromDirect }
-  }
-
-  try {
-    const offerings = await withTimeout(
-      Purchases.getOfferings(),
-      OFFERINGS_TIMEOUT_MS,
-      '讀取訂閱方案逾時。請確認 RevenueCat Offering 已設 Current'
-    )
-    const fromOffering =
-      offerings.current?.availablePackages?.find(pkg => pkg.product?.identifier === productId) ??
-      offerings.current?.availablePackages?.[0]
-    if (fromOffering?.product?.identifier) {
-      return { kind: 'package', value: fromOffering }
-    }
-  } catch (err) {
-    throw humanizePurchaseError(err)
-  }
-
-  throw ascProductUnavailableError()
+export interface AppleIapPackageOption {
+  plan: 'monthly' | 'yearly'
+  packageIdentifier: typeof APPLE_IAP_MONTHLY_PACKAGE_ID | typeof APPLE_IAP_ANNUAL_PACKAGE_ID
+  productId: AppleIapProductId
+  localizedPrice: string
+  price: number
+  currencyCode: string
+  localizedPricePerMonth: string | null
+  hasEligible14DayTrial: boolean
+  nativePackage: PurchasesPackage
 }
 
-async function executePurchase(Purchases: PurchasesClient, target: PurchaseTarget) {
-  if (target.kind === 'package') {
-    return withTimeout(
-      Purchases.purchasePackage({ aPackage: toNativePayload(target.value) }),
-      PURCHASE_SHEET_TIMEOUT_MS,
-      '等待 Apple 付款逾時。請到「設定 → 開發人員 → Sandbox」登入測試帳號後重試'
-    )
+export interface AppleIapOffering {
+  identifier: typeof APPLE_IAP_OFFERING_ID
+  monthly: AppleIapPackageOption | null
+  annual: AppleIapPackageOption | null
+}
+
+function isFourteenDayPeriod(aPackage: PurchasesPackage): boolean {
+  const intro = aPackage.product.introPrice
+  if (!intro || intro.price !== 0 || intro.cycles < 1) return false
+  return (
+    intro.period === 'P14D' ||
+    intro.period === 'P2W' ||
+    (intro.periodUnit === 'DAY' && intro.periodNumberOfUnits === 14) ||
+    (intro.periodUnit === 'WEEK' && intro.periodNumberOfUnits === 2)
+  )
+}
+
+export function hasEligibleFourteenDayTrial(
+  aPackage: PurchasesPackage,
+  eligibility?: IntroEligibility
+): boolean {
+  return (
+    isFourteenDayPeriod(aPackage) &&
+    eligibility?.status ===
+      INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE
+  )
+}
+
+function packageOption(
+  plan: AppleIapPackageOption['plan'],
+  aPackage: PurchasesPackage | null | undefined,
+  expectedPackageId: AppleIapPackageOption['packageIdentifier'],
+  expectedProductId: AppleIapProductId,
+  eligibility: Record<string, IntroEligibility>
+): AppleIapPackageOption | null {
+  if (
+    !aPackage ||
+    aPackage.identifier !== expectedPackageId ||
+    aPackage.product.identifier !== expectedProductId
+  ) {
+    return null
+  }
+  return {
+    plan,
+    packageIdentifier: expectedPackageId,
+    productId: expectedProductId,
+    localizedPrice: aPackage.product.priceString,
+    price: aPackage.product.price,
+    currencyCode: aPackage.product.currencyCode,
+    localizedPricePerMonth: aPackage.product.pricePerMonthString,
+    hasEligible14DayTrial: hasEligibleFourteenDayTrial(
+      aPackage,
+      eligibility[expectedProductId]
+    ),
+    nativePackage: aPackage,
+  }
+}
+
+export async function getAppleIapOffering(
+  userId: string
+): Promise<AppleIapOffering> {
+  const ready = await configureAppleIap(userId)
+  if (!ready) throw new Error('訂閱尚未開放')
+
+  const offerings = await withTimeout(
+    Purchases.getOfferings(),
+    OFFERINGS_TIMEOUT_MS,
+    '讀取訂閱方案逾時。請確認 RevenueCat Offering 已設 Current'
+  )
+  const current = offerings.current
+  if (!current || current.identifier !== APPLE_IAP_OFFERING_ID) {
+    throw new Error('目前找不到可用的訂閱方案，請重新整理')
   }
 
+  const monthlyPackage =
+    current.monthly ??
+    current.availablePackages.find(pkg => pkg.identifier === APPLE_IAP_MONTHLY_PACKAGE_ID)
+  const annualPackage =
+    current.annual ??
+    current.availablePackages.find(pkg => pkg.identifier === APPLE_IAP_ANNUAL_PACKAGE_ID)
+  const candidateProductIds = [monthlyPackage, annualPackage]
+    .filter((pkg): pkg is PurchasesPackage => pkg != null)
+    .map(pkg => pkg.product.identifier)
+
+  let eligibility: Record<string, IntroEligibility> = {}
+  if (candidateProductIds.length > 0) {
+    try {
+      eligibility = await Purchases.checkTrialOrIntroductoryPriceEligibility({
+        productIdentifiers: candidateProductIds,
+      })
+    } catch {
+      console.info('[IAP_OFFERINGS]', {
+        offeringId: current.identifier,
+        trialEligibilityUnavailable: true,
+      })
+    }
+  }
+
+  const monthly = packageOption(
+    'monthly',
+    monthlyPackage,
+    APPLE_IAP_MONTHLY_PACKAGE_ID,
+    APPLE_IAP_MONTHLY_PRODUCT_ID,
+    eligibility
+  )
+  const annual = packageOption(
+    'yearly',
+    annualPackage,
+    APPLE_IAP_ANNUAL_PACKAGE_ID,
+    APPLE_IAP_ANNUAL_PRODUCT_ID,
+    eligibility
+  )
+  console.info('[IAP_OFFERINGS]', {
+    offeringId: current.identifier,
+    monthlyAvailable: monthly != null,
+    annualAvailable: annual != null,
+    complete: monthly != null && annual != null,
+  })
+  if (!monthly && !annual) throw ascProductUnavailableError()
+  if (!monthly || !annual) {
+    console.warn('[IAP_OFFERINGS]', {
+      offeringId: current.identifier,
+      missingPackage: monthly ? 'annual' : 'monthly',
+    })
+  }
+  return { identifier: APPLE_IAP_OFFERING_ID, monthly, annual }
+}
+
+async function executePurchase(aPackage: PurchasesPackage) {
   return withTimeout(
-    Purchases.purchaseStoreProduct({ product: toNativePayload(target.value) }),
+    Purchases.purchasePackage({ aPackage: toNativePayload(aPackage) }),
     PURCHASE_SHEET_TIMEOUT_MS,
     '等待 Apple 付款逾時。請到「設定 → 開發人員 → Sandbox」登入測試帳號後重試'
   )
@@ -389,11 +493,13 @@ export async function getAppleIapStatus(userId: string): Promise<AppleIapPurchas
 
 export async function purchaseAppleIap(
   userId: string,
+  selectedPackage: AppleIapPackageOption,
   onStep?: (step: AppleIapPurchaseStep) => void
 ): Promise<AppleIapPurchaseResult> {
   try {
     console.info('[IAP_PURCHASE_STARTED]', {
-      productId: APPLE_IAP_PRODUCT_ID,
+      productId: selectedPackage.productId,
+      packageId: selectedPackage.packageIdentifier,
       entitlementId: APPLE_IAP_ENTITLEMENT_ID,
     })
     onStep?.('configure')
@@ -401,15 +507,27 @@ export async function purchaseAppleIap(
     if (!ready) throw new Error('訂閱尚未開放')
 
     onStep?.('offerings')
-    const target = await resolvePurchaseTarget(Purchases)
+    if (
+      selectedPackage.nativePackage.identifier !== selectedPackage.packageIdentifier ||
+      selectedPackage.nativePackage.product.identifier !== selectedPackage.productId ||
+      !isSupportedAppleIapProductId(selectedPackage.productId)
+    ) {
+      throw new Error('選取的訂閱方案無效，請重新整理')
+    }
 
     onStep?.('purchase')
-    const purchaseResult = await executePurchase(Purchases, target)
+    await executePurchase(selectedPackage.nativePackage)
     console.info('[IAP_PURCHASE_RESULT]', {
       completed: true,
-      purchaseTarget: target.kind,
+      purchaseTarget: 'package',
+      packageId: selectedPackage.packageIdentifier,
     })
-    const entitlement = readAndLogEntitlement(purchaseResult.customerInfo, 'purchase')
+    const { customerInfo } = await withTimeout(
+      Purchases.getCustomerInfo(),
+      OFFERINGS_TIMEOUT_MS,
+      '購買完成，但讀取會員狀態逾時'
+    )
+    const entitlement = readAndLogEntitlement(customerInfo, 'purchase')
     if (!entitlement) {
       throw new Error('購買未完成')
     }

@@ -39,6 +39,49 @@ export function yearlyPlanSubtextLines() {
   return [SUBSCRIPTION_PRICE_YEARLY_PER_MONTH, SUBSCRIPTION_YEARLY_SAVINGS] as const
 }
 
+function formatDerivedLocalizedPrice(
+  amount: number,
+  referencePrice: string,
+  currencyCode: string
+): string {
+  const rounded = Math.round(amount)
+  const number = rounded.toLocaleString('zh-TW')
+  const prefix = referencePrice.match(/^[^\d-]+/)?.[0]?.trim()
+  if (prefix) return `${prefix}${number}`
+  return new Intl.NumberFormat('zh-TW', {
+    style: 'currency',
+    currency: currencyCode,
+    maximumFractionDigits: 0,
+  }).format(rounded)
+}
+
+export function buildDynamicAnnualPriceCopy(input: {
+  monthlyPrice: number
+  annualPrice: number
+  annualLocalizedPrice: string
+  currencyCode: string
+}): { perMonth: string; savings: string } {
+  const annualMonthly = input.annualPrice / 12
+  const yearlyMonthlyCost = input.monthlyPrice * 12
+  const savingsAmount = Math.max(0, yearlyMonthlyCost - input.annualPrice)
+  const savingsPercent =
+    yearlyMonthlyCost > 0
+      ? Math.max(0, Math.round((savingsAmount / yearlyMonthlyCost) * 100))
+      : 0
+  return {
+    perMonth: `約 ${formatDerivedLocalizedPrice(
+      annualMonthly,
+      input.annualLocalizedPrice,
+      input.currencyCode
+    )}／月`,
+    savings: `現省 ${formatDerivedLocalizedPrice(
+      savingsAmount,
+      input.annualLocalizedPrice,
+      input.currencyCode
+    )}（${savingsPercent}%）`,
+  }
+}
+
 export const PRO_AUTO_RENEW_DISCLOSURE = '訂閱將自動續訂，可隨時在 App 內取消。'
 
 export const PRO_APP_STORE_MANAGE_HINT =

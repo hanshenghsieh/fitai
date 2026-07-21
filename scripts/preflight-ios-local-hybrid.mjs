@@ -19,7 +19,11 @@ import { basename, join, relative } from 'node:path'
 
 const root = join(import.meta.dirname, '..')
 const results = []
-const IAP_PRODUCT_ID = 'betterbit_pro_monthly'
+const IAP_MONTHLY_PRODUCT_ID = 'betterbit_pro_monthly'
+const IAP_ANNUAL_PRODUCT_ID = 'Betterbit_pro_annual'
+const IAP_OFFERING_ID = 'default'
+const IAP_MONTHLY_PACKAGE_ID = '$rc_monthly'
+const IAP_ANNUAL_PACKAGE_ID = '$rc_annual'
 const IAP_ENTITLEMENT_ID = 'premium'
 
 function rel(p) {
@@ -80,6 +84,16 @@ function gatherText(dirs, exts = ['.html', '.js', '.css', '.json', '.tsx', '.ts'
     }
   }
   return out
+}
+
+function bundleContains(dir, marker) {
+  return walkFiles(dir, (p) => p.endsWith('.js')).some((file) => {
+    try {
+      return readFileSync(file, 'utf8').includes(marker)
+    } catch {
+      return false
+    }
+  })
 }
 
 function routeHtmlExists(route) {
@@ -201,9 +215,9 @@ function checkRevenueCatIap() {
   publicKey?.startsWith('appl_')
     ? pass('iap.publicKey', 'RevenueCat iOS public key present')
     : fail('iap.publicKey', 'RevenueCat iOS appl_ public key missing')
-  productId === IAP_PRODUCT_ID
-    ? pass('iap.product', `product id = ${IAP_PRODUCT_ID}`)
-    : fail('iap.product', `product id must equal ${IAP_PRODUCT_ID}`)
+  productId === IAP_MONTHLY_PRODUCT_ID
+    ? pass('iap.product', `public product id = ${IAP_MONTHLY_PRODUCT_ID}`)
+    : fail('iap.product', `public product id must equal ${IAP_MONTHLY_PRODUCT_ID}`)
   entitlementId === IAP_ENTITLEMENT_ID
     ? pass('iap.entitlement', `entitlement id = ${IAP_ENTITLEMENT_ID}`)
     : fail('iap.entitlement', `entitlement id must equal ${IAP_ENTITLEMENT_ID}`)
@@ -239,9 +253,18 @@ function checkRevenueCatIap() {
     [join(root, 'ios/App/App/public/_next')],
     ['.js']
   )
-  iosJs.includes(IAP_PRODUCT_ID)
-    ? pass('iap.bundle.product', 'monthly product id found in iOS bundle')
-    : fail('iap.bundle.product', 'monthly product id missing from iOS bundle')
+  const iosBundleDir = join(root, 'ios/App/App/public/_next')
+  bundleContains(iosBundleDir, IAP_MONTHLY_PRODUCT_ID)
+    ? pass('iap.bundle.product.monthly', 'monthly product id found in iOS bundle')
+    : fail('iap.bundle.product.monthly', 'monthly product id missing from iOS bundle')
+  bundleContains(iosBundleDir, IAP_ANNUAL_PRODUCT_ID)
+    ? pass('iap.bundle.product.annual', 'annual product id found in iOS bundle')
+    : fail('iap.bundle.product.annual', 'annual product id missing from iOS bundle')
+  bundleContains(iosBundleDir, IAP_OFFERING_ID) &&
+  bundleContains(iosBundleDir, IAP_MONTHLY_PACKAGE_ID) &&
+  bundleContains(iosBundleDir, IAP_ANNUAL_PACKAGE_ID)
+    ? pass('iap.bundle.offering', 'default monthly and annual package markers found')
+    : fail('iap.bundle.offering', 'RevenueCat dual-plan offering markers missing')
   iosJs.includes(IAP_ENTITLEMENT_ID)
     ? pass('iap.bundle.entitlement', 'premium entitlement marker found in iOS bundle')
     : fail('iap.bundle.entitlement', 'premium entitlement marker missing from iOS bundle')
