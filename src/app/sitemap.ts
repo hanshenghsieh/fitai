@@ -1,10 +1,10 @@
 import type { MetadataRoute } from 'next'
-import { getAppUrl } from '@/lib/app-url'
+import { MARKETING_SITE_URL } from '@/lib/app-url'
 
 export const dynamic = 'force-static'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = getAppUrl()
+  const base = MARKETING_SITE_URL
   const now = new Date()
 
   const pages: MetadataRoute.Sitemap = [

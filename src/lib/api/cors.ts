@@ -7,6 +7,8 @@ const ALLOWED_ORIGINS = new Set([
   'https://localhost',
   'https://betterbit.app',
   'https://www.betterbit.app',
+  'https://betterbit.tw',
+  'https://www.betterbit.tw',
 ])
 
 const ALLOWED_METHODS = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'

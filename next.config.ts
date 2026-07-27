@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
   ...(isIosLocalBuild
     ? {}
     : {
+        async redirects() {
+          return [{ source: '/home', destination: '/', permanent: true }]
+        },
         async headers() {
           return [
             {

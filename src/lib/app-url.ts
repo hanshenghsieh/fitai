@@ -1,5 +1,8 @@
-/** Canonical production origin — single source of truth */
+/** Canonical production origin — single source of truth for API/auth/billing redirects */
 export const PRODUCTION_APP_URL = 'https://betterbit.app'
+
+/** Public marketing site domain — used for canonical URLs, sitemap, robots.txt, OG metadata */
+export const MARKETING_SITE_URL = 'https://betterbit.tw'
 
 /** Resolve app origin: env → production default → localhost dev */
 export function getAppUrl(): string {

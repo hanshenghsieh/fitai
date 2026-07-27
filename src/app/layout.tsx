@@ -9,7 +9,7 @@ import OfflineShell from '@/components/capacitor/OfflineShell'
 import OfflineMutationSync from '@/components/offline/OfflineMutationSync'
 import NativeAuthCallbackListener from '@/components/auth/NativeAuthCallbackListener'
 import { colors } from '@/lib/design-system'
-import { getAppUrl } from '@/lib/app-url'
+import { MARKETING_SITE_URL } from '@/lib/app-url'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from '@/lib/site-metadata'
 
 const inter = Inter({
@@ -25,7 +25,7 @@ const notoSansTC = Noto_Sans_TC({
   display: 'swap',
 })
 
-const appUrl = getAppUrl()
+const appUrl = MARKETING_SITE_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
