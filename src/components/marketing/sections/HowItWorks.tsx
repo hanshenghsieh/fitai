@@ -18,10 +18,10 @@ const STEPS = [
   },
   {
     number: '3',
-    title: '了解',
-    desc: '立即知道還能吃多少，並獲得飲食建議',
-    shot: '今日飲食建議',
-    image: '/marketing/hero-dashboard.png',
+    title: '快速記錄',
+    desc: '也可以輸入菜名或掃描條碼，快速完成記錄',
+    shot: '文字輸入或掃描條碼記錄',
+    image: '/marketing/step-text-barcode.png',
   },
 ] as const
 
@@ -33,24 +33,48 @@ export default function HowItWorks() {
           三步驟，輕鬆記錄每一餐
         </h2>
 
-        <div className="mt-16 flex flex-col items-center gap-16 lg:mt-20 lg:flex-row lg:items-start lg:justify-center lg:gap-10">
-          {STEPS.map((step, i) => (
-            <div key={step.number} className="flex flex-col items-center lg:flex-row lg:items-start">
-              <div className="flex flex-col items-center text-center">
+        {/* Mobile / tablet: stacked per step (unchanged) */}
+        <div className="mt-16 flex flex-col items-center gap-16 lg:hidden">
+          {STEPS.map((step) => (
+            <div key={step.number} className="flex flex-col items-center text-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-sm font-bold text-white">
+                {step.number}
+              </div>
+              <h3 className="mt-4 text-xl font-semibold tracking-tight text-gray-900">{step.title}</h3>
+              <p className="mt-2 max-w-[220px] text-sm leading-relaxed text-gray-500">{step.desc}</p>
+              <PhoneMockup src={step.image} alt={step.shot} className="mt-7 w-48 sm:w-52" />
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: text row and phone row are separate grids so all three
+            phones share one bottom baseline regardless of description length */}
+        <div className="hidden lg:block">
+          <div className="mt-20 grid grid-cols-3 gap-x-20">
+            {STEPS.map((step) => (
+              <div key={step.number} className="flex flex-col items-center text-center">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-sm font-bold text-white">
                   {step.number}
                 </div>
                 <h3 className="mt-4 text-xl font-semibold tracking-tight text-gray-900">{step.title}</h3>
                 <p className="mt-2 max-w-[220px] text-sm leading-relaxed text-gray-500">{step.desc}</p>
-
-                <PhoneMockup src={step.image} alt={step.shot} className="mt-7 w-48 sm:w-52" />
               </div>
+            ))}
+          </div>
 
-              {i < STEPS.length - 1 && (
-                <ChevronRight className="mx-2 mt-40 hidden shrink-0 text-gray-300 lg:block" size={28} />
-              )}
-            </div>
-          ))}
+          <div className="mt-7 grid grid-cols-3 items-end gap-x-20">
+            {STEPS.map((step, i) => (
+              <div key={step.number} className="relative flex items-end justify-center">
+                <PhoneMockup src={step.image} alt={step.shot} className="w-48" />
+                {i < STEPS.length - 1 && (
+                  <ChevronRight
+                    className="absolute top-1/2 -right-5 -translate-y-1/2 shrink-0 text-gray-300"
+                    size={28}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

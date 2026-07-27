@@ -40,8 +40,8 @@ export default function ComparisonSection() {
 
           <div className="mx-auto flex flex-col items-center">
             <PhoneMockup
-              src="/marketing/hero-dashboard.png"
-              alt="BetterBit 今日儀表板"
+              src="/marketing/hero-analysis.png"
+              alt="BetterBit AI 推薦餐點"
               className="w-40 sm:w-48"
             />
             <div className="mt-4 flex h-11 w-11 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white shadow-[0_8px_20px_rgba(0,0,0,0.25)]">

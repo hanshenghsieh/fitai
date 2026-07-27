@@ -47,7 +47,7 @@ export default function Footer() {
                 {column.links.map((link) => (
                   <li key={link}>
                     <a
-                      href="#"
+                      href={link === '聯絡我們' ? 'mailto:hansheng@betterbit.tw?subject=BetterBit%20使用者問題回報' : '#'}
                       className="text-sm text-gray-500 transition-colors duration-200 hover:text-gray-900"
                     >
                       {link}

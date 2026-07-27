@@ -49,7 +49,7 @@ export default function HeroSection() {
           <PhoneMockup
             src="/marketing/hero-analysis.png"
             alt="BetterBit AI 食物分析"
-            className="relative -ml-10 w-48 translate-y-14 sm:-ml-14 sm:w-64 sm:translate-y-16 lg:-ml-16 lg:w-72"
+            className="relative z-0 -ml-10 w-48 translate-y-14 transition-[transform] duration-[350ms] ease-[ease] hover:z-20 hover:!-translate-x-15 hover:!-translate-y-3 sm:-ml-14 sm:w-64 sm:translate-y-16 lg:-ml-16 lg:w-72"
           />
         </div>
       </div>
