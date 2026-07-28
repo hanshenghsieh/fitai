@@ -1,9 +1,16 @@
+'use client'
+
+import { useState } from 'react'
 import { Star } from 'lucide-react'
 import PhoneMockup from '../ui/PhoneMockup'
 
 const APP_STORE_URL = '#'
 
+type ActivePhone = 'left' | 'right' | null
+
 export default function HeroSection() {
+  const [activePhone, setActivePhone] = useState<ActivePhone>(null)
+
   return (
     <section id="hero" className="mx-auto max-w-6xl px-6 pb-24 pt-20 lg:px-8 lg:pb-40 lg:pt-28">
       <div className="grid items-center gap-16 lg:grid-cols-[6fr_5fr] lg:gap-12">
@@ -44,12 +51,24 @@ export default function HeroSection() {
             src="/marketing/hero-dashboard.png"
             alt="BetterBit 今日儀表板"
             priority
-            className="relative z-10 w-48 sm:w-64 lg:w-72"
+            onMouseEnter={() => setActivePhone('left')}
+            onClick={() => setActivePhone('left')}
+            className="relative w-48 transition-[transform] duration-[350ms] ease-[ease] sm:w-64 lg:w-72"
+            style={{
+              zIndex: activePhone === 'right' ? 10 : 20,
+              transform: activePhone === 'left' ? 'translateY(-4px)' : undefined,
+            }}
           />
           <PhoneMockup
             src="/marketing/hero-analysis.png"
             alt="BetterBit AI 食物分析"
-            className="relative z-0 -ml-10 w-48 translate-y-14 transition-[transform] duration-[350ms] ease-[ease] hover:z-20 hover:!-translate-x-15 hover:!-translate-y-3 sm:-ml-14 sm:w-64 sm:translate-y-16 lg:-ml-16 lg:w-72"
+            onMouseEnter={() => setActivePhone('right')}
+            onClick={() => setActivePhone('right')}
+            className="relative -ml-10 w-48 translate-y-14 transition-[transform] duration-[350ms] ease-[ease] sm:-ml-14 sm:w-64 sm:translate-y-16 lg:-ml-16 lg:w-72"
+            style={{
+              zIndex: activePhone === 'right' ? 20 : 10,
+              transform: activePhone === 'right' ? 'translateX(-60px) translateY(-12px)' : undefined,
+            }}
           />
         </div>
       </div>

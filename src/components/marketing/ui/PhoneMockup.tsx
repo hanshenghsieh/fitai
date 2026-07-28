@@ -7,14 +7,23 @@ export default function PhoneMockup({
   alt,
   className = '',
   priority = false,
+  style,
+  onMouseEnter,
+  onClick,
 }: {
   src: string
   alt: string
   className?: string
   priority?: boolean
+  style?: React.CSSProperties
+  onMouseEnter?: () => void
+  onClick?: () => void
 }) {
   return (
     <div
+      onMouseEnter={onMouseEnter}
+      onClick={onClick}
+      style={style}
       className={`shrink-0 rounded-[2.75rem] bg-gray-900 p-[7px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.35)] transition-transform duration-300 hover:-translate-y-1 ${className}`}
     >
       <div
