@@ -4,15 +4,20 @@ import BetterBitLogo from '@/components/brand/BetterBitLogo'
 const LINK_COLUMNS = [
   {
     title: '產品',
-    links: ['功能介紹', '怎麼運作', '方案價格', '更新內容'],
+    links: [
+      { label: '功能介紹', href: '#features' },
+      { label: '怎麼運作', href: '#how-it-works' },
+      { label: '方案價格', href: '#pricing' },
+    ],
   },
   {
     title: '支援',
-    links: ['常見問題', '聯絡我們', '使用條款', '隱私權政策'],
-  },
-  {
-    title: '公司',
-    links: ['關於 BetterBit', '部落格', '合作夥伴'],
+    links: [
+      { label: '常見問題', href: '#faq' },
+      { label: '聯絡我們', href: 'mailto:hansheng@betterbit.tw?subject=BetterBit%20使用者問題回報' },
+      { label: '使用條款', href: '/terms' },
+      { label: '隱私權政策', href: '/privacy' },
+    ],
   },
 ] as const
 
@@ -20,7 +25,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-gray-100 bg-white py-20 lg:py-24">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-12 sm:grid-cols-4 lg:gap-8">
+        <div className="grid grid-cols-2 gap-12 sm:grid-cols-3 lg:gap-8">
           <div className="col-span-2 sm:col-span-1">
             <div className="flex items-center gap-2">
               <BetterBitLogo size={24} />
@@ -45,12 +50,12 @@ export default function Footer() {
               <h3 className="text-sm font-semibold text-gray-900">{column.title}</h3>
               <ul className="mt-5 flex flex-col gap-3.5">
                 {column.links.map((link) => (
-                  <li key={link}>
+                  <li key={link.label}>
                     <a
-                      href={link === '聯絡我們' ? 'mailto:hansheng@betterbit.tw?subject=BetterBit%20使用者問題回報' : '#'}
+                      href={link.href}
                       className="text-sm text-gray-500 transition-colors duration-200 hover:text-gray-900"
                     >
-                      {link}
+                      {link.label}
                     </a>
                   </li>
                 ))}
