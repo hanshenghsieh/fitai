@@ -1173,7 +1173,12 @@ export default function TodayOS({
       closePhotoSheet()
       setPhotoSaving(false)
     }
-    void fileToDataUrl(photoDraft.file).then(finish)
+    void fileToDataUrl(photoDraft.file)
+      .then(finish)
+      .catch(err => {
+        setPhotoSaving(false)
+        toast.error(err instanceof Error ? err.message : '照片處理失敗，請重試')
+      })
   }, [photoDraft, photoSaving, commitLog, closePhotoSheet, activeSlot])
 
   const savePhotoDraft = useCallback(() => {
@@ -1182,8 +1187,14 @@ export default function TodayOS({
     const accuracy =
       photoDraft.accuracy ??
       (photoDraft.photo_v2 ? photoAccuracyStateFromV2(photoDraft.photo_v2) : null)
-    if (!accuracy) return
-    if (!photoAccuracyReadyForLog(accuracy)) return
+    if (!accuracy) {
+      toast.error(photoDraft.recognitionHint ?? '這張照片還沒辨識完成，請重新嘗試辨識或改用手動輸入')
+      return
+    }
+    if (!photoAccuracyReadyForLog(accuracy)) {
+      toast.message('請先確認品項後再加入紀錄')
+      return
+    }
     setPhotoSaving(true)
     const logId = `photo-${Date.now()}`
     const finish = (url: string) => {
@@ -1193,6 +1204,7 @@ export default function TodayOS({
       })
       if (!payload) {
         setPhotoSaving(false)
+        toast.error('這張照片辨識結果不完整，請重新嘗試辨識或改用手動輸入')
         return
       }
       commitLog({
@@ -1253,7 +1265,12 @@ export default function TodayOS({
       closePhotoSheet()
       setPhotoSaving(false)
     }
-    void fileToDataUrl(photoDraft.file).then(finish)
+    void fileToDataUrl(photoDraft.file)
+      .then(finish)
+      .catch(err => {
+        setPhotoSaving(false)
+        toast.error(err instanceof Error ? err.message : '照片處理失敗，請重試')
+      })
   }, [photoDraft, photoSaving, commitLog, closePhotoSheet, activeSlot, captureTargetDate, photoSettings, onOpenNutritionConfirmation])
 
   const handleManualPhotoCorrection = useCallback(
@@ -1308,7 +1325,12 @@ export default function TodayOS({
           onOpenNutritionConfirmation?.(pendingEntry)
         }
       }
-      void fileToDataUrl(photoDraft.file).then(finish)
+      void fileToDataUrl(photoDraft.file)
+        .then(finish)
+        .catch(err => {
+          setPhotoSaving(false)
+          toast.error(err instanceof Error ? err.message : '照片處理失敗，請重試')
+        })
     },
     [photoDraft, commitLog, activeSlot, captureTargetDate, closePhotoSheet, onOpenNutritionConfirmation, photoSettings]
   )
