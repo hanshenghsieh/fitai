@@ -35,13 +35,18 @@ export default function Footer() {
               AI 外食減脂助手，幫你輕鬆達成飲食目標。
             </p>
             <div className="mt-5 flex items-center gap-3 text-gray-400">
-              <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-gray-400 text-[9px] font-bold leading-none text-white transition-colors duration-200 hover:bg-gray-600">
+              <a
+                href="https://www.instagram.com/betterbit.tw/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-gray-400 text-[9px] font-bold leading-none text-white transition-colors duration-200 hover:bg-gray-600"
+              >
                 IG
-              </span>
-              <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-gray-400 text-[10px] font-bold leading-none text-white transition-colors duration-200 hover:bg-gray-600">
-                f
-              </span>
-              <Mail size={18} className="transition-colors duration-200 hover:text-gray-600" />
+              </a>
+              <a href="mailto:hansheng@betterbit.tw" aria-label="Email">
+                <Mail size={18} className="transition-colors duration-200 hover:text-gray-600" />
+              </a>
             </div>
           </div>
 

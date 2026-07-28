@@ -78,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var ua=navigator.userAgent||'';if(!/iPhone|iPad|iPod/i.test(ua))return;var h=screen.height;var t=h>=812?47:20;var b=h>=812?34:0;var r=document.documentElement;r.classList.add('capacitor-ios');r.style.setProperty('--app-safe-top',t+'px');r.style.setProperty('--app-safe-bottom',b+'px');}catch(e){}})();`,
+            __html: `(function(){try{var ua=navigator.userAgent||'';if(!/iPhone|iPad|iPod/i.test(ua))return;var isNative=window.location.protocol==='capacitor:'||!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());if(!isNative)return;var h=screen.height;var t=h>=812?47:20;var b=h>=812?34:0;var r=document.documentElement;r.classList.add('capacitor-ios');r.style.setProperty('--app-safe-top',t+'px');r.style.setProperty('--app-safe-bottom',b+'px');}catch(e){}})();`,
           }}
         />
       </head>

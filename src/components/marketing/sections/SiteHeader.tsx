@@ -12,7 +12,6 @@ const NAV_LINKS = [
   { label: '怎麼運作', href: '#how-it-works' },
   { label: '方案價格', href: '#pricing' },
   { label: '常見問題', href: '#faq' },
-  { label: '部落格', href: '#' },
 ] as const
 
 export default function SiteHeader() {
