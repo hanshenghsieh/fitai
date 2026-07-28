@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { requireApiUser } from '@/lib/api/auth'
 import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { cancelSubscription } from '@/lib/stripe'
+import { createAdminClient } from '@/lib/supabase/server'
 
 export async function OPTIONS(request: NextRequest) {
   return handleCorsOptions(request)
@@ -28,10 +29,14 @@ export async function POST(request: NextRequest) {
 
     await cancelSubscription(sub.stripe_subscription_id)
 
-    await supabase
+    // subscriptions no longer grants client-side UPDATE (RLS lockdown migration
+    // 20260729010000) — this write must go through the service-role client.
+    const admin = createAdminClient()
+    await admin
       .from('subscriptions')
       .update({ cancel_at_period_end: true, updated_at: new Date().toISOString() })
       .eq('stripe_subscription_id', sub.stripe_subscription_id)
+      .eq('user_id', user.id)
 
     return jsonWithCors({ success: true, message: '已設定於本期結束後取消，期間內仍可使用。' }, request)
   } catch (err) {
