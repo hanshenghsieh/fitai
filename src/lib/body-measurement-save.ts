@@ -117,6 +117,7 @@ export async function saveBodyMeasurementForUser(
   trace('9_daily_checkin_start', requestId)
   const historyResult = await appendWeightHistoryToCheckin(supabase, userId, body.weight_kg, {
     priorWeightKg,
+    requestId,
   })
   trace('10_daily_checkin_completed', requestId, { ok: !historyResult.error })
   if (historyResult.error) {

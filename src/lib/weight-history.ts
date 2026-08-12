@@ -158,14 +158,62 @@ function weightsNear(a: number, b: number): boolean {
   return Math.abs(a - b) < 0.05
 }
 
+/**
+ * Diagnostic-only: postgrest-js builders compute their target URL before
+ * you await them (`protected url: URL` on PostgrestBuilder) — this only
+ * READS that already-built value, it never touches or reorders the actual
+ * request. Best-effort: returns nulls if the internal shape isn't there.
+ */
+function inspectPostgrestUrl(builder: unknown): {
+  method: string | null
+  pathname: string | null
+  url_length: number | null
+  query_length: number | null
+} {
+  try {
+    const b = builder as { method?: string; url?: URL }
+    const url = b.url
+    if (!url) return { method: b.method ?? null, pathname: null, url_length: null, query_length: null }
+    return {
+      method: b.method ?? null,
+      pathname: url.pathname,
+      url_length: url.href.length,
+      query_length: url.search.length,
+    }
+  } catch {
+    return { method: null, pathname: null, url_length: null, query_length: null }
+  }
+}
+
+function traceCheckpoint(
+  tag: string,
+  requestId: string | null | undefined,
+  extra?: Record<string, unknown>
+): void {
+  console.log(`[WEIGHT_TRACE:${tag}]`, { request_id: requestId ?? null, ...extra })
+}
+
+function traceCompleted(
+  tag: string,
+  requestId: string | null | undefined,
+  error: SupabaseWriteError | null
+): void {
+  traceCheckpoint(tag, requestId, {
+    ok: !error,
+    error_code: error?.code ?? null,
+    error_message_head: error?.message ? error.message.slice(0, 120) : null,
+  })
+}
+
 /** Persist weight readings in today's checkin meta — append-only with optimistic retry. */
 export async function appendWeightHistoryToCheckin(
   supabase: SupabaseClient,
   userId: string,
   weightKg: number,
-  options?: { priorWeightKg?: number | null },
+  options?: { priorWeightKg?: number | null; requestId?: string | null },
   maxAttempts = 8
 ): Promise<{ error: SupabaseWriteError | null }> {
+  const requestId = options?.requestId ?? null
   const today = getNutritionDayKey()
   const loggedAt = new Date().toISOString()
   const newEntries: { logged_at: string; weight_kg: number }[] = []
@@ -179,15 +227,19 @@ export async function appendWeightHistoryToCheckin(
   newEntries.push({ logged_at: loggedAt, weight_kg: weightKg })
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const { data: existing, error: readError } = await supabase
+    const selectQuery = supabase
       .from('daily_checkins')
       .select('id, notes')
       .eq('user_id', userId)
       .eq('checkin_date', today)
       .maybeSingle()
+    traceCheckpoint('9a_daily_select_start', requestId, { attempt, ...inspectPostgrestUrl(selectQuery) })
+    const { data: existing, error: readError } = await selectQuery
+    const readWriteError = readError ? toWriteError(readError) : null
+    traceCompleted('9b_daily_select_completed', requestId, readWriteError)
 
     if (readError) {
-      const writeError = toWriteError(readError)
+      const writeError = readWriteError!
       if (isTransientSupabaseError(writeError) && attempt < maxAttempts - 1) {
         await sleep(40 * (attempt + 1))
         continue
@@ -226,9 +278,13 @@ export async function appendWeightHistoryToCheckin(
       } else {
         updateQuery = updateQuery.eq('notes', existing.notes)
       }
-      const { data: updated, error } = await updateQuery.select('id')
+      const finalUpdateQuery = updateQuery.select('id')
+      traceCheckpoint('9c_daily_update_start', requestId, { attempt, ...inspectPostgrestUrl(finalUpdateQuery) })
+      const { data: updated, error } = await finalUpdateQuery
+      const updateWriteError = error ? toWriteError(error) : null
+      traceCompleted('9d_daily_update_completed', requestId, updateWriteError)
       if (error) {
-        const writeError = toWriteError(error)
+        const writeError = updateWriteError!
         if (isTransientSupabaseError(writeError) && attempt < maxAttempts - 1) {
           await sleep(40 * (attempt + 1))
           continue
@@ -251,7 +307,7 @@ export async function appendWeightHistoryToCheckin(
     // out of the payload so a conflict (another request already created
     // today's row) only ever touches `notes` — it must never clobber real
     // diet/workout data with the insert-time empty-array defaults.
-    const { error } = await supabase.from('daily_checkins').upsert(
+    const upsertQuery = supabase.from('daily_checkins').upsert(
       {
         user_id: userId,
         checkin_date: today,
@@ -259,12 +315,16 @@ export async function appendWeightHistoryToCheckin(
       },
       { onConflict: 'user_id,checkin_date' }
     )
+    traceCheckpoint('9e_daily_upsert_start', requestId, { attempt, ...inspectPostgrestUrl(upsertQuery) })
+    const { error } = await upsertQuery
+    const upsertWriteError = error ? toWriteError(error) : null
+    traceCompleted('9f_daily_upsert_completed', requestId, upsertWriteError)
     if (!error) return { error: null }
     // Build 38: only genuinely transient (connection-class) errors keep
     // retrying — a real constraint/RLS/permission error now fails fast with
     // its full code/details/hint preserved, instead of silently retrying it
     // 8 times (adding latency) and then discarding the diagnostic detail.
-    const writeError = toWriteError(error)
+    const writeError = upsertWriteError!
     if (isTransientSupabaseError(writeError) && attempt < maxAttempts - 1) {
       await sleep(40 * (attempt + 1))
       continue
