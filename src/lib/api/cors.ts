@@ -12,7 +12,7 @@ const ALLOWED_ORIGINS = new Set([
 ])
 
 const ALLOWED_METHODS = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
-const ALLOWED_HEADERS = 'Authorization, Content-Type, X-Requested-With, x-betterbit-platform'
+const ALLOWED_HEADERS = 'Authorization, Content-Type, X-Requested-With, x-betterbit-platform, X-Client-Request-Id'
 
 function resolveAllowedOrigin(request: NextRequest): string | null {
   const origin = request.headers.get('Origin')?.trim()

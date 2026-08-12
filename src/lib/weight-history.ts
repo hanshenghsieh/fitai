@@ -1,4 +1,4 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
 import { getNutritionDayKey } from '@/lib/timezone'
 import {
   mergePersistedCheckinNotes,
@@ -12,6 +12,64 @@ export type WeightMeasurementRow = {
   measured_at: string
   weight_kg: number
   created_at?: string
+}
+
+/**
+ * Build 38 BUG 1 — the settings/body 500 has no reproducible cause in the
+ * schema, RLS, or merge logic (verified against real production data and a
+ * ROLLBACK-wrapped transaction under the actual authenticated-role RLS
+ * context — all clean). The remaining plausible explanation is a transient
+ * Supabase/Postgres connection hiccup, which the original code had zero
+ * resilience against (any Postgrest error, transient or not, failed the
+ * whole request immediately). This carries the FULL Postgrest error
+ * (code/details/hint) instead of collapsing it to a bare message — losing
+ * `hint`/`code` is exactly why the last two builds couldn't diagnose this
+ * from logs — and a narrow retry now covers connection-class failures
+ * without masking real bugs (constraint/RLS errors are never retried).
+ */
+export interface SupabaseWriteError {
+  message: string
+  code?: string
+  details?: string
+  hint?: string
+}
+
+function toWriteError(error: PostgrestError): SupabaseWriteError {
+  return { message: error.message, code: error.code, details: error.details, hint: error.hint }
+}
+
+const TRANSIENT_ERROR_CODES = new Set([
+  '57014', // query_canceled (statement/lock timeout)
+  '53300', // too_many_connections
+  '08000', // connection_exception
+  '08003', // connection_does_not_exist
+  '08006', // connection_failure
+  '08001', // sqlclient_unable_to_establish_sqlconnection
+  '08004', // sqlserver_rejected_establishment_of_sqlconnection
+])
+
+export function isTransientSupabaseError(error: SupabaseWriteError): boolean {
+  if (error.code && TRANSIENT_ERROR_CODES.has(error.code)) return true
+  const text = `${error.message} ${error.details ?? ''}`.toLowerCase()
+  return /fetch failed|econnreset|etimedout|network|timeout|socket hang up/.test(text)
+}
+
+function sleepMs(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+/** Retries only genuinely transient connection-class failures — constraint/RLS/validation errors fail fast on the first attempt. */
+export async function withTransientRetry<T>(
+  fn: () => Promise<{ error: SupabaseWriteError | null; data?: T }>,
+  attempts = 3
+): Promise<{ error: SupabaseWriteError | null; data?: T }> {
+  let last: { error: SupabaseWriteError | null; data?: T } = { error: null }
+  for (let i = 0; i < attempts; i++) {
+    last = await fn()
+    if (!last.error || !isTransientSupabaseError(last.error)) return last
+    if (i < attempts - 1) await sleepMs(80 * (i + 1))
+  }
+  return last
 }
 
 export function extractWeightHistoryFromCheckins(
@@ -107,7 +165,7 @@ export async function appendWeightHistoryToCheckin(
   weightKg: number,
   options?: { priorWeightKg?: number | null },
   maxAttempts = 8
-): Promise<{ error: Error | null }> {
+): Promise<{ error: SupabaseWriteError | null }> {
   const today = getNutritionDayKey()
   const loggedAt = new Date().toISOString()
   const newEntries: { logged_at: string; weight_kg: number }[] = []
@@ -128,7 +186,14 @@ export async function appendWeightHistoryToCheckin(
       .eq('checkin_date', today)
       .maybeSingle()
 
-    if (readError) return { error: new Error(readError.message) }
+    if (readError) {
+      const writeError = toWriteError(readError)
+      if (isTransientSupabaseError(writeError) && attempt < maxAttempts - 1) {
+        await sleep(40 * (attempt + 1))
+        continue
+      }
+      return { error: writeError }
+    }
 
     const existingNotes = existing?.notes ?? null
     const currentMeta: CheckinMeta = existingNotes
@@ -162,7 +227,14 @@ export async function appendWeightHistoryToCheckin(
         updateQuery = updateQuery.eq('notes', existing.notes)
       }
       const { data: updated, error } = await updateQuery.select('id')
-      if (error) return { error: new Error(error.message) }
+      if (error) {
+        const writeError = toWriteError(error)
+        if (isTransientSupabaseError(writeError) && attempt < maxAttempts - 1) {
+          await sleep(40 * (attempt + 1))
+          continue
+        }
+        return { error: writeError }
+      }
       if ((updated?.length ?? 0) > 0) return { error: null }
       await sleep(40 * (attempt + 1))
       continue
@@ -188,13 +260,18 @@ export async function appendWeightHistoryToCheckin(
       { onConflict: 'user_id,checkin_date' }
     )
     if (!error) return { error: null }
-    if (attempt < maxAttempts - 1) {
+    // Build 38: only genuinely transient (connection-class) errors keep
+    // retrying — a real constraint/RLS/permission error now fails fast with
+    // its full code/details/hint preserved, instead of silently retrying it
+    // 8 times (adding latency) and then discarding the diagnostic detail.
+    const writeError = toWriteError(error)
+    if (isTransientSupabaseError(writeError) && attempt < maxAttempts - 1) {
       await sleep(40 * (attempt + 1))
       continue
     }
-    return { error: new Error(error.message) }
+    return { error: writeError }
   }
 
-  return { error: new Error('Could not append weight history') }
+  return { error: { message: 'Could not append weight history' } }
 }
 

@@ -15,6 +15,7 @@ export const ERROR_CAPTURE_FEATURES = [
   'inbody-parse',
   'client-boundary',
   'analytics',
+  'settings-body',
 ] as const
 
 export type ErrorCaptureFeature = (typeof ERROR_CAPTURE_FEATURES)[number]

@@ -78,10 +78,25 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Build 38 BUG 1 — a per-request correlation ID sent as a header (never in
+ * the URL) so a client-side log line and a server-side log line for the
+ * SAME attempt can be matched up. Without this, "the 500 in Vercel logs"
+ * and "the 414 the user saw" could never be confirmed as the same request
+ * or two different ones.
+ */
+export function generateClientRequestId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID()
+  return `creq-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+}
+
 export function buildApiHeaders(options: RequestInit, token: string | null): Headers {
   const headers = new Headers(options.headers)
   if (token) {
     headers.set('Authorization', `Bearer ${token}`)
+  }
+  if (!headers.has('X-Client-Request-Id')) {
+    headers.set('X-Client-Request-Id', generateClientRequestId())
   }
   const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData
   if (
@@ -132,11 +147,43 @@ function parseJsonBody(body: BodyInit | null | undefined): unknown {
 async function nativeHttpFetch(url: string, options: RequestInit, headers: Headers): Promise<Response> {
   const method = (options.method || 'GET').toUpperCase()
   const data = parseJsonBody(options.body ?? undefined)
+  const headerRecord = headersToRecord(headers)
+  const requestId = headerRecord['X-Client-Request-Id'] ?? headerRecord['x-client-request-id'] ?? null
+
+  // Build 38 BUG 1 — diagnostic only, no secrets: two builds in a row could
+  // not diagnose a real-device 414/500 because nobody could see the actual
+  // outgoing request shape. This logs structure (lengths/counts, split into
+  // pathname vs query string specifically since a 414 is about URI length),
+  // never raw header values or body content — safe to ship, and every log
+  // line carries request_id so a client log line and the matching Vercel
+  // server log line for the SAME attempt can be confirmed as one request.
+  let pathnameLength = 0
+  let queryStringLength = 0
+  try {
+    const parsed = new URL(url)
+    pathnameLength = parsed.pathname.length
+    queryStringLength = parsed.search.length
+  } catch {
+    // Malformed URL — fall through, url_length below still reports the raw length.
+  }
+  const bodyLength = typeof options.body === 'string' ? options.body.length : 0
+  console.log('[API_REQUEST]', {
+    request_id: requestId,
+    method,
+    url_length: url.length,
+    pathname_length: pathnameLength,
+    query_string_length: queryStringLength,
+    has_query_string: url.includes('?'),
+    header_count: Object.keys(headerRecord).length,
+    header_names: Object.keys(headerRecord),
+    authorization_length: headerRecord['Authorization']?.length ?? headerRecord['authorization']?.length ?? 0,
+    body_length: bodyLength,
+  })
 
   const request = CapacitorHttp.request({
     url,
     method,
-    headers: headersToRecord(headers),
+    headers: headerRecord,
     data,
     responseType: 'text',
   })
@@ -159,6 +206,25 @@ async function nativeHttpFetch(url: string, options: RequestInit, headers: Heade
       : result.data == null
         ? ''
         : JSON.stringify(result.data)
+
+  // CapacitorHttp/URLSession follows redirects internally and reports the
+  // FINAL url it actually landed on — comparing it to what we requested is
+  // the only way to detect a silent redirect from this layer (STEP 3).
+  const finalUrl = typeof result.url === 'string' ? result.url : null
+  const redirected = finalUrl != null && finalUrl !== url
+
+  if (result.status >= 400 || redirected) {
+    console.log('[API_RESPONSE_ERROR]', {
+      request_id: requestId,
+      method,
+      url_length: url.length,
+      status: result.status,
+      redirected,
+      final_url_length: finalUrl?.length ?? null,
+      response_body_length: bodyText.length,
+      response_body_preview: bodyText.slice(0, 200),
+    })
+  }
 
   return new Response(bodyText, {
     status: result.status,

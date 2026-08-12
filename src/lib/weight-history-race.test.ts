@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { describe, it } from 'node:test'
-import { appendWeightHistoryToCheckin } from './weight-history'
+import { appendWeightHistoryToCheckin, isTransientSupabaseError, type SupabaseWriteError } from './weight-history'
 
 function readRepoFile(relativePath: string): string {
   return readFileSync(new URL(`../../${relativePath}`, import.meta.url), 'utf8')
@@ -163,5 +163,119 @@ describe('Build 37 BUG 1 — dead/broken PATCH+DELETE removed from /api/settings
     const source = readRepoFile('src/app/api/measurements/[id]/route.ts')
     assert.match(source, /export async function PATCH/)
     assert.match(source, /export async function DELETE/)
+  })
+})
+
+/**
+ * Build 38 BUG 1 — a real device still hit a 500 after Build 37's upsert
+ * fix was deployed (confirmed via a live production Vercel log entry).
+ * Exhaustive investigation (schema, RLS, constraints, a ROLLBACK-wrapped
+ * transaction replaying the exact write under the real authenticated-role
+ * RLS context, and a local replay of the real production `notes` merge
+ * logic) found no deterministic reproducible bug — the write itself is
+ * healthy. The only remaining honest explanation is a transient
+ * connection-class failure, which the code had zero resilience against:
+ * ANY Postgrest error (transient or permanent) failed immediately, and only
+ * `.message` ever reached logs — losing `code`/`details`/`hint`, which is
+ * exactly why two builds in a row couldn't diagnose this from Vercel logs.
+ * These tests lock in the fix: transient errors retry, permanent errors
+ * fail fast with full detail preserved.
+ */
+function buildTransientThenSuccessSupabase(failCount: number, error: SupabaseWriteError) {
+  let upsertAttempts = 0
+  return {
+    from(_table: string) {
+      return {
+        select() {
+          return {
+            eq() {
+              return this
+            },
+            maybeSingle: async () => ({ data: null, error: null }),
+          }
+        },
+        upsert() {
+          upsertAttempts += 1
+          if (upsertAttempts <= failCount) {
+            return Promise.resolve({ error })
+          }
+          return Promise.resolve({ error: null })
+        },
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    },
+  } as any
+}
+
+describe('Build 38 BUG 1 — transient vs permanent Postgrest errors', () => {
+  it('isTransientSupabaseError recognizes connection-class codes as transient', () => {
+    assert.equal(isTransientSupabaseError({ message: 'x', code: '08006' }), true)
+    assert.equal(isTransientSupabaseError({ message: 'x', code: '57014' }), true)
+    assert.equal(isTransientSupabaseError({ message: 'fetch failed' }), true)
+    assert.equal(isTransientSupabaseError({ message: 'Socket hang up' }), true)
+  })
+
+  it('isTransientSupabaseError does NOT treat a constraint/permission error as transient', () => {
+    assert.equal(
+      isTransientSupabaseError({ message: 'new row violates check constraint', code: '23514' }),
+      false
+    )
+    assert.equal(
+      isTransientSupabaseError({ message: 'permission denied for table daily_checkins', code: '42501' }),
+      false
+    )
+  })
+
+  it('a transient connection failure on the upsert is retried and eventually succeeds', async () => {
+    const supabase = buildTransientThenSuccessSupabase(2, { message: 'fetch failed', code: undefined })
+    const result = await appendWeightHistoryToCheckin(supabase, 'user-1', 70)
+    assert.equal(result.error, null)
+  })
+
+  it('a permanent (non-transient) upsert error fails fast with the full code/details/hint preserved, not just a bare message', async () => {
+    const supabase = buildTransientThenSuccessSupabase(99, {
+      message: 'permission denied for table daily_checkins',
+      code: '42501',
+      details: 'RLS denied the insert',
+      hint: 'Check your policies',
+    })
+    const result = await appendWeightHistoryToCheckin(supabase, 'user-1', 70)
+    assert.notEqual(result.error, null)
+    assert.equal(result.error?.code, '42501')
+    assert.equal(result.error?.hint, 'Check your policies')
+    assert.equal(result.error?.details, 'RLS denied the insert')
+  })
+})
+
+describe('Build 38 BUG 1 — /api/settings/body always logs full error detail, never swallows an unhandled throw', () => {
+  it('route.ts wraps the handler body in try/catch', () => {
+    const source = readRepoFile('src/app/api/settings/body/route.ts')
+    const fnStart = source.indexOf('export async function POST')
+    const fnSource = source.slice(fnStart)
+    assert.match(fnSource, /\btry\s*\{/)
+    assert.match(fnSource, /\}\s*catch\s*\(err\)/)
+  })
+
+  it('route.ts logs the full Postgrest error (code/details/hint), not just .message, on a save failure', () => {
+    const source = readRepoFile('src/app/api/settings/body/route.ts')
+    assert.match(source, /code:\s*result\.error\.code/)
+    assert.match(source, /details:\s*result\.error\.details/)
+    assert.match(source, /hint:\s*result\.error\.hint/)
+    assert.match(source, /console\.error\(/)
+  })
+
+  it('route.ts captures unhandled throws via captureError with a console.error including the stack', () => {
+    const source = readRepoFile('src/app/api/settings/body/route.ts')
+    const catchStart = source.indexOf('} catch (err)')
+    const catchSource = source.slice(catchStart)
+    assert.match(catchSource, /err\.stack/)
+    assert.match(catchSource, /captureError\(err,/)
+  })
+
+  it('the client-facing error message never leaks raw Postgrest internals (code/details/hint stay server-side only)', () => {
+    const source = readRepoFile('src/app/api/settings/body/route.ts')
+    const fnStart = source.indexOf('export async function POST')
+    const fnSource = source.slice(fnStart)
+    assert.doesNotMatch(fnSource, /jsonWithCors\(\{ error: result\.error\.message \}/)
   })
 })
