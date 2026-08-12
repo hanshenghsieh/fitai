@@ -998,28 +998,11 @@ export default function TodayOS({
       parsedName = parsed.name.trim() || '未知食物'
       const photoId = `photo-parse-${Date.now()}`
 
-      if (isNativeIOS()) {
-        setPhotoDraft(prev =>
-          prev
-            ? {
-                ...prev,
-                previewUrl,
-                file,
-                name: parsedName,
-                calories: null,
-                protein_g: null,
-                carbs_g: null,
-                fat_g: null,
-                loading: false,
-                matchingNutrition: false,
-                photo_v2: undefined,
-                accuracy: undefined,
-              }
-            : prev
-        )
-        return
-      }
-
+      // Both native iOS and web must resolve real nutrition (fetchPhotoMatch)
+      // before the food log can be committed with real macros — native used
+      // to short-circuit here with everything nulled out, which is why the
+      // first save always landed as an unknown/pending placeholder until the
+      // user re-ran a real match via Manual Correction.
       setPhotoDraft(prev =>
         prev
           ? {

@@ -16,6 +16,7 @@ import type {
 import { NULL_MACROS } from '@/lib/nutrition/search-v2/types'
 import { rankSearchCandidates } from '@/lib/nutrition/search-v2/search-ranking'
 import { isClearlyUnknownQuery } from '@/lib/nutrition/search-v2/query-patterns'
+import { wholeFoodSearchCandidates } from '@/lib/nutrition/search-v2/whole-food-candidates'
 
 const LEVEL_A_THRESHOLD = 0.92
 const LEVEL_B_MIN = 0.55
@@ -157,6 +158,7 @@ export function collectClientCandidates(query: string, ctx?: SearchV2Context): S
   for (const c of rankSearchCandidates([
     ...runtimeCandidates(trimmed),
     ...searchFoodDnaCandidates(trimmed),
+    ...wholeFoodSearchCandidates(trimmed),
     ...contextCandidates(ctx),
   ])) {
     const key = `${c.store ?? ''}::${normalizeFoodName(c.name)}`

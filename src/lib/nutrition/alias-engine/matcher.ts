@@ -23,6 +23,36 @@ type AliasIndexRow = {
   kind: 'alias' | 'restaurant_alias' | 'official'
 }
 
+/**
+ * Below this coverage ratio (shorter token length / longer token length), a
+ * substring-containment match against a raw `official_name` token is too
+ * weak to trust. Mirrors the equivalent guard in food-menu-lookup.ts's
+ * scoreNameMatch (SUBSTRING_COVERAGE_THRESHOLD) — without it, a bare 1-2
+ * character generic query like "蛋" would match ANY official name that
+ * merely contains that character anywhere (e.g. a specific "糖心蛋雞胸餐"
+ * restaurant meal), and — because an alias-engine hit short-circuits
+ * scoreNameMatch to a near-maximum 98 score — that unrelated dish would
+ * outrank the correct generic-food answer with false confidence.
+ *
+ * Deliberately scoped to `kind === 'official'` only. `alias` /
+ * `restaurant_alias` rows are curated by a human specifically so a shorter
+ * colloquial term resolves to a product (e.g. "竹筍湯" is intentionally
+ * listed as a partial alias of 7-11's "竹筍排骨湯" via "竹筍湯排骨" /
+ * "711竹筍湯") — that's real signal, not noise, and applying the same
+ * length-ratio guard there breaks legitimate curated shorthand.
+ */
+const OFFICIAL_NAME_SUBSTRING_COVERAGE_THRESHOLD = 0.8
+
+/**
+ * A substring-containment match (curated alias or not) requires the query
+ * to be at least this long. This is what actually separates the "蛋"
+ * (1-char, matches even a curated "糖心蛋雞" alias with no real signal) case
+ * from the legitimate "竹筍湯" (3-char, matches the curated "竹筍湯排骨" /
+ * "711竹筍湯" aliases it was clearly written to match) case — length alone,
+ * not the coverage ratio, is what makes a short query too generic to trust.
+ */
+const MIN_SUBSTRING_QUERY_LENGTH = 2
+
 let index: AliasIndexRow[] | null = null
 
 function buildIndex(): AliasIndexRow[] {
@@ -66,11 +96,24 @@ export function resolveAliasQuery(
   let bestScore = 0
 
   for (const row of rows) {
-    if (row.token !== q && !q.includes(row.token) && !row.token.includes(q)) continue
+    const exact = row.token === q
+    if (!exact) {
+      // A single generic character ("蛋", "湯", "肉"…) is never a specific
+      // enough signal to trust via substring containment, curated alias or
+      // not — only an exact match should ever resolve it.
+      if (q.length < MIN_SUBSTRING_QUERY_LENGTH) continue
+      const isSubstring = q.includes(row.token) || row.token.includes(q)
+      if (!isSubstring) continue
+      if (row.kind === 'official') {
+        const shorter = Math.min(q.length, row.token.length)
+        const longer = Math.max(q.length, row.token.length)
+        if (longer === 0 || shorter / longer < OFFICIAL_NAME_SUBSTRING_COVERAGE_THRESHOLD) continue
+      }
+    }
     const entryStore = row.entry.store ? normalizeRestaurantAlias(row.entry.store) : undefined
     if (storeNorm && entryStore && entryStore !== storeNorm) continue
 
-    let score = row.token === q ? 100 : 85
+    let score = exact ? 100 : 85
     if (row.kind === 'official') score += 5
     if (storeNorm && entryStore === storeNorm) score += 10
     if (score > bestScore) {

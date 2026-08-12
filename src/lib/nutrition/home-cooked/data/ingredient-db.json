@@ -515,13 +515,13 @@
   {
     "id": "me012",
     "food_id": "ME012",
-    "name_zh": "雞蛋（全蛋）",
+    "name_zh": "生雞蛋（全蛋）",
     "category": "protein",
     "excel_category": "蛋類",
     "state": "生/可食部",
     "aliases": [
-      "雞蛋（全蛋）",
-      "雞蛋"
+      "生雞蛋（全蛋）",
+      "生雞蛋"
     ],
     "calories_per_100": 143,
     "protein_g_per_100": 12.6,
@@ -904,7 +904,8 @@
     "state": "液體/100ml",
     "aliases": [
       "鮮奶（全脂）",
-      "鮮奶"
+      "鮮奶",
+      "牛奶"
     ],
     "calories_per_100": 61,
     "protein_g_per_100": 3.2,
@@ -3948,7 +3949,8 @@
     "state": "熟/可食部",
     "aliases": [
       "雞蛋（全蛋，熟）",
-      "雞蛋"
+      "雞蛋",
+      "蛋"
     ],
     "calories_per_100": 155,
     "protein_g_per_100": 12.6,
@@ -3956,6 +3958,7 @@
     "fat_g_per_100": 10.6,
     "sodium_mg_per_100": 124,
     "default_unit": "g",
+    "grams_per_piece": 50,
     "source": "USDA FDC / Taiwan FDA / estimate",
     "note": "每顆大約 50g"
   },
@@ -3967,7 +3970,9 @@
     "excel_category": "肉類/蛋白質",
     "state": "熟/可食部",
     "aliases": [
-      "水煮蛋"
+      "水煮蛋",
+      "白煮蛋",
+      "滷蛋"
     ],
     "calories_per_100": 155,
     "protein_g_per_100": 12.6,
@@ -3975,8 +3980,9 @@
     "fat_g_per_100": 10.6,
     "sodium_mg_per_100": 124,
     "default_unit": "g",
+    "grams_per_piece": 50,
     "source": "USDA FDC / Taiwan FDA / estimate",
-    "note": "等同熟全蛋，按可食重"
+    "note": "等同熟全蛋，按可食重；滷蛋以滷汁不加額外油估算，近似水煮蛋"
   },
   {
     "id": "me064",
@@ -3987,7 +3993,8 @@
     "state": "熟/可食部",
     "aliases": [
       "荷包蛋（不含額外油）",
-      "荷包蛋"
+      "荷包蛋",
+      "煎蛋"
     ],
     "calories_per_100": 196,
     "protein_g_per_100": 13.6,
@@ -3995,6 +4002,7 @@
     "fat_g_per_100": 14.8,
     "sodium_mg_per_100": 207,
     "default_unit": "g",
+    "grams_per_piece": 50,
     "source": "USDA FDC / Taiwan FDA / estimate",
     "note": "若煎油需另外計油"
   },
@@ -4014,6 +4022,7 @@
     "fat_g_per_100": 13.8,
     "sodium_mg_per_100": 146,
     "default_unit": "g",
+    "grams_per_piece": 70,
     "source": "USDA FDC / Taiwan FDA / estimate"
   },
   {
@@ -4032,6 +4041,7 @@
     "fat_g_per_100": 11.1,
     "sodium_mg_per_100": 141,
     "default_unit": "g",
+    "grams_per_piece": 10,
     "source": "USDA FDC / Taiwan FDA / estimate"
   },
   {
@@ -4050,6 +4060,7 @@
     "fat_g_per_100": 13.3,
     "sodium_mg_per_100": 138,
     "default_unit": "g",
+    "grams_per_piece": 144,
     "source": "USDA FDC / Taiwan FDA / estimate"
   },
   {
@@ -4068,6 +4079,7 @@
     "fat_g_per_100": 10.7,
     "sodium_mg_per_100": 542,
     "default_unit": "g",
+    "grams_per_piece": 65,
     "source": "USDA FDC / Taiwan FDA / estimate",
     "note": "加工蛋，鈉高"
   },
@@ -4087,6 +4099,7 @@
     "fat_g_per_100": 13.6,
     "sodium_mg_per_100": 1500,
     "default_unit": "g",
+    "grams_per_piece": 65,
     "source": "USDA FDC / Taiwan FDA / estimate",
     "note": "加工蛋，鈉很高"
   },
@@ -4106,6 +4119,7 @@
     "fat_g_per_100": 10,
     "sodium_mg_per_100": 130,
     "default_unit": "g",
+    "grams_per_piece": 50,
     "source": "USDA FDC / Taiwan FDA / estimate"
   },
   {
