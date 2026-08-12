@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       return jsonWithCors({ error: 'Server configuration error' }, req, { status: 500 })
     }
 
-    console.log('Creating user:', email)
+    console.log('Registration started')
 
     const signupRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
       method: 'POST',
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     })
 
     const userData = await signupRes.json()
-    console.log('Signup response:', { status: signupRes.status, body: userData })
+    console.log('Signup response status:', signupRes.status)
 
     if (!userData.id) {
       const errMsg = userData.message || userData.error_description || JSON.stringify(userData)
@@ -81,10 +81,15 @@ export async function POST(req: NextRequest) {
     console.log('Profile created, returning success')
 
     try {
+      const admin = createAdminClient()
       await trackServer(
         { name: 'account_created', properties: { auth_method: 'email', platform: 'unknown' } },
-        { supabase: createAdminClient(), userId }
+        { supabase: admin, userId }
       )
+      // Trial starts immediately at profile creation (getAccessStatus derives
+      // isTrial from user_profiles.created_at, no separate start action exists),
+      // so this fires at the same single-fire point as account_created above.
+      await trackServer({ name: 'trial_started', properties: {} }, { supabase: admin, userId })
     } catch (trackErr) {
       captureError(trackErr, { feature: 'analytics', operation: 'track', userId })
     }

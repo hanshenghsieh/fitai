@@ -11,7 +11,7 @@ export const metadata: Metadata = createPageMetadata({
 
 export default function PrivacyPage() {
   return (
-    <LegalPageLayout title="隱私權政策" updated="2026 年 6 月 18 日">
+    <LegalPageLayout title="隱私權政策" updated="2026 年 8 月 12 日">
       <LegalSection title="我們是誰">
         <p>
           Betterbit 由「再健一點有限公司」營運，提供個人化飲食與運動計畫的生活參考服務。我們重視你的隱私，只收集提供服務所需的資料，不販售、不公開你的個人資訊。
@@ -51,8 +51,24 @@ export default function PrivacyPage() {
           <li><strong>Firebase</strong> — 推播通知（若啟用）</li>
           <li><strong>Anthropic</strong> — 食物照片與 INBODY 報告解析（AI）</li>
           <li><strong>Vercel</strong> — 網站與 API 託管</li>
+          <li>
+            <strong>Sentry</strong> — 錯誤與當機診斷。我們已關閉 Sentry 預設的個人資料蒐集（sendDefaultPii
+            設為 false），並在事件送出前自動移除 email、照片、健康數據等敏感欄位，僅保留技術性的錯誤內容與內部帳號
+            ID，用於排查問題。
+          </li>
         </ul>
         <p>這些服務僅在提供功能所需範圍內處理資料，並受各自隱私政策約束。</p>
+      </LegalSection>
+
+      <LegalSection title="產品使用分析">
+        <p>
+          為了解功能是否好用、哪些流程容易卡關，Betterbit 會記錄部分使用行為（例如帳號建立、完成引導流程、記錄飲食成功或失敗、訂閱狀態變化等事件）。這些紀錄儲存在
+          Betterbit 自己的 Supabase 資料庫中，不會傳送給任何第三方廣告或行銷公司。
+        </p>
+        <p>
+          每筆紀錄會與你的內部帳號 ID 建立關聯（用於統計單一使用者的行為模式），因此這些資料並非完全匿名——內部帳號
+          ID 仍可能與你的帳號對應。我們不會在這些行為紀錄中儲存 email、照片或健康數值等內容。
+        </p>
       </LegalSection>
 
       <LegalSection title="資料保存與刪除">

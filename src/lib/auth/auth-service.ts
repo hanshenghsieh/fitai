@@ -173,6 +173,10 @@ export async function ensureUserProfile(
         name: 'account_created',
         properties: { auth_method: authMethod, platform: detectAnalyticsPlatform() },
       })
+      // Trial starts immediately at profile creation (getAccessStatus derives
+      // isTrial from user_profiles.created_at, no separate start action exists),
+      // so this fires at the same single-fire point as account_created above.
+      trackClient({ name: 'trial_started', properties: {} })
     }
     return { onboardingCompleted: Boolean(created.onboarding_completed) }
   }
