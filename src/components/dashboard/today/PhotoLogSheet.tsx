@@ -421,6 +421,24 @@ function AccuracyConfirmSection({
     )
   }
 
+  // CASE 1 (trusted Level A) / CASE 3 (AI estimate): a confirmed answer
+  // already exists — never show the "pick one of these" picker alongside
+  // it. Only CASE 2 (ambiguous Level B, not yet picked) renders a picker.
+  if (!accuracy.show_candidate_picker) {
+    return (
+      <div className="space-y-1 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
+        <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
+          {accuracy.is_ai_estimate ? '🟡 AI 營養估算' : '這餐看起來像這樣'}
+        </p>
+        <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
+          {accuracy.is_ai_estimate
+            ? '資料庫查無資料，以下為 AI 估算僅供參考，請確認或手動修正。'
+            : '營養資料來自官方資料庫，確認後點下方「加入今日紀錄」。'}
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div
       className="space-y-4 p-4"
@@ -565,12 +583,17 @@ function ReviewStep({
         fat_g: draft.fat_g ?? null,
       }
   const readyForLog = !accuracyMode || draft.accuracy!.ready_for_food_log
+  // Build 38 Task C — in accuracyMode, the three CASEs are mutually
+  // exclusive: trust PhotoAccuracyState.show_macros as the single source of
+  // truth. The old fallback (macroDisplay.calories != null) leaked a
+  // "preview" of the top (possibly wrong) candidate's macros during CASE 2,
+  // showing a nutrition card alongside the still-unresolved candidate
+  // picker — exactly the duplicate-confirmation-UI bug.
   const showMacros = iosLiteMode
     ? false
-    : !accuracyMode ||
-      draft.accuracy!.show_macros ||
-      macroDisplay.calories != null ||
-      macroDisplay.protein_g != null
+    : accuracyMode
+      ? draft.accuracy!.show_macros
+      : true
 
   const [calText, setCalText] = useState(draft.calories != null ? String(draft.calories) : '')
   const [proText, setProText] = useState(draft.protein_g != null ? String(draft.protein_g) : '')

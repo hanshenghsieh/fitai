@@ -1,5 +1,5 @@
 import { eatOutMenu, type ConvenienceItem } from '@/lib/convenience-store-menu'
-import { normalizeBrandName, normalizeFoodName } from '@/lib/food-kb/normalize'
+import { normalizeBrandName, normalizeFoodName, isKnownDishCategoryToken } from '@/lib/food-kb/normalize'
 import { resolveAliasQuery, expandQueryWithAliases } from '@/lib/nutrition/alias-engine'
 import { passesMenuAccessGate } from '@/lib/nutrition/menu-confidence-runtime'
 import kbIndex from '../../data/food-kb/menu-lookup-index.json'
@@ -66,7 +66,21 @@ export function scoreNameMatch(queryNorm: string, itemName: string, store?: stri
     if (shorter / longer >= SUBSTRING_COVERAGE_THRESHOLD) return 80
     // Short name is only a small fraction of the longer one \u2014 don't grant
     // full substring-match confidence (see SUBSTRING_COVERAGE_THRESHOLD).
-    return substringCoverageScore(shorter, longer)
+    const base = substringCoverageScore(shorter, longer)
+    // Exception: the query is a *known dish category* (e.g. "\u98ef\u5718") and a
+    // genuine *prefix* of the item name (e.g. "\u98ef\u5718\u6885\u5b50\u7d2b\u8607" \u2014 a flavor
+    // variant of the same base dish). This is the mirror case of the bug
+    // SUBSTRING_COVERAGE_THRESHOLD itself was built to prevent ("\u96de\u8089\u98ef"
+    // matching the unrelated "\u96de\u8089\u98ef\u5fa1\u98ef\u7cf0"): there the *query* "\u96de\u8089\u98ef" is
+    // NOT a recognized category on its own, so it correctly stays low. Here
+    // the query genuinely names the dish category and the remainder is just
+    // a flavor modifier, so a small floor lets it clear the search filters
+    // as a Level B "pick a variant" candidate \u2014 never Level A (kept well
+    // below 80).
+    if (nameNorm.startsWith(queryNorm) && isKnownDishCategoryToken(queryNorm)) {
+      return Math.max(base, 58)
+    }
+    return base
   }
   const qTokens = [...new Set(queryNorm.match(/[\u4e00-\u9fff]{2,}|[a-z0-9]{2,}/gi) ?? [])]
   if (!qTokens.length) return 0
@@ -120,6 +134,20 @@ function searchRuntimeMenu(query: string, storeHint?: string, limit = 8): MenuLo
     )
 }
 
+/**
+ * Below this raw name-match score, the evidence that this row is even the
+ * right FOOD is too weak for the row's own data-quality confidence
+ * (row.confidence) to be allowed to boost it — see rowToHit below. Set to
+ * the same score this function's own admission filter already requires
+ * (`.filter(x => x.score >= 50)` below, before the row.confidence addend) —
+ * i.e. a row must already be admissible on name-match evidence alone
+ * before its data-quality score gets to boost it further. Calibrated
+ * against two real cases: "711竹筍排骨湯" -> "膳馨綠竹筍排骨湯" (nameScore 55,
+ * a legitimate partial match that must still reach high confidence) vs.
+ * "地瓜" -> "小菜籃有機地瓜葉" (nameScore 41, a false match that must not).
+ */
+const RELIABLE_NAME_MATCH_FLOOR = 50
+
 function searchFoodKb(query: string, storeHint?: string, limit = 8): MenuLookupHit[] {
   const { store: parsedStore, foodName } = parseStorePrefix(query)
   const store = storeHint ? normalizeBrandName(storeHint) : parsedStore
@@ -127,20 +155,21 @@ function searchFoodKb(query: string, storeHint?: string, limit = 8): MenuLookupH
 
   return (kbIndex.items as KbRow[])
     .map(row => {
-      let score = scoreNameMatch(qNorm, row.name, store)
-      if (score === 0) return null
+      const nameScore = scoreNameMatch(qNorm, row.name, store)
+      if (nameScore === 0) return null
+      let score = nameScore
       if (store) {
         const rowStore = normalizeBrandName(row.store)
         if (rowStore === store) score += 15
         else score -= 20
       }
       score += row.confidence * 10
-      return { row, score }
+      return { row, score, nameScore }
     })
-    .filter((x): x is { row: KbRow; score: number } => x !== null && x.score >= 50)
+    .filter((x): x is { row: KbRow; score: number; nameScore: number } => x !== null && x.score >= 50)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
-    .map(({ row, score }) =>
+    .map(({ row, score, nameScore }) =>
       rowToHit(
         {
           id: `kb-${row.id}`,
@@ -152,7 +181,18 @@ function searchFoodKb(query: string, storeHint?: string, limit = 8): MenuLookupH
           fat_g: row.fat_g,
         },
         'food_kb',
-        Math.min(0.98, Math.max(row.confidence, score / 100))
+        // row.confidence (a data-quality score for this row's nutrition
+        // numbers) may only boost the final confidence when the *name*
+        // match is already reasonably reliable on its own
+        // (nameScore >= RELIABLE_NAME_MATCH_FLOOR, e.g. "711竹筍排骨湯" ->
+        // "膳馨綠竹筍排骨湯" at nameScore 80) — it must never rescue a weak
+        // match into false confidence (e.g. "地瓜" matching the unrelated
+        // "小菜籃有機地瓜葉" at nameScore 41, previously reported as 95%
+        // confident purely because that row's own data happened to be
+        // well-sourced).
+        nameScore >= RELIABLE_NAME_MATCH_FLOOR
+          ? Math.min(0.98, Math.max(row.confidence, score / 100))
+          : Math.min(0.98, score / 100)
       )
     )
 }

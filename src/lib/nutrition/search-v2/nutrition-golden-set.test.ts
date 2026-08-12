@@ -157,26 +157,24 @@ describe('Task 2C — Nutrition Golden Set (regression protection)', () => {
     })
   }
 
-  describe('known gaps — documented, not silently passing', () => {
-    it('KNOWN GAP: 御飯糰 has zero product-database coverage (Level C / unmatched)', () => {
+  describe('Build 36 fixes — previously documented as known gaps, now resolved', () => {
+    it('御飯糰 now surfaces a real candidate (root cause: 飯糰-family items were misclassified into the rice_bowl macro band and graded unsearchable — see macro-bands.ts)', () => {
       const candidates = collectClientCandidates('御飯糰')
       const result = classifyClientMatchLevel('御飯糰', candidates)
-      assert.equal(result.level, 'C')
-      assert.equal(result.best, null)
+      assert.notEqual(result.level, 'C')
+      assert.ok(result.best?.name.includes('飯糰'))
     })
 
-    it('KNOWN GAP: 蛋餅 does not currently surface its Food DNA template above weaker runtime-menu matches (Level C)', () => {
-      const candidates = collectClientCandidates('蛋餅')
-      const result = classifyClientMatchLevel('蛋餅', candidates)
-      assert.equal(result.level, 'C')
-    })
-
-    it('KNOWN GAP: 地瓜 currently collides with an unrelated product name ("小菜籃有機地瓜葉") via the token-overlap fallback in scoreNameMatch — pre-existing, outside today\'s two-bug fix scope', () => {
+    it('地瓜 no longer collides with the unrelated "小菜籃有機地瓜葉" (root causes: bogus 地瓜球/甜不辣/雞排 synonym group, and row.confidence overriding a weak name-match score — both fixed)', () => {
       const candidates = collectClientCandidates('地瓜')
       const result = classifyClientMatchLevel('地瓜', candidates)
-      // Documents the current (wrong) behavior so a future fix has this test
-      // to flip — NOT an assertion that this is correct.
-      assert.equal(result.best?.name, '小菜籃有機地瓜葉')
+      assert.notEqual(result.best?.name, '小菜籃有機地瓜葉')
+    })
+
+    it('蛋餅 no longer false-positives to a specific branded product (root cause: alias-engine coverage-ratio guard now also applies to curated alias rows, not just official names) — still correctly Level C, no confident false answer', () => {
+      const candidates = collectClientCandidates('蛋餅')
+      const result = classifyClientMatchLevel('蛋餅', candidates)
+      assert.notEqual(result.best?.name, '美而美玉米起司蛋餅')
     })
   })
 })

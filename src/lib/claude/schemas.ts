@@ -92,3 +92,24 @@ export const FoodPhotoParseSchema = z.object({
   })).min(1).max(8),
   meal_summary: z.string().optional(),
 })
+
+/**
+ * Build 37 — Level 2 AI nutrition fallback (LEVEL 1 trusted-DB match failed).
+ * Every field is required and bounded — strict schema validation is the
+ * guardrail against free-text AI output ever reaching nutrition math
+ * un-checked. `source_type` is a fixed literal so a downstream consumer can
+ * never mistake this for verified/official data.
+ */
+export const AiNutritionEstimateSchema = z.object({
+  canonical_name: z.string().min(1).max(60),
+  estimated_weight_g: z.number().finite().positive().max(3000),
+  calories: z.number().finite().min(0).max(3000),
+  protein_g: z.number().finite().min(0).max(300),
+  carbs_g: z.number().finite().min(0).max(500),
+  fat_g: z.number().finite().min(0).max(300),
+  confidence: z.number().finite().min(0).max(1),
+  reason: z.string().min(1).max(300),
+  source_type: z.literal('ai_estimate'),
+})
+
+export type AiNutritionEstimate = z.infer<typeof AiNutritionEstimateSchema>

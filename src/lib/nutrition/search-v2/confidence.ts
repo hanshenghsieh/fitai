@@ -6,7 +6,7 @@ export const CONFIDENCE_BADGE: Record<
 > = {
   A: { label: '官方', emoji: '🟢', description: 'Official Nutrition Reference 完全匹配' },
   B: { label: '已確認', emoji: '🟢', description: '官方資料 + Smart Clarification 確認' },
-  C: { label: '推估', emoji: '🟡', description: '可信估算（未來功能，目前未啟用）' },
+  C: { label: 'AI 營養估算', emoji: '🟡', description: '資料庫查無資料，AI 估算僅供參考，請確認或手動修正' },
   Unknown: { label: '無資料', emoji: '⚪', description: 'Text Only Record，無營養統計' },
 }
 

@@ -168,13 +168,25 @@ export async function appendWeightHistoryToCheckin(
       continue
     }
 
-    const { error } = await supabase.from('daily_checkins').insert({
-      user_id: userId,
-      checkin_date: today,
-      notes: mergedNotes,
-      diet_items: [],
-      workout_items: [],
-    })
+    // Root cause of the production 500 on POST /api/settings/body: a plain
+    // .insert() here raced against daily_checkins' UNIQUE(user_id,
+    // checkin_date) constraint whenever two weight-saves overlapped (e.g.
+    // "目前體重" and "新增" on the same settings screen, or a slow network
+    // causing an overlapping retry) — the loser hit a duplicate-key error
+    // and, if unlucky, could exhaust all retries and surface as a real 500.
+    // .upsert(onConflict) makes this single write atomic instead of relying
+    // on check-then-insert. diet_items/workout_items are deliberately left
+    // out of the payload so a conflict (another request already created
+    // today's row) only ever touches `notes` — it must never clobber real
+    // diet/workout data with the insert-time empty-array defaults.
+    const { error } = await supabase.from('daily_checkins').upsert(
+      {
+        user_id: userId,
+        checkin_date: today,
+        notes: mergedNotes,
+      },
+      { onConflict: 'user_id,checkin_date' }
+    )
     if (!error) return { error: null }
     if (attempt < maxAttempts - 1) {
       await sleep(40 * (attempt + 1))

@@ -33,6 +33,17 @@ export interface PhotoAccuracyState {
   ready_for_food_log: boolean
   ui_message: string
   show_macros: boolean
+  /**
+   * Build 38 Task C — the three CASEs (trusted match / candidate picker /
+   * AI estimate) are mutually exclusive: only one of show_candidate_picker
+   * or show_macros may render a confirmation UI at a time. Before this flag
+   * existed, `PhotoLogSheet` showed the picker whenever `candidates.length >
+   * 0` with no regard for level, so a trusted Level A match (e.g. 溏心蛋 →
+   * 水煮蛋) still listed the losing candidates (7-11 sandwiches etc.)
+   * alongside the already-resolved nutrition card.
+   */
+  show_candidate_picker: boolean
+  is_ai_estimate: boolean
   nutrition_status: 'official' | 'estimated' | 'unknown'
 }
 
@@ -66,9 +77,19 @@ function buildPhotoAccuracyStateFromV2(v2: PhotoV2State): PhotoAccuracyState {
   const resolved = resolvePhotoV2Outcome(v2)
   const unknown = resolved.action === 'create_unknown'
   const levelA = resolved.level === 'A' && resolved.action === 'create_official'
-  const needsConfirm = resolved.action === 'clarify' || resolved.level === 'B'
+  const levelC = resolved.level === 'C' && resolved.action === 'create_official'
   const confirmed = v2.user_confirmed
   const picked = resolvePhotoOfficialRecord(v2)
+  const finalized = confirmed && Boolean(picked)
+
+  // Build 38 Task C — CASE 1/2/3 are mutually exclusive:
+  // CASE 1 (trusted Level A): show_macros only, never the picker.
+  // CASE 2 (ambiguous Level B / clarify, not yet picked): picker only.
+  // CASE 3 (AI fallback, Level C): show_macros (marked as AI estimate) only,
+  //   never a multi-item picker — the AI already committed to one estimate.
+  // Once the user has picked+confirmed out of CASE 2, treat it the same as
+  // CASE 1 for rendering purposes (macro card only, picker hides).
+  const showCandidatePicker = !unknown && !levelA && !levelC && !finalized
 
   return {
     label: v2.detected_label,
@@ -87,8 +108,10 @@ function buildPhotoAccuracyStateFromV2(v2: PhotoV2State): PhotoAccuracyState {
     },
     ready_for_food_log: photoV2ReadyForLog(v2),
     ui_message: photoV2UiMessage(v2),
-    show_macros: !unknown && (levelA || (confirmed && Boolean(picked))),
-    nutrition_status: unknown ? 'unknown' : 'official',
+    show_macros: !unknown && (levelA || levelC || finalized),
+    show_candidate_picker: showCandidatePicker,
+    is_ai_estimate: levelC,
+    nutrition_status: unknown ? 'unknown' : levelC ? 'estimated' : 'official',
   }
 }
 

@@ -20,7 +20,6 @@ const SYNONYM_GROUPS: string[][] = [
   ['牛肉麵', '紅燒牛肉麵', '清燉牛肉麵'],
   ['滷味', '滷味拼盤'],
   ['鹹酥雞', '酥炸雞'],
-  ['地瓜球', '甜不辣', '雞排'],
 ]
 
 const SYNONYM_MAP = new Map<string, string>()
@@ -29,6 +28,19 @@ for (const group of SYNONYM_GROUPS) {
   for (const term of group) {
     SYNONYM_MAP.set(normalizeToken(term), canonical)
   }
+}
+
+/** Canonical (post-normalization) form of every curated SYNONYM_GROUPS entry. */
+const KNOWN_DISH_CATEGORY_TOKENS = new Set(SYNONYM_GROUPS.map(group => normalizeToken(group[0]!)))
+
+/**
+ * True when `token` (already normalized via normalizeFoodName) is one of the
+ * curated SYNONYM_GROUPS canonical dish-category names (e.g. "飯糰", "蛋餅",
+ * "牛肉麵") — a small, human-reviewed list of genuine standalone dish
+ * categories, as opposed to an arbitrary word fragment.
+ */
+export function isKnownDishCategoryToken(token: string): boolean {
+  return KNOWN_DISH_CATEGORY_TOKENS.has(token)
 }
 
 const BRAND_ALIASES: Record<string, string> = {

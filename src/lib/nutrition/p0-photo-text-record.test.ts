@@ -101,7 +101,18 @@ describe('P0 — Photo Category Guard', () => {
     assert.equal(names.some(n => n.includes('壽司郎')), false)
     if (outcome.candidates.length === 0) {
       assert.equal(outcome.action, 'create_unknown')
-      assert.match(outcome.explanation, /漢堡/)
+      // Build 36: the alias-engine coverage-ratio fix (see
+      // alias-engine/matcher.ts) correctly removed a weak false-positive
+      // candidate that "起司漢堡" used to get, so there are now zero RAW
+      // candidates before category filtering even runs (not merely zero
+      // *compatible* ones). searchNutritionV2Client only shows the
+      // category-aware "看起來像漢堡類" message when a raw candidate existed
+      // and got filtered OUT by category — with zero raw candidates from
+      // the start it falls through to the same generic "no data" message
+      // the plain text pipeline uses (required for consistency by P20 in
+      // photo-pipeline.test.ts — photo and text must not disagree when
+      // photo has no extra signal beyond an empty candidate list either).
+      assert.match(outcome.explanation, /沒有可信營養資料/)
     }
   })
 })

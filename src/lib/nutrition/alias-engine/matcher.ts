@@ -25,31 +25,31 @@ type AliasIndexRow = {
 
 /**
  * Below this coverage ratio (shorter token length / longer token length), a
- * substring-containment match against a raw `official_name` token is too
- * weak to trust. Mirrors the equivalent guard in food-menu-lookup.ts's
- * scoreNameMatch (SUBSTRING_COVERAGE_THRESHOLD) — without it, a bare 1-2
- * character generic query like "蛋" would match ANY official name that
- * merely contains that character anywhere (e.g. a specific "糖心蛋雞胸餐"
- * restaurant meal), and — because an alias-engine hit short-circuits
- * scoreNameMatch to a near-maximum 98 score — that unrelated dish would
- * outrank the correct generic-food answer with false confidence.
- *
- * Deliberately scoped to `kind === 'official'` only. `alias` /
- * `restaurant_alias` rows are curated by a human specifically so a shorter
- * colloquial term resolves to a product (e.g. "竹筍湯" is intentionally
- * listed as a partial alias of 7-11's "竹筍排骨湯" via "竹筍湯排骨" /
- * "711竹筍湯") — that's real signal, not noise, and applying the same
- * length-ratio guard there breaks legitimate curated shorthand.
+ * substring-containment match is too weak to trust — curated alias row or
+ * not. Mirrors the equivalent guard in food-menu-lookup.ts's scoreNameMatch
+ * (SUBSTRING_COVERAGE_THRESHOLD). Without it, a short query matches ANY
+ * name/alias that merely contains it anywhere, and — because an
+ * alias-engine hit short-circuits scoreNameMatch to a near-maximum 98
+ * score — an unrelated dish outranks the correct answer with false
+ * confidence: "蛋" → "糖心蛋雞胸餐" (400 kcal, an unrelated restaurant meal),
+ * "蛋餅" → "美而美玉米起司蛋餅" (a specific branded product) via its curated
+ * "玉米起司蛋餅" alias, and — discovered when a looser, `kind`-dependent
+ * version of this threshold was tried and broke the wider test suite —
+ * "雞蛋"/"雞胸肉"/"香蕉"/"無糖豆漿" all similarly hijacked by curated aliases
+ * of unrelated products at exactly the same ~0.5 coverage ratio as the one
+ * legitimate curated-shorthand case this threshold must still allow
+ * ("711竹筍排骨湯", a near-full-length, near-exact query — see AE4 in
+ * alias-engine.test.ts). A single uniform threshold, not a per-`kind`
+ * split, is what actually holds up: 0.8 comfortably clears AE4's
+ * near-exact query while rejecting every one of the ~0.5-ratio false
+ * positives above.
  */
-const OFFICIAL_NAME_SUBSTRING_COVERAGE_THRESHOLD = 0.8
+const SUBSTRING_COVERAGE_THRESHOLD = 0.8
 
 /**
- * A substring-containment match (curated alias or not) requires the query
- * to be at least this long. This is what actually separates the "蛋"
- * (1-char, matches even a curated "糖心蛋雞" alias with no real signal) case
- * from the legitimate "竹筍湯" (3-char, matches the curated "竹筍湯排骨" /
- * "711竹筍湯" aliases it was clearly written to match) case — length alone,
- * not the coverage ratio, is what makes a short query too generic to trust.
+ * A substring-containment match requires the query to be at least this
+ * long — a single generic character ("蛋", "湯", "肉"…) is never a specific
+ * enough signal to trust via substring containment, regardless of ratio.
  */
 const MIN_SUBSTRING_QUERY_LENGTH = 2
 
@@ -104,11 +104,9 @@ export function resolveAliasQuery(
       if (q.length < MIN_SUBSTRING_QUERY_LENGTH) continue
       const isSubstring = q.includes(row.token) || row.token.includes(q)
       if (!isSubstring) continue
-      if (row.kind === 'official') {
-        const shorter = Math.min(q.length, row.token.length)
-        const longer = Math.max(q.length, row.token.length)
-        if (longer === 0 || shorter / longer < OFFICIAL_NAME_SUBSTRING_COVERAGE_THRESHOLD) continue
-      }
+      const shorter = Math.min(q.length, row.token.length)
+      const longer = Math.max(q.length, row.token.length)
+      if (longer === 0 || shorter / longer < SUBSTRING_COVERAGE_THRESHOLD) continue
     }
     const entryStore = row.entry.store ? normalizeRestaurantAlias(row.entry.store) : undefined
     if (storeNorm && entryStore && entryStore !== storeNorm) continue

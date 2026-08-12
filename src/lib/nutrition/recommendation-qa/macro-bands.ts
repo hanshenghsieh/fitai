@@ -102,6 +102,13 @@ export function classifyDishBand(name: string, tags: string[] = [], role?: strin
   if (/炸|雞排|鹽酥|咔啦|薯條|排骨酥/.test(n)) return 'fried'
   if (/麵|拉麵|烏龍|米粉|河粉/.test(n)) return 'noodles'
   if (/雞胸|燒肉飯|雞腿便當|舒肥雞/.test(n)) return 'chicken_bento'
+  // Rice balls/onigiri are a snack-sized portion (~150-250 kcal), not a
+  // full rice-bowl meal (380-720 kcal) — must be checked before the generic
+  // "飯" substring rule below, which would otherwise catch "飯糰" too (it
+  // contains "飯") and fail the rice_bowl macro band for having too few
+  // calories, incorrectly grading real, well-sourced rice-ball products as
+  // low-confidence/unsearchable.
+  if (/飯糰/.test(n)) return 'generic'
   if (tags.includes('rice') || /飯|便當|燴飯|炒飯|拌飯/.test(n)) return 'rice_bowl'
   return 'generic'
 }

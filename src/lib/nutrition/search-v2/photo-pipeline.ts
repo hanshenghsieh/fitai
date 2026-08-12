@@ -212,7 +212,12 @@ export function photoV2ReadyForLog(state: PhotoV2State): boolean {
     return Boolean(resolved.official_record)
   }
 
-  if (resolved.action === 'pick_candidate' || (resolved.action === 'create_official' && resolved.level === 'B')) {
+  if (
+    resolved.action === 'pick_candidate' ||
+    (resolved.action === 'create_official' && (resolved.level === 'B' || resolved.level === 'C'))
+  ) {
+    // Level C = AI nutrition fallback (Build 37 LEVEL 2/3) — same "must
+    // confirm" gate as Level B. Never auto-applies an AI estimate.
     return state.user_confirmed && Boolean(resolved.official_record)
   }
 
@@ -302,8 +307,15 @@ export function finalizePhotoV2ToFoodLogPayload(
   if (!official) return null
 
   const macros = candidateToMacros(official)
-  const confidence: NutritionConfidence =
-    resolved.level === 'A' && !state.user_confirmed ? 'A' : 'B'
+  // A Level C (AI fallback) candidate already carries its own real status —
+  // must never be coerced to 'official'/'A'/'B', which would make an AI
+  // estimate indistinguishable from verified database nutrition.
+  const isAiEstimate = official.nutrition_status === 'estimated'
+  const confidence: NutritionConfidence = isAiEstimate
+    ? 'C'
+    : resolved.level === 'A' && !state.user_confirmed
+      ? 'A'
+      : 'B'
 
   return {
     id: opts.id,
@@ -312,7 +324,11 @@ export function finalizePhotoV2ToFoodLogPayload(
     user_input_label: state.detected_label,
     matched_item_label: official.name,
     matched_restaurant: official.store,
-    match_type: state.user_confirmed ? 'user_selected_verified_item' : 'photo_verified_match',
+    match_type: isAiEstimate
+      ? 'ai_nutrition_estimate'
+      : state.user_confirmed
+        ? 'user_selected_verified_item'
+        : 'photo_verified_match',
     store: official.store ?? state.store,
     calories: macros.calories,
     protein_g: macros.protein,
@@ -321,7 +337,7 @@ export function finalizePhotoV2ToFoodLogPayload(
     fiber_g: macros.fiber,
     sugar_g: macros.sugar,
     sodium_mg: macros.sodium,
-    nutrition_status: 'official',
+    nutrition_status: isAiEstimate ? 'estimated' : 'official',
     nutrition_confidence: confidence,
     source: 'photo',
     user_declared: true,
