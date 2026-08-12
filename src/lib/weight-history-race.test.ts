@@ -28,6 +28,8 @@ function buildMockSupabase(opts: {
   upsertError?: { message: string } | null
   insertError?: { message: string } | null
   onCall?: (op: 'select' | 'upsert' | 'insert' | 'update', payload?: unknown) => void
+  /** Build 38 — records every .eq()/.is() call made on the UPDATE chain, so tests can assert on the filter shape. */
+  onUpdateFilter?: (method: 'eq' | 'is', column: string, value: unknown) => void
 }) {
   let callCount = 0
   return {
@@ -59,10 +61,12 @@ function buildMockSupabase(opts: {
         update(payload: unknown) {
           opts.onCall?.('update', payload)
           return {
-            eq() {
+            eq(column: string, value: unknown) {
+              opts.onUpdateFilter?.('eq', column, value)
               return this
             },
-            is() {
+            is(column: string, value: unknown) {
+              opts.onUpdateFilter?.('is', column, value)
               return this
             },
             select: async () => ({ data: [{ id: 'existing-row' }], error: null }),
@@ -277,5 +281,119 @@ describe('Build 38 BUG 1 — /api/settings/body always logs full error detail, n
     const fnStart = source.indexOf('export async function POST')
     const fnSource = source.slice(fnStart)
     assert.doesNotMatch(fnSource, /jsonWithCors\(\{ error: result\.error\.message \}/)
+  })
+})
+
+/**
+ * Root cause of the production 414 "Request-URI Too Large": the daily_checkins
+ * UPDATE path added `.eq('notes', existing.notes)` (or `.is('notes', null)`)
+ * as an optimistic-concurrency guard. PostgREST serializes .eq()/.is() filter
+ * conditions into the URL query string, not the request body — so embedding
+ * the FULL previous `notes` value (which had grown to ~347KB for the real
+ * test account, confirmed via a direct production read) blew the query
+ * string to 378,500 bytes on a real request (confirmed via
+ * request_id-correlated Vercel production logs), past Cloudflare's ~32KB
+ * 414 threshold. Fixed by locating the row with only its primary key
+ * (`existing.id`) — a filter should never carry large/variable-size payload
+ * data, only small scalar identifiers.
+ */
+describe('Build 38 BUG 1 — daily_checkins UPDATE filter never embeds large payload data', () => {
+  it('the update filter uses only existing.id — never .eq/.is on notes', async () => {
+    const filterCalls: { method: string; column: string; value: unknown }[] = []
+    const supabase = buildMockSupabase({
+      existing: { id: 'row-1', notes: 'x'.repeat(400_000) },
+      onUpdateFilter: (method, column, value) => filterCalls.push({ method, column, value }),
+    })
+    const result = await appendWeightHistoryToCheckin(supabase, 'user-1', 70)
+    assert.equal(result.error, null)
+    assert.ok(filterCalls.length > 0, 'the update chain must apply at least one filter')
+    for (const call of filterCalls) {
+      assert.equal(call.column, 'id', `update filter must only ever target the "id" column, saw "${call.column}"`)
+    }
+    assert.ok(
+      filterCalls.every(c => typeof c.value === 'string' && c.value.length < 100),
+      'the filter value must be a short scalar identifier, never a large payload'
+    )
+  })
+
+  it('the update filter never carries the notes column at all, even when the existing row has a 400KB notes value', async () => {
+    const filterCalls: { method: string; column: string; value: unknown }[] = []
+    const supabase = buildMockSupabase({
+      existing: { id: 'row-1', notes: 'x'.repeat(400_000) },
+      onUpdateFilter: (method, column, value) => filterCalls.push({ method, column, value }),
+    })
+    await appendWeightHistoryToCheckin(supabase, 'user-1', 70)
+    assert.ok(
+      filterCalls.every(c => c.column !== 'notes'),
+      'notes must never appear as a filter column — it belongs in the update body only'
+    )
+  })
+
+  it('the update filter never carries diet_items/workout_items or any JSON/array/object value', async () => {
+    const filterCalls: { method: string; column: string; value: unknown }[] = []
+    const supabase = buildMockSupabase({
+      existing: { id: 'row-1', notes: null },
+      onUpdateFilter: (method, column, value) => filterCalls.push({ method, column, value }),
+    })
+    await appendWeightHistoryToCheckin(supabase, 'user-1', 70)
+    for (const call of filterCalls) {
+      assert.notEqual(call.column, 'diet_items')
+      assert.notEqual(call.column, 'workout_items')
+      assert.equal(typeof call.value !== 'object' || call.value === null, true, `filter value for "${call.column}" must not be an object/array`)
+    }
+  })
+
+  it('source regression: appendWeightHistoryToCheckin no longer builds an .eq/.is filter on the notes column', () => {
+    const source = readRepoFile('src/lib/weight-history.ts')
+    const fnStart = source.indexOf('export async function appendWeightHistoryToCheckin')
+    const fnSource = source.slice(fnStart)
+    assert.doesNotMatch(fnSource, /\.eq\('notes',/)
+    assert.doesNotMatch(fnSource, /\.is\('notes',/)
+    assert.match(fnSource, /\.eq\('id', existing\.id\)/, 'the update must still locate the row by its primary key')
+  })
+
+  it('a simulated 400KB daily_checkins row does not produce an oversized update filter (regression for the exact production 414)', async () => {
+    const hugeNotes = JSON.stringify({
+      user_memory: { food_dna: { frequent: Array.from({ length: 50 }, (_, i) => ({ id: `photo-${i}`, cluster_hero_image: 'x'.repeat(8000) })) } },
+    })
+    assert.ok(hugeNotes.length > 300_000, 'sanity check: the simulated notes blob is realistically huge')
+    const filterCalls: { method: string; column: string; value: unknown }[] = []
+    const supabase = buildMockSupabase({
+      existing: { id: 'row-1', notes: hugeNotes },
+      onUpdateFilter: (method, column, value) => filterCalls.push({ method, column, value }),
+    })
+    const result = await appendWeightHistoryToCheckin(supabase, 'user-1', 70)
+    assert.equal(result.error, null)
+    const totalFilterBytes = filterCalls.reduce((sum, c) => sum + String(c.value).length, 0)
+    assert.ok(totalFilterBytes < 1000, `total filter payload must stay tiny regardless of row size, got ${totalFilterBytes} bytes`)
+  })
+
+  it('original weight-history behavior is unaffected: first checkin of the day still succeeds via upsert, not update', async () => {
+    let upsertCalls = 0
+    let updateCalls = 0
+    const supabase = buildMockSupabase({
+      existing: null,
+      onCall: op => {
+        if (op === 'upsert') upsertCalls += 1
+        if (op === 'update') updateCalls += 1
+      },
+    })
+    const result = await appendWeightHistoryToCheckin(supabase, 'user-1', 70)
+    assert.equal(result.error, null)
+    assert.equal(upsertCalls, 1)
+    assert.equal(updateCalls, 0)
+  })
+
+  it('original weight-history behavior is unaffected: an existing row still gets updated with the merged notes body (not filtered by notes)', async () => {
+    let updatePayload: unknown
+    const supabase = buildMockSupabase({
+      existing: { id: 'row-1', notes: null },
+      onCall: (op, payload) => {
+        if (op === 'update') updatePayload = payload
+      },
+    })
+    const result = await appendWeightHistoryToCheckin(supabase, 'user-1', 70)
+    assert.equal(result.error, null)
+    assert.ok(updatePayload && typeof updatePayload === 'object' && 'notes' in updatePayload)
   })
 })

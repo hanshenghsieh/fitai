@@ -269,16 +269,22 @@ export async function appendWeightHistoryToCheckin(
     )
 
     if (existing?.id) {
-      let updateQuery = supabase
+      // Root cause of the production 414 "Request-URI Too Large": this used
+      // to add an optimistic-concurrency guard filtering on the full previous
+      // notes column value — but PostgREST serializes .eq()/.is() filter
+      // conditions into the URL query string, not the request body. `notes` can
+      // grow to hundreds of KB (weight_history entries plus other checkin
+      // metadata accumulated over time) — embedding its full previous value
+      // in the filter blew the query string past Cloudflare's ~32KB 414
+      // threshold (confirmed on a real request: query_length 378,500 bytes).
+      // The row is already uniquely and cheaply located by its primary key —
+      // `existing.id` — which is all a row-locating filter should ever need;
+      // large payloads belong in the update body, never in a filter.
+      const finalUpdateQuery = supabase
         .from('daily_checkins')
         .update({ notes: mergedNotes })
         .eq('id', existing.id)
-      if (existing.notes == null) {
-        updateQuery = updateQuery.is('notes', null)
-      } else {
-        updateQuery = updateQuery.eq('notes', existing.notes)
-      }
-      const finalUpdateQuery = updateQuery.select('id')
+        .select('id')
       traceCheckpoint('9c_daily_update_start', requestId, { attempt, ...inspectPostgrestUrl(finalUpdateQuery) })
       const { data: updated, error } = await finalUpdateQuery
       const updateWriteError = error ? toWriteError(error) : null
