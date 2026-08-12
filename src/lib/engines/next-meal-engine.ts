@@ -8,6 +8,7 @@ import type { FoodLogEntry } from '@/lib/banks/types'
 import { isRecoveryActive } from '@/lib/engines/calorie-bank-engine'
 import type { MealType } from '@/lib/checkin-utils'
 import { MEAL_RATIOS } from '@/lib/meal-engine-types'
+import { isFoodLogCountedTowardTotals, sumCountedCalories, sumCountedProtein } from '@/lib/food-log-totals'
 
 export interface NextMealEngineInput {
   todayFoodLogs: FoodLogEntry[]
@@ -64,58 +65,16 @@ export const OVER_TARGET_COPY = {
 }
 
 export function sumLoggedCalories(logs: FoodLogEntry[]): number {
-  return logs.reduce((s, l) => {
-    if (
-      l.nutrition_status === 'unknown' ||
-      l.nutrition_status === 'pending_confirmation' ||
-      l.nutrition_status === 'pending_review' ||
-      l.nutrition_status === 'estimated_pending_confirmation'
-    ) {
-      return s
-    }
-    if (l.capture_status === 'photo_only' && l.nutrition_status !== 'user_entered' && l.nutrition_status !== 'auto_resolved') {
-      return s
-    }
-    if (l.calories == null) return s
-    return s + l.calories
-  }, 0)
+  return sumCountedCalories(logs)
 }
 
 export function sumLoggedProtein(logs: FoodLogEntry[]): number {
-  return logs.reduce((s, l) => {
-    if (
-      l.nutrition_status === 'unknown' ||
-      l.nutrition_status === 'pending_confirmation' ||
-      l.nutrition_status === 'pending_review' ||
-      l.nutrition_status === 'estimated_pending_confirmation'
-    ) {
-      return s
-    }
-    if (l.capture_status === 'photo_only' && l.nutrition_status !== 'user_entered' && l.nutrition_status !== 'auto_resolved') {
-      return s
-    }
-    if (l.protein_g == null) return s
-    return s + l.protein_g
-  }, 0)
+  return sumCountedProtein(logs)
 }
 
 function sumLoggedMacro(logs: FoodLogEntry[], key: 'fat_g' | 'carbs_g'): number {
   return logs.reduce((sum, log) => {
-    if (
-      log.nutrition_status === 'unknown' ||
-      log.nutrition_status === 'pending_confirmation' ||
-      log.nutrition_status === 'pending_review' ||
-      log.nutrition_status === 'estimated_pending_confirmation'
-    ) {
-      return sum
-    }
-    if (
-      log.capture_status === 'photo_only' &&
-      log.nutrition_status !== 'user_entered' &&
-      log.nutrition_status !== 'auto_resolved'
-    ) {
-      return sum
-    }
+    if (!isFoodLogCountedTowardTotals(log)) return sum
     const value = log[key]
     return value == null ? sum : sum + value
   }, 0)

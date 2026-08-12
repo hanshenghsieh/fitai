@@ -1,6 +1,7 @@
 import { addDays, format, parseISO } from 'date-fns'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import { extractRecentFoodLogsFromCheckins } from '@/lib/food-memory'
+import { sumCountedCalories, sumCountedProtein, sumCountedFat } from '@/lib/food-log-totals'
 import { HIGH_FIBER_PATTERN, SUGAR_DRINK_PATTERN } from './week-constants'
 import type { AnalysisCheckinRow } from './analysis-summary'
 
@@ -51,15 +52,13 @@ export function buildDayFacts(
   checkin: AnalysisCheckinRow | undefined
 ): DayFacts {
   const dayLogs = logs.filter(l => l.logged_at.slice(0, 10) === day)
-  const dinnerCalories = dayLogs
-    .filter(l => mealBucket(l) === 'dinner')
-    .reduce((s, l) => s + l.calories, 0)
+  const dinnerCalories = sumCountedCalories(dayLogs.filter(l => mealBucket(l) === 'dinner'))
   return {
     date: day,
     hasLogs: dayLogs.length > 0,
-    calories: dayLogs.reduce((s, l) => s + l.calories, 0),
-    protein_g: dayLogs.reduce((s, l) => s + l.protein_g, 0),
-    fat_g: dayLogs.reduce((s, l) => s + (l.fat_g ?? 0), 0),
+    calories: sumCountedCalories(dayLogs),
+    protein_g: sumCountedProtein(dayLogs),
+    fat_g: sumCountedFat(dayLogs),
     dinnerCalories,
     veggieHits: dayLogs.filter(l => HIGH_FIBER_PATTERN.test(l.name)).length,
     sugarDrinkCount: dayLogs.filter(l => SUGAR_DRINK_PATTERN.test(l.name)).length,

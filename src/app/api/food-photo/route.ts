@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server'
 import { requireApiUser } from '@/lib/api/auth'
 import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { parseFoodImage } from '@/lib/claude/client'
+import { captureError } from '@/lib/observability/capture-error'
+import { classifyPipelineFailure } from '@/lib/observability/photo-outcome'
 
 export const maxDuration = 60
 
@@ -105,9 +107,11 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let userId: string | null = null
   try {
     const auth = await requireApiUser(request)
     if (!auth.ok) return auth.response
+    userId = auth.user.id
 
     if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
       return jsonWithCors({ error: '拍照辨識尚未設定' }, request, { status: 503 })
@@ -122,6 +126,16 @@ export async function POST(request: NextRequest) {
       'Food photo parse error:',
       err instanceof Error ? { name: err.name, message: err.message } : 'Unknown error'
     )
+    // Request-shape errors (missing/oversized image, unsupported format) are
+    // expected user-input failures, not incidents — only capture the rest.
+    if (!(err instanceof FoodPhotoRequestError)) {
+      captureError(err, {
+        feature: 'food-photo',
+        operation: 'parse',
+        userId,
+        extra: { failure_type: classifyPipelineFailure(err) },
+      })
+    }
     const message = err instanceof Error ? err.message : '辨識失敗，改用搜尋或常吃？'
     const status = err instanceof FoodPhotoRequestError ? err.status : 502
     return jsonWithCors({ error: message }, request, { status })

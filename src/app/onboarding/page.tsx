@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { createClient, isCapacitorNative } from '@/lib/supabase/client'
 import { waitForSession } from '@/lib/supabase/wait-for-session'
+import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
@@ -20,6 +21,7 @@ import { apiFetch, apiUrl } from '@/lib/api/client'
 import AppAuthLoadingShell from '@/features/auth/AppAuthLoadingShell'
 import { messageForGeneratePlanError } from '@/lib/generate-plan-errors'
 import { resolveGeneratePlanWeekStart } from '@/lib/weekly-plan-week'
+import { trackClient, detectAnalyticsPlatform } from '@/lib/analytics/track-client'
 
 const TOTAL_STEPS = 3
 
@@ -111,6 +113,7 @@ export default function OnboardingPage() {
   const [sessionReady, setSessionReady] = useState(false)
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
   const set = (key: keyof FormData, val: unknown) => setData(prev => ({ ...prev, [key]: val }))
+  const onboardingStartedAtRef = useRef<number | null>(null)
 
   useEffect(() => {
     let mounted = true
@@ -137,6 +140,8 @@ export default function OnboardingPage() {
         return
       }
       setSessionReady(true)
+      onboardingStartedAtRef.current = Date.now()
+      trackClient({ name: 'onboarding_started', properties: {} })
     })()
 
     return () => {
@@ -448,6 +453,17 @@ export default function OnboardingPage() {
         throw new Error(completionError?.message || '個人設定尚未完成，請再試一次。')
       }
 
+      trackClient({
+        name: 'onboarding_completed',
+        properties: {
+          duration_seconds:
+            onboardingStartedAtRef.current != null
+              ? Math.round((Date.now() - onboardingStartedAtRef.current) / 1000)
+              : 0,
+          platform: detectAnalyticsPlatform(),
+        },
+      })
+
       // Hard navigation so the dashboard guard reads the freshly-written
       // onboarding_completed profile + session instead of bouncing to /login.
       toast.success('計畫已就緒，照著做就好。')
@@ -744,6 +760,13 @@ function StepFinish({
             {planPreview.dailyDeficit > 0 && formatDeficitPlain(planPreview.dailyDeficit) + '。'}
             {formatProteinPlain(planPreview.proteinGrams, planPreview.leanMassKg)}。
           </p>
+          <Link
+            href="/health-sources"
+            className="text-[11px] underline underline-offset-2 mt-2 inline-block"
+            style={{ color: BB_V2.text.muted }}
+          >
+            資料來源
+          </Link>
         </CollapsibleSection>
       )}
 

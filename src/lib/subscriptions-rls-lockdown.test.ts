@@ -119,7 +119,12 @@ describe('subscriptions RLS lockdown (client cannot self-grant premium)', () => 
       assert.match(revenuecatWebhook, /upsertAppleIapSubscription\(admin,/)
 
       const appleIapSync = readRepoFile('src/app/api/apple-iap/sync/route.ts')
-      assert.match(appleIapSync, /upsertAppleIapSubscription\(\s*createAdminClient\(\)/)
+      // Accepts either the inline call or the `const admin = createAdminClient()`
+      // variable form (the latter is also reused for the Phase 2 analytics
+      // track() call in this route) — both guarantee the admin/service-role
+      // client, never a user-scoped one, is what upsertAppleIapSubscription receives.
+      assert.match(appleIapSync, /const admin = createAdminClient\(\)/)
+      assert.match(appleIapSync, /upsertAppleIapSubscription\(admin,\s*verified\)/)
 
       // apple-iap-store.ts itself is client-agnostic (takes a SupabaseClient param);
       // both call sites above are what guarantee it always receives the admin client.

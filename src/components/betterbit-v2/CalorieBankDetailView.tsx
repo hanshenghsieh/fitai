@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, Check, Heart, Landmark } from 'lucide-react'
 import { BB_V2 } from '@/lib/betterbit-v2'
 import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
+import { trackClient } from '@/lib/analytics/track-client'
 import {
   DEFAULT_CALORIE_FLOOR_FEMALE,
   type DailyExcessDriver,
@@ -52,6 +53,10 @@ export default function CalorieBankDetailView({
       setSaveError(null)
     }
   }, [open, bank])
+
+  useEffect(() => {
+    if (open) trackClient({ name: 'calorie_bank_viewed', properties: {} })
+  }, [open])
 
   const todayExcess = getTodayExcessKcal(bank)
   const heroCopy = getDetailHeroCopy(bank, miniState)

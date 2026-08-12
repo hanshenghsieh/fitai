@@ -1,5 +1,8 @@
 import { NextRequest } from 'next/server'
 import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
+import { createAdminClient } from '@/lib/supabase/server'
+import { trackServer } from '@/lib/analytics/track-server'
+import { captureError } from '@/lib/observability/capture-error'
 
 export async function OPTIONS(request: NextRequest) {
   return handleCorsOptions(request)
@@ -76,6 +79,16 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('Profile created, returning success')
+
+    try {
+      await trackServer(
+        { name: 'account_created', properties: { auth_method: 'email', platform: 'unknown' } },
+        { supabase: createAdminClient(), userId }
+      )
+    } catch (trackErr) {
+      captureError(trackErr, { feature: 'analytics', operation: 'track', userId })
+    }
+
     return jsonWithCors({ userId, email }, req)
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Registration failed'

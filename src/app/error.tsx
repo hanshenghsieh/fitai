@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import { colors } from '@/lib/design-system'
 
 export default function RootError({
@@ -12,6 +13,7 @@ export default function RootError({
 }) {
   useEffect(() => {
     console.error('[root-error]', error)
+    Sentry.captureException(error, { tags: { feature: 'client-boundary', operation: 'route-error' } })
   }, [error])
 
   return (

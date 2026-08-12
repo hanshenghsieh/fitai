@@ -2,6 +2,7 @@ import type { CalorieBankRow } from '@/lib/banks/calorie-bank-types'
 import type { FoodLogEntry, UserBanks } from './types'
 import type { AdherenceState } from '@/lib/engines/adherence-types'
 import { effectiveDailyTargetFromBank } from '@/lib/engines/calorie-bank-engine'
+import { sumCountedCalories, sumCountedProtein } from '@/lib/food-log-totals'
 import type { DayPlan } from '@/types'
 
 interface GoalSnap {
@@ -9,21 +10,6 @@ interface GoalSnap {
   total_deficit_kcal?: number
   weeks_remaining?: number
   lean_mass_kg?: number
-}
-
-function logCountsTowardTotals(log: FoodLogEntry): boolean {
-  if (
-    log.nutrition_status === 'unknown' ||
-    log.nutrition_status === 'pending_confirmation' ||
-    log.nutrition_status === 'pending_review' ||
-    log.nutrition_status === 'estimated_pending_confirmation'
-  ) {
-    return false
-  }
-  if (log.capture_status === 'photo_only' && log.nutrition_status !== 'user_entered' && log.nutrition_status !== 'auto_resolved') {
-    return false
-  }
-  return log.calories != null && log.protein_g != null
 }
 
 export function buildUserBanks(
@@ -40,8 +26,8 @@ export function buildUserBanks(
     goalSnapshot?.daily_deficit ??
     Math.max(200, Math.round((goalSnapshot?.total_deficit_kcal ?? 0) / Math.max(1, (goalSnapshot?.weeks_remaining ?? 12) * 7)))
 
-  const todayLoggedKcal = foodLogs.reduce((s, f) => s + (logCountsTowardTotals(f) ? (f.calories ?? 0) : 0), 0)
-  const todayLoggedProtein = foodLogs.reduce((s, f) => s + (logCountsTowardTotals(f) ? (f.protein_g ?? 0) : 0), 0)
+  const todayLoggedKcal = sumCountedCalories(foodLogs)
+  const todayLoggedProtein = sumCountedProtein(foodLogs)
   const proteinTarget = todayPlan.daily_targets.protein_g
 
   const weeklyTarget = todayPlan.workout?.type === 'rest' ? 0 : Math.max(3, workoutTotal > 0 ? 5 : 3)

@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest } from 'next/server'
-import { requireApiUser } from '@/lib/api/auth'
+import { requireAdminUser } from '@/lib/api/auth'
 import { applyCorsHeaders, handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import {
   flattenCollectorResults,
@@ -14,7 +14,7 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await requireApiUser(request)
+  const auth = await requireAdminUser(request)
   if (!auth.ok) return auth.response
 
   try {

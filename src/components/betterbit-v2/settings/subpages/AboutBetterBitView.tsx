@@ -14,6 +14,7 @@ import {
   Paintbrush,
   Terminal,
   Heart,
+  HeartPulse,
 } from 'lucide-react'
 import { formatAppVersionWithBuild } from '@/lib/app-version'
 import { isNativeIOS } from '@/lib/capacitor-native'
@@ -80,6 +81,11 @@ export default function AboutBetterBitView({ appVersion }: { appVersion: string 
             icon={<Shield className="h-4 w-4" />}
             label="隱私權政策"
             onClick={() => router.push('/privacy')}
+          />
+          <V2VisualChevronRow
+            icon={<HeartPulse className="h-4 w-4" />}
+            label="健康資訊與資料來源"
+            onClick={() => router.push('/health-sources')}
           />
           <V2VisualChevronRow
             icon={<Code2 className="h-4 w-4" />}

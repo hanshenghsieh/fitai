@@ -1,8 +1,9 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { trackClient } from '@/lib/analytics/track-client'
 import type { AccessStatus } from '@/lib/subscription-access'
 import {
   PRO_AUTO_RENEW_DISCLOSURE,
@@ -10,6 +11,7 @@ import {
   type ProPlanId,
   yearlyPlanSubtextLines,
 } from '@/lib/pro-subscription-v2'
+import { APPLE_IAP_LEGAL_DISCLOSURE } from '@/lib/apple-iap-config'
 import { PRO_V2_FEATURES } from '@/lib/pro-v2-features'
 import { premiumTrialWhisper } from '@/lib/premium-narrative'
 import { triggerV2Haptic } from '@/lib/v2-haptics'
@@ -128,6 +130,11 @@ export default function ProSubscriptionV2View({
           }
   const selectedOption = plan === 'yearly' ? yearlyOption : monthlyOption
 
+  useEffect(() => {
+    trackClient({ name: 'paywall_viewed', properties: {} })
+    // Mount-only: a re-render from a plan/offering change must not double-count a view.
+  }, [])
+
   const handleSubscribe = () => {
     triggerV2Haptic('medium')
     onSubscribe(plan)
@@ -243,7 +250,7 @@ export default function ProSubscriptionV2View({
             </V2PrimaryButton>
 
             <p className="text-[11px] text-center leading-relaxed px-2" style={{ color: BB_V2.text.muted }}>
-              {PRO_AUTO_RENEW_DISCLOSURE}
+              {dynamicPlans ? APPLE_IAP_LEGAL_DISCLOSURE : PRO_AUTO_RENEW_DISCLOSURE}
             </p>
 
             <div className="flex justify-center gap-6 text-[12px]">

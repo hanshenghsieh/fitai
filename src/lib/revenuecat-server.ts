@@ -15,6 +15,8 @@ export interface VerifiedRevenueCatSubscription {
   purchasedAt: string
   expiresAt: string
   willRenew: boolean
+  /** RevenueCat's per-subscription is_sandbox flag — null when not present in the response. */
+  isSandbox: boolean | null
 }
 
 export class RevenueCatConfigurationError extends Error {
@@ -80,12 +82,15 @@ export function parseVerifiedRevenueCatSubscriber(
       purchasedAt: now.toISOString(),
       expiresAt: now.toISOString(),
       willRenew: false,
+      isSandbox: null,
     }
   }
 
   const subscriptions = asRecord(subscriber.subscriptions)
   const productSubscription = asRecord(subscriptions?.[productId])
   const unsubscribeDetectedAt = validIso(productSubscription?.unsubscribe_detected_at)
+  const isSandbox =
+    typeof productSubscription?.is_sandbox === 'boolean' ? productSubscription.is_sandbox : null
 
   return {
     userId,
@@ -94,6 +99,7 @@ export function parseVerifiedRevenueCatSubscriber(
     purchasedAt,
     expiresAt,
     willRenew: !unsubscribeDetectedAt,
+    isSandbox,
   }
 }
 

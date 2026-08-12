@@ -93,4 +93,106 @@ describe('subscription-access', () => {
     assert.equal(isAppleReviewDemoEmail('Apple-Review@Betterbit.tw'), true)
     assert.equal(isAppleReviewDemoEmail('other@betterbit.tw'), false)
   })
+
+  describe('P0-5 wall-clock expiration', () => {
+    it('active with a future current_period_end → premium', () => {
+      assert.equal(
+        isPremiumSubscription({
+          status: 'active',
+          subscription_source: 'stripe',
+          current_period_end: '2099-12-31T23:59:59.000Z',
+        }),
+        true
+      )
+    })
+
+    it('active but current_period_end already passed → NOT premium', () => {
+      assert.equal(
+        isPremiumSubscription({
+          status: 'active',
+          subscription_source: 'stripe',
+          current_period_end: '2020-01-01T00:00:00.000Z',
+        }),
+        false
+      )
+    })
+
+    it('cancelled status → NOT premium, regardless of current_period_end', () => {
+      assert.equal(
+        isPremiumSubscription({
+          status: 'cancelled',
+          subscription_source: 'stripe',
+          current_period_end: '2099-12-31T23:59:59.000Z',
+        }),
+        false
+      )
+    })
+
+    it('trialing with a future trial end (current_period_end) → premium', () => {
+      assert.equal(
+        isPremiumSubscription({
+          status: 'trialing',
+          subscription_source: 'stripe',
+          current_period_end: '2099-12-31T23:59:59.000Z',
+        }),
+        true
+      )
+    })
+
+    it('trialing with an expired trial end → NOT premium', () => {
+      assert.equal(
+        isPremiumSubscription({
+          status: 'trialing',
+          subscription_source: 'stripe',
+          current_period_end: '2020-01-01T00:00:00.000Z',
+        }),
+        false
+      )
+    })
+
+    it('active with no current_period_end at all → still premium (nothing to expire against)', () => {
+      assert.equal(
+        isPremiumSubscription({
+          status: 'active',
+          subscription_source: 'stripe',
+          current_period_end: null,
+        }),
+        true
+      )
+    })
+
+    it('manual grant (is_premium true) with an expired current_period_end → still premium (lifetime override, not a recurring period)', () => {
+      assert.equal(
+        isPremiumSubscription({
+          status: 'active',
+          subscription_source: 'manual_grant',
+          is_premium: true,
+          current_period_end: '2020-01-01T00:00:00.000Z',
+        }),
+        true
+      )
+    })
+
+    it('unparseable current_period_end fails open (does not reject a genuinely active subscription)', () => {
+      assert.equal(
+        isPremiumSubscription({
+          status: 'active',
+          subscription_source: 'stripe',
+          current_period_end: 'not-a-real-date',
+        }),
+        true
+      )
+    })
+
+    it('getAccessStatus reflects an expired period as not subscribed / no full access', () => {
+      const access = getAccessStatus('2020-01-01T00:00:00.000Z', {
+        status: 'active',
+        subscription_source: 'stripe',
+        current_period_end: '2020-02-01T00:00:00.000Z',
+      })
+      assert.equal(access.isSubscribed, false)
+      assert.equal(access.hasFullAccess, false)
+      assert.equal(access.trialExpired, true)
+    })
+  })
 })

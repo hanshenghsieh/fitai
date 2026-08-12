@@ -17,6 +17,7 @@ import V2Header from '@/components/betterbit-v2/V2Header'
 import V2PageBackground from '@/components/betterbit-v2/V2PageBackground'
 import type { AnalysisCheckinRow, AnalysisDayPlanHint, AnalysisTargets } from '@/lib/analytics/analysis-summary'
 import { weightChartYDomain } from '@/lib/analytics/analysis-summary'
+import { trackClient } from '@/lib/analytics/track-client'
 import {
   buildAnalysisWeekView,
   canNavigateAnalysisWeek,
@@ -323,6 +324,9 @@ export default function AnalysisV2Screen({
   isWeekTransitioning,
 }: Props) {
   const router = useRouter()
+  useEffect(() => {
+    trackClient({ name: 'analysis_viewed', properties: {} })
+  }, [])
   const [internalAnchor, setInternalAnchor] = useState(() => initialAnalysisWeekAnchor(todayStr))
   const [isPending, startTransition] = useTransition()
   const anchor = anchorDateProp ?? internalAnchor
@@ -465,6 +469,13 @@ export default function AnalysisV2Screen({
             </div>
             <p className="v2-analysis-coach-line">{weekView.coachSummary.line1}</p>
             <p className="v2-analysis-coach-line">{weekView.coachSummary.line2}</p>
+            <button
+              type="button"
+              onClick={() => router.push('/health-sources')}
+              className="text-[11px] underline underline-offset-2 mt-2 opacity-70"
+            >
+              資料來源
+            </button>
           </section>
 
           <section className="v2-analysis-goals v2-analysis-stagger" style={{ animationDelay: '320ms' }}>

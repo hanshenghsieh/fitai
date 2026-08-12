@@ -1,5 +1,6 @@
 import type { FoodLogEntry } from '@/lib/banks/types'
 import { mealBucket } from '@/lib/analytics/analytics-helpers'
+import { sumCountedCalories, sumCountedProtein } from '@/lib/food-log-totals'
 
 export type DailyScoreStatus = '很穩' | '不錯' | '可調整' | '待回補' | '尚未記錄'
 
@@ -110,8 +111,8 @@ export function calculateDailyFoodScore(input: DailyFoodScoreInput): DailyFoodSc
     }
   }
 
-  const calories = dayLogs.reduce((s, l) => s + l.calories, 0)
-  const protein = dayLogs.reduce((s, l) => s + l.protein_g, 0)
+  const calories = sumCountedCalories(dayLogs)
+  const protein = sumCountedProtein(dayLogs)
 
   const breakdown = {
     calories: caloriePoints40(calories, dailyTargets.calories),

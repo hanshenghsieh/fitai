@@ -14,6 +14,7 @@ import {
   type AnalysisTargets,
 } from '@/lib/analytics/analysis-summary'
 import { extractRecentFoodLogsFromCheckins } from '@/lib/food-memory'
+import { sumCountedCalories } from '@/lib/food-log-totals'
 import type { BodyMeasurement } from '@/types'
 
 export interface AnalysisWeekSummaryCards {
@@ -120,7 +121,7 @@ function resolveDayCalorieTarget(
 
 function sumLogsDay(logs: FoodLogEntry[], day: string) {
   const dayLogs = logs.filter(l => l.logged_at.slice(0, 10) === day)
-  return dayLogs.reduce((s, l) => s + l.calories, 0)
+  return sumCountedCalories(dayLogs)
 }
 
 function buildDailyMetricSeries(

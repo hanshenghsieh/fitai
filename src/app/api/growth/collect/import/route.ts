@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest } from 'next/server'
-import { requireApiUser } from '@/lib/api/auth'
+import { requireAdminUser } from '@/lib/api/auth'
 import { applyCorsHeaders, handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import type { CollectedPost } from '@/growth/collectors/types'
 import { importCollectedPosts } from '@/growth/collectors/import'
@@ -13,7 +13,7 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await requireApiUser(request)
+  const auth = await requireAdminUser(request)
   if (!auth.ok) return auth.response
 
   try {
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
 /** Manual single post via collector pipeline */
 export async function PUT(request: NextRequest) {
-  const auth = await requireApiUser(request)
+  const auth = await requireAdminUser(request)
   if (!auth.ok) return auth.response
 
   try {

@@ -7,6 +7,7 @@ import { syncBankFromFoodLogs } from '@/lib/banks/calorie-bank-store'
 import { differenceInDays, format, parseISO, startOfWeek } from 'date-fns'
 import type { DailyCheckin, WeeklyPlanData, UserProfile } from '@/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { captureError } from '@/lib/observability/capture-error'
 
 class CheckinRequestError extends Error {}
 
@@ -248,7 +249,15 @@ export async function POST(request: NextRequest) {
     .select()
     .single()
 
-  if (error) return jsonWithCors({ error: error.message }, request, { status: 500 })
+  if (error) {
+    captureError(new Error(error.message), {
+      feature: 'checkin-save',
+      operation: 'upsert',
+      userId: user.id,
+      extra: { method: 'POST' },
+    })
+    return jsonWithCors({ error: error.message }, request, { status: 500 })
+  }
 
   const { data: profile } = await supabase
     .from('user_profiles')
@@ -261,6 +270,7 @@ export async function POST(request: NextRequest) {
     bank = await maybeSyncCalorieBank(supabase, user.id, data, profile as UserProfile | null)
   } catch (err) {
     console.error('[checkin] calorie bank sync failed after POST:', err)
+    captureError(err, { feature: 'checkin-save', operation: 'calorie-bank-sync', userId: user.id })
   }
 
   return jsonWithCors({ checkin: data, calorie_bank: bank }, request)
@@ -305,7 +315,15 @@ export async function PATCH(request: NextRequest) {
     .select()
     .single()
 
-  if (error) return jsonWithCors({ error: error.message }, request, { status: 500 })
+  if (error) {
+    captureError(new Error(error.message), {
+      feature: 'checkin-save',
+      operation: 'upsert',
+      userId: user.id,
+      extra: { method: 'PATCH' },
+    })
+    return jsonWithCors({ error: error.message }, request, { status: 500 })
+  }
 
   const { data: profile } = await supabase
     .from('user_profiles')
@@ -318,6 +336,7 @@ export async function PATCH(request: NextRequest) {
     bank = await maybeSyncCalorieBank(supabase, user.id, data, profile as UserProfile | null)
   } catch (err) {
     console.error('[checkin] calorie bank sync failed after PATCH:', err)
+    captureError(err, { feature: 'checkin-save', operation: 'calorie-bank-sync', userId: user.id })
   }
 
   return jsonWithCors(

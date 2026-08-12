@@ -1,5 +1,6 @@
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { AdherenceEvent } from './adherence-types'
+import { sumCountedCalories } from '@/lib/food-log-totals'
 
 const SOCIAL = /火鍋|麻辣鍋|涮涮鍋|蛋糕|生日蛋糕|啤酒|燒烤|BBQ|串燒|居酒屋|婚禮|喜酒|聚餐|吃到飽|buffet|和牛|燒肉/i
 const STRESS = /珍奶|手搖|奶茶|雞排|鹽酥雞|炸雞|咔啦|薯條|泡麵|巧克力|甜甜圈|可樂|含糖/i
@@ -80,7 +81,7 @@ export function detectPlateau(ctx: {
   const days = [...byDay.values()].slice(-14)
   if (days.length < 7) return false
   const onTarget = days.filter(dayLogs => {
-    const kcal = dayLogs.reduce((s, l) => s + l.calories, 0)
+    const kcal = sumCountedCalories(dayLogs)
     return kcal >= ctx.todayTargetKcal * 0.75 && kcal <= ctx.todayTargetKcal * 1.2
   })
   return onTarget.length >= Math.min(10, days.length - 2)

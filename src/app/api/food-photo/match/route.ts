@@ -4,6 +4,8 @@ import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { storesInText } from '@/lib/dice-store-names'
 import { createPhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 import { buildPhotoMatchSnapshot } from '@/lib/nutrition/photo-match-snapshot'
+import { captureError } from '@/lib/observability/capture-error'
+import { classifyPipelineFailure } from '@/lib/observability/photo-outcome'
 
 export const maxDuration = 30
 
@@ -12,9 +14,11 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let userId: string | null = null
   try {
     const auth = await requireApiUser(request)
     if (!auth.ok) return auth.response
+    userId = auth.user.id
 
     const { label, store, photo_id } = await request.json()
     const trimmed = typeof label === 'string' ? label.trim() : ''
@@ -44,6 +48,12 @@ export async function POST(request: NextRequest) {
     )
   } catch (err) {
     console.error('Food photo match error:', err)
+    captureError(err, {
+      feature: 'manual-nutrition',
+      operation: 'match',
+      userId,
+      extra: { failure_type: classifyPipelineFailure(err) },
+    })
     return jsonWithCors(
       { error: err instanceof Error ? err.message : '比對失敗' },
       request,

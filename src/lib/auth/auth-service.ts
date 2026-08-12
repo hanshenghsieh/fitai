@@ -6,6 +6,7 @@ import type { Session, User } from '@supabase/supabase-js'
 import { configureAppleIap } from '@/lib/apple-iap-client'
 import { clearUserLocalState } from '@/lib/clear-user-local-state'
 import { createClient, isCapacitorNative } from '@/lib/supabase/client'
+import { trackClient, detectAnalyticsPlatform } from '@/lib/analytics/track-client'
 
 export const NATIVE_AUTH_CALLBACK_URL = 'betterbit://auth/callback'
 
@@ -163,6 +164,16 @@ export async function ensureUserProfile(
       .select('onboarding_completed')
       .single()
     if (insertError) throw insertError
+    // Only fires for the providers that create their profile row here
+    // (Google/Apple) — email signup pre-creates its profile row in
+    // /api/auth/register, which reports account_created itself.
+    const authMethod = typeof user.app_metadata?.provider === 'string' ? user.app_metadata.provider : 'unknown'
+    if (authMethod !== 'email') {
+      trackClient({
+        name: 'account_created',
+        properties: { auth_method: authMethod, platform: detectAnalyticsPlatform() },
+      })
+    }
     return { onboardingCompleted: Boolean(created.onboarding_completed) }
   }
 

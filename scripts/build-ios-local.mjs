@@ -16,6 +16,21 @@ const stagingRoot = join(root, '.ios-local-staging')
 const IAP_PRODUCT_ID = 'betterbit_pro_monthly'
 const IAP_ENTITLEMENT_ID = 'premium'
 
+// The native app must always authenticate against the same Supabase project
+// as production web (betterbit.tw / betterbit.app), regardless of whatever
+// project a developer's local .env.local happens to point at for `next dev`.
+// A mismatch here doesn't fail loudly — Supabase Auth just returns a normal
+// "invalid_credentials" response for every real account, which looks
+// identical to a wrong password. Force the correct project for every
+// ios-local build instead of trusting the ambient env. The anon key is a
+// public, RLS-scoped credential (meant to ship inside client bundles, same as
+// it already does in the production web JS) — not a secret like the service
+// role key, so hardcoding it here is safe.
+const PRODUCTION_SUPABASE_PROJECT_REF = 'ofbxybkshmbrdffcywyl'
+const PRODUCTION_SUPABASE_URL = `https://${PRODUCTION_SUPABASE_PROJECT_REF}.supabase.co`
+const PRODUCTION_SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mYnh5YmtzaG1icmRmZmN5d3lsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1OTc5MTYsImV4cCI6MjA5NzE3MzkxNn0.JiHna8LEyhtVqS4kMEWGhfEq2T6nLSyXrg04avkAsTE'
+
 const EXCLUDE_DIRS = [
   { src: join(root, 'src/app/api'), bak: join(stagingRoot, 'api') },
   { src: join(root, 'src/app/growth'), bak: join(stagingRoot, 'growth') },
@@ -176,10 +191,21 @@ function failFastEnv() {
     console.log(`[build:ios-local] normalized API base → ${canonical}`)
   }
 
+  const ambientSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
+  if (ambientSupabaseUrl && ambientSupabaseUrl.replace(/\/$/, '') !== PRODUCTION_SUPABASE_URL) {
+    console.warn(
+      `[build:ios-local] NEXT_PUBLIC_SUPABASE_URL (${ambientSupabaseUrl}) does not match the ` +
+        `production project — overriding to ${PRODUCTION_SUPABASE_URL} for this native build.`
+    )
+  }
+  console.log(`[build:ios-local] Supabase project → ${PRODUCTION_SUPABASE_URL}`)
+
   return {
     ...process.env,
     NEXT_PUBLIC_BUILD_TARGET: 'ios-local',
     NEXT_PUBLIC_API_BASE_URL: canonical,
+    NEXT_PUBLIC_SUPABASE_URL: PRODUCTION_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: PRODUCTION_SUPABASE_ANON_KEY,
   }
 }
 

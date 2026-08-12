@@ -17,6 +17,13 @@ import { zhTW } from 'date-fns/locale'
 import type { FoodLogEntry } from '@/lib/banks/types'
 import type { BodyMeasurement } from '@/types'
 import { extractRecentFoodLogsFromCheckins } from '@/lib/food-memory'
+import {
+  isFoodLogCountedTowardTotals,
+  sumCountedCalories,
+  sumCountedProtein,
+  sumCountedCarbs,
+  sumCountedFat,
+} from '@/lib/food-log-totals'
 
 export function isSyntheticWeightMeasurementId(id?: string | null): boolean {
   return (
@@ -457,10 +464,10 @@ export function weightChartYDomain(points: { weight: number }[]): [number, numbe
 function sumLogsDay(logs: FoodLogEntry[], day: string) {
   const dayLogs = logs.filter(l => l.logged_at.slice(0, 10) === day)
   return {
-    calories: dayLogs.reduce((s, l) => s + l.calories, 0),
-    protein_g: dayLogs.reduce((s, l) => s + l.protein_g, 0),
-    carbs_g: dayLogs.reduce((s, l) => s + (l.carbs_g ?? 0), 0),
-    fat_g: dayLogs.reduce((s, l) => s + (l.fat_g ?? 0), 0),
+    calories: sumCountedCalories(dayLogs),
+    protein_g: sumCountedProtein(dayLogs),
+    carbs_g: sumCountedCarbs(dayLogs),
+    fat_g: sumCountedFat(dayLogs),
     count: dayLogs.length,
   }
 }
@@ -584,15 +591,16 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
       ? `${input.periodType === 'week' ? '本週' : input.periodType === 'month' ? '本月' : '今日'} ${deltaKg > 0 ? '+' : ''}${deltaKg} kg`
       : null
 
-  const totalCals = logs.reduce((s, l) => s + l.calories, 0)
-  const totalPro = logs.reduce((s, l) => s + l.protein_g, 0)
-  const totalCarbs = logs.reduce((s, l) => s + (l.carbs_g ?? 0), 0)
-  const totalFat = logs.reduce((s, l) => s + (l.fat_g ?? 0), 0)
+  const totalCals = sumCountedCalories(logs)
+  const totalPro = sumCountedProtein(logs)
+  const totalCarbs = sumCountedCarbs(logs)
+  const totalFat = sumCountedFat(logs)
   const macroDenom = totalPro * 4 + totalCarbs * 4 + totalFat * 9
 
   const bucketCals = { breakfast: 0, lunch: 0, dinner: 0, snack: 0 }
   for (const log of logs) {
-    bucketCals[mealBucket(log)] += log.calories
+    if (!isFoodLogCountedTowardTotals(log)) continue
+    bucketCals[mealBucket(log)] += log.calories ?? 0
   }
   const dinnerRatio = totalCals > 0 ? bucketCals.dinner / totalCals : null
 
@@ -602,7 +610,7 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
       if (v.count === 0) return null
       const calOk = v.calories <= calTarget * 1.05 && v.calories >= calTarget * 0.85
       const proOk = v.protein_g >= proTarget * 0.9
-      const dinnerShare = v.calories > 0 ? (logs.filter(l => l.logged_at.startsWith(day) && mealBucket(l) === 'dinner').reduce((s, l) => s + l.calories, 0) / v.calories) : 0
+      const dinnerShare = v.calories > 0 ? (sumCountedCalories(logs.filter(l => l.logged_at.startsWith(day) && mealBucket(l) === 'dinner')) / v.calories) : 0
       const score =
         (calOk ? 2 : 0) +
         (proOk ? 2 : 0) +
@@ -697,9 +705,9 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
 
   const proteinMetDays = proteinPoints.filter(p => p.metTarget).length
   const dinnerUnder600Days = days.filter(day => {
-    const dinnerKcal = logs
-      .filter(l => l.logged_at.startsWith(day) && mealBucket(l) === 'dinner')
-      .reduce((s, l) => s + l.calories, 0)
+    const dinnerKcal = sumCountedCalories(
+      logs.filter(l => l.logged_at.startsWith(day) && mealBucket(l) === 'dinner')
+    )
     return dinnerKcal > 0 && dinnerKcal <= 600
   }).length
   const workoutSessions = periodCheckins.filter(c => c.workout_items?.some(w => w.completed)).length

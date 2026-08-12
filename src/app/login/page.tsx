@@ -32,6 +32,24 @@ export default function LoginPage() {
   function showAuthError(err: unknown) {
     if (err instanceof AuthCancelledError) return
     const msg = err instanceof Error ? err.message : ''
+
+    // Diagnostic-only, never shown to the user: which Supabase project this
+    // build talks to and the raw Supabase error shape, so a "wrong
+    // project"/network/config failure isn't indistinguishable from a real
+    // wrong-password attempt. Never logs the password, tokens, or anon key.
+    const isDiagnosticBuild =
+      process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_BUILD_TARGET === 'ios-local'
+    if (isDiagnosticBuild) {
+      const authErr = err as { name?: string; status?: number; code?: string }
+      console.log('[login] diagnostic', {
+        name: authErr?.name,
+        status: authErr?.status,
+        code: authErr?.code,
+        message: msg,
+        supabaseHost: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      })
+    }
+
     let friendly: string
     if (/invalid login credentials/i.test(msg)) {
       friendly = '帳號或密碼不對。再試一次。'

@@ -30,13 +30,44 @@ function parseStorePrefix(query: string): { store?: string; foodName: string } {
   return { store, foodName }
 }
 
-function scoreNameMatch(queryNorm: string, itemName: string, store?: string): number {
+/**
+ * Below this coverage ratio (shorter length / longer length of the two
+ * normalized names), a substring-containment match is treated as weak
+ * evidence rather than a confident match. Without this guard, a short name
+ * that merely happens to be a prefix/substring of an unrelated, much larger
+ * dish's name (e.g. "\u96de\u8089\u98ef" inside "\u96de\u8089\u98ef\u5fa1\u98ef\u7cf0" \u2014 a ~180kcal onigiri vs a
+ * ~500kcal breakfast-shop rice plate that share no real relationship) scored
+ * the same flat 80 as two names that are nearly identical.
+ */
+const SUBSTRING_COVERAGE_THRESHOLD = 0.8
+
+/**
+ * Proportional score for a substring-containment match whose coverage ratio
+ * falls below SUBSTRING_COVERAGE_THRESHOLD. Deliberately kept well below the
+ * exact/alias tiers (98-100) and the full substring tier (80), and computed
+ * directly from length ratio rather than the CJK token-overlap fallback
+ * below (which degrades to all-or-nothing for short, single-token queries).
+ */
+export function substringCoverageScore(shorterLen: number, longerLen: number): number {
+  if (longerLen <= 0) return 0
+  const ratio = shorterLen / longerLen
+  return Math.round(30 + ratio * 40)
+}
+
+export function scoreNameMatch(queryNorm: string, itemName: string, store?: string): number {
   const nameNorm = normalizeFoodName(itemName)
   if (!queryNorm || !nameNorm) return 0
   const aliasHit = resolveAliasQuery(queryNorm, { store })
   if (aliasHit && normalizeFoodName(aliasHit.official_name) === nameNorm) return 98
   if (nameNorm === queryNorm) return 100
-  if (nameNorm.includes(queryNorm) || queryNorm.includes(nameNorm)) return 80
+  if (nameNorm.includes(queryNorm) || queryNorm.includes(nameNorm)) {
+    const shorter = Math.min(nameNorm.length, queryNorm.length)
+    const longer = Math.max(nameNorm.length, queryNorm.length)
+    if (shorter / longer >= SUBSTRING_COVERAGE_THRESHOLD) return 80
+    // Short name is only a small fraction of the longer one \u2014 don't grant
+    // full substring-match confidence (see SUBSTRING_COVERAGE_THRESHOLD).
+    return substringCoverageScore(shorter, longer)
+  }
   const qTokens = [...new Set(queryNorm.match(/[\u4e00-\u9fff]{2,}|[a-z0-9]{2,}/gi) ?? [])]
   if (!qTokens.length) return 0
   const hits = qTokens.filter(t => nameNorm.includes(t)).length

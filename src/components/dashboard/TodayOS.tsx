@@ -19,6 +19,10 @@ import {
   resolveOrEstimateFreeTextMeal,
 } from '@/lib/food-estimate'
 import { enrichFoodLog, sumItemMacros } from '@/lib/food-log-macros'
+import { sumCountedCalories } from '@/lib/food-log-totals'
+import { trackClient } from '@/lib/analytics/track-client'
+import type { ConfidenceBucket, MealLogSource } from '@/lib/analytics/events'
+import { classifyPipelineFailure } from '@/lib/observability/photo-outcome'
 import {
   fileToDataUrl,
   FoodPhotoError,
@@ -159,6 +163,37 @@ interface GoalSnapshot {
   weeks_remaining?: number
 }
 
+
+/**
+ * Appends a new entry onto the *current* logs array. Callers must pass the
+ * live source of truth (foodLogsRef.current), never a value captured in a
+ * useCallback closure — a stale closure snapshot silently drops any entry
+ * committed between when that closure was created and when it's called
+ * (see the P0-2 commitLog race-condition fix).
+ */
+export function nextFoodLogsAfterCommit(
+  currentLogs: FoodLogEntry[],
+  entry: FoodLogEntry
+): FoodLogEntry[] {
+  return [...currentLogs, entry]
+}
+
+/** Maps a FoodLogEntry's raw source into the canonical analytics meal_log_started/succeeded source bucket. */
+export function mealLogSourceForAnalytics(source: FoodLogEntry['source']): MealLogSource {
+  if (source === 'photo') return 'photo'
+  if (source === 'search' || source === 'free_text') return 'manual'
+  return 'other'
+}
+
+/** Maps a FoodLogEntry's nutrition_confidence into the canonical analytics confidence_bucket. */
+export function confidenceBucketForAnalytics(
+  confidence: FoodLogEntry['nutrition_confidence']
+): ConfidenceBucket {
+  if (confidence === 'A' || confidence === 'user_confirmed') return 'high'
+  if (confidence === 'B') return 'medium'
+  if (confidence === 'C') return 'low'
+  return 'unknown'
+}
 
 function namesFromFoodLog(log: FoodLogEntry): string[] {
   if (!log.name) return []
@@ -421,7 +456,7 @@ function buildAdherenceContext(
     goalSnapshot?.daily_deficit ??
     Math.max(200, Math.round((goalSnapshot?.total_deficit_kcal ?? 0) / Math.max(1, (goalSnapshot?.weeks_remaining ?? 12) * 7)))
   const todayTarget = todayPlan.daily_targets.calories
-  const todayLogged = logs.reduce((s, f) => s + f.calories, 0)
+  const todayLogged = sumCountedCalories(logs)
 
   const adherence = mergeBankIntoAdherence(
     buildAdherenceState(
@@ -473,6 +508,17 @@ export default function TodayOS({
 }: Props) {
   const pathname = usePathname()
   const onDashboard = pathname === '/dashboard'
+
+  useEffect(() => {
+    if (!onDashboard) return
+    trackClient({ name: 'today_viewed', properties: {} })
+    const APP_OPENED_SESSION_KEY = 'betterbit:analytics:app-opened-this-session'
+    if (typeof window !== 'undefined' && !window.sessionStorage.getItem(APP_OPENED_SESSION_KEY)) {
+      window.sessionStorage.setItem(APP_OPENED_SESSION_KEY, '1')
+      trackClient({ name: 'app_opened', properties: {} })
+    }
+  }, [onDashboard])
+
   const coords = useGeolocation(userMemory.eat_out_prefs?.work_location)
   const memory = memoryFromCheckinMeta({ user_memory: userMemory })
   const [dietaryContextRevision, setDietaryContextRevision] = useState(0)
@@ -673,6 +719,8 @@ export default function TodayOS({
   const foodLogsRef = useRef(foodLogs)
   const activeSlotRef = useRef(activeSlot)
   const dayStateRef = useRef(dayState)
+  /** Set when a photo capture begins, read (and cleared) by commitLog to report meal_log_succeeded's duration_ms. */
+  const mealLogStartRef = useRef<number | null>(null)
 
   useEffect(() => {
     foodLogsRef.current = foodLogs
@@ -840,7 +888,7 @@ export default function TodayOS({
         ),
         user_declared: true,
       })
-      const nextLogs = [...foodLogs, full]
+      const nextLogs = nextFoodLogsAfterCommit(foodLogsRef.current, full)
       const nextDna = full.learning
         ? (userMemory.food_dna ?? foodDna)
         : learnFromLog(userMemory.food_dna ?? foodDna, full)
@@ -863,12 +911,25 @@ export default function TodayOS({
       })
       clearCaptureContext()
       schedulePostureLine(nextLogs, nextMemory, (full.calories ?? 0) - mealTargets.calories)
+      const startedAt = mealLogStartRef.current
+      mealLogStartRef.current = null
+      trackClient({
+        name: 'meal_log_succeeded',
+        properties: {
+          source: mealLogSourceForAnalytics(full.source),
+          meal_type: full.slot ?? 'other',
+          nutrition_status: full.nutrition_status ?? 'unknown',
+          match_type: full.match_type ?? 'unknown',
+          confidence_bucket: confidenceBucketForAnalytics(full.nutrition_confidence),
+          duration_ms: startedAt != null ? Date.now() - startedAt : 0,
+        },
+      })
+      trackClient({ name: 'first_meal_logged', properties: {} })
       queueMicrotask(() => {
         loggingRef.current = false
       })
     },
     [
-      foodLogs,
       userMemory,
       foodDna,
       activeSlot,
@@ -883,10 +944,11 @@ export default function TodayOS({
 
   const removeLogById = useCallback(
     (logId: string) => {
-      const removed = foodLogs.find(l => l.id === logId)
-      const prevLogs = foodLogs
+      const currentLogs = foodLogsRef.current
+      const removed = currentLogs.find(l => l.id === logId)
+      const prevLogs = currentLogs
       const prevMemory = userMemory
-      const nextLogs = foodLogs.filter(l => l.id !== logId)
+      const nextLogs = currentLogs.filter(l => l.id !== logId)
       const nextMemory = { ...userMemory, food_logs_today: nextLogs }
       onLogFood(nextLogs, nextMemory, { targetDate: getNutritionDayKey() })
       if (removed) {
@@ -918,7 +980,7 @@ export default function TodayOS({
         },
       })
     },
-    [foodLogs, userMemory, schedulePostureLine, onLogFood, onClearMealSelection]
+    [userMemory, schedulePostureLine, onLogFood, onClearMealSelection]
   )
 
   useLayoutEffect(() => {
@@ -1015,6 +1077,10 @@ export default function TodayOS({
             )
       if (photoError.code !== 'PHOTO_CANCELLED') {
         toast.error(photoError.message)
+        trackClient({
+          name: 'meal_log_failed',
+          properties: { source: 'photo', failure_type: classifyPipelineFailure(err), stage: 'recognition' },
+        })
       }
       setPhotoDraft(prev =>
         prev
@@ -1041,6 +1107,8 @@ export default function TodayOS({
       setPhotoOpen(true)
       setPhotoDraft(null)
       setPhotoProcessing(true)
+      mealLogStartRef.current = Date.now()
+      trackClient({ name: 'meal_log_started', properties: { source: 'photo' } })
 
       void (async () => {
         try {
@@ -1065,6 +1133,10 @@ export default function TodayOS({
           const message = err instanceof Error ? err.message : '無法處理照片'
           toast.error('照片無法使用', { description: message })
           setPhotoDraft(null)
+          trackClient({
+            name: 'meal_log_failed',
+            properties: { source: 'photo', failure_type: classifyPipelineFailure(err), stage: 'prepare' },
+          })
         }
       })()
     },
@@ -1205,6 +1277,10 @@ export default function TodayOS({
       if (!payload) {
         setPhotoSaving(false)
         toast.error('這張照片辨識結果不完整，請重新嘗試辨識或改用手動輸入')
+        trackClient({
+          name: 'meal_log_failed',
+          properties: { source: 'photo', failure_type: 'schema_error', stage: 'save' },
+        })
         return
       }
       commitLog({
@@ -1270,6 +1346,10 @@ export default function TodayOS({
       .catch(err => {
         setPhotoSaving(false)
         toast.error(err instanceof Error ? err.message : '照片處理失敗，請重試')
+        trackClient({
+          name: 'meal_log_failed',
+          properties: { source: 'photo', failure_type: classifyPipelineFailure(err), stage: 'save' },
+        })
       })
   }, [photoDraft, photoSaving, commitLog, closePhotoSheet, activeSlot, captureTargetDate, photoSettings, onOpenNutritionConfirmation])
 

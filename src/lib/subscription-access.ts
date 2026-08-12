@@ -45,15 +45,33 @@ export function isAppleReviewDemoEmail(email?: string | null): boolean {
   return email?.toLowerCase() === APPLE_REVIEW_DEMO_EMAIL
 }
 
+/**
+ * Stripe sets current_period_end to the trial end while status is
+ * 'trialing', so this single check also correctly expires a stale trial
+ * record — no separate trial-end field exists in this schema. A record with
+ * no current_period_end (e.g. a manual grant never given one) is treated as
+ * non-expiring, since there's nothing to compare against. An unparseable
+ * value fails open (not expired) rather than silently locking out a
+ * genuinely valid subscriber over a data glitch.
+ */
+function isSubscriptionPeriodExpired(subscription: SubscriptionRecord): boolean {
+  if (!subscription.current_period_end) return false
+  const periodEndMs = new Date(subscription.current_period_end).getTime()
+  if (Number.isNaN(periodEndMs)) return false
+  return periodEndMs < Date.now()
+}
+
 export function isPremiumSubscription(subscription: SubscriptionRecord | null | undefined): boolean {
   if (!subscription) return false
 
   const status = subscription.subscription_status ?? subscription.status
   const source = inferSubscriptionSource(subscription)
 
+  // Manual/lifetime grant — no recurring period to expire against.
   if (subscription.is_premium === true) return true
   if (!isGrantedPremiumSource(source)) return false
   if (!ACTIVE_STATUSES.has(status)) return false
+  if (isSubscriptionPeriodExpired(subscription)) return false
 
   return true
 }

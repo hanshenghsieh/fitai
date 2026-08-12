@@ -1,4 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import {
+  billingPeriodFromAppleIapProductId,
+  environmentFromAppleIapSandboxFlag,
+} from '@/lib/subscription-product'
 
 export interface AppleIapSyncInput {
   userId: string
@@ -7,6 +11,7 @@ export interface AppleIapSyncInput {
   purchasedAt: string
   expiresAt: string
   willRenew: boolean
+  isSandbox?: boolean | null
 }
 
 export interface AppleIapSubscriptionRow {
@@ -16,6 +21,9 @@ export interface AppleIapSubscriptionRow {
   status: string
   subscription_source: 'apple_iap'
   plan: 'premium'
+  product_id: string
+  billing_period: string
+  environment: string
   current_period_start: string
   current_period_end: string | null
   cancel_at_period_end: boolean
@@ -46,6 +54,9 @@ export function buildAppleIapSubscriptionRow(input: AppleIapSyncInput): AppleIap
     status: input.active ? 'active' : 'canceled',
     subscription_source: 'apple_iap',
     plan: 'premium',
+    product_id: input.productId,
+    billing_period: billingPeriodFromAppleIapProductId(input.productId),
+    environment: environmentFromAppleIapSandboxFlag(input.isSandbox),
     current_period_start: new Date(input.purchasedAt).toISOString(),
     current_period_end: new Date(input.expiresAt).toISOString(),
     cancel_at_period_end: input.active && !input.willRenew,
@@ -63,7 +74,26 @@ export async function upsertAppleIapSubscription(
   })
   if (!error) return row
 
-  // Production may not have subscription_source / plan columns yet.
+  // Production may not have product_id / billing_period / environment yet
+  // (20260812010000_subscriptions_product_identity.sql not applied).
+  const withoutProductColumns = {
+    user_id: row.user_id,
+    stripe_subscription_id: row.stripe_subscription_id,
+    stripe_customer_id: row.stripe_customer_id,
+    status: row.status,
+    subscription_source: row.subscription_source,
+    plan: row.plan,
+    current_period_start: row.current_period_start,
+    current_period_end: row.current_period_end,
+    cancel_at_period_end: row.cancel_at_period_end,
+    updated_at: row.updated_at,
+  }
+  const { error: midError } = await supabase.from('subscriptions').upsert(withoutProductColumns, {
+    onConflict: 'stripe_subscription_id',
+  })
+  if (!midError) return row
+
+  // Production may not have subscription_source / plan columns yet either.
   const legacyRow = {
     user_id: row.user_id,
     stripe_subscription_id: row.stripe_subscription_id,

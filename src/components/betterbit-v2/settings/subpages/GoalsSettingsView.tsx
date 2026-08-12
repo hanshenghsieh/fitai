@@ -18,6 +18,7 @@ import {
   RefreshCw,
   Snail,
   Rocket,
+  Info,
 } from 'lucide-react'
 import { calculateGoalPlan, calculateBMR } from '@/lib/goal-calculator'
 import { calorieFloorFromGender } from '@/lib/engines/calorie-bank-engine'
@@ -412,6 +413,12 @@ export default function GoalsSettingsView({ initial }: { initial: SettingsBundle
               readOnly={isAuto}
             />
           </div>
+          <V2VisualChevronRow
+            icon={<Info className="h-4 w-4" />}
+            label="資料來源"
+            subtitle="BMR、熱量與蛋白質計算方式的參考來源"
+            onClick={() => router.push('/health-sources')}
+          />
         </V2SettingsVisualCard>
 
         <V2SettingsVisualCard icon={<RefreshCw className="h-4 w-4" />} title="回補策略" staggerIndex={3}>

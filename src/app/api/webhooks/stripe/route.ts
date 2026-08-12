@@ -2,8 +2,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/server'
 import Stripe from 'stripe'
+import { captureError } from '@/lib/observability/capture-error'
+import { trackServer } from '@/lib/analytics/track-server'
+import {
+  billingPeriodFromStripeInterval,
+  environmentFromStripeLivemode,
+} from '@/lib/subscription-product'
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+
+function stripeProductIdentity(subscription: Stripe.Subscription) {
+  const price = subscription.items.data[0]?.price
+  return {
+    productId: price?.id ?? null,
+    billingPeriod: billingPeriodFromStripeInterval(price?.recurring?.interval),
+  }
+}
 
 async function resolveUserId(subscription: Stripe.Subscription): Promise<string | null> {
   if (subscription.metadata?.user_id) return subscription.metadata.user_id
@@ -26,28 +40,54 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
 
   if (!userId) return
 
+  const { productId, billingPeriod } = stripeProductIdentity(subscription)
+  const environment = environmentFromStripeLivemode(subscription.livemode)
+
   const { error } = await supabase.from('subscriptions').upsert({
     user_id: userId,
     stripe_subscription_id: subscription.id,
     stripe_customer_id: subscription.customer as string,
     status: subscription.status,
+    product_id: productId,
+    billing_period: billingPeriod,
+    environment,
     current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
     current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
     cancel_at_period_end: subscription.cancel_at_period_end,
     updated_at: new Date().toISOString(),
   }, { onConflict: 'stripe_subscription_id' })
 
-  if (error) console.error('Error creating subscription record:', error)
-  else console.log(`✅ Subscription created for user ${userId}`)
+  if (error) {
+    console.error('Error creating subscription record:', error)
+    return
+  }
+  console.log(`✅ Subscription created for user ${userId}`)
+  await trackServer(
+    {
+      name: 'subscription_started',
+      properties: {
+        product_id: productId ?? 'unknown',
+        billing_period: billingPeriod,
+        platform: 'web',
+        provider: 'stripe',
+      },
+    },
+    { supabase, userId }
+  )
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const supabase = createAdminClient()
+  const { productId, billingPeriod } = stripeProductIdentity(subscription)
+  const environment = environmentFromStripeLivemode(subscription.livemode)
 
   const { error } = await supabase
     .from('subscriptions')
     .update({
       status: subscription.status,
+      product_id: productId,
+      billing_period: billingPeriod,
+      environment,
       current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
       current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
       cancel_at_period_end: subscription.cancel_at_period_end,
@@ -62,7 +102,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   const supabase = createAdminClient()
 
-  const { error } = await supabase
+  const { data: existing, error } = await supabase
     .from('subscriptions')
     .update({
       status: 'canceled',
@@ -70,9 +110,20 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       updated_at: new Date().toISOString(),
     })
     .eq('stripe_subscription_id', subscription.id)
+    .select('user_id')
+    .maybeSingle()
 
-  if (error) console.error('Error canceling subscription:', error)
-  else console.log(`✅ Subscription canceled: ${subscription.id}`)
+  if (error) {
+    console.error('Error canceling subscription:', error)
+    return
+  }
+  console.log(`✅ Subscription canceled: ${subscription.id}`)
+  if (existing?.user_id) {
+    await trackServer(
+      { name: 'subscription_cancelled', properties: {} },
+      { supabase, userId: existing.user_id }
+    )
+  }
 }
 
 async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
@@ -170,6 +221,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true })
   } catch (err) {
     console.error('Error handling webhook:', err)
+    captureError(err, {
+      feature: 'stripe-webhook',
+      operation: 'handle-event',
+      extra: { event_type: event.type },
+    })
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Webhook processing failed' },
       { status: 500 }

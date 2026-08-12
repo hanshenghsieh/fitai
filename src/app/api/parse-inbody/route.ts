@@ -2,16 +2,19 @@ import { NextRequest } from 'next/server'
 import { requireApiUser } from '@/lib/api/auth'
 import { handleCorsOptions, jsonWithCors } from '@/lib/api/cors'
 import { parseInBodyImage } from '@/lib/claude/client'
+import { captureError } from '@/lib/observability/capture-error'
 
 export async function OPTIONS(request: NextRequest) {
   return handleCorsOptions(request)
 }
 
 export async function POST(request: NextRequest) {
+  let userId: string | null = null
   try {
     const auth = await requireApiUser(request)
     if (!auth.ok) return auth.response
     const { user, supabase } = auth
+    userId = user.id
 
     const { storagePath } = await request.json()
     if (!storagePath) return jsonWithCors({ error: 'Missing storagePath' }, request, { status: 400 })
@@ -56,6 +59,9 @@ export async function POST(request: NextRequest) {
     return jsonWithCors({ success: true, data: parsed }, request)
   } catch (err) {
     console.error('InBody parse error:', err)
+    // storagePath/parsed InBody data may include user-identifying scan
+    // contents — never attach the raw error payload beyond the message.
+    captureError(err, { feature: 'inbody-parse', operation: 'parse', userId })
     return jsonWithCors({ error: err instanceof Error ? err.message : 'Parse failed' }, request, { status: 500 })
   }
 }

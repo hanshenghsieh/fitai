@@ -1,13 +1,20 @@
 import type { FoodLogEntry } from '@/lib/banks/types'
+import { isFoodLogCountedTowardTotals } from '@/lib/food-log-totals'
 
-/** Sum carbs from logs, inferring when legacy entries omit macros. */
+/** Sum carbs from logs counted toward totals, inferring when legacy entries omit macros. */
 export function sumLoggedCarbs(logs: FoodLogEntry[]): number {
-  return logs.reduce((acc, log) => acc + resolveLogMacros(log).carbs_g, 0)
+  return logs.reduce(
+    (acc, log) => acc + (isFoodLogCountedTowardTotals(log) ? resolveLogMacros(log).carbs_g : 0),
+    0
+  )
 }
 
-/** Sum fat from logs, inferring when legacy entries omit macros. */
+/** Sum fat from logs counted toward totals, inferring when legacy entries omit macros. */
 export function sumLoggedFat(logs: FoodLogEntry[]): number {
-  return logs.reduce((acc, log) => acc + resolveLogMacros(log).fat_g, 0)
+  return logs.reduce(
+    (acc, log) => acc + (isFoodLogCountedTowardTotals(log) ? resolveLogMacros(log).fat_g : 0),
+    0
+  )
 }
 
 export function resolveLogMacros(log: FoodLogEntry): { carbs_g: number; fat_g: number } {

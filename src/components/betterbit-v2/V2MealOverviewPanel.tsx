@@ -7,6 +7,7 @@ import type { FoodLogEntry } from '@/lib/banks/types'
 import { normalizeFoodLogSlot, type FoodSlot } from '@/lib/food-slots'
 import { groupTodayMealOverviewLogs } from '@/lib/today-meal-overview'
 import { setAppScrollLocked } from '@/lib/today-actions'
+import { sumCountedCalories } from '@/lib/food-log-totals'
 import V2Card from './V2Card'
 
 const LONG_PRESS_MS = 800
@@ -268,7 +269,7 @@ export default function V2MealOverviewPanel({
         <V2Card padding="4px 16px 8px">
         {SLOT_ROWS.map(({ slot, icon: Icon }, rowIndex) => {
           const logs = grouped[slot]
-          const kcal = logs.reduce((s, l) => s + (l.calories ?? 0), 0)
+          const kcal = sumCountedCalories(logs)
           const isDropTarget = editMode && hoverSlot === slot
           const isLast = rowIndex === SLOT_ROWS.length - 1
 

@@ -51,6 +51,7 @@ import {
   targetMealSlotForCaptureLabel,
 } from '@/lib/today-actions'
 import { traceRecordDate } from '@/lib/record-date-trace'
+import { trackClient } from '@/lib/analytics/track-client'
 
 interface Props {
   todayStr: string
@@ -129,6 +130,9 @@ export default function RecordV2Screen({
 }: Props) {
   const router = useRouter()
   const dateInputRef = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    trackClient({ name: 'record_viewed', properties: {} })
+  }, [])
   const [internalDate, setInternalDate] = useState(todayStr)
   const selectedDate = selectedDateProp ?? internalDate
   const [foodLogs, setFoodLogs] = useState<FoodLogEntry[]>(() =>

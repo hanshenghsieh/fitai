@@ -10,6 +10,7 @@ import {
   type DailyScoreStatus,
   type DailyScoreTone,
 } from '@/lib/record/daily-food-score'
+import { sumCountedCalories, sumCountedProtein } from '@/lib/food-log-totals'
 
 const WEEKDAY_ZH = ['日', '一', '二', '三', '四', '五', '六'] as const
 
@@ -142,7 +143,7 @@ export function buildMealGroups(dayLogs: FoodLogEntry[]): RecordMealGroup[] {
       bucket,
       label: MEAL_LABELS[bucket],
       logs,
-      totalKcal: logs.reduce((s, l) => s + (l.calories ?? 0), 0),
+      totalKcal: sumCountedCalories(logs),
       timeLabel: formatRecordMealTime(logs),
       photoUrl: pickMealPhoto(logs),
     }
@@ -211,11 +212,11 @@ export function buildRecordDayView(
     isFuture,
     isEmpty: !isFuture && dayLogs.length === 0,
     summary: {
-      totalKcal: dayLogs.reduce((s, l) => s + (l.calories ?? 0), 0),
+      totalKcal: sumCountedCalories(dayLogs),
       targetKcal: targets.calories,
       mealCount,
       mealTarget,
-      proteinG: Math.round(dayLogs.reduce((s, l) => s + (l.protein_g ?? 0), 0)),
+      proteinG: Math.round(sumCountedProtein(dayLogs)),
       proteinTarget: targets.protein_g,
       score: scored.score,
       status: scored.status,
