@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * iOS local hybrid build — static export to out/
- * Temporarily excludes src/app/api and src/app/growth (restored in finally).
+ * Temporarily excludes src/app/api, src/app/growth, and
+ * src/app/founder-dashboard (restored in finally).
  * Does NOT affect npm run build (Vercel / API routes preserved).
  *
  * Windows: if EPERM persists, run on Mac (recommended for TestFlight Build 16).
@@ -34,6 +35,7 @@ const PRODUCTION_SUPABASE_ANON_KEY =
 const EXCLUDE_DIRS = [
   { src: join(root, 'src/app/api'), bak: join(stagingRoot, 'api') },
   { src: join(root, 'src/app/growth'), bak: join(stagingRoot, 'growth') },
+  { src: join(root, 'src/app/founder-dashboard'), bak: join(stagingRoot, 'founder-dashboard') },
 ]
 
 const moved = []
