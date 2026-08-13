@@ -235,7 +235,7 @@ function lookupMenuItemForLog(name: string, store?: string) {
   return byName[0]
 }
 
-function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
+export function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
   const names = log.name.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean)
   if (!names.length) return []
   const store = log.store ?? '已記錄'
@@ -316,8 +316,20 @@ function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
     return resolved as MealPreviewItem[]
   }
 
-  const perCal = Math.round(log.calories / names.length)
-  const perPro = Math.round(log.protein_g / names.length)
+  // Conservation fix: menu lookup couldn't resolve every "+"-separated
+  // segment individually, but the saved log already has a trusted aggregate
+  // (calories/protein_g non-null here, checked above). Splitting that
+  // aggregate evenly across segments via Math.round(x / names.length) and
+  // then re-summing in DiceMealPreview's totals reducer silently drifted
+  // the displayed total away from what was actually saved (e.g. protein
+  // 5.4g -> two segments of Math.round(2.7)=3 -> displayed total 6g), and
+  // carbs_g/fat_g were hardcoded to 0 on every segment regardless of the
+  // log's real values, discarding them entirely from the displayed total.
+  // Putting the full trusted aggregate on exactly one segment (and 0 on the
+  // rest) is the only allocation where the segments' individual macros are
+  // never separately displayed anywhere in DiceMealPreview (only totals are
+  // shown), so this is safe: sum(segments) === log's own saved macros
+  // exactly, no rounding, no drift.
   return names.map((segment, i) => {
     const parsed = parseDiceLogSegment(segment)
     return {
@@ -329,10 +341,10 @@ function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
       role: 'main' as const,
       portionable: false,
       tags: [],
-      calories: perCal,
-      protein_g: perPro,
-      carbs_g: 0,
-      fat_g: 0,
+      calories: i === 0 ? log.calories : 0,
+      protein_g: i === 0 ? log.protein_g : 0,
+      carbs_g: i === 0 ? (log.carbs_g ?? 0) : 0,
+      fat_g: i === 0 ? (log.fat_g ?? 0) : 0,
       price: 0,
       photo_url: '',
       description: '',
@@ -879,12 +891,6 @@ export default function TodayOS({
     (entry: Omit<FoodLogEntry, 'logged_at' | 'user_declared'>) => {
       if (loggingRef.current) return
       loggingRef.current = true
-      console.log('[PHOTO_MACRO_TRACE:4_BEFORE_ENRICH]', {
-        calories: entry.calories,
-        protein_g: entry.protein_g,
-        fat_g: entry.fat_g,
-        carbs_g: entry.carbs_g,
-      })
       const full: FoodLogEntry = enrichFoodLog({
         ...entry,
         slot: entry.slot ?? activeSlot,
@@ -893,12 +899,6 @@ export default function TodayOS({
           entry.slot ?? activeSlot
         ),
         user_declared: true,
-      })
-      console.log('[PHOTO_MACRO_TRACE:5_AFTER_ENRICH]', {
-        calories: full.calories,
-        protein_g: full.protein_g,
-        fat_g: full.fat_g,
-        carbs_g: full.carbs_g,
       })
       const nextLogs = nextFoodLogsAfterCommit(foodLogsRef.current, full)
       const nextDna = full.learning
@@ -1351,14 +1351,6 @@ export default function TodayOS({
   const handleManualPhotoCorrection = useCallback(
     (result: ManualPhotoCorrectionResult) => {
       if (!photoDraft) return
-      if (result.mode === 'user_entered') {
-        console.log('[PHOTO_MACRO_TRACE:3_CONFIRM_PAYLOAD]', {
-          calories: result.nutrition.calories,
-          protein_g: result.nutrition.protein_g,
-          fat_g: result.nutrition.fat_g,
-          carbs_g: result.nutrition.carbs_g,
-        })
-      }
       setPhotoSaving(true)
       const logId = `photo-${Date.now()}`
       const finish = (url: string) => {
