@@ -44,6 +44,19 @@ export const NULL_MACROS: NutritionMacros = {
   sodium: null,
 }
 
+/**
+ * Build 38 BUG 4 — for a `nutrition_status: 'estimated'` candidate, which
+ * concrete mechanism produced it. `nutrition_source` is a free-text display
+ * string and isn't safe for the UI to branch on; this is the machine-checked
+ * discriminator so "🟡 AI 營養估算" is only ever shown for a real network
+ * call to the AI (aiEstimateToCandidate in ai-nutrition-fallback.ts), never
+ * for the compound ingredient-DB sum (compoundMealCandidateFromLabel in
+ * compound-meal-candidate.ts) — the two have very different reliability and
+ * must not share a label implying the same thing. Omitted for every
+ * non-estimated (official/onr/food_dna/...) candidate.
+ */
+export type EstimateProvenance = 'ai_estimate' | 'compound_db_estimate'
+
 export interface SearchV2Candidate {
   id: string
   name: string
@@ -55,6 +68,7 @@ export interface SearchV2Candidate {
   source_tier: SearchSourceTier
   match_score: number
   explanation: string
+  estimate_provenance?: EstimateProvenance
 }
 
 export interface ClarificationOption {

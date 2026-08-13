@@ -4,6 +4,10 @@ import {
   confidenceToPct,
   isLowConfidence,
   lookupVerifiedFood,
+  parsePhotoApiResponse,
+  scaledDimensions,
+  NATIVE_PHOTO_MAX_EDGE,
+  NATIVE_PHOTO_JPEG_QUALITY,
   type PhotoParseResult,
 } from '@/lib/food-capture'
 import type { FoodDna } from '@/lib/food-memory'
@@ -67,5 +71,74 @@ describe('Photo capture — label only, no AI nutrition', () => {
   it('FC4: low confidence threshold blocks fake precision', () => {
     assert.equal(isLowConfidence(confidenceToPct('low')), true)
     assert.equal(isLowConfidence(confidenceToPct('high')), false)
+  })
+})
+
+describe('Build 38 BUG 4 — dish-first client-side naming rule', () => {
+  it('FC5: composite dish uses dish_name, ignores the per-item breakdown for naming', () => {
+    const result = parsePhotoApiResponse({
+      data: {
+        is_composite_dish: true,
+        dish_name: '任意整道料理',
+        items: [
+          { name: '視覺誤判食材甲', confidence: 'medium' },
+          { name: '視覺誤判食材乙', confidence: 'low' },
+        ],
+      },
+    })
+    assert.equal(result.name, '任意整道料理')
+  })
+
+  it('FC6: genuinely independent multi-item photo still joins with " + "', () => {
+    const result = parsePhotoApiResponse({
+      data: {
+        is_composite_dish: false,
+        items: [
+          { name: '獨立食物甲', confidence: 'high' },
+          { name: '獨立食物乙', confidence: 'high' },
+        ],
+      },
+    })
+    assert.equal(result.name, '獨立食物甲 + 獨立食物乙')
+  })
+
+  it('FC7: is_composite_dish true but dish_name missing falls back to the join rule (never silently empty)', () => {
+    const result = parsePhotoApiResponse({
+      data: {
+        is_composite_dish: true,
+        items: [
+          { name: '食物甲', confidence: 'high' },
+          { name: '食物乙', confidence: 'high' },
+        ],
+      },
+    })
+    assert.equal(result.name, '食物甲 + 食物乙')
+  })
+
+  it('FC8: old-shape response (no is_composite_dish/dish_name fields at all) behaves exactly as before', () => {
+    const result = parsePhotoApiResponse({
+      data: { items: [{ name: '單一食物', confidence: 'high' }] },
+    })
+    assert.equal(result.name, '單一食物')
+  })
+})
+
+describe('Build 38 BUG 4 — first-pass photo quality', () => {
+  it('IMG1: first-pass max edge raised from the old 512px default, still well inside existing payload caps', () => {
+    assert.equal(NATIVE_PHOTO_MAX_EDGE, 1024)
+    assert.ok(NATIVE_PHOTO_JPEG_QUALITY >= 0.75)
+  })
+
+  it('IMG2: a normal phone photo resolution is not crushed to 512px on the first pass', () => {
+    // Typical iPhone photo — long edge far bigger than either candidate max edge.
+    const dims = scaledDimensions(3024, 4032, NATIVE_PHOTO_MAX_EDGE)
+    assert.equal(Math.max(dims.width, dims.height), 1024)
+    assert.notEqual(Math.max(dims.width, dims.height), 512)
+  })
+
+  it('IMG3: a photo already smaller than the max edge is never upscaled', () => {
+    const dims = scaledDimensions(600, 800, NATIVE_PHOTO_MAX_EDGE)
+    assert.equal(dims.width, 600)
+    assert.equal(dims.height, 800)
   })
 })

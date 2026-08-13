@@ -1,4 +1,4 @@
-import type { ClarificationSession, SearchV2Candidate } from '@/lib/nutrition/search-v2/types'
+import type { ClarificationSession, EstimateProvenance, SearchV2Candidate } from '@/lib/nutrition/search-v2/types'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
 import type { PhotoVisualParse } from '@/lib/nutrition/photo-visual-parse'
 import { buildPhotoVisualParse } from '@/lib/nutrition/photo-visual-parse'
@@ -44,6 +44,8 @@ export interface PhotoAccuracyState {
    */
   show_candidate_picker: boolean
   is_ai_estimate: boolean
+  /** Build 38 BUG 4 — only set when is_ai_estimate is true; see EstimateProvenance. */
+  estimate_provenance?: EstimateProvenance
   nutrition_status: 'official' | 'estimated' | 'unknown'
 }
 
@@ -111,6 +113,7 @@ function buildPhotoAccuracyStateFromV2(v2: PhotoV2State): PhotoAccuracyState {
     show_macros: !unknown && (levelA || levelC || finalized),
     show_candidate_picker: showCandidatePicker,
     is_ai_estimate: levelC,
+    estimate_provenance: levelC ? picked?.estimate_provenance : undefined,
     nutrition_status: unknown ? 'unknown' : levelC ? 'estimated' : 'official',
   }
 }

@@ -180,6 +180,7 @@ export function aiEstimateToCandidate(estimate: AiNutritionEstimate, demoted: bo
     source_tier: 'official',
     match_score: demoted ? 55 : Math.round(60 + estimate.confidence * 30),
     explanation: `🟡 AI 營養估算 — ${estimate.reason}`,
+    estimate_provenance: 'ai_estimate',
   }
 }
 

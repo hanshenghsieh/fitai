@@ -393,7 +393,7 @@ function IosLiteConfirmSection({
   )
 }
 
-function AccuracyConfirmSection({
+export function AccuracyConfirmSection({
   accuracy,
   onAccuracyChange,
 }: {
@@ -421,20 +421,47 @@ function AccuracyConfirmSection({
     )
   }
 
-  // CASE 1 (trusted Level A) / CASE 3 (AI estimate): a confirmed answer
-  // already exists — never show the "pick one of these" picker alongside
-  // it. Only CASE 2 (ambiguous Level B, not yet picked) renders a picker.
+  // CASE 1 (trusted Level A) / CASE 3 (AI or compound-DB estimate): a
+  // confirmed answer already exists — never show the "pick one of these"
+  // picker alongside it. Only CASE 2 (ambiguous Level B, not yet picked)
+  // renders a picker.
   if (!accuracy.show_candidate_picker) {
+    // Build 38 BUG 4 — is_ai_estimate (Level C) previously rendered ONLY
+    // this informational text, with no control anywhere that could set
+    // user_confirmed=true. photoV2ReadyForLog requires user_confirmed for
+    // Level C, so the estimate could be *shown* but never *saved* — a
+    // dead-end (the only way forward was the unrelated "手動修正" flow).
+    // Reuses the exact same confirm button/action as the picker branch
+    // below, just gated on is_ai_estimate instead of a selected candidate.
+    const isAiEstimate = accuracy.estimate_provenance === 'ai_estimate'
     return (
-      <div className="space-y-1 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
+      <div className="space-y-3 p-4" style={{ backgroundColor: TODAY.surface, borderRadius: 24 }}>
         <p className="text-[14px]" style={{ color: TODAY.text, fontWeight: 600 }}>
-          {accuracy.is_ai_estimate ? '🟡 AI 營養估算' : '這餐看起來像這樣'}
+          {accuracy.is_ai_estimate ? (isAiEstimate ? '🟡 AI 營養估算' : '🟡 營養估算') : '這餐看起來像這樣'}
         </p>
         <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
           {accuracy.is_ai_estimate
-            ? '資料庫查無資料，以下為 AI 估算僅供參考，請確認或手動修正。'
+            ? isAiEstimate
+              ? '資料庫查無資料，以下為 AI 估算僅供參考，請確認或手動修正。'
+              : '部分食材比對資料庫估算，僅供參考，請確認或手動修正。'
             : '營養資料來自官方資料庫，確認後點下方「加入今日紀錄」。'}
         </p>
+        {accuracy.is_ai_estimate && !confirmed && (
+          <button
+            type="button"
+            onClick={() => onAccuracyChange({ user_confirmed: true })}
+            className="w-full h-11 text-[14px] active:opacity-90"
+            style={{
+              borderRadius: 20,
+              backgroundColor: TODAY.card,
+              color: TODAY.mocha,
+              fontWeight: 600,
+              border: `1px solid ${BB_V2.divider}`,
+            }}
+          >
+            這樣記錄可以
+          </button>
+        )}
       </div>
     )
   }

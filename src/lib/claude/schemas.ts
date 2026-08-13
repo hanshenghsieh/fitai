@@ -85,6 +85,16 @@ export const InBodyParseSchema = z.object({
 })
 
 export const FoodPhotoParseSchema = z.object({
+  /**
+   * Build 38 BUG 4 — dish-first identification. True when the model judged
+   * the photo to be one already-composed dish (e.g. a salad, a mixed dish, a
+   * bento) rather than several independently-plateable foods. When true,
+   * `dish_name` is the whole-dish label to prefer over joining `items[].name`
+   * — see parsePhotoApiResponse in food-capture.ts, which is the only place
+   * that reads these two fields.
+   */
+  is_composite_dish: z.boolean().optional(),
+  dish_name: z.string().optional(),
   items: z.array(z.object({
     name: z.string(),
     portion: z.string().optional(),

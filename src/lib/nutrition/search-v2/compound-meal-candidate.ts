@@ -34,13 +34,38 @@ function sumMacros(list: NutritionMacros[]): NutritionMacros {
 }
 
 /**
+ * Build 38 BUG 4 — how many of a compound label's segments must resolve to a
+ * known whole-food ingredient before the sum is trustworthy enough to
+ * short-circuit the normal search flow. A single matched segment out of many
+ * (e.g. 1 of 4) previously produced a confident-looking "estimated" total
+ * built almost entirely from unmatched-segment zeros — silently discarding
+ * the rest of the dish and, worse, pre-empting create_unknown so the *real*
+ * AI nutrition fallback (runAiNutritionFallback, a genuine whole-dish
+ * estimate) never got a chance to run. Rule (deliberately not "at least 1
+ * match"):
+ *   - 1 segment: not reached here — isCompositeMealLabel/segments.length<2
+ *     already routes a single segment through the normal single-food path.
+ *   - 2 segments: both must resolve (no partial-of-2 credit — too little
+ *     signal to trust a 50%-guessed sum).
+ *   - 3+ segments: at least half, rounded up (matches the majority-coverage
+ *     principle already used for the generic-ingredient matcher guard in
+ *     food-menu-lookup.ts's scoreNameMatch).
+ * Locked by tests in photo-compound-meal-guard.test.ts (CASE 5/6).
+ */
+export function requiredCompoundMatchCount(segmentCount: number): number {
+  if (segmentCount <= 2) return segmentCount
+  return Math.ceil(segmentCount / 2)
+}
+
+/**
  * Builds a Level C ("estimated", must be confirmed before it can be saved —
  * same semantics as aiEstimateToCandidate) candidate for a compound label by
  * summing per-segment whole-food matches. Returns null when the label isn't
- * compound, or when NONE of its segments resolve to a known ingredient —
- * callers keep using the normal single-product search / AI fallback in that
- * case, so a fully-unrecognized compound label still degrades gracefully
- * instead of asserting a fabricated partial total.
+ * compound, or when too few of its segments resolve to a known ingredient
+ * (see requiredCompoundMatchCount) — callers keep using the normal
+ * single-product search / AI fallback in that case, so a label with only
+ * sparse ingredient-DB coverage degrades gracefully to a real whole-dish AI
+ * estimate instead of a confident-looking partial sum standing in for it.
  */
 export function compoundMealCandidateFromLabel(label: string): SearchV2Candidate | null {
   if (!isCompositeMealLabel(label)) return null
@@ -57,7 +82,7 @@ export function compoundMealCandidateFromLabel(label: string): SearchV2Candidate
   const matched = resolvedSegments.filter(
     (r): r is { seg: string; candidate: SearchV2Candidate } => r.candidate !== null
   )
-  if (matched.length === 0) return null
+  if (matched.length < requiredCompoundMatchCount(segments.length)) return null
 
   const macros = sumMacros(matched.map(r => r.candidate.macros))
   const matchedNames = matched.map(r => r.candidate.name).join('、')
@@ -79,5 +104,9 @@ export function compoundMealCandidateFromLabel(label: string): SearchV2Candidate
     explanation: partial
       ? `複合餐點依食材估算（${unmatchedCount} 項食材未辨識，僅估算已比對部分）：${matchedNames}，實際營養請確認`
       : `複合餐點依食材估算：${matchedNames}，實際營養請確認`,
+    // Build 38 BUG 4 — this is a DB-derived partial sum, not a real AI call.
+    // See EstimateProvenance in search-v2/types.ts: only aiEstimateToCandidate
+    // (ai-nutrition-fallback.ts) may claim 'ai_estimate'.
+    estimate_provenance: 'compound_db_estimate',
   }
 }

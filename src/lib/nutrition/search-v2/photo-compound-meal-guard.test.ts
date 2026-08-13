@@ -15,12 +15,18 @@ import { scoreNameMatch, searchFoodMenuExtended } from '@/lib/food-menu-lookup'
 import { normalizeFoodName } from '@/lib/food-kb/normalize'
 import { wholeFoodSearchCandidates } from '@/lib/nutrition/search-v2/whole-food-candidates'
 import { applyVisualCategoryGuard } from '@/lib/nutrition/food-category-guard'
-import { compoundMealCandidateFromLabel } from '@/lib/nutrition/search-v2/compound-meal-candidate'
+import {
+  compoundMealCandidateFromLabel,
+  requiredCompoundMatchCount,
+} from '@/lib/nutrition/search-v2/compound-meal-candidate'
 import {
   createPhotoV2State,
   updatePhotoV2State,
   photoV2ReadyForLog,
 } from '@/lib/nutrition/search-v2/photo-pipeline'
+import { searchNutritionV2Client } from '@/lib/nutrition/search-v2/search-client'
+import { aiEstimateToCandidate } from '@/lib/nutrition/ai-nutrition-fallback'
+import type { AiNutritionEstimate } from '@/lib/claude/schemas'
 
 const PASTA_SALAD_LABEL = '螺旋麵沙拉 + 小黃瓜 + 火腿 + 美乃滋醬'
 
@@ -124,5 +130,106 @@ describe('Build 38 BUG 3 — compound meal / generic-ingredient guard', () => {
       const tokens = normalizeFoodName(q).match(/[一-鿿]{2,}|[a-z0-9]{2,}/gi) ?? []
       assert.ok(tokens.length <= 1, `expected "${q}" to tokenize to <= 1 token, got ${JSON.stringify(tokens)}`)
     }
+  })
+})
+
+/**
+ * Build 38 BUG 4 — a real-device photo of a potato/cucumber salad was
+ * vision-misidentified as 3 unrelated segments; only ONE of those segments
+ * happened to fuzzy-match the whole-food ingredient DB. The old "at least 1
+ * segment matched" rule let that single, coincidental match hijack the
+ * outcome into a confident-looking partial "estimated" total AND pre-empt
+ * the real create_unknown -> runAiNutritionFallback() path. CASE numbering
+ * here matches this round's fix-phase request (distinct from BUG 3's CASE
+ * 6/6b above, which is about the visual-category guard, not coverage).
+ */
+describe('Build 38 BUG 4 — compound coverage gate', () => {
+  it('requiredCompoundMatchCount locks the exact systemic rule', () => {
+    assert.equal(requiredCompoundMatchCount(1), 1)
+    assert.equal(requiredCompoundMatchCount(2), 2)
+    assert.equal(requiredCompoundMatchCount(3), 2)
+    assert.equal(requiredCompoundMatchCount(4), 2)
+    assert.equal(requiredCompoundMatchCount(5), 3)
+    assert.equal(requiredCompoundMatchCount(6), 3)
+    assert.equal(requiredCompoundMatchCount(7), 4)
+  })
+
+  it('CASE 5: 2-segment label with only 1 of 2 matched must NOT produce a partial aggregate', () => {
+    // "小黃瓜" resolves via the whole-food DB; the other segment is nonsense.
+    const result = compoundMealCandidateFromLabel('小黃瓜 + 未知神秘配料XYZ')
+    assert.equal(result, null)
+  })
+
+  it('CASE 5b: 4-segment label with only 1 of 4 matched (the real incident shape) must NOT produce a partial aggregate', () => {
+    // Reproduces the reported incident's segment shape (3 vision-misread
+    // items + 1 coincidental ingredient-DB hit) without hardcoding it in
+    // production code — this is a regression fixture, not a prompt rule.
+    const result = compoundMealCandidateFromLabel('未知食物甲 + 未知食物乙／未知食物丙 + 小黃瓜')
+    assert.equal(result, null)
+  })
+
+  it('CASE 6: sufficient coverage (2 of 2) still produces an aggregate with correct macro conservation', () => {
+    const result = compoundMealCandidateFromLabel('小黃瓜 + 火腿')
+    assert.ok(result, 'expected an aggregate candidate when both segments resolve')
+    const cucumber = wholeFoodSearchCandidates('小黃瓜')[0]!
+    const ham = wholeFoodSearchCandidates('火腿')[0]!
+    assert.equal(result!.macros.calories, (cucumber.macros.calories ?? 0) + (ham.macros.calories ?? 0))
+    assert.equal(
+      Math.round((result!.macros.protein ?? 0) * 10) / 10,
+      Math.round(((cucumber.macros.protein ?? 0) + (ham.macros.protein ?? 0)) * 10) / 10
+    )
+  })
+
+  it('CASE 6b: sufficient coverage for a 4-segment label (>= half) still produces an aggregate', () => {
+    // 螺旋麵沙拉 unmatched, 小黃瓜/火腿/美乃滋醬 matched — 3 of 4 clears the
+    // required-2-of-4 threshold from requiredCompoundMatchCount(4).
+    const result = compoundMealCandidateFromLabel('螺旋麵沙拉 + 小黃瓜 + 火腿 + 美乃滋醬')
+    assert.ok(result, 'expected the previously-fixed 3/4 coverage case to still produce an aggregate')
+  })
+
+  it('CASE 7: insufficient coverage restores create_unknown so the real AI fallback condition is reachable', () => {
+    // Regression fixture reproducing the reported incident's exact segment
+    // shape (3 vision-misread items, only 1 of which coincidentally hits the
+    // whole-food ingredient DB) — a fixture reproducing a real bug report is
+    // not the same as hardcoding a rule into production code.
+    const label = '未知視覺誤判食材甲 + 未知視覺誤判食材乙／未知視覺誤判食材丙'
+    assert.equal(compoundMealCandidateFromLabel(label), null)
+
+    // The full photo pipeline must fall through to whatever the normal
+    // (non-compound-guarded) search produces for this label.
+    const normalOutcome = searchNutritionV2Client(label)
+    const state = createPhotoV2State(label)
+    assert.equal(state.outcome.action, normalOutcome.action)
+    assert.equal(
+      state.outcome.action,
+      'create_unknown',
+      'expected the API-layer AI-fallback trigger condition (action === "create_unknown") to be reachable'
+    )
+  })
+
+  it('CASE 8: nutrition provenance distinguishes a real AI estimate from a compound-DB estimate', () => {
+    const compoundCandidate = compoundMealCandidateFromLabel('小黃瓜 + 火腿')
+    assert.equal(compoundCandidate?.estimate_provenance, 'compound_db_estimate')
+
+    const estimate: AiNutritionEstimate = {
+      canonical_name: '任意食物',
+      estimated_weight_g: 100,
+      calories: 100,
+      protein_g: 5,
+      carbs_g: 10,
+      fat_g: 2,
+      confidence: 0.5,
+      reason: '測試',
+      source_type: 'ai_estimate',
+    }
+    const aiCandidate = aiEstimateToCandidate(estimate, false)
+    assert.equal(aiCandidate.estimate_provenance, 'ai_estimate')
+    assert.notEqual(compoundCandidate?.estimate_provenance, aiCandidate.estimate_provenance)
+  })
+
+  it('CASE 9: a fully unrecognized single (non-compound) food still reaches create_unknown', () => {
+    const state = createPhotoV2State('完全無法辨識的神秘食物')
+    assert.equal(state.outcome.action, 'create_unknown')
+    assert.equal(photoV2ReadyForLog(state), true)
   })
 })

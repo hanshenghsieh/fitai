@@ -4,9 +4,24 @@ import type { PhotoV2State } from '@/lib/nutrition/search-v2/photo-pipeline'
 import { apiFetch } from '@/lib/api/client'
 
 const PHOTO_PARSE_TIMEOUT_MS = 45_000
-export const NATIVE_PHOTO_MAX_EDGE = 512
+/**
+ * Build 38 BUG 4 — first-pass identification quality. 512px/quality 0.7 was
+ * aggressive enough to destroy the fine texture (ridges, dicing, surface
+ * detail) a vision model needs to tell diced potato/cucumber salad apart
+ * from potato-chip ridges or citrus slices. 1024px/0.8 is well inside the
+ * two size ceilings this pipeline already enforces and tests against —
+ * NATIVE_PHOTO_BASE64_MAX_CHARS below (client) and MAX_JSON_BINARY_BYTES in
+ * app/api/food-photo/route.ts (server, same 3.5MB base64 char budget) — a
+ * 1024px JPEG at quality 0.8 for a typical phone food photo lands well
+ * under a megabyte, nowhere near either cap. If a specific photo still
+ * produces an oversized payload, the existing retry path below
+ * (NATIVE_PHOTO_RETRY_MAX_EDGE / NATIVE_PHOTO_RETRY_QUALITY) still shrinks
+ * it — this only raises the *first* attempt's target, the safety-net
+ * fallback is unchanged.
+ */
+export const NATIVE_PHOTO_MAX_EDGE = 1024
 export const NATIVE_PHOTO_RETRY_MAX_EDGE = 384
-export const NATIVE_PHOTO_JPEG_QUALITY = 0.7
+export const NATIVE_PHOTO_JPEG_QUALITY = 0.8
 export const NATIVE_PHOTO_RETRY_QUALITY = 0.55
 export const NATIVE_PHOTO_BASE64_MAX_CHARS = Math.floor(3.5 * 1024 * 1024)
 export const NATIVE_PHOTO_BINARY_MAX_BYTES = Math.floor(
@@ -140,7 +155,7 @@ async function rasterizeToJpegBlob(
   return blob
 }
 
-function scaledDimensions(width: number, height: number, maxEdge: number) {
+export function scaledDimensions(width: number, height: number, maxEdge: number) {
   const scale = maxEdge / Math.max(width, height, 1)
   return {
     width: Math.max(1, Math.round(width * Math.min(1, scale))),
@@ -240,15 +255,35 @@ export interface PhotoParseResult {
   ai_nutrition_suppressed: true
 }
 
-type PhotoApiJson = {
+export type PhotoApiJson = {
   error?: string
-  data?: { items: Array<{ name: string; confidence: 'high' | 'medium' | 'low' }> }
+  data?: {
+    items: Array<{ name: string; confidence: 'high' | 'medium' | 'low' }>
+    is_composite_dish?: boolean
+    dish_name?: string
+  }
 }
 
-function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
+/**
+ * Build 38 BUG 4 — dish-first naming. When the model explicitly identified
+ * the photo as one already-composed dish (is_composite_dish + dish_name,
+ * see the prompt in claude/client.ts), that dish-level name is preferred
+ * over joining the per-item guesses — a compound dish should not be
+ * re-decomposed into "ingredient A + ingredient B + ..." for display/search
+ * just because the model also filled in an items[] breakdown. Deterministic
+ * on the model's own structured fields, not a guess from meal_summary.
+ */
+export function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
   const items = json.data?.items ?? []
   const names = items.map(item => item.name.trim()).filter(Boolean)
-  const name = names.length > 1 ? names.join(' + ') : names[0] ?? ''
+  const dishName = json.data?.dish_name?.trim()
+  const isCompositeDish = json.data?.is_composite_dish === true
+  const name =
+    isCompositeDish && dishName
+      ? dishName
+      : names.length > 1
+        ? names.join(' + ')
+        : names[0] ?? ''
 
   const worst = items.reduce<'high' | 'medium' | 'low'>(
     (worstConf, item) => {
