@@ -14,7 +14,7 @@ import { enqueueUnknownFood } from './unknown-queue'
 import { explainConfidence } from './confidence'
 import { rankSearchCandidates } from './search-ranking'
 import {
-  filterByVisualCategory,
+  applyVisualCategoryGuard,
   categoryGuardMessage,
 } from '@/lib/nutrition/food-category-guard'
 
@@ -56,34 +56,27 @@ export function searchNutritionV2Client(query: string, ctx?: SearchV2Context): S
   const rawCandidates = collectClientCandidates(trimmed, ctx)
   let candidates = rawCandidates
   if (ctx?.visual_category && ctx.visual_category !== 'unknown') {
-    const filtered = filterByVisualCategory(rawCandidates, ctx.visual_category)
-    if (filtered.length === 0 && rawCandidates.length > 0) {
-      const dnaFallback = filterByVisualCategory(
-        rawCandidates.filter(c => c.source_tier === 'food_dna'),
-        ctx.visual_category
-      )
-      if (dnaFallback.length > 0) {
-        candidates = dnaFallback
-      } else {
-        return {
-          level: 'C',
-          action: 'create_unknown',
-          query: trimmed,
-          explanation: categoryGuardMessage(ctx.visual_category),
-          candidates: [],
-          unknown_record: {
-            food_name: trimmed,
-            restaurant: null,
-            nutrition_status: 'unknown',
-            nutrition_confidence: 'Unknown',
-            macros: NULL_MACROS,
-            ui_message: categoryGuardMessage(ctx.visual_category),
-          },
-        }
+    const guarded = applyVisualCategoryGuard(rawCandidates, ctx.visual_category, ctx.visual_category_confidence)
+    if (guarded.length === 0 && rawCandidates.length > 0) {
+      return {
+        level: 'C',
+        action: 'create_unknown',
+        query: trimmed,
+        explanation: categoryGuardMessage(ctx.visual_category),
+        candidates: [],
+        unknown_record: {
+          food_name: trimmed,
+          restaurant: null,
+          nutrition_status: 'unknown',
+          nutrition_confidence: 'Unknown',
+          macros: NULL_MACROS,
+          ui_message: categoryGuardMessage(ctx.visual_category),
+        },
       }
-    } else {
-      candidates = filtered
     }
+    // The guard adjusts match_score without re-sorting — classifyClientMatchLevel
+    // assumes candidates[0]/[1] are already best/second-best.
+    candidates = rankSearchCandidates(guarded)
   }
   const { level, best, ambiguous } = classifyClientMatchLevel(trimmed, candidates)
 

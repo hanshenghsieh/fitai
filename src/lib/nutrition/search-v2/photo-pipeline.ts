@@ -21,6 +21,7 @@ import { enqueueUnknownPhoto } from '@/lib/nutrition/search-v2/unknown-photo-que
 import { explainConfidence } from '@/lib/nutrition/search-v2/confidence'
 import { buildPhotoVisualParse, type PhotoVisualParse } from '@/lib/nutrition/photo-visual-parse'
 import { collectClientCandidates } from '@/lib/nutrition/search-v2/matcher-core'
+import { compoundMealCandidateFromLabel } from '@/lib/nutrition/search-v2/compound-meal-candidate'
 import type { PhotoAiMeta } from '@/lib/banks/types'
 import { PHOTO_UI_CANDIDATE_LIMIT } from '@/lib/nutrition/photo-display-limits'
 
@@ -90,6 +91,7 @@ export function createPhotoV2State(
   const searchCtx: SearchV2Context = {
     ...opts?.ctx,
     visual_category: visual_parse.visual_category,
+    visual_category_confidence: visual_parse.category_confidence,
     photo_mode: true,
   }
   const allCandidates = collectClientCandidates(label, opts?.ctx)
@@ -99,7 +101,7 @@ export function createPhotoV2State(
 
   const outcome = isUnrecognizablePhotoLabel(label)
     ? buildPhotoUnknownOutcome(label, [])
-    : searchNutritionV2(label, searchCtx)
+    : resolveOutcomeWithCompoundGuard(label, searchCtx)
 
   if (outcome.action === 'create_unknown') {
     enqueueUnknownPhoto({
@@ -122,6 +124,35 @@ export function createPhotoV2State(
     clarification: outcome.clarification ?? null,
     answers: {},
     user_confirmed: false,
+  }
+}
+
+/**
+ * Build 38 BUG 3 FIX 1 — a "+"-joined compound/multi-ingredient label must
+ * not be resolved as a search for ONE single branded/menu product. When the
+ * normal single-product search (searchNutritionV2) didn't reach a fully
+ * confident Level A match, prefer the compound aggregate (existing
+ * whole-food ingredient data, summed across segments) over a misleading
+ * single-ingredient "best guess" (e.g. "小黃瓜（生）" standing in for a
+ * 4-ingredient meal) or a clarify dead-end built from weak/wrong
+ * candidates. A genuinely confident Level A single-product match (e.g. an
+ * alias resolves the whole compound string directly) still wins — this only
+ * intervenes when the normal flow itself wasn't confident.
+ */
+function resolveOutcomeWithCompoundGuard(label: string, ctx: SearchV2Context): SearchV2Outcome {
+  const normalOutcome = searchNutritionV2(label, ctx)
+  if (normalOutcome.level === 'A') return normalOutcome
+
+  const compoundCandidate = compoundMealCandidateFromLabel(label)
+  if (!compoundCandidate) return normalOutcome
+
+  return {
+    level: 'C',
+    action: 'create_official',
+    query: label,
+    explanation: compoundCandidate.explanation,
+    candidates: [compoundCandidate, ...normalOutcome.candidates],
+    official_record: compoundCandidate,
   }
 }
 

@@ -130,6 +130,56 @@ export function filterByVisualCategory<T extends { name: string; store?: string 
   })
 }
 
+/**
+ * Build 38 BUG 3 — used by the search-v2 photo pipeline instead of
+ * filterByVisualCategory. A pure text-keyword visual guess (buildPhotoVisualParse)
+ * is unreliable exactly when the label is compound/multi-ingredient — e.g. a
+ * cold pasta salad ("螺旋麵沙拉 + 小黃瓜 + 火腿 + 美乃滋醬") got misread as
+ * 'noodle' from the word "麵", and the hard filter then permanently deleted
+ * the correctly-categorized 'salad' candidate while keeping an unrelated
+ * branded item whose category couldn't be inferred at all ('unknown' always
+ * passed unfiltered). visual_category must be a ranking/guard SIGNAL, not a
+ * permanent deletion, when the classifier itself has low/medium confidence:
+ * downgrade the match_score instead of removing the candidate. Only a
+ * *high-confidence* guess against a genuinely hard-incompatible pair (e.g.
+ * burger vs sushi — see INCOMPATIBLE_PAIRS) still hard-excludes, preserving
+ * the original P0 guarantee ("漢堡照片不得出現壽司候選") filterByVisualCategory
+ * was built for.
+ *
+ * Also fixes the "unknown beats known-but-conflicting" asymmetry: an
+ * unrecognized candidate category was previously treated as automatically
+ * compatible (zero penalty), which let it out-rank a candidate whose own
+ * category is confidently known but merely disagrees with a possibly-wrong
+ * visual guess. Both now take a penalty; "I don't know what this is" is no
+ * longer free evidence of relevance.
+ */
+export function applyVisualCategoryGuard<T extends { name: string; store?: string; match_score: number }>(
+  candidates: T[],
+  visualCategory: FoodCategory,
+  categoryConfidence: CategoryConfidence = 'medium'
+): T[] {
+  if (visualCategory === 'unknown') return candidates
+  const conflictPenalty =
+    categoryConfidence === 'high' ? 30 : categoryConfidence === 'medium' ? 15 : 5
+  const unknownCategoryPenalty = 6
+
+  const guarded = candidates
+    .map(c => {
+      const cat = inferCategoryFromCandidate(c.name, c.store)
+      if (cat === 'unknown') {
+        return { ...c, match_score: Math.max(0, c.match_score - unknownCategoryPenalty) }
+      }
+      if (areCategoriesCompatible(visualCategory, cat)) return c
+      if (categoryConfidence === 'high' && INCOMPATIBLE_SET.has(pairKey(visualCategory, cat))) {
+        return null
+      }
+      return { ...c, match_score: Math.max(0, c.match_score - conflictPenalty) }
+    })
+    .filter((c): c is T => c !== null)
+
+  return guarded
+}
+
 export function categoryGuardMessage(visualCategory: FoodCategory): string {
   const label =
     visualCategory === 'burger'

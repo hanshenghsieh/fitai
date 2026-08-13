@@ -146,5 +146,7 @@ export interface SearchV2Context {
   favorites?: Array<{ id: string; name: string; store?: string }>
   /** Photo pipeline — guard candidates by visual category */
   visual_category?: import('@/lib/nutrition/food-category-guard').FoodCategory
+  /** How confident the visual_category guess itself is — low/medium confidence softens the category guard (see applyVisualCategoryGuard). */
+  visual_category_confidence?: import('@/lib/nutrition/food-category-guard').CategoryConfidence
   photo_mode?: boolean
 }

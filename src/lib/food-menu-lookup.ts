@@ -80,13 +80,50 @@ export function scoreNameMatch(queryNorm: string, itemName: string, store?: stri
     if (nameNorm.startsWith(queryNorm) && isKnownDishCategoryToken(queryNorm)) {
       return Math.max(base, 58)
     }
+    // Build 38 BUG 3 — a short (<=3 char) QUERY contained inside a much
+    // longer candidate name (e.g. "火腿" inside "火腿起司蛋凱薩堡") is very
+    // likely a bare generic ingredient, not a dish name — the linear
+    // coverage formula above still lets some of these clear the 45/50
+    // admission thresholds (e.g. ratio 0.4-0.5 already scores 46-50).
+    // Excludes two legitimate cases: a recognized dish/category token
+    // (isKnownDishCategoryToken, same whitelist as the exception above), and
+    // a query that appears as the *suffix* of the candidate name — Chinese
+    // dish names conventionally put the head noun last ("總匯三明治" = combo
+    // + SANDWICH, "起司漢堡" = cheese + BURGER), so a suffix match means the
+    // query is naming the actual dish category (even if not yet whitelisted,
+    // e.g. "三明治"), not describing one ingredient among several.
+    if (
+      nameNorm.includes(queryNorm) &&
+      !nameNorm.endsWith(queryNorm) &&
+      queryNorm.length <= 3 &&
+      !isKnownDishCategoryToken(queryNorm) &&
+      shorter / longer < 0.55
+    ) {
+      return Math.round(20 + (shorter / longer) * 20)
+    }
     return base
   }
   const qTokens = [...new Set(queryNorm.match(/[\u4e00-\u9fff]{2,}|[a-z0-9]{2,}/gi) ?? [])]
   if (!qTokens.length) return 0
   const hits = qTokens.filter(t => nameNorm.includes(t)).length
   if (hits === 0) return 0
-  return 40 + (hits / qTokens.length) * 35
+  const hitRatio = hits / qTokens.length
+  // Build 38 BUG 3 \u2014 a compound/multi-ingredient query (qTokens.length > 1,
+  // e.g. a "+"-joined photo label "\u87ba\u65cb\u9eb5\u6c99\u62c9 + \u5c0f\u9ec3\u74dc + \u706b\u817f + \u7f8e\u4e43\u6ecb\u91ac")
+  // that only shares a SMALL minority of its tokens with a candidate name
+  // is weak evidence, not a dish match: one generic ingredient token
+  // ("\u706b\u817f") happening to be a substring of an unrelated branded composite
+  // item's name ("\u706b\u817f\u8d77\u53f8\u53ef\u980c") must not score as if the whole query
+  // matched. Require genuine majority token coverage before granting the
+  // normal fallback score; below that, cap well under every admission
+  // threshold in this file (45/50) so the candidate never becomes trusted.
+  // A single-token query (qTokens.length === 1, e.g. bare "\u8d77\u53f8\u6f22\u5821" or any
+  // undelimited dish name) is unaffected \u2014 it never had multiple tokens to
+  // require majority coverage of in the first place.
+  if (qTokens.length > 1 && hitRatio < 0.5) {
+    return Math.round(20 + hitRatio * 20)
+  }
+  return Math.round(40 + hitRatio * 35)
 }
 
 function rowToHit(

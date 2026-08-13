@@ -9858,5 +9858,50 @@
     "default_unit": "g",
     "source": "USDA FDC / Taiwan FDA / estimate",
     "note": "熟牛小排，油脂偏高；外食份量差異大"
+  },
+  {
+    "id": "me076",
+    "food_id": "ME076",
+    "name_zh": "火腿",
+    "category": "protein",
+    "excel_category": "肉類/蛋白質",
+    "state": "熟/即食",
+    "aliases": [
+      "火腿",
+      "火腿片",
+      "里肌火腿",
+      "圓火腿"
+    ],
+    "calories_per_100": 145,
+    "protein_g_per_100": 17.9,
+    "carbs_g_per_100": 1.5,
+    "fat_g_per_100": 7.7,
+    "sodium_mg_per_100": 1203,
+    "default_unit": "g",
+    "source": "USDA FDC / Taiwan FDA nutrition DB",
+    "note": "一般市售火腿片（含醃製鈉），品牌差異大"
+  },
+  {
+    "id": "sc001",
+    "food_id": "SC001",
+    "name_zh": "美乃滋",
+    "category": "sauce",
+    "excel_category": "醬料",
+    "state": "即食",
+    "aliases": [
+      "美乃滋",
+      "美乃滋醬",
+      "沙拉醬",
+      "蛋黃醬",
+      "mayonnaise"
+    ],
+    "calories_per_100": 680,
+    "protein_g_per_100": 1,
+    "carbs_g_per_100": 0.6,
+    "fat_g_per_100": 75,
+    "sodium_mg_per_100": 635,
+    "default_unit": "g",
+    "source": "USDA FDC / Taiwan FDA nutrition DB",
+    "note": "一般市售美乃滋，脂肪含量高"
   }
 ]
