@@ -879,6 +879,12 @@ export default function TodayOS({
     (entry: Omit<FoodLogEntry, 'logged_at' | 'user_declared'>) => {
       if (loggingRef.current) return
       loggingRef.current = true
+      console.log('[PHOTO_MACRO_TRACE:4_BEFORE_ENRICH]', {
+        calories: entry.calories,
+        protein_g: entry.protein_g,
+        fat_g: entry.fat_g,
+        carbs_g: entry.carbs_g,
+      })
       const full: FoodLogEntry = enrichFoodLog({
         ...entry,
         slot: entry.slot ?? activeSlot,
@@ -887,6 +893,12 @@ export default function TodayOS({
           entry.slot ?? activeSlot
         ),
         user_declared: true,
+      })
+      console.log('[PHOTO_MACRO_TRACE:5_AFTER_ENRICH]', {
+        calories: full.calories,
+        protein_g: full.protein_g,
+        fat_g: full.fat_g,
+        carbs_g: full.carbs_g,
       })
       const nextLogs = nextFoodLogsAfterCommit(foodLogsRef.current, full)
       const nextDna = full.learning
@@ -1339,6 +1351,14 @@ export default function TodayOS({
   const handleManualPhotoCorrection = useCallback(
     (result: ManualPhotoCorrectionResult) => {
       if (!photoDraft) return
+      if (result.mode === 'user_entered') {
+        console.log('[PHOTO_MACRO_TRACE:3_CONFIRM_PAYLOAD]', {
+          calories: result.nutrition.calories,
+          protein_g: result.nutrition.protein_g,
+          fat_g: result.nutrition.fat_g,
+          carbs_g: result.nutrition.carbs_g,
+        })
+      }
       setPhotoSaving(true)
       const logId = `photo-${Date.now()}`
       const finish = (url: string) => {
