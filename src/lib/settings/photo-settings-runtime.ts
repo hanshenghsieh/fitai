@@ -62,6 +62,33 @@ export function shouldRequirePhotoConfirmation(
   return isLowConfidencePhotoResult(result)
 }
 
+/**
+ * Build 38 BUG 7 — a confirmed AI/compound-DB estimate already went through
+ * the user's explicit review one screen earlier ("這樣記錄可以" ->
+ * accuracy.answers.user_confirmed). Re-opening NutritionConfirmationSheet
+ * for it re-derives "do we have usable nutrition data" from a fresh DB-name
+ * search (resolvePortionContextFromLog / findSimilarVerifiedItems) that has
+ * no way to know a real, confirmed estimate already exists — for a
+ * descriptive AI-generated label with no DB match, that search wrongly
+ * concludes "目前沒有可信營養資料" even though the confirmed estimate was
+ * just saved with real macros. An already-confirmed save must skip the
+ * second-look prompt entirely; only genuinely-unconfirmed saves (e.g. a
+ * fresh Level A auto-resolve, or a create_unknown photo-only save) still go
+ * through it.
+ */
+export function shouldReopenPhotoConfirmation(
+  userConfirmed: boolean,
+  confirmMode: PhotoConfirmMode,
+  result: {
+    nutrition_confidence?: string | null
+    match_score?: number | null
+    nutrition_status?: string | null
+  }
+): boolean {
+  if (userConfirmed) return false
+  return shouldRequirePhotoConfirmation(confirmMode, result)
+}
+
 /** Map settings meal-slot auto rules to FoodSlot. */
 export function resolvePhotoMealSlot(params: {
   settings: PhotoSettings

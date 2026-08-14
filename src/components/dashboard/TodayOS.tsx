@@ -73,6 +73,7 @@ import {
   loadPhotoSettingsRuntime,
   resolvePhotoMealSlotFromLogs,
   shouldRequirePhotoConfirmation,
+  shouldReopenPhotoConfirmation,
   isLowConfidencePhotoResult,
 } from '@/lib/settings/photo-settings-runtime'
 import type { PhotoSettings, UserSettingsPreferences } from '@/lib/settings/user-settings-types'
@@ -1330,10 +1331,14 @@ export default function TodayOS({
         source: 'photo' as const,
         logged_at: loggedAtForNutritionDate(captureTargetDate, activeSlot),
       }
-      const needsConfirm = shouldRequirePhotoConfirmation(photoSettings.confirm_mode, {
-        nutrition_confidence: payload.nutrition_confidence,
-        nutrition_status: payload.nutrition_status,
-      })
+      const needsConfirm = shouldReopenPhotoConfirmation(
+        accuracy.answers.user_confirmed === true,
+        photoSettings.confirm_mode,
+        {
+          nutrition_confidence: payload.nutrition_confidence,
+          nutrition_status: payload.nutrition_status,
+        }
+      )
       if (photoSettings.low_confidence_alert && isLowConfidencePhotoResult({
         nutrition_confidence: payload.nutrition_confidence,
         nutrition_status: payload.nutrition_status,

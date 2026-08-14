@@ -298,7 +298,16 @@ export function finalizePhotoV2ToFoodLogPayload(
     photo_ai_category_confidence: state.visual_parse.category_confidence,
   }
 
-  if (resolved.action === 'create_unknown' || resolved.level === 'C') {
+  // Build 38 BUG 7 — `|| resolved.level === 'C'` used to also catch a
+  // properly-confirmed AI/compound-DB estimate (action: 'create_official',
+  // level: 'C' — the exact shape route.ts's AI fallback and the compound
+  // guard both produce), discarding its real macros into this unknown
+  // branch even though photoV2ReadyForLog (checked above) already required
+  // user_confirmed + a real official_record before this function runs at
+  // all. Only a genuine create_unknown outcome belongs here — a resolved
+  // Level C estimate must fall through to the official/estimated branch
+  // below, which already has the correct isAiEstimate handling.
+  if (resolved.action === 'create_unknown') {
     const unknown = resolved.unknown_record
     enqueueUnknownPhoto({
       detected_label: state.detected_label,
