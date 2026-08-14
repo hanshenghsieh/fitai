@@ -25,7 +25,15 @@ import type { FoodLogEntry } from '@/lib/banks/types'
  * log's own saved macros exactly, with no rounding/splitting drift at all.
  */
 
-function baseLog(overrides: Partial<FoodLogEntry> = {}): FoodLogEntry {
+// FoodLogEntry types carbs_g/fat_g as `number | undefined`, but production
+// code has always written literal `null` for a genuinely unknown record — a
+// pre-existing type/runtime mismatch, not introduced by this fix.
+type LogOverrides = Partial<Omit<FoodLogEntry, 'carbs_g' | 'fat_g'>> & {
+  carbs_g?: number | null
+  fat_g?: number | null
+}
+
+function baseLog(overrides: LogOverrides = {}): FoodLogEntry {
   return {
     id: 'log-1',
     name: '測試餐點',
@@ -101,17 +109,21 @@ describe('Today recommendation-card macro conservation (logToDisplayItems)', () 
     assert.equal(items[0]!.fat_g, 15)
   })
 
-  it('CASE 4 — a genuinely unresolved/pending-confirmation log never fakes 0 as a confident value', () => {
+  it('CASE 4 — a genuinely unresolved/pending-confirmation log never fakes 0 as a confident value (all four macros)', () => {
     const log = baseLog({
       name: '未知食物 + 未知配菜',
       calories: null,
       protein_g: null,
+      carbs_g: null,
+      fat_g: null,
       nutrition_status: 'unknown',
     })
     const items = logToDisplayItems(log)
     for (const item of items) {
       assert.equal(item.calories, null, 'calories must stay null, never fabricated as 0')
       assert.equal(item.protein_g, null, 'protein_g must stay null, never fabricated as 0')
+      assert.equal(item.carbs_g, null, 'carbs_g must stay null, never fabricated as 0 (Build 38 BUG 5)')
+      assert.equal(item.fat_g, null, 'fat_g must stay null, never fabricated as 0 (Build 38 BUG 5)')
     }
   })
 

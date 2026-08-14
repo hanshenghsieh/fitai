@@ -3,7 +3,7 @@ import type {
   ClarificationSession,
   SearchV2Candidate,
 } from '@/lib/nutrition/search-v2/types'
-import { hasClarificationPattern } from '@/lib/nutrition/search-v2/query-patterns'
+import { hasClarificationPattern, HIGH_RISK_CLARIFICATION_RE } from '@/lib/nutrition/search-v2/query-patterns'
 import { collectClientCandidates } from '@/lib/nutrition/search-v2/matcher-core'
 
 export { hasClarificationPattern } from '@/lib/nutrition/search-v2/query-patterns'
@@ -123,7 +123,7 @@ export function buildClarificationQuestions(
     return questions.slice(0, 3)
   }
 
-  if (/滷味|鹽酥雞|火鍋|自助餐|燒肉|串串|鹹酥雞/.test(q)) {
+  if (HIGH_RISK_CLARIFICATION_RE.test(q)) {
     questions.push({
       id: 'high_risk_type',
       prompt: '這是哪一種？',

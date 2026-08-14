@@ -41,6 +41,35 @@ function buildUnknownOutcome(
   }
 }
 
+/**
+ * Build 38 BUG 5 — invariant: action:'clarify' must never carry a null
+ * clarification session. hasClarificationPattern/buildClarificationQuestions
+ * now share one keyword source (query-patterns.ts's HIGH_RISK_CLARIFICATION_RE)
+ * so this shouldn't happen for that specific case anymore, but any future
+ * pattern added to one and not the other would reproduce the same
+ * unrecoverable dead-end (clarify with clarification:null, ready-for-log
+ * permanently false, AI fallback's create_unknown trigger unreachable) — so
+ * this is enforced structurally at the single place a clarify outcome gets
+ * built, not just by keeping the two keyword lists in sync.
+ */
+export function buildClarifyOrUnknownOutcome(
+  trimmed: string,
+  candidates: SearchV2Candidate[]
+): SearchV2Outcome {
+  const session = startClarificationSession(trimmed, candidates)
+  if (!session) {
+    return buildUnknownOutcome(trimmed, candidates, candidates.map(c => c.name).slice(0, 5))
+  }
+  return {
+    level: 'B',
+    action: 'clarify',
+    query: trimmed,
+    explanation: '找到相近資料或菜名模糊，需 Smart Clarification 確認後才能建立。',
+    candidates: rankSearchCandidates(candidates),
+    clarification: session,
+  }
+}
+
 export function searchNutritionV2Client(query: string, ctx?: SearchV2Context): SearchV2Outcome {
   const trimmed = query.trim()
   if (!trimmed) {
@@ -89,15 +118,7 @@ export function searchNutritionV2Client(query: string, ctx?: SearchV2Context): S
   }
 
   if (hasClarificationPattern(trimmed)) {
-    const session = startClarificationSession(trimmed, candidates)
-    return {
-      level: 'B',
-      action: 'clarify',
-      query: trimmed,
-      explanation: '找到相近資料或菜名模糊，需 Smart Clarification 確認後才能建立。',
-      candidates: rankSearchCandidates(candidates),
-      clarification: session ?? undefined,
-    }
+    return buildClarifyOrUnknownOutcome(trimmed, candidates)
   }
 
   if (level === 'A' && best && !ambiguous) {
@@ -112,15 +133,7 @@ export function searchNutritionV2Client(query: string, ctx?: SearchV2Context): S
   }
 
   if (level === 'B' || ambiguous) {
-    const session = startClarificationSession(trimmed, candidates)
-    return {
-      level: 'B',
-      action: 'clarify',
-      query: trimmed,
-      explanation: '找到相近資料或菜名模糊，需 Smart Clarification 確認後才能建立。',
-      candidates: rankSearchCandidates(candidates),
-      clarification: session ?? undefined,
-    }
+    return buildClarifyOrUnknownOutcome(trimmed, candidates)
   }
 
   if (level === 'C' && !candidates.some(c => c.nutrition_status === 'official')) {

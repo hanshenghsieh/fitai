@@ -6,6 +6,7 @@ import type { MealSuggestion } from '@/lib/meal-engine-types'
 import { TODAY } from '@/lib/today-design'
 import type { ConvenienceItem } from '@/lib/convenience-store-menu'
 import type { FoodNutritionStatus } from '@/lib/banks/types'
+import { isNutritionPendingConfirmation, NUTRITION_PENDING_LABEL } from '@/lib/nutrition/nutrition-pending-status'
 import {
   confidenceDisclaimer,
   confidenceDisplayLabel,
@@ -14,9 +15,11 @@ import {
 } from '@/lib/recommendation/v2/display-macro'
 import type { ConfidenceLevel } from '@/lib/recommendation/v2/types'
 
-export interface MealPreviewItem extends Omit<ConvenienceItem, 'calories' | 'protein_g'> {
+export interface MealPreviewItem extends Omit<ConvenienceItem, 'calories' | 'protein_g' | 'carbs_g' | 'fat_g'> {
   calories: number | null
   protein_g: number | null
+  carbs_g: number | null
+  fat_g: number | null
   nutrition_status?: FoodNutritionStatus
 }
 
@@ -48,6 +51,15 @@ export default function DiceMealPreview({
     items.length === 1
       ? primaryItem.name
       : items.map(i => i.name).join(' + ')
+
+  // Build 38 BUG 5 — UNKNOWN != ZERO. Any item still pending a real
+  // nutrition estimate makes the whole card's total unreliable — summing it
+  // with unknown items' null macros coerced to 0 via `?? 0` used to render a
+  // confident-looking "0 kcal" for a meal Betterbit never actually
+  // estimated. nutrition_status is the explicit signal already threaded
+  // through from logToDisplayItems; a real (non-unknown) 0 kcal item must
+  // still sum normally, so this can't be a `calories === 0` check.
+  const hasUnknownItem = items.some(item => isNutritionPendingConfirmation(item))
 
   const totals = items.reduce(
     (acc, item) => ({
@@ -89,16 +101,22 @@ export default function DiceMealPreview({
 
       <div className="space-y-1">
         <p className="text-[20px] tabular-nums" style={{ color: TODAY.text, fontWeight: 700 }}>
-          {level ? formatRecommendationCalories(totals.calories, level) : `${totals.calories} kcal`}
+          {hasUnknownItem
+            ? NUTRITION_PENDING_LABEL
+            : level
+              ? formatRecommendationCalories(totals.calories, level)
+              : `${totals.calories} kcal`}
         </p>
         <p className="text-[14px] tabular-nums" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
-          {level
-            ? [
-                formatRecommendationMacroGrams(totals.protein, '蛋白質', level),
-                formatRecommendationMacroGrams(totals.fat, '脂肪', level),
-                formatRecommendationMacroGrams(totals.carbs, '碳水', level),
-              ].join(' · ')
-            : `蛋白質 ${Math.round(totals.protein)}g · 脂肪 ${Math.round(totals.fat)}g · 碳水 ${Math.round(totals.carbs)}g`}
+          {hasUnknownItem
+            ? '尚無可靠的熱量與營養素估算'
+            : level
+              ? [
+                  formatRecommendationMacroGrams(totals.protein, '蛋白質', level),
+                  formatRecommendationMacroGrams(totals.fat, '脂肪', level),
+                  formatRecommendationMacroGrams(totals.carbs, '碳水', level),
+                ].join(' · ')
+              : `蛋白質 ${Math.round(totals.protein)}g · 脂肪 ${Math.round(totals.fat)}g · 碳水 ${Math.round(totals.carbs)}g`}
         </p>
       </div>
 

@@ -264,10 +264,15 @@ export function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
         role: 'main',
         portionable: false,
         tags: [],
+        // Build 38 BUG 5 — UNKNOWN != ZERO. calories/protein_g already
+        // respected `unknown`; carbs_g/fat_g must too, or a genuinely
+        // unknown record silently displays half its macros as a confident
+        // literal 0 instead of "not yet known". `?? 0` still applies for a
+        // KNOWN record with just an omitted carbs/fat field (unchanged).
         calories: unknown ? null : log.calories,
         protein_g: unknown ? null : log.protein_g,
-        carbs_g: log.carbs_g ?? 0,
-        fat_g: log.fat_g ?? 0,
+        carbs_g: unknown ? null : (log.carbs_g ?? 0),
+        fat_g: unknown ? null : (log.fat_g ?? 0),
         price: 0,
         photo_url: '',
         description: '',
@@ -276,6 +281,11 @@ export function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
     ]
   }
   if (unknown || log.calories == null || log.protein_g == null) {
+    // Build 38 BUG 5 — this branch means no trustworthy aggregate exists for
+    // the whole log (explicitly unknown, or the calorie/protein aggregate
+    // itself is missing) — none of the four macros are reliable here, so
+    // none of them may be a literal 0 (see the sibling single-item branch
+    // above for the same UNKNOWN != ZERO principle).
     return names.map((segment, i) => {
       const parsed = parseDiceLogSegment(segment)
       return {
@@ -289,8 +299,8 @@ export function logToDisplayItems(log: FoodLogEntry): MealPreviewItem[] {
         tags: [],
         calories: null,
         protein_g: null,
-        carbs_g: 0,
-        fat_g: 0,
+        carbs_g: null,
+        fat_g: null,
         price: 0,
         photo_url: '',
         description: '',
