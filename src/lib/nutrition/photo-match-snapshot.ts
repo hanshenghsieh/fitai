@@ -13,7 +13,16 @@ import type { SearchV2Candidate, SearchV2Outcome } from '@/lib/nutrition/search-
 /** Slim PhotoV2State for client hydration — caps candidate payload size. */
 export type PhotoMatchSnapshot = PhotoV2State
 
-function slimCandidate(candidate: SearchV2Candidate): SearchV2Candidate {
+/**
+ * Build 38 BUG 6 — this manual field whitelist dropped `estimate_provenance`
+ * (added after this function was written) on every server response, so the
+ * UI could never tell a real AI-fallback estimate from a compound-DB
+ * estimate once it round-tripped through this snapshot. Any new
+ * SearchV2Candidate field must be added here explicitly — see the whitelist
+ * invariant test in photo-match-snapshot-estimate-provenance.test.ts, which
+ * fails loudly if this list falls out of sync with the type again.
+ */
+export function slimCandidate(candidate: SearchV2Candidate): SearchV2Candidate {
   return {
     id: candidate.id,
     name: candidate.name,
@@ -25,6 +34,7 @@ function slimCandidate(candidate: SearchV2Candidate): SearchV2Candidate {
     source_tier: candidate.source_tier,
     match_score: candidate.match_score,
     explanation: candidate.explanation.slice(0, 160),
+    estimate_provenance: candidate.estimate_provenance,
   }
 }
 
