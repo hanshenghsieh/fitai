@@ -1,5 +1,6 @@
 import { Mail } from 'lucide-react'
 import BetterBitLogo from '@/components/brand/BetterBitLogo'
+import { SUPPORT_EMAIL } from '@/lib/support'
 
 const LINK_COLUMNS = [
   {
@@ -14,12 +15,12 @@ const LINK_COLUMNS = [
     title: '支援',
     links: [
       { label: '常見問題', href: '#faq' },
-      { label: '聯絡我們', href: 'mailto:hansheng@betterbit.tw?subject=BetterBit%20使用者問題回報' },
+      { label: '聯絡我們', href: `mailto:${SUPPORT_EMAIL}?subject=BetterBit%20使用者問題回報` },
       { label: '使用條款', href: '/terms' },
       { label: '隱私權政策', href: '/privacy' },
     ],
   },
-] as const
+]
 
 export default function Footer() {
   return (
@@ -44,7 +45,7 @@ export default function Footer() {
               >
                 IG
               </a>
-              <a href="mailto:hansheng@betterbit.tw" aria-label="Email">
+              <a href={`mailto:${SUPPORT_EMAIL}`} aria-label="Email">
                 <Mail size={18} className="transition-colors duration-200 hover:text-gray-600" />
               </a>
             </div>
