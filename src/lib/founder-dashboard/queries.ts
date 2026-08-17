@@ -33,8 +33,24 @@ async function fetchEventsInRange(
   return (data ?? []) as AnalyticsEventRow[]
 }
 
-function countDistinctUsers(rows: AnalyticsEventRow[]): number {
+/** Distinct user_id count within a set of event rows — the same user logging 5 meals in one day counts once, not 5 times. Exported (pure, DB-agnostic) so it can be unit-tested directly. */
+export function countDistinctUsers(rows: AnalyticsEventRow[]): number {
   return new Set(rows.filter(r => r.user_id).map(r => r.user_id)).size
+}
+
+/** How many distinct users in `rows` are also present in `cohortUserIds` — the cohort-intersection primitive the funnel relies on to guarantee subset counts. */
+export function countDistinctUsersInCohort(rows: AnalyticsEventRow[], cohortUserIds: Set<string>): number {
+  const seen = new Set<string>()
+  for (const row of rows) {
+    if (row.user_id && cohortUserIds.has(row.user_id)) seen.add(row.user_id)
+  }
+  return seen.size
+}
+
+/** mealsLogged / activeFoodLoggers, one decimal place. Null when there are no active loggers (nothing to divide by). Pure, exported for direct testing. */
+export function mealsPerActiveUser(snapshot: { mealsLogged: number; activeFoodLoggers: number }): number | null {
+  if (snapshot.activeFoodLoggers === 0) return null
+  return Math.round((snapshot.mealsLogged / snapshot.activeFoodLoggers) * 10) / 10
 }
 
 export interface DashboardSnapshot {
@@ -71,7 +87,15 @@ async function buildSnapshot(
   const activeFoodLoggers = countDistinctUsers(succeededRows)
   const mealsLogged = succeededRows.length
   const trialsStarted = rows.filter(r => r.event_name === 'trial_started').length
-  const subscriptionsStarted = rows.filter(r => r.event_name === 'subscription_started').length
+  // Distinct users, not raw event count: Stripe delivers both
+  // checkout.session.completed and customer.subscription.created for the
+  // same purchase (both fire subscription_started), and Apple IAP fires it
+  // from both the client sync call and the independent RevenueCat webhook —
+  // neither path is deduplicated at the analytics-write layer, so a raw
+  // row count double-counts real single purchases. Distinct-user counting
+  // doesn't fix the underlying webhook double-fire, but it does stop it from
+  // inflating this dashboard number for the common case (same user, same day).
+  const subscriptionsStarted = countDistinctUsers(rows.filter(r => r.event_name === 'subscription_started'))
 
   const photo = summarizePhotoOutcomes(
     rows
@@ -80,6 +104,7 @@ async function buildSnapshot(
         eventName: r.event_name as 'meal_log_started' | 'meal_log_succeeded' | 'meal_log_failed',
         source: typeof r.properties?.source === 'string' ? r.properties.source : 'other',
         failureType: typeof r.properties?.failure_type === 'string' ? r.properties.failure_type : null,
+        nutritionStatus: typeof r.properties?.nutrition_status === 'string' ? r.properties.nutrition_status : null,
       }))
   )
 
@@ -102,13 +127,29 @@ export async function getLast7DaysSnapshot(
   return { dayKey: `${from}..${today}`, ...stats }
 }
 
+export interface FunnelWithConversions {
+  stages: FunnelStageResult[]
+  /**
+   * subscriptionStarted / trialStarted, both counted within the
+   * accountCreated cohort (same intersected counts the funnel stages use) —
+   * "of the cohort members who started a trial, how many converted to
+   * paid." A separate question from the funnel's own accountCreated-relative
+   * percentages, not a funnel stage itself (trial->paid does not need to be
+   * ≤ 100% of accountCreated as a concept, it needs to be ≤ 100% of
+   * trialStarted, which is guaranteed by both numerator and denominator
+   * being subsets of the same cohort). Null when no cohort member started a
+   * trial yet (nothing to convert from).
+   */
+  trialToPaidPct: number | null
+}
+
 export async function getFunnelCounts(
   supabase: SupabaseClient,
   now = new Date()
-): Promise<FunnelStageResult[]> {
+): Promise<FunnelWithConversions> {
   const today = dashboardDayKey(now)
   // Funnel is all-time (not windowed) — a 7-day window would hide most of
-  // the D7/trial/paid stages for a young product with few users so far.
+  // the trial/paid stages for a young product with few users so far.
   const epoch = '2000-01-01'
 
   const [accountRows, onboardingRows, firstMealRows, trialRows, subRows] = await Promise.all([
@@ -119,18 +160,33 @@ export async function getFunnelCounts(
     fetchEventsInRange(supabase, ['subscription_started'], epoch, today),
   ])
 
-  const cohort = await buildRetentionCohort(supabase, epoch, today)
-  const [d1, d7] = calculateRetentionCurve(cohort, [1, 7], addDaysToDayKey)
+  // Cohort = distinct users who ever fired account_created. Every other
+  // stage below is intersected against this set, not counted independently
+  // — that intersection is what guarantees each stage is a true subset of
+  // accountCreated, so conversionPct can never exceed 100%. Counting each
+  // event independently (the previous design) is exactly what produced the
+  // >100% bug: a user can log a first meal without ever firing
+  // onboarding_completed, or start a trial without ever logging a meal, so
+  // independent counts have no subset relationship to divide by.
+  const accountUserIds = new Set(accountRows.filter(r => r.user_id).map(r => r.user_id!))
 
-  return calculateFunnel({
-    accountCreated: countDistinctUsers(accountRows),
-    onboardingCompleted: countDistinctUsers(onboardingRows),
-    firstMealLogged: countDistinctUsers(firstMealRows),
-    d1Active: d1!.activeCount,
-    d7Active: d7!.activeCount,
-    trialStarted: countDistinctUsers(trialRows),
-    subscriptionStarted: countDistinctUsers(subRows),
+  const onboardingInCohort = countDistinctUsersInCohort(onboardingRows, accountUserIds)
+  const firstMealInCohort = countDistinctUsersInCohort(firstMealRows, accountUserIds)
+  const trialInCohort = countDistinctUsersInCohort(trialRows, accountUserIds)
+  const subInCohort = countDistinctUsersInCohort(subRows, accountUserIds)
+
+  const stages = calculateFunnel({
+    accountCreated: accountUserIds.size,
+    onboardingCompleted: onboardingInCohort,
+    firstMealLogged: firstMealInCohort,
+    trialStarted: trialInCohort,
+    subscriptionStarted: subInCohort,
   })
+
+  return {
+    stages,
+    trialToPaidPct: trialInCohort > 0 ? Math.round((subInCohort / trialInCohort) * 1000) / 10 : null,
+  }
 }
 
 async function buildRetentionCohort(supabase: SupabaseClient, fromDayKey: string, toDayKey: string) {
@@ -162,7 +218,7 @@ export async function getRetentionCurve(
   const today = dashboardDayKey(now)
   const epoch = '2000-01-01'
   const cohort = await buildRetentionCohort(supabase, epoch, today)
-  return calculateRetentionCurve(cohort, [1, 3, 7], addDaysToDayKey)
+  return calculateRetentionCurve(cohort, [1, 3, 7], addDaysToDayKey, today)
 }
 
 export interface SubscriptionOverview {

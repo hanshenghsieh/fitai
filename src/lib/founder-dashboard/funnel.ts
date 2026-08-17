@@ -1,44 +1,57 @@
 /**
- * Phase 2 TASK 4 — funnel calculation (pure, DB-agnostic).
+ * Phase 3 (Founder Dashboard correctness pass) — funnel calculation (pure, DB-agnostic).
  *
- * Account Created -> Onboarding Completed -> First Meal Logged -> D1 Active
- * -> D7 Active -> Trial Started -> Subscription Started.
+ * Account Created -> Onboarding Completed -> First Meal Logged -> Trial
+ * Started -> Subscription Started.
  *
- * Conversion % has two different denominators depending on the stage,
- * matching the worked example in the task spec exactly:
- *   - Onboarding Completed and First Meal Logged: % of the IMMEDIATELY
- *     PRIOR stage (72/100 = 72%, 55/72 = 76.4%).
- *   - D1 Active, D7 Active, Trial Started, Subscription Started: % of the
- *     ACTIVATED cohort (First Meal Logged), not of each other sequentially
- *     (22/55 = 40% for D1, but D7 is 8/55 = 14.5% — NOT 8/22 = 36.4%).
- *     This matches the retention/conversion definitions in
- *     docs/founder-kpi-definitions.md, where D1/D7 retention and trial/paid
- *     conversion are both defined as "% of the activated cohort who did X",
- *     not a strictly nested funnel where each step is a subset % of the
- *     step before it.
+ * Every stage's conversionPct is "% of the accountCreated cohort" — a single,
+ * fixed denominator for the whole funnel, never a chain of stage/prior-stage
+ * ratios and never a mix of independent all-time event counts. This is a
+ * deliberate replacement of the previous design (stage/prior-stage for
+ * onboarding+firstMeal, stage/firstMealLogged for D1/D7/trial/subscription),
+ * which produced >100% conversions in production (e.g. firstMealLogged 2 /
+ * onboardingCompleted 1 = 200%, trialStarted 5 / firstMealLogged 2 = 250%)
+ * because the underlying counts were never guaranteed to be subsets of each
+ * other — a user can log a first meal without ever firing
+ * onboarding_completed, and can start a trial without ever logging a meal.
+ *
+ * The caller (queries.ts) is responsible for passing true cohort-intersected
+ * counts here — i.e. counts.onboardingCompleted must be "how many of the
+ * accountCreated cohort also fired onboarding_completed", not "how many
+ * users total ever fired onboarding_completed". Given that contract, every
+ * stage here is a literal subset of accountCreated, so conversionPct can
+ * never exceed 100% by construction — no clamping needed or wanted.
+ *
+ * D1/D7 retention and Trial->Paid conversion are deliberately NOT part of
+ * this funnel — they are separate questions ("of the people who activated,
+ * how many came back" / "of the people who trialed, how many paid") with
+ * their own cohorts and eligibility rules, computed in retention.ts and
+ * queries.ts respectively. Folding them into this chain is exactly what
+ * caused the previous bug.
  */
 
 export interface FunnelStageCounts {
   accountCreated: number
+  /** Count of accountCreated-cohort users who also fired onboarding_completed. */
   onboardingCompleted: number
+  /** Count of accountCreated-cohort users who also fired first_meal_logged. */
   firstMealLogged: number
-  d1Active: number
-  d7Active: number
+  /** Count of accountCreated-cohort users who also fired trial_started. */
   trialStarted: number
+  /** Count of accountCreated-cohort users who also fired subscription_started. */
   subscriptionStarted: number
 }
 
 export interface FunnelStageResult {
   stage: keyof FunnelStageCounts
   count: number
-  /** 0-100, one decimal place. Null for the first stage or when its denominator is 0. */
+  /** 0-100, one decimal place, always relative to accountCreated. Null for the first stage or when accountCreated is 0. */
   conversionPct: number | null
 }
 
-const SEQUENTIAL_STAGES: (keyof FunnelStageCounts)[] = ['onboardingCompleted', 'firstMealLogged']
-const ACTIVATED_RELATIVE_STAGES: (keyof FunnelStageCounts)[] = [
-  'd1Active',
-  'd7Active',
+const FUNNEL_STAGES: (keyof FunnelStageCounts)[] = [
+  'onboardingCompleted',
+  'firstMealLogged',
   'trialStarted',
   'subscriptionStarted',
 ]
@@ -48,22 +61,15 @@ function roundPct(value: number): number {
 }
 
 export function calculateFunnel(counts: FunnelStageCounts): FunnelStageResult[] {
-  const activated = counts.firstMealLogged
-  let prevCount = counts.accountCreated
+  const cohortSize = counts.accountCreated
 
   const results: FunnelStageResult[] = [
     { stage: 'accountCreated', count: counts.accountCreated, conversionPct: null },
   ]
 
-  for (const stage of [...SEQUENTIAL_STAGES, ...ACTIVATED_RELATIVE_STAGES]) {
+  for (const stage of FUNNEL_STAGES) {
     const count = counts[stage]
-    let conversionPct: number | null
-    if (SEQUENTIAL_STAGES.includes(stage)) {
-      conversionPct = prevCount > 0 ? roundPct(count / prevCount) : null
-      prevCount = count
-    } else {
-      conversionPct = activated > 0 ? roundPct(count / activated) : null
-    }
+    const conversionPct = cohortSize > 0 ? roundPct(count / cohortSize) : null
     results.push({ stage, count, conversionPct })
   }
 
