@@ -233,3 +233,44 @@ describe('Build 38 BUG 4 — compound coverage gate', () => {
     assert.equal(photoV2ReadyForLog(state), true)
   })
 })
+
+describe('CASE E — P0 photo-portion fix: mixed meal (rice + vegetables + bone-in chicken) totals exactly sum its items', () => {
+  const MIXED_MEAL_LABEL = '白飯 + 青江菜 + 櫛瓜 + 帶骨雞腿'
+
+  it('all 4 segments of the reported bug-report meal resolve (previously the chicken segment failed to match at all)', () => {
+    const result = compoundMealCandidateFromLabel(MIXED_MEAL_LABEL)
+    assert.ok(result, 'expected an aggregate candidate for the full 4-segment meal')
+    assert.equal(result!.explanation.includes('未辨識'), false, 'expected all 4 segments to match, not a partial sum')
+  })
+
+  it('the compound total is exactly the sum of each segment resolved independently (macro conservation)', () => {
+    const result = compoundMealCandidateFromLabel(MIXED_MEAL_LABEL)!
+    const rice = wholeFoodSearchCandidates('白飯')[0]!
+    const veg1 = wholeFoodSearchCandidates('青江菜')[0]!
+    const veg2 = wholeFoodSearchCandidates('櫛瓜')[0]!
+    const chicken = wholeFoodSearchCandidates('帶骨雞腿')[0]!
+    const expectedCalories =
+      (rice.macros.calories ?? 0) + (veg1.macros.calories ?? 0) + (veg2.macros.calories ?? 0) + (chicken.macros.calories ?? 0)
+    assert.equal(result.macros.calories, expectedCalories)
+  })
+
+  it('with an explicit "4塊" count on the chicken segment, the total reflects 4 pieces, not 1 (the actual bug-report scenario)', () => {
+    const withCount = compoundMealCandidateFromLabel('白飯 + 青江菜 + 櫛瓜 + 4塊帶骨雞腿')!
+    const withoutCount = compoundMealCandidateFromLabel(MIXED_MEAL_LABEL)!
+    assert.ok(withCount.macros.calories! > withoutCount.macros.calories!)
+  })
+
+  it('the P0 bug-report meal (rice + greens + zucchini + 4 pieces of bone-in chicken thigh) now lands close to the reported plausible manual-estimate range, well above the previously-reported 352 kcal', () => {
+    const result = compoundMealCandidateFromLabel('白飯 + 青江菜 + 櫛瓜 + 4塊帶骨雞腿')!
+    // Rice/veg here fall back to the 100g reference (no explicit weight in
+    // the label) — a real photo where the AI also reports rice/veg portion
+    // text would land higher still via buildQuantifiedLabel. This asserts
+    // the fix's direction and magnitude, not a single "true" number: must be
+    // meaningfully above the reported 352 kcal bug, not just marginally.
+    assert.ok(
+      result.macros.calories! >= 450,
+      `expected total calories meaningfully above the reported 352 kcal bug, got ${result.macros.calories}`
+    )
+    assert.notEqual(result.macros.calories, 352)
+  })
+})

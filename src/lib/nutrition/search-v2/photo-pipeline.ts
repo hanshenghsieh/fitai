@@ -24,6 +24,7 @@ import { collectClientCandidates } from '@/lib/nutrition/search-v2/matcher-core'
 import { compoundMealCandidateFromLabel } from '@/lib/nutrition/search-v2/compound-meal-candidate'
 import type { PhotoAiMeta } from '@/lib/banks/types'
 import { PHOTO_UI_CANDIDATE_LIMIT } from '@/lib/nutrition/photo-display-limits'
+import { checkMacroCalorieConsistency } from '@/lib/nutrition/search-v2/nutrition-sanity-check'
 
 export interface PhotoV2State {
   detected_label: string
@@ -356,6 +357,27 @@ export function finalizePhotoV2ToFoodLogPayload(
     : resolved.level === 'A' && !state.user_confirmed
       ? 'A'
       : 'B'
+
+  // P0 photo-portion fix — Step 5 sanity check. Observability only: never
+  // blocks the save, never changes `macros`. See nutrition-sanity-check.ts.
+  if (macros.calories != null && macros.protein != null && macros.fat != null && macros.carbs != null) {
+    const sanityWarnings = checkMacroCalorieConsistency({
+      calories: macros.calories,
+      protein: macros.protein,
+      fat: macros.fat,
+      carbs: macros.carbs,
+    })
+    if (sanityWarnings.length > 0) {
+      console.warn('[photo-pipeline] nutrition sanity check flagged this result', {
+        photo_id: state.photo_id,
+        detected_label: state.detected_label,
+        matched_name: official.name,
+        macros,
+        warnings: sanityWarnings,
+      })
+      photo_ai_meta.photo_ai_sanity_warning = sanityWarnings.map(w => w.message).join('; ')
+    }
+  }
 
   return {
     id: opts.id,

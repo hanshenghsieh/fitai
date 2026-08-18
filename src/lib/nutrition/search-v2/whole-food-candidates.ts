@@ -23,9 +23,14 @@ const MAX_PLAUSIBLE_PIECES = 20
 /** Reference scale shown when no quantity is known and the food has no vetted piece weight. */
 const REFERENCE_GRAMS = 100
 
-const QUANTITY_STRIP_PATTERN = /^\s*\d+(?:\.\d+)?\s*(g|克|公克|顆|個|粒)\s*/i
+// P0 photo-portion fix — 塊/支/片/份 cover how the photo-vision prompt's own
+// example portion text counts meat/bone-in pieces ("約 4 塊", "2 支雞翅"),
+// which previously had no quantity unit at all and silently fell through to
+// the flat REFERENCE_GRAMS default regardless of how many pieces were
+// visible. 顆/個/粒 (whole small items like eggs/fruit) were already here.
+const QUANTITY_STRIP_PATTERN = /^\s*\d+(?:\.\d+)?\s*(g|克|公克|顆|個|粒|塊|支|片|份)\s*/i
 const GRAM_PATTERN = /(\d+(?:\.\d+)?)\s*(g|克|公克)/i
-const COUNT_PATTERN = /(\d+(?:\.\d+)?)\s*(顆|個|粒)/
+const COUNT_PATTERN = /(\d+(?:\.\d+)?)\s*(顆|個|粒|塊|支|片|份)/
 
 export interface ParsedFoodQuantity {
   grams: number
@@ -81,7 +86,12 @@ export function parseFoodQuantityGrams(
   return { grams: REFERENCE_GRAMS, explicit: false, clamped: false, unresolved: true }
 }
 
-function scaleMacros(food: WholeFoodReference, grams: number): NutritionMacros {
+function scaleMacros(food: WholeFoodReference, grossGrams: number): NutritionMacros {
+  // Build 38 BUG 2 — bone-in items (排骨 etc.) report a gross/as-served
+  // weight; calories_per_100 etc. are per 100g of edible meat, so the gram
+  // amount must be discounted by edible_fraction before scaling — matching
+  // the same fix in home-cooked/portion-calculator.ts's calculateIngredientPortion.
+  const grams = food.edible_fraction != null ? grossGrams * food.edible_fraction : grossGrams
   const factor = grams / 100
   return {
     calories: Math.round(food.calories_per_100 * factor),
@@ -123,6 +133,26 @@ export function wholeFoodSearchCandidates(query: string): SearchV2Candidate[] {
     : quantity.explicit
       ? `${Math.round(quantity.grams)}g`
       : `約 ${Math.round(quantity.grams)}g（未指定份量，以一般一顆估算）`
+
+  // P0 photo-portion fix — Step 11 observability. Production previously only
+  // saw the final summed kcal with no way to reconstruct which ingredient
+  // matched which DB row, what weight was assumed, or what kcal_per_100g was
+  // applied. Dev/server-only structured log (console.debug, not persisted to
+  // the user's nutrition record) — no image data, no PII, just the numbers
+  // that produced this candidate.
+  console.debug('[whole-food-candidates] resolved', {
+    recognized_food: nameOnly,
+    matched_food_name: food.name_zh,
+    match_confidence: confidence,
+    estimated_weight_g: Math.round(quantity.grams),
+    weight_explicit: quantity.explicit,
+    weight_unresolved: quantity.unresolved,
+    edible_fraction: food.edible_fraction ?? null,
+    edible_weight_g: food.edible_fraction != null ? Math.round(quantity.grams * food.edible_fraction) : null,
+    kcal_per_100g: food.calories_per_100,
+    calculated_kcal: macros.calories,
+    nutrition_source: food.source ?? '食材資料庫',
+  })
 
   return [
     {

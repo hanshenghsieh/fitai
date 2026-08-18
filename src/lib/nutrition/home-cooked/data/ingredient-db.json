@@ -341,7 +341,9 @@
     "state": "熟/可食部",
     "aliases": [
       "雞翅（熟）",
-      "雞翅"
+      "雞翅",
+      "帶骨雞翅",
+      "雞翅膀"
     ],
     "calories_per_100": 254,
     "protein_g_per_100": 23.8,
@@ -349,8 +351,36 @@
     "fat_g_per_100": 16.9,
     "sodium_mg_per_100": 87,
     "default_unit": "g",
+    "grams_per_piece": 35,
+    "edible_fraction": 0.58,
     "source": "USDA FDC",
-    "note": "含皮版本偏高脂"
+    "note": "含皮版本偏高脂；雞翅本身即為帶骨部位，calories/protein/fat 為每 100g 可食肉，回報份量（例：2支雞翅）視為含骨重量，以 edible_fraction 換算實際可食肉重"
+  },
+  {
+    "id": "me077",
+    "food_id": "ME077",
+    "name_zh": "雞腿（帶骨，熟）",
+    "category": "protein",
+    "excel_category": "肉類/蛋白質",
+    "state": "熟/可食部",
+    "aliases": [
+      "雞腿（帶骨，熟）",
+      "帶骨雞腿",
+      "雞腿（帶骨）",
+      "帶骨雞腿肉",
+      "全雞腿",
+      "雞腿（連骨）"
+    ],
+    "calories_per_100": 232,
+    "protein_g_per_100": 25.9,
+    "carbs_g_per_100": 0,
+    "fat_g_per_100": 13.5,
+    "sodium_mg_per_100": 82,
+    "default_unit": "g",
+    "grams_per_piece": 50,
+    "edible_fraction": 0.7,
+    "source": "USDA FDC / Taiwan FDA / estimate",
+    "note": "P0 照片營養估算修復 — 帶骨雞腿（如烤雞腿、滷雞腿、切塊拌炒），與去骨雞腿肉（me002/me018）為不同品項。calories/protein/fat 沿用熟帶皮雞腿肉（me018）每 100g 可食肉數值；回報份量（例：4塊雞腿）視為含骨重量，以 edible_fraction 換算實際可食肉重。grams_per_piece 假設為「切塊」份量（家常菜常見的帶骨雞腿丁，非整支雞腿）——若照片實際是整支帶骨雞腿，單支重量會明顯更高；此為估計值，非精確秤重，不確定時應由使用者調整份量修正"
   },
   {
     "id": "me004",
@@ -3122,7 +3152,9 @@
     "state": "熟/可食部",
     "aliases": [
       "雞小腿（熟）",
-      "雞小腿"
+      "雞小腿",
+      "棒棒腿",
+      "帶骨雞小腿"
     ],
     "calories_per_100": 216,
     "protein_g_per_100": 27,
@@ -3130,7 +3162,10 @@
     "fat_g_per_100": 11.2,
     "sodium_mg_per_100": 90,
     "default_unit": "g",
-    "source": "USDA FDC / Taiwan FDA / estimate"
+    "grams_per_piece": 70,
+    "edible_fraction": 0.67,
+    "source": "USDA FDC / Taiwan FDA / estimate",
+    "note": "雞小腿（棒棒腿）本身即為帶骨部位，calories/protein/fat 為每 100g 可食肉，回報份量（例：1支棒棒腿）視為含骨重量，以 edible_fraction 換算實際可食肉重"
   },
   {
     "id": "me020",
@@ -3352,7 +3387,12 @@
     "state": "熟/可食部",
     "aliases": [
       "豬肋排（熟）",
-      "豬肋排"
+      "豬肋排",
+      "排骨",
+      "豬排骨",
+      "小排",
+      "小排骨",
+      "肋排"
     ],
     "calories_per_100": 361,
     "protein_g_per_100": 24,
@@ -3360,8 +3400,9 @@
     "fat_g_per_100": 29,
     "sodium_mg_per_100": 90,
     "default_unit": "g",
+    "edible_fraction": 0.65,
     "source": "USDA FDC / Taiwan FDA / estimate",
-    "note": "骨頭需扣除不可食重"
+    "note": "骨頭需扣除不可食重；calories/protein/fat 為每 100g 可食瘦肉，回報份量（例：150g排骨）視為含骨重量，以 edible_fraction 換算實際可食肉重"
   },
   {
     "id": "me032",

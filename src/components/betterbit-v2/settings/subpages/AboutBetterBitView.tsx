@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { formatAppVersionWithBuild } from '@/lib/app-version'
 import { isNativeIOS } from '@/lib/capacitor-native'
+import { getNativeAppInfo, type NativeAppInfo } from '@/lib/native-app-info'
 import V2SupportPageShell from '@/components/betterbit-v2/settings/visual-v2/V2SupportPageShell'
 import V2SettingsVisualCard from '@/components/betterbit-v2/settings/visual-v2/V2SettingsVisualCard'
 import V2OverlayPortal from '@/components/betterbit-v2/settings/visual-v2/V2OverlayPortal'
@@ -32,10 +33,18 @@ export default function AboutBetterBitView({ appVersion }: { appVersion: string 
   const router = useRouter()
   const [modal, setModal] = useState<ModalContent | null>(null)
   const [onIos, setOnIos] = useState(false)
-  const versionLabel = formatAppVersionWithBuild(appVersion)
+  const [nativeInfo, setNativeInfo] = useState<NativeAppInfo | null>(null)
+  // On native iOS, prefer the real installed version/build (App.getInfo())
+  // over the package.json-derived `appVersion` prop — see native-app-info.ts.
+  // Falls back to the existing package.json path on web, or if the native
+  // call fails for any reason, never a hardcoded literal.
+  const versionLabel = nativeInfo
+    ? formatAppVersionWithBuild(nativeInfo.version, nativeInfo.build)
+    : formatAppVersionWithBuild(appVersion)
 
   useEffect(() => {
     setOnIos(isNativeIOS())
+    void getNativeAppInfo().then(setNativeInfo)
   }, [])
 
   const thirdPartyBody = onIos
@@ -68,7 +77,9 @@ export default function AboutBetterBitView({ appVersion }: { appVersion: string 
             onClick={() =>
               setModal({
                 title: '版本資訊',
-                body: `Betterbit ${versionLabel}\n\n版本號來自 package.json，build 號可透過 NEXT_PUBLIC_APP_BUILD 設定。`,
+                body: nativeInfo
+                  ? `Betterbit ${versionLabel}\n\n版本號讀取自 App 實際安裝版本。`
+                  : `Betterbit ${versionLabel}\n\n版本號來自 package.json，build 號可透過 NEXT_PUBLIC_APP_BUILD 設定。`,
               })
             }
           />

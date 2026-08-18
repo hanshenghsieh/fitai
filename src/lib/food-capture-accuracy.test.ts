@@ -6,6 +6,7 @@ import {
   lookupVerifiedFood,
   parsePhotoApiResponse,
   scaledDimensions,
+  buildQuantifiedLabel,
   NATIVE_PHOTO_MAX_EDGE,
   NATIVE_PHOTO_JPEG_QUALITY,
   type PhotoParseResult,
@@ -140,5 +141,76 @@ describe('Build 38 BUG 4 — first-pass photo quality', () => {
     const dims = scaledDimensions(600, 800, NATIVE_PHOTO_MAX_EDGE)
     assert.equal(dims.width, 600)
     assert.equal(dims.height, 800)
+  })
+})
+
+describe('P0 photo-portion fix — buildQuantifiedLabel propagates the AI\'s free-text portion forward', () => {
+  it('a portion with a leading-recognizable count is prepended to the name', () => {
+    assert.equal(buildQuantifiedLabel('雞腿肉', '約 4 塊'), '4塊雞腿肉')
+  })
+
+  it('a portion with an explicit gram amount is prepended the same way', () => {
+    assert.equal(buildQuantifiedLabel('白飯', '約 150g'), '150g白飯')
+  })
+
+  it('no portion text at all -> name is returned unchanged (never invents a quantity)', () => {
+    assert.equal(buildQuantifiedLabel('青江菜', undefined), '青江菜')
+  })
+
+  it('portion text with no recognizable count/gram token -> name is returned unchanged', () => {
+    assert.equal(buildQuantifiedLabel('青江菜', '一些'), '青江菜')
+    assert.equal(buildQuantifiedLabel('青江菜', ''), '青江菜')
+  })
+
+  it('parsePhotoApiResponse actually threads portion through end to end for a multi-item photo', () => {
+    const result = parsePhotoApiResponse({
+      data: {
+        is_composite_dish: false,
+        items: [
+          { name: '白飯', portion: '約 1 碗', confidence: 'medium' },
+          { name: '雞腿肉', portion: '約 4 塊', confidence: 'medium' },
+        ],
+      },
+    })
+    assert.match(result.name, /4塊雞腿肉/)
+  })
+})
+
+describe('CASE D — malformed/edge-case AI responses must never silently produce a confident wrong result', () => {
+  it('an empty items array does not throw, resolves to an empty name', () => {
+    assert.doesNotThrow(() => parsePhotoApiResponse({ data: { items: [] } }))
+    const result = parsePhotoApiResponse({ data: { items: [] } })
+    assert.equal(result.name, '')
+  })
+
+  it('missing data entirely does not throw', () => {
+    assert.doesNotThrow(() => parsePhotoApiResponse({}))
+    const result = parsePhotoApiResponse({})
+    assert.equal(result.name, '')
+  })
+
+  it('an item with an empty-string name is filtered out, not joined as a blank segment', () => {
+    const result = parsePhotoApiResponse({
+      data: { items: [{ name: '', confidence: 'low' }, { name: '雞腿肉', confidence: 'high' }] },
+    })
+    assert.equal(result.name, '雞腿肉')
+  })
+
+  it('portion = "0塊" (zero count) does not crash buildQuantifiedLabel and does not fabricate a phantom quantity token silently accepted downstream as literal zero', () => {
+    assert.doesNotThrow(() => buildQuantifiedLabel('雞腿肉', '0塊'))
+    // "0塊雞腿肉" is intentionally passed through as-is — parseFoodQuantityGrams
+    // (whole-food-candidates.ts) is the layer responsible for rejecting a
+    // non-positive count and clamping to a single piece; this layer's job is
+    // only to not crash and not invent text that wasn't there.
+    assert.equal(buildQuantifiedLabel('雞腿肉', '0塊'), '0塊雞腿肉')
+  })
+
+  it('an extreme/implausible portion count does not throw here — the downstream severe-error guard (parseFoodQuantityGrams) is what clamps it', () => {
+    assert.doesNotThrow(() => buildQuantifiedLabel('雞腿肉', '約 9999 塊'))
+  })
+
+  it('a portion string with only non-numeric junk does not throw and falls back to the bare name', () => {
+    assert.doesNotThrow(() => buildQuantifiedLabel('雞腿肉', '看不清楚份量'))
+    assert.equal(buildQuantifiedLabel('雞腿肉', '看不清楚份量'), '雞腿肉')
   })
 })

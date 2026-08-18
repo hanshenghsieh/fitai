@@ -258,10 +258,37 @@ export interface PhotoParseResult {
 export type PhotoApiJson = {
   error?: string
   data?: {
-    items: Array<{ name: string; confidence: 'high' | 'medium' | 'low' }>
+    items: Array<{ name: string; portion?: string; confidence: 'high' | 'medium' | 'low' }>
     is_composite_dish?: boolean
     dish_name?: string
   }
+}
+
+/**
+ * P0 photo-portion fix — the AI vision prompt (see claude/client.ts) already
+ * asks for a free-text portion description per item (e.g. "約 4 塊", "約 1
+ * 顆") and the server already returns it (FoodPhotoParseSchema has `portion`)
+ * — but this type never declared the field, so it was silently dropped here
+ * and every matched ingredient fell through to a flat, unadjusted 100g
+ * reference weight regardless of how much was actually visible (a full bowl
+ * of rice and a garnish of greens were priced identically; "4 pieces of
+ * chicken thigh" was priced as if it were 100g total). When the portion text
+ * starts with a recognizable count/gram token, this prepends it to the food
+ * name (e.g. "雞腿肉" + "約 4 塊" -> "4塊雞腿肉") so it survives the
+ * "+"-joined label all the way to parseFoodQuantityGrams
+ * (search-v2/whole-food-candidates.ts), which already reads a leading
+ * count/gram token with the same 顆/個/粒/塊/支/片/份/g/克/公克 vocabulary.
+ * No parseable token -> name is returned unchanged, identical to today's
+ * behavior — this never invents a quantity that wasn't already there.
+ */
+const PORTION_LEADING_QUANTITY = /(\d+(?:\.\d+)?)\s*(g|克|公克|顆|個|粒|塊|支|片|份)/i
+
+export function buildQuantifiedLabel(name: string, portion: string | undefined): string {
+  const trimmedName = name.trim()
+  if (!portion) return trimmedName
+  const match = portion.match(PORTION_LEADING_QUANTITY)
+  if (!match) return trimmedName
+  return `${match[1]}${match[2]}${trimmedName}`
 }
 
 /**
@@ -275,7 +302,7 @@ export type PhotoApiJson = {
  */
 export function parsePhotoApiResponse(json: PhotoApiJson): PhotoParseResult {
   const items = json.data?.items ?? []
-  const names = items.map(item => item.name.trim()).filter(Boolean)
+  const names = items.map(item => buildQuantifiedLabel(item.name, item.portion)).filter(Boolean)
   const dishName = json.data?.dish_name?.trim()
   const isCompositeDish = json.data?.is_composite_dish === true
   const name =

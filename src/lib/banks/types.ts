@@ -68,6 +68,8 @@ export interface PhotoAiMeta {
   photo_ai_detected_label: string
   photo_ai_visual_category: string
   photo_ai_category_confidence: string
+  /** P0 photo-portion fix — set when nutrition-sanity-check.ts flags this result as internally inconsistent (e.g. macros don't add up to the total). Observability only; never blocks the save or changes the stored macros. */
+  photo_ai_sanity_warning?: string
 }
 
 export interface PhotoCorrectionMeta {

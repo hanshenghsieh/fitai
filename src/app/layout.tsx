@@ -5,6 +5,7 @@ import '@/styles/betterbit-v2.css'
 import '@/styles/capacitor-ios-shell.css'
 import { Toaster } from '@/components/ui/sonner'
 import CapacitorShell from '@/components/capacitor/CapacitorShell'
+import AppUpdateGate from '@/components/update/AppUpdateGate'
 import OfflineShell from '@/components/capacitor/OfflineShell'
 import OfflineMutationSync from '@/components/offline/OfflineMutationSync'
 import NativeAuthCallbackListener from '@/components/auth/NativeAuthCallbackListener'
@@ -93,6 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <NativeAuthCallbackListener />
         <CapacitorShell />
+        <AppUpdateGate />
         <OfflineMutationSync />
         <OfflineShell />
         <Toaster theme="light" richColors={false} position="top-center" />
