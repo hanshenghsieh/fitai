@@ -32,6 +32,17 @@ export interface WholeFoodReference {
   vegan?: boolean
   source?: string
   note?: string
+  /**
+   * Build 38 BUG 2 — fraction (0-1) of a reported gross/as-served weight
+   * that is actually edible meat, for bone-in items (排骨, 雞翅, 魚 with
+   * bone, etc.). When set, an estimated portion like "150g排骨" is treated
+   * as 150g of bone-in product, not 150g of pure meat — calories_per_100 /
+   * protein_g_per_100 / etc. are still per-100g-of-edible-meat (unchanged
+   * convention for this DB), but the gram amount gets scaled down by this
+   * fraction before applying them. Omitted (undefined) means the food is
+   * already boneless/fully edible, matching every other entry in this DB.
+   */
+  edible_fraction?: number
 }
 
 export interface OilRule {
