@@ -322,7 +322,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 41;
+				CURRENT_PROJECT_VERSION = 42;
 				DEVELOPMENT_TEAM = 65YBSTG96W;
 				GOOGLE_IOS_CLIENT_ID = "403467297093-roq8l6b583110qqeh90rpurmugnhd3do.apps.googleusercontent.com";
 				GOOGLE_REVERSED_IOS_CLIENT_ID = "com.googleusercontent.apps.403467297093-roq8l6b583110qqeh90rpurmugnhd3do";
@@ -333,7 +333,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = app.fitai.betterbit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -349,7 +349,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 41;
+				CURRENT_PROJECT_VERSION = 42;
 				DEVELOPMENT_TEAM = 65YBSTG96W;
 				GOOGLE_IOS_CLIENT_ID = "403467297093-roq8l6b583110qqeh90rpurmugnhd3do.apps.googleusercontent.com";
 				GOOGLE_REVERSED_IOS_CLIENT_ID = "com.googleusercontent.apps.403467297093-roq8l6b583110qqeh90rpurmugnhd3do";
@@ -360,7 +360,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = app.fitai.betterbit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
