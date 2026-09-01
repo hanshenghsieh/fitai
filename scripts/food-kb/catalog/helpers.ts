@@ -7,53 +7,49 @@ export type CatalogItem = SeedTemplate & {
 
 export type BrandCatalog = Record<string, CatalogItem[]>
 
-export function drink(
-  name: string,
-  calories: number,
-  a: number,
-  b: number,
-  c?: number | Partial<CatalogItem>,
-  d?: Partial<CatalogItem>
-): CatalogItem {
-  let protein_g = 1
-  let carbs_g: number
-  let fat_g: number | undefined
-  let price: number
-  let extra: Partial<CatalogItem> | undefined
+export interface DrinkInput {
+  name: string
+  calories: number
+  /** Explicit and required — no positional-argument guessing. Use 0 for a protein-free drink, never omit it. */
+  protein_g: number
+  carbs_g: number
+  /** Defaults to 10% of carbs_g (a rough placeholder) only when genuinely unknown — pass the real value whenever the source has one. */
+  fat_g?: number
+  /** Defaults to 70% of carbs_g when unknown. */
+  sugar_g?: number
+  price: number
+  role?: string
+  meal_category?: 'breakfast' | 'lunch' | 'dinner'
+  tags?: string[]
+  aliases?: string[]
+}
 
-  if (typeof c === 'number') {
-    if (typeof d === 'object') {
-      // (cal, protein, carbs, price, extra)
-      protein_g = a
-      carbs_g = b
-      price = c
-      extra = d
-    } else {
-      // (cal, carbs, fat, price, extra?)
-      carbs_g = a
-      fat_g = b
-      price = c
-      extra = d
-    }
-  } else {
-    // (cal, carbs, price, extra?)
-    carbs_g = a
-    price = b
-    extra = c
-  }
-
+/**
+ * Single named-field signature — deliberately NOT overloaded by argument
+ * count/type. The prior positional form drink(name, cal, a, b, c?, d?)
+ * silently reinterpreted which number meant protein vs. carbs vs. fat
+ * depending on how many arguments a call happened to pass, which corrupted
+ * hundreds of generated bubble-tea records (protein/carbs/fat swapped) and
+ * mis-routed price entirely for at least two other items (米漿, 可樂) whose
+ * calls simply had one argument too many for the overload to notice. See
+ * the 2026-08 menu-nutrition-integrity audit. There is no positional
+ * fallback here on purpose — every nutrition field must be named at the
+ * call site so a reviewer (and the compiler) can see exactly what maps to
+ * what.
+ */
+export function drink(input: DrinkInput): CatalogItem {
   return {
-    name,
-    meal_category: 'lunch',
-    role: 'drink',
-    calories,
-    protein_g: extra?.protein_g ?? protein_g,
-    carbs_g,
-    fat_g: extra?.fat_g ?? fat_g ?? Math.round(carbs_g * 0.1),
-    sugar_g: extra?.sugar_g ?? Math.round(carbs_g * 0.7),
-    price,
-    tags: ['drink', ...(extra?.tags ?? [])],
-    aliases: extra?.aliases,
+    name: input.name,
+    meal_category: input.meal_category ?? 'lunch',
+    role: input.role ?? 'drink',
+    calories: input.calories,
+    protein_g: input.protein_g,
+    carbs_g: input.carbs_g,
+    fat_g: input.fat_g ?? Math.round(input.carbs_g * 0.1),
+    sugar_g: input.sugar_g ?? Math.round(input.carbs_g * 0.7),
+    price: input.price,
+    tags: ['drink', ...(input.tags ?? [])],
+    aliases: input.aliases,
   }
 }
 
@@ -110,8 +106,15 @@ export function side(
     role: 'side',
     calories,
     protein_g,
-    carbs_g: carbs_g ?? extra?.carbs_g ?? Math.round(calories * 0.4),
-    fat_g: fat_g ?? extra?.fat_g ?? Math.round(calories * 0.2),
+    // Bug fix (menu-nutrition-integrity audit, phase 3): these defaults were
+    // Math.round(calories * 0.4) / Math.round(calories * 0.2) — the exact
+    // same calorie-share-treated-as-grams mistake found and fixed in
+    // generate-expanded-menu.mjs. Dividing by the energy density (4 kcal/g
+    // carbs, 9 kcal/g fat) converts the intended ~40%/~20% calorie share
+    // into an actual gram value instead of a wildly oversized one (e.g. a
+    // 300kcal side item was defaulting to 120g carbs — 480kcal on its own).
+    carbs_g: carbs_g ?? extra?.carbs_g ?? Math.round((calories * 0.4) / 4),
+    fat_g: fat_g ?? extra?.fat_g ?? Math.round((calories * 0.2) / 9),
     price,
     tags: ['side', ...(extra?.tags ?? [])],
   }

@@ -287,7 +287,7 @@
     "name": "豆漿（中杯）",
     "store": "麥味登",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -309,7 +309,7 @@
     "name": "米漿（中杯）",
     "store": "麥味登",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -317,11 +317,11 @@
       "breakfast"
     ],
     "calories": 185,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 29,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "麥味登 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "breakfast"
@@ -331,7 +331,7 @@
     "name": "紅茶（中杯）",
     "store": "麥味登",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1016,7 +1016,7 @@
     "name": "豆漿（中杯）",
     "store": "Q Burger",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1038,7 +1038,7 @@
     "name": "米漿（中杯）",
     "store": "Q Burger",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1046,11 +1046,11 @@
       "breakfast"
     ],
     "calories": 182,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 28,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "Q Burger · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "breakfast"
@@ -1060,7 +1060,7 @@
     "name": "紅茶（中杯）",
     "store": "Q Burger",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1925,7 +1925,7 @@
     "name": "豆漿（中杯）",
     "store": "弘爺漢堡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1947,7 +1947,7 @@
     "name": "米漿（中杯）",
     "store": "弘爺漢堡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1955,11 +1955,11 @@
       "breakfast"
     ],
     "calories": 171,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 27,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 27,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "弘爺漢堡 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "breakfast"
@@ -1969,7 +1969,7 @@
     "name": "紅茶（中杯）",
     "store": "弘爺漢堡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -2334,7 +2334,7 @@
     "name": "豆漿（中杯）",
     "store": "拉亞漢堡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -2356,7 +2356,7 @@
     "name": "米漿（中杯）",
     "store": "拉亞漢堡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -2364,11 +2364,11 @@
       "breakfast"
     ],
     "calories": 169,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 27,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 26,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 30,
     "photo_url": "",
     "description": "拉亞漢堡 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "breakfast"
@@ -2378,7 +2378,7 @@
     "name": "紅茶（中杯）",
     "store": "拉亞漢堡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -3483,7 +3483,7 @@
     "name": "豆漿（中杯）",
     "store": "早安美芝城",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -3505,7 +3505,7 @@
     "name": "米漿（中杯）",
     "store": "早安美芝城",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -3513,11 +3513,11 @@
       "breakfast"
     ],
     "calories": 176,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 27,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "早安美芝城 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "breakfast"
@@ -3527,7 +3527,7 @@
     "name": "紅茶（中杯）",
     "store": "早安美芝城",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -4212,7 +4212,7 @@
     "name": "豆漿（中杯）",
     "store": "晨間廚房",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -4234,7 +4234,7 @@
     "name": "米漿（中杯）",
     "store": "晨間廚房",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -4242,11 +4242,11 @@
       "breakfast"
     ],
     "calories": 189,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 29,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 29,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 30,
     "photo_url": "",
     "description": "晨間廚房 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "breakfast"
@@ -4379,7 +4379,7 @@
     "name": "豆漿（中杯）",
     "store": "美而美",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -4401,7 +4401,7 @@
     "name": "米漿（中杯）",
     "store": "美而美",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -4409,11 +4409,11 @@
       "breakfast"
     ],
     "calories": 176,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 27,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "美而美 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "breakfast"
@@ -4423,7 +4423,7 @@
     "name": "紅茶（中杯）",
     "store": "美而美",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -5608,7 +5608,7 @@
     "name": "豆漿（中杯）",
     "store": "呷尚寶",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -5630,7 +5630,7 @@
     "name": "米漿（中杯）",
     "store": "呷尚寶",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -5638,11 +5638,11 @@
       "breakfast"
     ],
     "calories": 185,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 29,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "呷尚寶 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "breakfast"
@@ -5652,7 +5652,7 @@
     "name": "紅茶（中杯）",
     "store": "呷尚寶",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -6177,7 +6177,7 @@
     "name": "豆漿（中杯）",
     "store": "早安山丘",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -6199,7 +6199,7 @@
     "name": "米漿（中杯）",
     "store": "早安山丘",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -6207,11 +6207,11 @@
       "breakfast"
     ],
     "calories": 175,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 27,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 30,
     "photo_url": "",
     "description": "早安山丘 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "breakfast"
@@ -6221,7 +6221,7 @@
     "name": "紅茶（中杯）",
     "store": "早安山丘",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -6866,7 +6866,7 @@
     "name": "豆漿（中杯）",
     "store": "巨林美而美",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -6888,7 +6888,7 @@
     "name": "米漿（中杯）",
     "store": "巨林美而美",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -6896,11 +6896,11 @@
       "breakfast"
     ],
     "calories": 182,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 28,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "巨林美而美 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "breakfast"
@@ -6910,7 +6910,7 @@
     "name": "紅茶（中杯）",
     "store": "巨林美而美",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { usePathname } from 'next/navigation'
 import { format, subDays, parseISO } from 'date-fns'
 import { searchFoodMenu, type FoodSearchHit } from '@/lib/food-search'
+import { deriveNutritionProvenanceFromHit } from '@/lib/nutrition/ai-fallback-search-hit'
 import FoodTypePortionSheet from '@/components/dashboard/today/FoodTypePortionSheet'
 import EstimateMealSheet from '@/components/dashboard/today/EstimateMealSheet'
 import { getP0FoodById } from '@/lib/nutrition/p0-common-foods/catalog'
@@ -1260,7 +1261,7 @@ export default function TodayOS({
   }, [photoDraft, photoSaving, commitLog, closePhotoSheet, activeSlot])
 
   const savePhotoDraft = useCallback(() => {
-    if (!photoDraft || photoSaving || photoDraft.loading) return
+    if (!photoDraft || photoSaving || photoDraft.loading || photoDraft.matchingNutrition) return
 
     const accuracy =
       photoDraft.accuracy ??
@@ -1840,6 +1841,7 @@ export default function TodayOS({
         setMoreOpen(false)
         return
       }
+      const provenance = deriveNutritionProvenanceFromHit(item)
       commitLog({
         id: item.id,
         name: item.name,
@@ -1847,15 +1849,15 @@ export default function TodayOS({
         user_input_label: trimmedQuery || item.name,
         matched_item_label: item.name,
         matched_restaurant: item.store,
-        match_type: 'user_selected_verified_item',
+        match_type: item.searchSource === 'ai_estimate' ? 'ai_nutrition_fallback' : 'user_selected_verified_item',
         store: item.store,
         calories: item.calories,
         protein_g: item.protein_g,
         carbs_g: item.carbs_g,
         fat_g: item.fat_g,
         source: 'search',
-        nutrition_status: item.sourceType === 'official' ? 'official' : 'estimated',
-        nutrition_confidence: item.sourceType === 'official' ? 'A' : 'B',
+        nutrition_status: provenance.nutrition_status,
+        nutrition_confidence: provenance.nutrition_confidence,
         capture_status: 'resolved',
       })
       setQuery('')

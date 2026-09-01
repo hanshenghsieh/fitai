@@ -19,6 +19,7 @@ import { photoV2UiMessage } from '@/lib/nutrition/search-v2/photo-pipeline'
 import type { ConfirmationQuestion, UserConfirmationAnswers } from '@/lib/nutrition/types'
 import { isNativeIOS } from '@/lib/capacitor-native'
 import type { FoodPhotoSource } from '@/lib/food-capture'
+import { isPhotoConfirmDisabled } from '@/lib/nutrition/photo-confirm-readiness'
 
 const ICON_STROKE = TODAY.iconStroke
 const IOS_LITE_CANDIDATE_LIMIT = 3
@@ -272,11 +273,15 @@ function PhotoReviewFooter({
   onClose: () => void
 }) {
   const step: 1 | 2 | 3 = draft.loading ? 1 : readyForLog || iosLiteMode ? 3 : 2
-  const primaryDisabled =
-    draft.loading ||
-    saving ||
-    !draft.name.trim() ||
-    (iosLiteMode ? !onSavePhotoOnly : !readyForLog)
+  const primaryDisabled = isPhotoConfirmDisabled({
+    loading: draft.loading,
+    matchingNutrition: draft.matchingNutrition,
+    saving,
+    nameTrim: draft.name.trim(),
+    iosLiteMode,
+    hasSavePhotoOnly: !!onSavePhotoOnly,
+    readyForLog,
+  })
   const handlePrimary = iosLiteMode && onSavePhotoOnly ? onSavePhotoOnly : onSave
 
   return (

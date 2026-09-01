@@ -108,6 +108,57 @@ export function buildAllCategorySeeds(categories?: KbCategory[]): {
   return { byCategory, total }
 }
 
+export interface DrinkStructuralIssue {
+  id: string
+  message: string
+  severity: 'warning' | 'severe'
+}
+
+const STRUCTURALLY_CHECKED_ROLES = new Set(['drink', 'side'])
+
+/**
+ * Structural/numerical integrity check on freshly generated output — NOT the
+ * production trust gate (placeholder/restaurant-allowlist/macro-band checks
+ * stay in menu-confidence-core.ts and are not duplicated here; a placeholder
+ * item does not need to pass this). This exists so the exact bug class this
+ * generator has now produced twice — once in drink()'s old positional
+ * overload, once in side()'s calorie-share-treated-as-grams default formula
+ * — fails generation loudly instead of silently writing corrupted seeds
+ * that surface as a support ticket months later. Scoped to 'drink' and
+ * 'side' roles specifically: those are the two helpers with a fallback
+ * default formula that can silently produce an implausible value. meal()
+ * takes every macro as a required, explicit argument with no fallback, so
+ * it isn't at risk of this specific bug class.
+ *
+ * Two tiers, on purpose: a ratio outside the production energy-balance band
+ * ([0.72, 1.28] from menu-confidence-core.ts — reused, not redefined) is
+ * flagged as a warning, since some hand-authored recipes are imprecise
+ * without being a mapping bug. A ratio this far off (< 0.4 or > 2.2) has no
+ * innocent explanation — it's the exact signature of a swapped/misrouted
+ * field or a missing energy-density conversion — and blocks generation.
+ */
+export function validateGeneratedDrinks(items: RuntimeMenuItem[]): DrinkStructuralIssue[] {
+  const issues: DrinkStructuralIssue[] = []
+  for (const item of items) {
+    if (!STRUCTURALLY_CHECKED_ROLES.has(item.role)) continue
+    // tweak() floors calories at 1 for a genuinely free item (e.g. plain
+    // unsweetened tea whose base calories is 0), which makes the ratio
+    // structurally noisy/meaningless below this floor — not a mapping bug.
+    if (item.calories < 10) continue
+    const implied = item.protein_g * 4 + item.carbs_g * 4 + item.fat_g * 9
+    const ratio = implied / item.calories
+    if (ratio < 0.72 || ratio > 1.28) {
+      const severe = ratio < 0.4 || ratio > 2.2
+      issues.push({
+        id: item.id,
+        message: `${item.name} (${item.store}): declared ${item.calories}kcal but protein/carbs/fat imply ${Math.round(implied)}kcal (ratio ${ratio.toFixed(2)})`,
+        severity: severe ? 'severe' : 'warning',
+      })
+    }
+  }
+  return issues
+}
+
 function main() {
   const args = process.argv.slice(2)
   let categories: KbCategory[] | undefined
@@ -116,9 +167,24 @@ function main() {
     categories = args[catIdx + 1]!.split(',').map(s => s.trim()) as KbCategory[]
   }
 
-  fs.mkdirSync(OUT_DIR, { recursive: true })
   const { byCategory, total } = buildAllCategorySeeds(categories)
 
+  const allItems = Object.values(byCategory).flat()
+  const issues = validateGeneratedDrinks(allItems)
+  const severe = issues.filter(i => i.severity === 'severe')
+  const warnings = issues.filter(i => i.severity === 'warning')
+  if (warnings.length > 0) {
+    console.warn(`\n⚠ ${warnings.length} drink/side item(s) outside the normal energy-balance band (pre-existing recipe imprecision, not blocking):`)
+    for (const w of warnings.slice(0, 20)) console.warn(`  - ${w.id}: ${w.message}`)
+    if (warnings.length > 20) console.warn(`  ...and ${warnings.length - 20} more`)
+  }
+  if (severe.length > 0) {
+    console.error(`\n❌ ${severe.length} drink/side item(s) have a severe energy-balance mismatch — this is the exact signature of a drink()/side() argument-mapping or default-formula bug. Generation aborted; NOTHING was written.`)
+    for (const s of severe) console.error(`  - ${s.id}: ${s.message}`)
+    process.exit(1)
+  }
+
+  fs.mkdirSync(OUT_DIR, { recursive: true })
   for (const [cat, items] of Object.entries(byCategory)) {
     const outPath = path.join(OUT_DIR, `${cat}.json`)
     fs.writeFileSync(outPath, JSON.stringify(items, null, 2))
@@ -138,4 +204,6 @@ function main() {
   console.log(`\n✅ Generated ${total} unique single items (${catalogBrands} brands with dedicated menus)`)
 }
 
-main()
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main()
+}

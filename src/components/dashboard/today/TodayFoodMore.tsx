@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useState, useEffect, useMemo } from 'react'
+import { useRef, useState, useEffect, useMemo, useSyncExternalStore } from 'react'
+import { toast } from 'sonner'
 import { Check, Search, X, PenLine, ScanBarcode } from 'lucide-react'
 import type { FrequentFood } from '@/lib/food-memory'
 import { primaryFoodLabel } from '@/lib/food-photography'
@@ -10,9 +11,14 @@ import AppOverlay from '@/components/ui/AppOverlay'
 
 import type { FoodSearchHit } from '@/lib/food-search'
 import { findP0FoodCandidates } from '@/lib/nutrition/p0-common-foods/resolve-p0-food'
+import { TextSearchAiFallbackController } from '@/lib/nutrition/text-search-ai-fallback-controller'
+import { fetchTextAiEstimate } from '@/lib/nutrition/text-search-ai-fallback-client'
+import { candidateToSearchHit } from '@/lib/nutrition/ai-fallback-search-hit'
+import { CONFIDENCE_BADGE } from '@/lib/nutrition/search-v2/confidence'
 
 import { BB_V2 } from '@/lib/betterbit-v2'
 import { getNutritionDayKey } from '@/lib/timezone'
+import { trackClient } from '@/lib/analytics/track-client'
 
 const DS = {
   text: BB_V2.text.primary,
@@ -87,6 +93,22 @@ export default function TodayFoodMore({
   const [showAllFrequent, setShowAllFrequent] = useState(false)
   const [selectedSearchHit, setSelectedSearchHit] = useState<FoodSearchHit | null>(null)
 
+  // Local trusted search always runs first (searchResults/nearCandidates,
+  // computed by the parent/above) — this controller only ever fires on an
+  // explicit submit (handlePrimaryAction / Enter), after BOTH have already
+  // missed. See text-search-ai-fallback-controller.ts for the cost/
+  // cancellation invariants this depends on.
+  const aiControllerRef = useRef<TextSearchAiFallbackController | null>(null)
+  if (!aiControllerRef.current) {
+    aiControllerRef.current = new TextSearchAiFallbackController(fetchTextAiEstimate)
+  }
+  const aiController = aiControllerRef.current
+  const aiPhase = useSyncExternalStore(
+    listener => aiController.subscribe(listener),
+    () => aiController.getPhase(),
+    () => aiController.getPhase()
+  )
+
   useEffect(() => {
     if (!open) return
     // Auto-focus triggers iOS keyboard zoom on <16px inputs; skip on native shell.
@@ -112,6 +134,51 @@ export default function TodayFoodMore({
     return findP0FoodCandidates(trimmed, 5)
   }, [noSearchHits, trimmed])
 
+  useEffect(() => {
+    if (noSearchHits && nearCandidates.length === 0) {
+      trackClient({ name: 'food_search_no_result', properties: {} })
+    }
+  }, [noSearchHits, nearCandidates.length, trimmed])
+
+  useEffect(() => {
+    if (hasSearch && searchResults.length > 0) {
+      trackClient({ name: 'food_search_local_hit', properties: {} })
+    }
+  }, [hasSearch, searchResults.length])
+
+  // Query text changed (or the sheet closed) — abandon any in-flight/stale
+  // AI request rather than let it resolve against a query the user has
+  // already moved past.
+  useEffect(() => {
+    aiController.reset()
+  }, [trimmed, aiController])
+
+  useEffect(() => {
+    if (!open) aiController.reset()
+  }, [open, aiController])
+
+  // AI fallback failed (or was rejected by guardrails) — fall through to the
+  // exact same manual-estimate escape hatch a no-AI miss already uses, with
+  // no extra tap required. See PART 18 of the fallback spec.
+  useEffect(() => {
+    if (aiPhase.status === 'failed' && aiPhase.query === trimmed) {
+      trackClient({ name: 'food_search_ai_fallback_failed', properties: { reason: aiPhase.reason } })
+      toast.message('暫時無法取得結果', { description: '你仍可以自行估算記錄' })
+      aiController.reset()
+      if (onCreateEstimate) onCreateEstimate(trimmed)
+      else onCreateFreeText?.(trimmed)
+    }
+  }, [aiPhase, trimmed, onCreateEstimate, onCreateFreeText, aiController])
+
+  const triggerAiFallback = async (q: string) => {
+    trackClient({ name: 'food_search_ai_fallback_started', properties: {} })
+    await aiController.trigger(q)
+    const phase = aiController.getPhase()
+    if (phase.status === 'success' && phase.query === q) {
+      trackClient({ name: 'food_search_ai_fallback_success', properties: { outcome: phase.outcome } })
+    }
+  }
+
   const toSearchHit = (item: (typeof nearCandidates)[number]['item']): FoodSearchHit => ({
     id: `p0-${item.id}`,
     name: item.name,
@@ -130,6 +197,7 @@ export default function TodayFoodMore({
   const handleClose = () => {
     setSelectedSearchHit(null)
     setShowAllFrequent(false)
+    aiController.reset()
     onClose()
   }
 
@@ -139,7 +207,26 @@ export default function TodayFoodMore({
     if (selectedSearchHit) {
       const selected = selectedSearchHit
       setSelectedSearchHit(null)
+      trackClient({ name: 'food_search_result_selected', properties: { source: selected.searchSource } })
       onPickSearch(selected)
+      return
+    }
+    if (noSearchHits && nearCandidates.length === 0) {
+      // Trusted local search (above) and the P0 near-candidate fallback both
+      // missed — this is the one intentional trigger point for AI fallback.
+      // Never called from a keystroke handler; a second tap while loading is
+      // a no-op (the controller itself also guards this).
+      if (aiPhase.status === 'success' && aiPhase.query === trimmed) {
+        const hit = candidateToSearchHit(aiPhase.candidate, aiPhase.outcome)
+        trackClient({ name: 'food_search_result_selected', properties: { source: hit.searchSource } })
+        aiController.reset()
+        onPickSearch(hit)
+        return
+      }
+      if (aiPhase.status === 'loading') return
+      if (aiPhase.status !== 'failed') {
+        void triggerAiFallback(trimmed)
+      }
       return
     }
     if (onCreateEstimate) {
@@ -281,18 +368,42 @@ export default function TodayFoodMore({
 
           {noSearchHits && nearCandidates.length === 0 && (onCreateEstimate || onCreateFreeText) && (
             <div
-              className="mb-5 py-6 px-4 text-center"
+              className="mb-5 py-6 px-4"
               style={{
                 borderTop: '1px solid rgba(142, 131, 120, 0.12)',
                 borderBottom: '1px solid rgba(142, 131, 120, 0.12)',
               }}
             >
-              <p className="text-[15px] leading-relaxed" style={{ color: DS.text, fontWeight: 500 }}>
-                找不到「{trimmed}」
-              </p>
-              <p className="text-[13px] mt-2 leading-relaxed" style={{ color: DS.textSecondary, fontWeight: 400 }}>
-                你可以先用估算方式記錄，我們會幫你算一個大概值。
-              </p>
+              {aiPhase.status === 'loading' && aiPhase.query === trimmed ? (
+                <p className="text-[15px] leading-relaxed text-center" style={{ color: DS.text, fontWeight: 500 }}>
+                  ✨ 正在幫你查找「{trimmed}」…
+                </p>
+              ) : aiPhase.status === 'success' && aiPhase.query === trimmed ? (
+                <div>
+                  <p className="text-[16px]" style={{ color: DS.text, fontWeight: 600 }}>
+                    {aiPhase.candidate.name}
+                  </p>
+                  <p className="text-[14px] mt-1" style={{ color: DS.textSecondary }}>
+                    約 {aiPhase.candidate.macros.calories ?? '—'} kcal · 蛋白質{' '}
+                    {aiPhase.candidate.macros.protein ?? '—'}g · 碳水 {aiPhase.candidate.macros.carbs ?? '—'}g · 脂肪{' '}
+                    {aiPhase.candidate.macros.fat ?? '—'}g
+                  </p>
+                  <p className="text-[12px] mt-2" style={{ color: DS.mocha, fontWeight: 500 }}>
+                    {aiPhase.outcome === 'ai_fallback'
+                      ? `${CONFIDENCE_BADGE.C.emoji} ${CONFIDENCE_BADGE.C.label} · 實際營養可能依產品規格有所差異`
+                      : `${aiPhase.candidate.nutrition_source}`}
+                  </p>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <p className="text-[15px] leading-relaxed" style={{ color: DS.text, fontWeight: 500 }}>
+                    找不到「{trimmed}」
+                  </p>
+                  <p className="text-[13px] mt-2 leading-relaxed" style={{ color: DS.textSecondary, fontWeight: 400 }}>
+                    你可以先用估算方式記錄，我們會幫你算一個大概值。
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
@@ -342,7 +453,7 @@ export default function TodayFoodMore({
           >
             <button
               type="button"
-              disabled={!trimmed}
+              disabled={!trimmed || (aiPhase.status === 'loading' && aiPhase.query === trimmed)}
               onClick={handlePrimaryAction}
               className="w-full h-14 rounded-[22px] text-[15px] flex items-center justify-center gap-2 disabled:opacity-40 active:opacity-90"
               style={{ backgroundColor: DS.mocha, color: '#FFFFFF', fontWeight: 500 }}
@@ -351,7 +462,11 @@ export default function TodayFoodMore({
               {trimmed
                 ? selectedSearchHit
                   ? `加入${targetDate === getNutritionDayKey() ? '今日' : '所選日期'}紀錄`
-                  : `建立「${trimmed}」`
+                  : noSearchHits && nearCandidates.length === 0 && aiPhase.status === 'loading' && aiPhase.query === trimmed
+                    ? '正在查找…'
+                    : noSearchHits && nearCandidates.length === 0 && aiPhase.status === 'success' && aiPhase.query === trimmed
+                      ? `加入「${aiPhase.candidate.name}」`
+                      : `建立「${trimmed}」`
                 : '輸入菜名後建立估算餐點'}
             </button>
           </div>

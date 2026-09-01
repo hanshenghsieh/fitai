@@ -235,3 +235,37 @@ export interface WeeklyFeedback {
   had_travel: boolean
   additional_notes: string | null
 }
+
+export type ActivityType = 'walking' | 'running' | 'cycling' | 'swimming' | 'strength_training' | 'other'
+
+/**
+ * User-initiated exercise record — what the user says they actually did.
+ * Distinct from DailyWorkout (an AI-suggested activity for the day, see
+ * DayPlan.workout): a suggestion never becomes one of these on its own,
+ * only a confirmed save from the Add Exercise flow does. Kept separate so
+ * "suggested" and "actually happened" are never conflated.
+ */
+export type ExerciseIntensity = 'light' | 'moderate' | 'vigorous'
+
+export interface ExerciseLog {
+  id: string
+  user_id: string
+  activity_type: ActivityType
+  activity_label: string | null
+  duration_minutes: number
+  estimated_calories: number
+  logged_date: string
+  created_at: string
+  updated_at: string
+  /**
+   * Additive (2026-08-26): the specific resolved activity name shown in the
+   * UI — e.g. "羽球" for a matched custom activity, or the raw typed text
+   * when intensity was used as a fallback. Null on rows written before this
+   * column existed; UI falls back to ACTIVITY_LABEL_ZH[activity_type] then.
+   */
+  activity_name: string | null
+  /** The MET value actually used to compute estimated_calories, frozen at write time. Null on pre-migration rows. */
+  met_value: number | null
+  /** Set only when the typed activity didn't match the catalog and the user picked an intensity instead. */
+  intensity: ExerciseIntensity | null
+}

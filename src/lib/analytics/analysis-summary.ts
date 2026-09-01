@@ -710,6 +710,11 @@ export function buildAnalysisSummary(input: AnalysisInput): AnalysisSummary {
     )
     return dinnerKcal > 0 && dinnerKcal <= 600
   }).length
+  // TODO(exercise-logs): counts completions against the prescribed-workout
+  // checklist, not actual logged activity from exercise_logs. Intentionally
+  // left as-is for this iteration — redefining "workout adherence" against
+  // real logged sessions is scoped to a dedicated follow-up once exercise_logs
+  // has enough data to be a reliable signal.
   const workoutSessions = periodCheckins.filter(c => c.workout_items?.some(w => w.completed)).length
 
   const todayKey = input.todayDate ?? format(input.anchorDate, 'yyyy-MM-dd')

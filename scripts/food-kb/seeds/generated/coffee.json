@@ -173,7 +173,7 @@
     "calories": 420,
     "protein_g": 48,
     "carbs_g": 8,
-    "fat_g": 84,
+    "fat_g": 9,
     "price": 75,
     "photo_url": "",
     "description": "星巴克 · 巧克力司康 · 估計營養（待交叉驗證）",
@@ -205,7 +205,7 @@
     "name": "豆漿（中杯）",
     "store": "星巴克",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -227,7 +227,7 @@
     "name": "米漿（中杯）",
     "store": "星巴克",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -235,11 +235,11 @@
       "coffee"
     ],
     "calories": 189,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 29,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 29,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 30,
     "photo_url": "",
     "description": "星巴克 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "coffee"
@@ -249,7 +249,7 @@
     "name": "紅茶（中杯）",
     "store": "星巴克",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1164,7 +1164,7 @@
     "name": "豆漿（中杯）",
     "store": "路易莎",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1186,7 +1186,7 @@
     "name": "米漿（中杯）",
     "store": "路易莎",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1194,11 +1194,11 @@
       "coffee"
     ],
     "calories": 175,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 27,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 30,
     "photo_url": "",
     "description": "路易莎 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "coffee"
@@ -1208,7 +1208,7 @@
     "name": "紅茶（中杯）",
     "store": "路易莎",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1979,7 +1979,7 @@
     "name": "豆漿（中杯）",
     "store": "85度C",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -2001,7 +2001,7 @@
     "name": "米漿（中杯）",
     "store": "85度C",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -2009,11 +2009,11 @@
       "coffee"
     ],
     "calories": 187,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 29,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 29,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 30,
     "photo_url": "",
     "description": "85度C · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "coffee"
@@ -2023,7 +2023,7 @@
     "name": "紅茶（中杯）",
     "store": "85度C",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -2597,7 +2597,7 @@
     "name": "豆漿（中杯）",
     "store": "cama",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -2619,7 +2619,7 @@
     "name": "米漿（中杯）",
     "store": "cama",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -2627,11 +2627,11 @@
       "coffee"
     ],
     "calories": 178,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 28,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "cama · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "coffee"
@@ -2641,7 +2641,7 @@
     "name": "紅茶（中杯）",
     "store": "cama",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -3415,7 +3415,7 @@
     "name": "豆漿（中杯）",
     "store": "伯朗咖啡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -3437,7 +3437,7 @@
     "name": "米漿（中杯）",
     "store": "伯朗咖啡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -3445,11 +3445,11 @@
       "coffee"
     ],
     "calories": 178,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 28,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "伯朗咖啡 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "coffee"
@@ -3459,7 +3459,7 @@
     "name": "紅茶（中杯）",
     "store": "伯朗咖啡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -4503,7 +4503,7 @@
     "name": "豆漿（中杯）",
     "store": "黑沃咖啡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -4525,7 +4525,7 @@
     "name": "米漿（中杯）",
     "store": "黑沃咖啡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -4533,11 +4533,11 @@
       "coffee"
     ],
     "calories": 187,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 29,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 29,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "黑沃咖啡 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "coffee"
@@ -4547,7 +4547,7 @@
     "name": "紅茶（中杯）",
     "store": "黑沃咖啡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -5641,7 +5641,7 @@
     "name": "豆漿（中杯）",
     "store": "丹堤咖啡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -5663,7 +5663,7 @@
     "name": "米漿（中杯）",
     "store": "丹堤咖啡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -5671,11 +5671,11 @@
       "coffee"
     ],
     "calories": 180,
-    "protein_g": 1,
-    "carbs_g": 4,
-    "fat_g": 28,
-    "sugar_g": 3,
-    "price": 10,
+    "protein_g": 4,
+    "carbs_g": 28,
+    "fat_g": 6,
+    "sugar_g": 20,
+    "price": 31,
     "photo_url": "",
     "description": "丹堤咖啡 · 米漿（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "coffee"
@@ -5685,7 +5685,7 @@
     "name": "紅茶（中杯）",
     "store": "丹堤咖啡",
     "source": "chain",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [

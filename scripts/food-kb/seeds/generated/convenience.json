@@ -420,7 +420,7 @@
     "name": "美式咖啡（中杯）",
     "store": "7-11",
     "source": "convenience",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -442,7 +442,7 @@
     "name": "拿鐵（中杯）",
     "store": "7-11",
     "source": "convenience",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1138,7 +1138,7 @@
     "name": "美式咖啡（中杯）",
     "store": "全家",
     "source": "convenience",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [
@@ -1160,7 +1160,7 @@
     "name": "拿鐵（中杯）",
     "store": "全家",
     "source": "convenience",
-    "category": "lunch",
+    "category": "breakfast",
     "role": "drink",
     "portionable": false,
     "tags": [

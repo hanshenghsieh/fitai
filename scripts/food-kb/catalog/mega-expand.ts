@@ -62,11 +62,11 @@ function convenienceBank(): BankRow[] {
     side('茶碗蒸', 80, 6, 4, 4, 45),
     side('薯條（小）', 180, 2, 24, 8, 35, { tags: ['fried'] }),
     side('雞塊（4塊）', 200, 12, 14, 12, 45),
-    drink('無糖綠茶（600ml）', 0, 0, 0, 25, { role: 'drink' }),
-    drink('黑豆茶（600ml）', 0, 0, 0, 25, { role: 'drink' }),
-    drink('鮮奶茶（中杯）', 220, 5, 32, 50, { role: 'drink' }),
-    drink('美式咖啡（中杯）', 10, 1, 1, 55, { role: 'drink', meal_category: 'breakfast' }),
-    drink('拿鐵（中杯）', 180, 8, 14, 75, { role: 'drink', meal_category: 'breakfast' }),
+    drink({ name: '無糖綠茶（600ml）', calories: 0, protein_g: 0, carbs_g: 0, price: 25, role: 'drink' }),
+    drink({ name: '黑豆茶（600ml）', calories: 0, protein_g: 0, carbs_g: 0, price: 25, role: 'drink' }),
+    drink({ name: '鮮奶茶（中杯）', calories: 220, protein_g: 5, carbs_g: 32, price: 50, role: 'drink' }),
+    drink({ name: '美式咖啡（中杯）', calories: 10, protein_g: 1, carbs_g: 1, price: 55, role: 'drink', meal_category: 'breakfast' }),
+    drink({ name: '拿鐵（中杯）', calories: 180, protein_g: 8, carbs_g: 14, price: 75, role: 'drink', meal_category: 'breakfast' }),
     meal('水果優格杯', 150, 6, 22, 4, 55, 'breakfast'),
     meal('燕麥杯', 200, 8, 32, 6, 65, 'breakfast'),
     meal('雞胸肉沙拉碗', 280, 32, 12, 10, 99, 'lunch'),
@@ -106,9 +106,9 @@ function breakfastBank(): BankRow[] {
     side('薯餅', 180, 2, 22, 10, 25),
     side('油條', 220, 4, 28, 12, 20),
     side('燒餅', 280, 8, 38, 10, 30),
-    drink('豆漿（中杯）', 120, 8, 10, 25, { role: 'drink', meal_category: 'breakfast' }),
-    drink('米漿（中杯）', 180, 4, 28, 6, 30, { role: 'drink', meal_category: 'breakfast' }),
-    drink('紅茶（中杯）', 80, 0, 20, 25, { role: 'drink', meal_category: 'breakfast' }),
+    drink({ name: '豆漿（中杯）', calories: 120, protein_g: 8, carbs_g: 10, price: 25, role: 'drink', meal_category: 'breakfast' }),
+    drink({ name: '米漿（中杯）', calories: 180, protein_g: 4, carbs_g: 28, fat_g: 6, price: 30, role: 'drink', meal_category: 'breakfast' }),
+    drink({ name: '紅茶（中杯）', calories: 80, protein_g: 0, carbs_g: 20, price: 25, role: 'drink', meal_category: 'breakfast' }),
     meal('蘿蔔糕（3片）', 240, 4, 38, 8, 40, 'breakfast'),
     meal('燒肉飯', 520, 22, 68, 16, 70, 'breakfast'),
     meal('雞肉飯', 480, 26, 58, 14, 65, 'breakfast'),
@@ -182,14 +182,15 @@ function bubbleteaBank(): BankRow[] {
         if (s === 2) continue
       }
       rows.push(
-        drink(
-          `${name}${sizes[s]}`,
-          Math.round(cal * scale[s]!),
-          Math.round(carb * scale[s]!),
-          Math.round(fat * scale[s]!),
-          Math.round(price * (0.85 + s * 0.1)),
-          { tags: ['bubble_tea'] }
-        )
+        drink({
+          name: `${name}${sizes[s]}`,
+          calories: Math.round(cal * scale[s]!),
+          protein_g: Math.round(pro * scale[s]!),
+          carbs_g: Math.round(carb * scale[s]!),
+          fat_g: Math.round(fat * scale[s]!),
+          price: Math.round(price * (0.85 + s * 0.1)),
+          tags: ['bubble_tea'],
+        })
       )
     }
   }
@@ -244,10 +245,10 @@ function chainMealBank(): BankRow[] {
     side('煎餃（5顆）', 220, 8, 28, 8, 80),
     side('蒜香麵包（2片）', 220, 6, 32, 8, 60),
     side('凱薩沙拉', 180, 6, 10, 14, 80),
-    drink('無糖綠茶', 0, 0, 0, 25, { role: 'drink' }),
-    drink('可樂（中杯）', 180, 0, 46, 0, 35, { role: 'drink' }),
-    drink('美式咖啡（中杯）', 10, 1, 1, 75, { role: 'drink' }),
-    drink('拿鐵（中杯）', 180, 8, 14, 95, { role: 'drink' }),
+    drink({ name: '無糖綠茶', calories: 0, protein_g: 0, carbs_g: 0, price: 25, role: 'drink' }),
+    drink({ name: '可樂（中杯）', calories: 180, protein_g: 0, carbs_g: 46, fat_g: 0, price: 35, role: 'drink' }),
+    drink({ name: '美式咖啡（中杯）', calories: 10, protein_g: 1, carbs_g: 1, price: 75, role: 'drink' }),
+    drink({ name: '拿鐵（中杯）', calories: 180, protein_g: 8, carbs_g: 14, price: 95, role: 'drink' }),
   ]
 }
 

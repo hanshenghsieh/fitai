@@ -85,6 +85,27 @@ export interface AnalyticsEventPropertiesMap {
   subscription_restored: Record<string, never>
   subscription_expired: Record<string, never>
   subscription_cancelled: Record<string, never>
+  exercise_add_started: Record<string, never>
+  exercise_logged: {
+    activity_type: string
+    duration_minutes: number
+  }
+  exercise_edited: {
+    activity_type: string
+  }
+  exercise_deleted: Record<string, never>
+  food_search_no_result: Record<string, never>
+  food_search_result_selected: {
+    source: string
+  }
+  food_search_local_hit: Record<string, never>
+  food_search_ai_fallback_started: Record<string, never>
+  food_search_ai_fallback_success: {
+    outcome: string
+  }
+  food_search_ai_fallback_failed: {
+    reason: string
+  }
 }
 
 export const ANALYTICS_EVENT_NAMES = [
@@ -106,6 +127,16 @@ export const ANALYTICS_EVENT_NAMES = [
   'subscription_restored',
   'subscription_expired',
   'subscription_cancelled',
+  'exercise_add_started',
+  'exercise_logged',
+  'exercise_edited',
+  'exercise_deleted',
+  'food_search_no_result',
+  'food_search_result_selected',
+  'food_search_local_hit',
+  'food_search_ai_fallback_started',
+  'food_search_ai_fallback_success',
+  'food_search_ai_fallback_failed',
 ] as const satisfies readonly (keyof AnalyticsEventPropertiesMap)[]
 
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number]
@@ -137,6 +168,16 @@ export const ANALYTICS_PROPERTY_ALLOWLIST: Record<AnalyticsEventName, readonly s
   subscription_restored: [],
   subscription_expired: [],
   subscription_cancelled: [],
+  exercise_add_started: [],
+  exercise_logged: ['activity_type', 'duration_minutes'],
+  exercise_edited: ['activity_type'],
+  exercise_deleted: [],
+  food_search_no_result: [],
+  food_search_result_selected: ['source'],
+  food_search_local_hit: [],
+  food_search_ai_fallback_started: [],
+  food_search_ai_fallback_success: ['outcome'],
+  food_search_ai_fallback_failed: ['reason'],
 }
 
 /**

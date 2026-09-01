@@ -7,6 +7,7 @@ export type DishMacroBandId =
   | 'fried'
   | 'drink'
   | 'salad'
+  | 'soup'
   | 'generic'
 
 export interface MacroBand {
@@ -83,6 +84,14 @@ export const MACRO_BANDS: Record<DishMacroBandId, MacroBand> = {
     fat_g: [3, 20],
     carbs_g: [5, 35],
   },
+  soup: {
+    id: 'soup',
+    label: '湯品',
+    calories: [20, 320],
+    protein_g: [0, 20],
+    fat_g: [0, 20],
+    carbs_g: [0, 40],
+  },
   generic: {
     id: 'generic',
     label: '一般餐點',
@@ -97,6 +106,13 @@ export function classifyDishBand(name: string, tags: string[] = [], role?: strin
   const n = name
   if (role === 'drink' || /奶茶|咖啡|茶$|果汁|可樂|汽水|豆漿|拿鐵|鮮奶|紅茶|綠茶|珍奶/.test(n)) return 'drink'
   if (/沙拉|輕食|蔬食/.test(n)) return 'salad'
+  // A soup side (酸辣湯/玉米濃湯/味噌湯 etc.) is naturally lower-calorie than a
+  // whole meal — without this, it falls through to 'generic' (calories
+  // [150,900]) and a legitimately low-calorie, officially-sourced soup gets
+  // graded D purely for being a soup, not for anything wrong with the data.
+  // Checked before 'dumplings' since 鍋貼/水餃 combo names can carry a
+  // trailing "+ 酸辣湯" — the combo itself is a meal, not a soup.
+  if (!/鍋貼|水餃|餃子|小籠/.test(n) && /湯$|濃湯|羹$/.test(n)) return 'soup'
   if (/水餃|鍋貼|煎餃|餃子|小籠/.test(n)) return 'dumplings'
   if (/壽司|握壽司|丼|刺身|生魚片|軍艦/.test(n)) return 'sushi'
   if (/炸|雞排|鹽酥|咔啦|薯條|排骨酥/.test(n)) return 'fried'

@@ -1,8 +1,8 @@
 # Release Gate Report
 
-Generated: 2026-07-10T09:22:18.914Z
+Generated: 2026-09-01T04:23:20.172Z
 
-## Verdict: **PASS** — automated gate clear
+## Verdict: **FAIL** — do not ship / do not ask user to test
 
 > 2 optional step(s) skipped or warned — see below.
 
@@ -10,10 +10,10 @@ Generated: 2026-07-10T09:22:18.914Z
 
 | Step | Status | Time |
 |------|--------|------|
-| Unit tests (npm test) | ✅ pass | 199696ms |
-| Regression unit tests | ✅ pass | 6845ms |
-| E2E coverage scan | ✅ pass | 851ms |
-| Button registry scan (warn only) | ⚠️ warn | 880ms |
+| Unit tests (npm test) | ❌ fail | 20322ms |
+| Regression unit tests | ✅ pass | 367ms |
+| E2E coverage scan | ❌ fail | 108ms |
+| Button registry scan (warn only) | ⚠️ warn | 103ms |
 | Food log persist E2E | ⚠️ warn | 0ms |
 
 ## Required before TestFlight handoff

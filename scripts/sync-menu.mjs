@@ -123,6 +123,8 @@ export interface ConvenienceItem {
   price: number
   photo_url: string
   description: string
+  /** Optional alternate search terms (other common spellings/names for the same drink/dish) — checked in food-search.ts alongside \`name\`. */
+  aliases?: string[]
 }
 
 export const eatOutMenu: ConvenienceItem[] = `

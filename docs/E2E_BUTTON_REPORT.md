@@ -1,6 +1,6 @@
 # E2E Button Coverage Report
 
-**Coverage:** 52/65 (80%)
+**Coverage:** 46/64 (72%)
 
 | Button | File | Status |
 |--------|------|--------|
@@ -18,7 +18,7 @@
 | undefined | src/components/dashboard/today/TodayFoodMore.tsx | pass |
 | undefined | src/components/dashboard/today/TodayFoodMore.tsx | pass |
 | undefined | src/components/dashboard/today/TodayFoodMore.tsx | pass |
-| undefined | src/components/dashboard/today/TodayFoodMore.tsx | pass |
+| undefined | src/components/dashboard/today/TodayFoodMore.tsx | fail |
 | undefined | src/components/dashboard/today/PhotoLogSheet.tsx | pass |
 | undefined | src/components/dashboard/today/PhotoLogSheet.tsx | pass |
 | undefined | src/components/dashboard/today/PhotoLogSheet.tsx | pass |
@@ -28,14 +28,13 @@
 | undefined | src/components/dashboard/BetterBitHome.tsx | pass |
 | undefined | src/components/dashboard/BetterBitHome.tsx | pass |
 | undefined | src/components/dashboard/BetterBitHome.tsx | pass |
-| undefined | src/components/dashboard/GeneratePlanButton.tsx | pass |
 | undefined | src/components/dashboard/NotificationPrompt.tsx | pass |
 | undefined | src/components/dashboard/NotificationPrompt.tsx | pass |
+| undefined | src/components/dashboard/BottomNav.tsx | fail |
+| undefined | src/components/dashboard/BottomNav.tsx | fail |
 | undefined | src/components/dashboard/BottomNav.tsx | pass |
-| undefined | src/components/dashboard/BottomNav.tsx | pass |
-| undefined | src/components/dashboard/BottomNav.tsx | pass |
-| undefined | src/components/dashboard/BottomNav.tsx | pass |
-| undefined | src/components/dashboard/BottomNav.tsx | pass |
+| undefined | src/components/dashboard/BottomNav.tsx | fail |
+| undefined | src/components/dashboard/BottomNav.tsx | fail |
 | undefined | src/components/dashboard/week/WeekTimeline.tsx | pass |
 | undefined | src/components/dashboard/week/WeekDaySheet.tsx | pass |
 | undefined | src/components/dashboard/week/WeekDaySheet.tsx | pass |

@@ -624,7 +624,13 @@ const moreChains = [
   ['清心', ['無糖綠', '仙草茶', '檸檬愛玉', '鮮奶茶', '冬瓜茶'], 'breakfast'],
   ['鮮茶道', ['無糖茶', '奶茶', '綠茶', '烏龍', '紅茶'], 'breakfast'],
   ['老賴紅茶', ['紅茶', '奶茶', '檸檬紅茶', '冬瓜茶', '仙草茶'], 'breakfast'],
-  ['春水堂', ['鐵觀音', '珍珠奶茶', '牛肉麵', '滷味', '茶葉蛋'], 'lunch'],
+  // '茶葉蛋' removed: it's a boiled egg, not a beverage or combo meal, so no
+  // baseline in this formulaic loop (drink or meal_category-based) can ever
+  // produce a realistic calorie value for it — 茶葉蛋 already has correct,
+  // explicit ~80kcal definitions elsewhere in the catalog (mega-expand.ts,
+  // gap-fill.ts, noodles-more.ts); this generic duplicate only risked
+  // shadowing them with a formula-generated number.
+  ['春水堂', ['鐵觀音', '珍珠奶茶', '牛肉麵', '滷味'], 'lunch'],
   ['鼎泰豐', ['小籠包（6顆）', '炒飯', '紅油抄手', '青菜', '酸辣湯'], 'lunch'],
   ['夏慕尼', ['香蒜牛排', '菲力牛排', '雞排', '義大利麵', '沙拉'], 'dinner'],
   ['饗食天堂', ['沙拉吧', '牛排', '壽司', '甜點', '義大利麵'], 'lunch'],
@@ -644,7 +650,14 @@ for (const [store, names, defaultCat] of moreChains) {
     const cat = name.includes('茶') || name.includes('奶茶') || name.includes('咖啡') || name.includes('麵包') || name.includes('蛋糕') || name.includes('蛋餅')
       ? 'breakfast'
       : defaultCat
-    const isDrink = name.includes('茶') || name.includes('奶茶') || name.includes('咖啡')
+    // Bug fix (menu-nutrition-integrity audit, phase 3): a plain substring
+    // check on '茶' misclassified 春水堂's '茶葉蛋' (tea egg — a boiled egg,
+    // not a beverage) as a drink, routing it through the drink calorie
+    // formula (up to 255 kcal) instead of realistic solid-food calories —
+    // regressed a search-v2 golden-set expectation once the macro-mapping
+    // fix (below) made this bad record internally consistent enough to
+    // start winning selection over the correct ~80kcal record elsewhere.
+    const isDrink = (name.includes('茶') || name.includes('奶茶') || name.includes('咖啡')) && !name.includes('蛋')
     const calBase = cat === 'breakfast' ? 220 : cat === 'lunch' ? 420 : 480
     const pro = isDrink ? 1 + (batchIdx % 3) : 14 + (batchIdx % 8) * 3
     const priceBase = cat === 'breakfast' ? 55 : cat === 'lunch' ? 99 : 120
@@ -654,7 +667,16 @@ for (const [store, names, defaultCat] of moreChains) {
       cal = 520 + (batchIdx % 9) * 45
       price = 320 + (batchIdx % 10) * 55
     }
-    add(mk(store, 'chain', cat, name, cal, pro, Math.round(cal * 0.48), Math.round(cal * 0.22), price, '連鎖餐廳營養參考', {
+    // Bug fix (menu-nutrition-integrity audit, phase 3): these were
+    // Math.round(cal * 0.48) / Math.round(cal * 0.22) — i.e. treating a
+    // calorie-share fraction as a GRAM value directly, without converting
+    // through the 4 kcal/g (carbs) and 9 kcal/g (fat) energy density. That
+    // implied ~3.9 kcal of macros per 1 declared kcal (e.g. 420 declared →
+    // ~1690 implied), a severe energy-balance mismatch across every item
+    // this loop produced — the source of the "~5 corrupted items per brand"
+    // signature spanning dozens of unrelated chains. Dividing by the energy
+    // density converts the intended calorie-share into the correct gram value.
+    add(mk(store, 'chain', cat, name, cal, pro, Math.round((cal * 0.48) / 4), Math.round((cal * 0.22) / 9), price, '連鎖餐廳營養參考', {
       role: isDrink ? 'drink' : name.includes('沙拉') || name.includes('青菜') ? 'side' : 'combo',
       portionable: name.includes('飯') || name.includes('麵') || name.includes('比薩'),
       tags: name.includes('飯') ? ['rice'] : name.includes('麵') ? ['noodle'] : [],

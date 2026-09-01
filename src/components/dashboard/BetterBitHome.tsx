@@ -74,6 +74,9 @@ import { filterFoodLogsForNutritionDay } from '@/lib/nutrition-day-food-logs'
 import { addWaterMl, resetWaterMl, resolveDailyWaterGoalMl, setWaterMl as applyWaterTotal } from '@/lib/water-log'
 import { TODAY } from '@/lib/today-design'
 import TodayWaterLog from '@/components/dashboard/today/TodayWaterLog'
+import TodayExerciseLog from '@/components/dashboard/today/TodayExerciseLog'
+import type { ExerciseDraft } from '@/components/dashboard/today/AddExerciseSheet'
+import { trackClient } from '@/lib/analytics/track-client'
 import BBCard from '@/components/ui/BBCard'
 import {
   dispatchOpenPhotoSheet,
@@ -103,8 +106,8 @@ import {
 } from '@/lib/offline-mutation-queue'
 import { zaijian } from '@/lib/copy/zaijian'
 import { invalidateMealMutation } from '@/lib/local-cache/invalidate'
-import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile } from '@/types'
-import { apiFetch } from '@/lib/api/client'
+import type { DayPlan, DailyCheckin, WorkoutCheckinItem, UserProfile, ExerciseLog } from '@/types'
+import { apiFetch, apiFetchJson } from '@/lib/api/client'
 import { moveTodayMealLogSlot } from '@/lib/today-meal-overview'
 import {
   mergeCapturedFoodLogsForDate,
@@ -232,6 +235,7 @@ export default function BetterBitHome({
   const [trackedDayKey, setTrackedDayKey] = useState(() => getNutritionDayKey())
   const syncUserId = userId
   const [waterMl, setWaterMl] = useState(checkin?.water_ml ?? 0)
+  const [exerciseLogs, setExerciseLogs] = useState<ExerciseLog[]>([])
   const [calorieBank, setCalorieBank] = useState<CalorieBankRow | null>(null)
   const [previousDayBank, setPreviousDayBank] = useState<CalorieBankRow | null>(null)
   const [userPrefs, setUserPrefs] = useState<UserSettingsPreferences | null>(null)
@@ -685,6 +689,62 @@ export default function BetterBitHome({
     commitWaterMl(resetWaterMl())
   }, [commitWaterMl])
 
+  useEffect(() => {
+    let cancelled = false
+    void apiFetchJson<{ logs: ExerciseLog[] }>(`/api/exercise-logs?date=${trackedDayKey}`)
+      .then(({ logs }) => {
+        if (!cancelled) setExerciseLogs(logs)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [trackedDayKey])
+
+  const handleAddExercise = useCallback(
+    (draft: ExerciseDraft) => {
+      void apiFetchJson<{ logs: ExerciseLog[] }>('/api/exercise-logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...draft, logged_date: trackedDayKey }),
+      })
+        .then(({ logs }) => {
+          setExerciseLogs(logs)
+          trackClient({
+            name: 'exercise_logged',
+            properties: { activity_type: draft.activity_type, duration_minutes: draft.duration_minutes },
+          })
+          toast.success('已記錄運動')
+        })
+        .catch(() => toast.error('運動紀錄暫時無法儲存，請再試一次'))
+    },
+    [trackedDayKey]
+  )
+
+  const handleEditExercise = useCallback((id: string, draft: ExerciseDraft) => {
+    void apiFetchJson<{ logs: ExerciseLog[] }>(`/api/exercise-logs/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(draft),
+    })
+      .then(({ logs }) => {
+        setExerciseLogs(logs)
+        trackClient({ name: 'exercise_edited', properties: { activity_type: draft.activity_type } })
+        toast.success('已更新運動紀錄')
+      })
+      .catch(() => toast.error('運動紀錄暫時無法更新，請再試一次'))
+  }, [])
+
+  const handleDeleteExercise = useCallback((id: string) => {
+    void apiFetchJson<{ logs: ExerciseLog[] }>(`/api/exercise-logs/${id}`, { method: 'DELETE' })
+      .then(({ logs }) => {
+        setExerciseLogs(logs)
+        trackClient({ name: 'exercise_deleted', properties: {} })
+        toast.message('已刪除運動紀錄')
+      })
+      .catch(() => toast.error('運動紀錄暫時無法刪除，請再試一次'))
+  }, [])
+
   const handleLogFood = useCallback((
     logs: FoodLogEntry[],
     nextMemory: UserMemoryMeta,
@@ -1095,6 +1155,15 @@ export default function BetterBitHome({
           onReset={handleResetWater}
         />
 
+        <TodayExerciseLog
+          logs={exerciseLogs}
+          bodyWeightKg={profile?.weight_kg}
+          onAdd={handleAddExercise}
+          onEdit={handleEditExercise}
+          onDelete={handleDeleteExercise}
+          onSheetOpened={() => trackClient({ name: 'exercise_add_started', properties: {} })}
+        />
+
         {isPending && (
           <p className="text-center text-[11px]" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>{zaijian.saving}</p>
         )}
@@ -1118,12 +1187,16 @@ export default function BetterBitHome({
               onClick={() => setExpandedWorkout(!expandedWorkout)}
             >
               <div className="min-w-0 flex-1 space-y-2">
+                <p className="text-[12px]" style={{ color: TODAY.textSecondary, fontWeight: 500 }}>
+                  今日運動建議
+                </p>
                 <p className="text-[16px]" style={{ color: TODAY.text, fontWeight: 500 }}>
                   {todayPlan.workout.type_zh}
                 </p>
                 <p className="text-[13px] leading-relaxed" style={{ color: TODAY.textSecondary, fontWeight: 400 }}>
                   約 {todayPlan.workout.estimated_duration_mins} 分鐘
                   {todayPlan.workout.calories_burned_est > 0 && ` · 預估 ${todayPlan.workout.calories_burned_est} kcal`}
+                  ・這只是建議，想動的話也可以做別的，實際做的運動記得到上面「記錄運動」
                 </p>
                 {!expandedWorkout && exercises[0] && (
                   <div className="pt-3 space-y-1" style={{ borderTop: '1px solid rgba(47, 36, 29, 0.06)' }}>

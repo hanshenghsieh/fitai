@@ -49,7 +49,14 @@ export default function AppRouteShell({ children }: { children: React.ReactNode 
   }, [pathname])
 
   return (
-    <div key={pathname} className="relative isolate min-h-0 overflow-x-hidden">
+    // No overflow-x-hidden here: setting only one axis to non-visible makes
+    // the UA compute the other axis to 'auto' too (CSS Overflow §3), turning
+    // this div into its own scroll container and hijacking position:sticky
+    // for every V2Header inside it — the header would stop tracking
+    // #app-scroll-root (the real scroller in layout.tsx) and scroll away
+    // with the content instead of staying pinned. #app-scroll-root already
+    // clips horizontal overflow, so this div doesn't need its own.
+    <div key={pathname} className="relative isolate min-h-0">
       {children}
     </div>
   )

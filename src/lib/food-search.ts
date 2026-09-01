@@ -33,7 +33,7 @@ export interface FoodSearchHit {
   initialPortionAmount?: number
   initialPortionUnit?: string
   portionLabel?: string
-  searchSource: 'official' | 'p0' | 'runtime' | 'dish'
+  searchSource: 'official' | 'p0' | 'runtime' | 'dish' | 'ai_estimate'
   sourceLabel?: string
 }
 
@@ -135,7 +135,13 @@ export function foodSearchHitForP0(
 
 function hitDedupeKey(hit: FoodSearchHit): string {
   if (hit.p0FoodId) return `p0:${hit.p0FoodId}`
-  return `${hit.searchSource}:${hit.id}`
+  // 'official' (food-kb index) and 'runtime' (direct eatOutMenu scan) can both
+  // surface the same underlying convenience-store record under the same id —
+  // they're already treated as the same confidence tier for ranking (see
+  // rankFoodSearchHit above), so they must dedupe together too, or the same
+  // item shows twice in results.
+  const bucket = hit.searchSource === 'official' || hit.searchSource === 'runtime' ? 'menu' : hit.searchSource
+  return `${bucket}:${hit.id}`
 }
 
 /** Client-safe search — merges dish, official menu, P0, then re-ranks by match quality. */
@@ -223,11 +229,18 @@ export function searchFoodMenu(query: string, limit = 8): FoodSearchHit[] {
       .map(item => {
         const name = item.name.toLowerCase()
         const store = item.store.toLowerCase()
+        const aliases = (item.aliases ?? []).map(a => a.toLowerCase())
+        // Canonical name always outranks an alias at the same match tier —
+        // exact name > exact alias > prefix name > prefix alias > substring
+        // name > substring alias > store substring (see food-search-ranking.test.ts).
         let score = 0
-        if (name === q) score += 100
-        else if (name.startsWith(q)) score += 50
-        else if (name.includes(q)) score += 30
-        else if (store.includes(q)) score += 10
+        if (name === q) score = 100
+        else if (aliases.includes(q)) score = 90
+        else if (name.startsWith(q)) score = 50
+        else if (aliases.some(a => a.startsWith(q))) score = 45
+        else if (name.includes(q)) score = 30
+        else if (aliases.some(a => a.includes(q))) score = 25
+        else if (store.includes(q)) score = 10
         else return null
         return { item, score }
       })
@@ -244,6 +257,7 @@ export function searchFoodMenu(query: string, limit = 8): FoodSearchHit[] {
         protein_g: item.protein_g,
         carbs_g: item.carbs_g,
         fat_g: item.fat_g,
+        aliases: item.aliases,
         sourceType: 'official',
         searchSource: 'runtime',
         sourceLabel: '官方資料',

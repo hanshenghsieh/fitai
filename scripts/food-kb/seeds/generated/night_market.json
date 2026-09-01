@@ -611,11 +611,11 @@
       "night_market"
     ],
     "calories": 176,
-    "protein_g": 1,
-    "carbs_g": 0,
-    "fat_g": 46,
-    "sugar_g": 0,
-    "price": 10,
+    "protein_g": 0,
+    "carbs_g": 45,
+    "fat_g": 0,
+    "sugar_g": 32,
+    "price": 35,
     "photo_url": "",
     "description": "台灣夜市 · 可樂（中杯） · 估計營養（待交叉驗證）",
     "kb_category": "night_market"

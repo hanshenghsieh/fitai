@@ -1,15 +1,15 @@
 # BetterBit App Button QA Report
 
-Generated: 2026-07-10T09:22:18.770Z
+Generated: 2026-09-01T04:23:20.165Z
 
 ## Summary
 
 | Metric | Count |
 |--------|-------|
-| Total buttons | 65 |
-| Static pass | 52 |
-| Static fail | 13 |
-| Dynamic (manual/E2E) | 65 pending manual |
+| Total buttons | 64 |
+| Static pass | 46 |
+| Static fail | 18 |
+| Dynamic (manual/E2E) | 64 pending manual |
 
 ## Methodology
 
@@ -43,7 +43,7 @@ For each button below, verify on device:
 | Today | 更多記錄-關閉 | aria-label: 關閉 | yes | manual | pass |  |  |  |
 | Today | 手動紀錄-搜尋 | onPickSearch | yes | manual | pass |  |  |  |
 | Today | 常吃紀錄 | onCommitFrequent | yes | manual | pass |  |  |  |
-| Today | 建立食物紀錄 | handleCreate | yes | manual | pass |  |  |  |
+| Today | 建立食物紀錄 | handleCreate | no | manual | fail | Missing patterns: handleCreate | P1 |  |
 | Today | 拍照-返回 | 返回 | yes | manual | pass |  |  |  |
 | Today | 拍照-關閉 | aria-label: 關閉 | yes | manual | pass |  |  |  |
 | Today | 拍照-開啟相機 | 開啟相機拍照 | yes | manual | pass |  |  |  |
@@ -53,14 +53,13 @@ For each button below, verify on device:
 | Today | 下肢重訓展開 | setExpandedWorkout | yes | manual | pass |  |  |  |
 | Today | 動作完成切換 | toggleExercise | yes | manual | pass |  |  |  |
 | Today | 動作教學 | 動作教學 | yes | manual | pass |  |  |  |
-| Today | 幫我排本週 | 幫我排本週 | yes | manual | pass |  |  |  |
 | Today | 通知-好 | 好 | yes | manual | pass |  |  |  |
 | Today | 通知-關閉 | aria-label: 關閉 | yes | manual | pass |  |  |  |
-| BottomNav | 今日 | 今日 | yes | manual | pass |  |  |  |
-| BottomNav | 本週 | 本週 | yes | manual | pass |  |  |  |
+| BottomNav | 今日 | 今日 | no | manual | fail | Missing patterns: Link | P1 |  |
+| BottomNav | 本週 | 本週 | no | manual | fail | Missing patterns: Link | P1 |  |
 | BottomNav | 拍照記錄 FAB | aria-label: 拍照記錄 | yes | manual | pass |  |  |  |
-| BottomNav | 分析 | 分析 | yes | manual | pass |  |  |  |
-| BottomNav | 我的 | 我的 | yes | manual | pass |  |  |  |
+| BottomNav | 分析 | 分析 | no | manual | fail | Missing patterns: Link | P1 |  |
+| BottomNav | 我的 | 我的 | no | manual | fail | Missing patterns: Link | P1 |  |
 | 本週 | 選擇日期 | onSelectDay | yes | manual | pass |  |  |  |
 | 本週 | 日詳情-關閉 | aria-label: 關閉 | yes | manual | pass |  |  |  |
 | 本週 | 去 Today 記今天 | 去 Today 記今天 | yes | manual | pass |  |  |  |
