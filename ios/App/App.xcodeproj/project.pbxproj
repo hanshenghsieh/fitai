@@ -322,7 +322,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 40;
+				CURRENT_PROJECT_VERSION = 41;
 				DEVELOPMENT_TEAM = 65YBSTG96W;
 				GOOGLE_IOS_CLIENT_ID = "403467297093-roq8l6b583110qqeh90rpurmugnhd3do.apps.googleusercontent.com";
 				GOOGLE_REVERSED_IOS_CLIENT_ID = "com.googleusercontent.apps.403467297093-roq8l6b583110qqeh90rpurmugnhd3do";
@@ -349,7 +349,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 40;
+				CURRENT_PROJECT_VERSION = 41;
 				DEVELOPMENT_TEAM = 65YBSTG96W;
 				GOOGLE_IOS_CLIENT_ID = "403467297093-roq8l6b583110qqeh90rpurmugnhd3do.apps.googleusercontent.com";
 				GOOGLE_REVERSED_IOS_CLIENT_ID = "com.googleusercontent.apps.403467297093-roq8l6b583110qqeh90rpurmugnhd3do";
